@@ -1,4 +1,4 @@
-package refine
+package EntRefine
 
 import (
 	"bytes"

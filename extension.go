@@ -1,4 +1,4 @@
-package refine
+package EntRefine
 
 import (
 	"entgo.io/ent/entc"
