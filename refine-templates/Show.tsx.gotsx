@@ -1,0 +1,30 @@
+{{- /* gotype: backend/ent/refine.RefineGen */ -}}
+import { useShow, useOne } from "@pankod/refine-core";
+import { Show, Typography, Tag } from "@pankod/refine-antd";
+
+import * as Interfaces from "./Interfaces";
+
+{{- range $n := $.Graph.Nodes}}
+
+export const {{$n.Name}}Show = () => {
+    const { queryResult } = useShow({
+        resource: "{{ $n.Name }}",
+        metaData: {
+            fields: {{$.FieldList $n}},
+        },
+    });
+    const { data, isLoading } = queryResult;
+    const record = data?.data
+    console.log(record);
+
+    return (
+        <Show isLoading={isLoading}>
+            {{- range $f := $n.Fields}}
+            <Typography.Title level={5}>{{ $f.Name }}</Typography.Title>
+            <Typography.Text>{ record?.{{ camel $f.Name }} }</Typography.Text>
+            {{- end }}
+        </Show>
+    );
+};
+
+{{- end}}

@@ -1,0 +1,21 @@
+{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
+import * as Lists from "./List";
+import * as Show from "./Show";
+import * as Create from "./Create";
+import * as Edit from "./Edit";
+import {
+    Icons,
+} from "@pankod/refine-antd";
+
+export const Resources = [
+    {{- range $n := $.Graph.Nodes}}
+    {
+        name: "{{ $n.Name }}",
+        list: Lists.{{ $n.Name }}List,
+        show: Show.{{ $n.Name }}Show,
+        create: Create.{{ $n.Name }}Create,
+        edit: Edit.{{ $n.Name }}Edit,
+        icon: <Icons.{{$n.Annotations.REFINE.Icon}}/>,
+    },
+    {{- end}}
+];

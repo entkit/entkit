@@ -1,0 +1,164 @@
+{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
+import React, {useState} from "react";
+import {IResourceComponentsProps} from "@pankod/refine-core";
+import * as RA from "@pankod/refine-antd";
+import * as Interfaces from "./Interfaces";
+import {Cursors} from "../graphql-relay/data-provider";
+
+{{- range $n := $.Graph.Nodes}}
+{{- $fieldsAttr := print "{" ($.FieldList $n) "}" }}
+export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
+    const [cursors, setCursors] = useState<Cursors>({
+        first: 10,
+    })
+
+    const table = RA.useTable<Interfaces.I{{$n.Name}}>({
+        resource: "{{$n.Name}}",
+        initialSorter: [
+            {
+                field: "id",
+                order: "asc",
+            },
+        ],
+        initialFilter: [
+            {
+                field: "{{$n.ID.Name}}",
+                value: null,
+                operator: "{{ default $n.ID.Annotations.REFINE.FilterOperator "eq"}}",
+            },
+            {{- range $f := $n.Fields }}
+            {{- if not $f.Annotations.REFINE.HideOnList }}
+            {
+                field: "{{$f.Name}}",
+                value: null,
+                operator: "{{ default $f.Annotations.REFINE.FilterOperator "eq"}}",
+            },
+            {{- end }}
+            {{- end }}
+        ],
+        metaData: {
+            fields: {{$.FieldList $n}},
+            cursors,
+        },
+        hasPagination: true,
+    });
+
+    const data = table.tableQueryResult.data as any
+
+    return (
+        <RA.List>
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+                <RA.Table.Column
+                    dataIndex="{{ $n.ID.Name }}"
+                    title="{{ $n.ID.Name | replace "_" " " | title }}"
+                    sorter={
+                        {multiple: 2}
+                    }
+                    render={ (value)=><RA.TextField value={value.substring(0, 5) + '...'} title={value}/> }
+                    filterDropdown={(props) => (
+                        <RA.FilterDropdown {...props}>
+                            <RA.Input />
+                        </RA.FilterDropdown>
+                    )}
+                    defaultSortOrder={RA.getDefaultSortOrder("{{ $n.ID.Name }}", table.sorter)}
+                />
+                {{- range $f := $n.Fields}}
+                {{- if not $f.Annotations.REFINE.HideOnList }}
+                <RA.Table.Column
+                    dataIndex="{{ camel $f.Name }}"
+                    title="{{ $f.Name | title }}"
+                    sorter={
+                        {multiple: 2}
+                    }
+                    render={ (value)=> {
+                        {{- if eq $f.Type.String "time.Time"}}
+                        if (value) {
+                            return <RA.DateField format="LLL" value={value}/>
+                        } else {
+                            return <RA.TextField value="Never"/>
+                        }
+                        {{- else if eq $f.Type.String "uuid.UUID"}}
+                        return <RA.TextField value={value.substring(0, 5) + '...'} title={value}/>
+                        {{- else if eq $f.Type.String "bool"}}
+                        return <RA.TextField value={value ? "Yes" : "No"}/>
+                        {{- else}}
+                        return <RA.TextField value={value}/>
+                        {{- end}}
+                    } }
+                    filterDropdown={(props) => (
+                        <RA.FilterDropdown {...props}>
+                            {{- if $f.IsEnum }}
+                            <RA.Select
+                                options={[
+                                    {{- range $v := $f.EnumValues }}
+                                    {
+                                        value: "{{$v}}",
+                                        label: "{{$v}}",
+                                    },
+                                    {{- end }}
+                                ]}
+                                style={ { width: '100%', minWidth: "100px" } }
+                                />
+                            {{- else }}
+                            <RA.Input />
+                            {{- end}}
+                        </RA.FilterDropdown>
+                    )}
+                    defaultSortOrder={RA.getDefaultSortOrder("{{ $f.Name }}", table.sorter)}
+                    />
+                {{- end }}
+                {{- end }}
+                <RA.Table.Column<Interfaces.I{{ $n.Name }}>
+                    title="Actions"
+                    dataIndex="actions"
+                    render={(_, record) => (
+                        <RA.Space>
+                            <RA.EditButton
+                                hideText
+                                size="small"
+                                recordItemId={record.id}
+                            />
+                            <RA.ShowButton
+                                hideText
+                                size="small"
+                                recordItemId={record.id}
+                            />
+                            <RA.DeleteButton
+                                hideText
+                                size="small"
+                                recordItemId={record.id}
+                            />
+                        </RA.Space>
+                    )}
+                />
+            </RA.Table>
+            <div>
+                <RA.Button
+                    disabled={!Boolean(data?.pageInfo?.hasPreviousPage)}
+                    onClick={() => {
+                        setCursors({
+                            before: data?.pageInfo?.startCursor,
+                            last: 10,
+                            after: undefined,
+                            first: undefined,
+                        })
+                    }
+                    }>{"< Prev"}
+                </RA.Button>
+                <RA.Button
+                    disabled={!Boolean(data?.pageInfo?.hasNextPage)}
+                    onClick={() => {
+                        setCursors({
+                            after: data?.pageInfo?.endCursor,
+                            first: 10,
+                            before: undefined,
+                            last: undefined,
+                        })
+                    }}>{"Next >"}
+                </RA.Button>
+            </div>
+
+        </RA.List>
+    );
+};
+{{- end}}

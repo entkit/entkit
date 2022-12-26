@@ -1,0 +1,149 @@
+{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
+import {useState} from "react";
+import * as RA from "@pankod/refine-antd";
+import * as Interfaces from "./Interfaces";
+import {Cursors} from "../graphql-relay/data-provider";
+import dayjs from "dayjs";
+
+import CodeEditor from '@uiw/react-textarea-code-editor';
+
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+{{- range $n := $.Graph.Nodes}}
+
+export const {{$n.Name}}Edit: React.FC = () => {
+    const { formProps, saveButtonProps, queryResult } = RA.useForm<Interfaces.I{{$n.Name}}>(
+        {
+            redirect: false,
+            metaData: {
+                fields: [
+                    {{- range $f := $n.Fields}}
+                    "{{ camel $f.Name}}",
+                    {{- end }}
+                    {{- range $e := $n.EdgesWithID}}
+                    {{- if $e.Unique}}
+                    {
+                        "{{ camel $e.Name }}": [ "id" ]
+                    },
+                    {{- else }}
+                    {
+                        "{{ camel $e.Name }}": [
+                            {
+                                edges: [
+                                    {
+                                        node: [ "id" ],
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {{- end }}
+                    {{- end }}
+                ],
+            }
+        }
+    );
+    {{- range $ed := $n.EdgesWithID }}
+    const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
+    {{- $titleField := "id" }}
+    {{- range $f:=$ed.Type.Fields }}
+    {{- if $f.Annotations.REFINE.TitleField }}
+    {{- $titleField = $f }}
+    {{- end }}
+
+    {{- end}}
+    const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$n.Name}}>({
+        resource: "{{ $ed.Type.Name }}",
+        optionLabel: "{{$titleField.Name}}",
+        optionValue: "id",
+        metaData:{
+            cursors: {{$ed.Name}}Cursors,
+            fields: ["id","{{$titleField.Name}}"]
+        },
+        onSearch: (value) => [
+            {
+                field: "{{$titleField.Name}}",
+                {{- $operator := "contains" }}
+                operator: "{{$operator}}",
+                value,
+            },
+        ],
+    });
+    {{- end}}
+
+    return (
+        <RA.Edit saveButtonProps={saveButtonProps}>
+            <RA.Form {...formProps} layout="vertical">
+                {{- range $f := $n.Fields}}
+                {{if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
+                <RA.Form.Item
+                    label="{{ $f.Name }}"
+                    name="{{ camel $f.Name }}"
+                    rules={[{required: {{ not $f.Optional }}}]}
+                    {{- if eq $f.Type.String "time.Time"}}
+                    getValueProps={(value) => ({
+                        value: value ? dayjs(value) : "",
+                    })}
+                    {{- end}}
+                >
+                    {{- if eq $f.Type.String "time.Time"}}
+                    <RA.DatePicker showTime={true} />
+                    {{- else if eq $f.Type.String "[]string"}}
+                    <RA.Select mode="tags" />
+                    {{- else if $f.IsEnum }}
+                    <RA.Select
+                        options={[
+                            {{- range $v := $f.EnumValues }}
+                            {
+                                value: "{{$v}}",
+                                label: "{{$v}}",
+                            },
+                            {{- end }}
+                        ]}
+                    />
+                    {{- else if hasPrefix $f.Type.String "float"}}
+                    <RA.InputNumber />
+                    {{- else if eq $f.Type.String "bool"}}
+                    <RA.Radio.Group>
+                        <RA.Radio value={true}>Yes</RA.Radio>
+                        <RA.Radio value={false}>No</RA.Radio>
+                    </RA.Radio.Group>
+                    {{- else if eq $f.Type.String "string"}}
+                    {{- if $f.Annotations.REFINE.CodeField }}
+                    <CodeEditor
+                        language="{{ default $f.Annotations.REFINE.CodeField.Language "js" }}"
+                        padding={15}
+                        style={ {
+                            fontSize: 12,
+                            backgroundColor: "#000",
+                            fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+                        } }
+                        />
+                    {{- else if $f.Annotations.REFINE.RichTextField }}
+                    <ReactQuill theme="snow"/>
+                    {{- else }}
+                    <RA.Input/>
+                    {{- end }}
+                    {{- end }}
+                </RA.Form.Item>
+                {{- end}}
+                {{- end }}
+                {{- range $edge := $n.EdgesWithID}}
+
+                {{- $gqlFieldName := print `{["` (singular $edge.Name | camel) `IDs"]}` }}
+                {{- $mode := `"multiple"` }}
+                {{- if $edge.Unique}}
+                {{- $gqlFieldName = print `"` ( $edge.Name | camel) `ID"` }}
+                {{- $mode = `undefined` }}
+                {{- end}}
+                <RA.Form.Item label="{{ $edge.Name }}" name={{ $gqlFieldName }} rules={[{required: {{ not $edge.Optional }}}]}>
+                    <RA.Select {...{{$edge.Name}}SelectProps} mode={ {{$mode}} }/>
+                </RA.Form.Item>
+                {{- end }}
+            </RA.Form>
+        </RA.Edit>
+    );
+};
+
+{{- end}}
