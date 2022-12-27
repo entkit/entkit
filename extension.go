@@ -7,20 +7,33 @@ import (
 
 type Extension struct {
 	entc.DefaultExtension
-	GeneratedResourcesDir string
+	appPath    string
+	srcDirName string
 }
 
-func New(generatedResourcesDir string) *Extension {
+// AppPath directory that contains package.json file
+func (ex *Extension) AppPath(dir string) *Extension {
+	ex.appPath = dir
+	return ex
+}
+
+// SrcDirName directory to save generated TS files
+func (ex *Extension) SrcDirName(dir string) *Extension {
+	ex.srcDirName = dir
+	return ex
+}
+
+func New() *Extension {
 	return &Extension{
-		GeneratedResourcesDir: generatedResourcesDir,
+		srcDirName: "src",
 	}
 }
 
-//func (ex Extension) Templates() []*gen.Template {
-//	return []*gen.Template{
-//		gen.MustParse(gen.NewTemplate("greet").ParseFiles("templates/many-setter.tmpl")),
-//	}
-//}
+func (ex *Extension) Templates() []*gen.Template {
+	return []*gen.Template{
+		//gen.MustParse(gen.NewTemplate("greet").ParseFiles("templates/many-setter.tmpl")),
+	}
+}
 
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{

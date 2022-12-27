@@ -1,7 +1,9 @@
-{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "edit.tsx" -}}
+
 import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
-import * as Interfaces from "./Interfaces";
+import * as Interfaces from "./interfaces";
 import {Cursors} from "../graphql-relay/data-provider";
 import dayjs from "dayjs";
 
@@ -146,4 +148,5 @@ export const {{$n.Name}}Edit: React.FC = () => {
     );
 };
 
-{{- end}}
+{{- end -}}
+{{- end -}}

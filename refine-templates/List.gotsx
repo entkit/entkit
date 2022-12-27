@@ -1,12 +1,13 @@
-{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "list.tsx" -}}
+
 import React, {useState} from "react";
 import {IResourceComponentsProps} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
-import * as Interfaces from "./Interfaces";
+import * as Interfaces from "./interfaces";
 import {Cursors} from "../graphql-relay/data-provider";
 
 {{- range $n := $.Graph.Nodes}}
-{{- $fieldsAttr := print "{" ($.FieldList $n) "}" }}
 export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
     const [cursors, setCursors] = useState<Cursors>({
         first: 10,
@@ -37,7 +38,11 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
             {{- end }}
         ],
         metaData: {
-            fields: {{$.FieldList $n}},
+            fields: [
+                {{- range $f :=  $n.Fields}}
+                "{{ $f.Name | camel }}",
+                {{- end}}
+            ],
             cursors,
         },
         hasPagination: true,
@@ -161,4 +166,5 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
         </RA.List>
     );
 };
-{{- end}}
+{{- end -}}
+{{- end -}}

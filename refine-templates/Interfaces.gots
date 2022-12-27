@@ -1,4 +1,5 @@
-{{- /* gotype: backend/ent/refine.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "interfaces.tsx" -}}
 export type UUID = string;
 {{ range $n := $.Graph.Nodes }}
 export interface I{{ $n.Name}} {
@@ -7,4 +8,5 @@ export interface I{{ $n.Name}} {
     {{ $f.Name }}: {{ $.FieldTypeName $f }};
     {{- end}}
 }
-{{ end }}
+{{- end -}}
+{{- end -}}

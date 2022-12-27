@@ -1,8 +1,9 @@
-{{- /* gotype: backend/ent/refine/gen.RefineGen */ -}}
-import * as Lists from "./List";
-import * as Show from "./Show";
-import * as Create from "./Create";
-import * as Edit from "./Edit";
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "resources.tsx" -}}
+import * as Lists from "./list";
+import * as Show from "./show";
+import * as Create from "./create";
+import * as Edit from "./edit";
 import {
     Icons,
 } from "@pankod/refine-antd";
@@ -19,3 +20,4 @@ export const Resources = [
     },
     {{- end}}
 ];
+{{- end -}}

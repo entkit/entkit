@@ -1,8 +1,9 @@
-{{- /* gotype: backend/ent/refine.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "show.tsx" -}}
 import { useShow, useOne } from "@pankod/refine-core";
 import { Show, Typography, Tag } from "@pankod/refine-antd";
 
-import * as Interfaces from "./Interfaces";
+import * as Interfaces from "./interfaces";
 
 {{- range $n := $.Graph.Nodes}}
 
@@ -10,7 +11,11 @@ export const {{$n.Name}}Show = () => {
     const { queryResult } = useShow({
         resource: "{{ $n.Name }}",
         metaData: {
-            fields: {{$.FieldList $n}},
+            fields: [
+                {{- range $f :=  $n.Fields}}
+                "{{ $f.Name | camel }}",
+                {{- end}}
+            ],
         },
     });
     const { data, isLoading } = queryResult;
@@ -27,4 +32,5 @@ export const {{$n.Name}}Show = () => {
     );
 };
 
-{{- end}}
+{{- end -}}
+{{- end -}}
