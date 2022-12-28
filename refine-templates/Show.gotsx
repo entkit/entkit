@@ -12,6 +12,7 @@ export const {{$n.Name}}Show = () => {
         resource: "{{ $n.Name }}",
         metaData: {
             fields: [
+                "{{ $n.ID.Name }}",
                 {{- range $f :=  $n.Fields}}
                 "{{ $f.Name | camel }}",
                 {{- end}}
@@ -25,7 +26,7 @@ export const {{$n.Name}}Show = () => {
     return (
         <Show isLoading={isLoading}>
             {{- range $f := $n.Fields}}
-            <Typography.Title level={5}>{{ $f.Name }}</Typography.Title>
+            <Typography.Title level={5}>{{ $f.Name | label }}</Typography.Title>
             <Typography.Text>{ record?.{{ camel $f.Name }} }</Typography.Text>
             {{- end }}
         </Show>

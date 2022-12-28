@@ -5,9 +5,10 @@ import React, {useState} from "react";
 import {IResourceComponentsProps} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
-import {Cursors} from "../graphql-relay/data-provider";
+import {Cursors} from "./data-provider";
+import truncate from "truncate";
 
-{{- range $n := $.Graph.Nodes}}
+{{ range $n := $.Graph.Nodes }}
 export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
     const [cursors, setCursors] = useState<Cursors>({
         first: 10,
@@ -28,17 +29,18 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                 operator: "{{ default $n.ID.Annotations.REFINE.FilterOperator "eq"}}",
             },
             {{- range $f := $n.Fields }}
-            {{- if not $f.Annotations.REFINE.HideOnList }}
+            {{- if not $f.Annotations.REFINE.HideOnList -}}
             {
                 field: "{{$f.Name}}",
                 value: null,
                 operator: "{{ default $f.Annotations.REFINE.FilterOperator "eq"}}",
             },
-            {{- end }}
-            {{- end }}
+            {{- end -}}
+            {{- end -}}
         ],
         metaData: {
             fields: [
+                "{{ $n.ID.Name }}",
                 {{- range $f :=  $n.Fields}}
                 "{{ $f.Name | camel }}",
                 {{- end}}
@@ -55,11 +57,11 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
             <RA.Table {...table.tableProps} pagination={false} rowKey="id">
                 <RA.Table.Column
                     dataIndex="{{ $n.ID.Name }}"
-                    title="{{ $n.ID.Name | replace "_" " " | title }}"
+                    title="{{ $n.ID.Name | label }}"
                     sorter={
                         {multiple: 2}
                     }
-                    render={ (value)=><RA.TextField value={value.substring(0, 5) + '...'} title={value}/> }
+                    render={ (value)=><RA.TextField value={truncate(value, 5)} title={value}/> }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
                             <RA.Input />
@@ -67,28 +69,28 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("{{ $n.ID.Name }}", table.sorter)}
                 />
-                {{- range $f := $n.Fields}}
+                {{- range $f := $n.Fields }}
                 {{- if not $f.Annotations.REFINE.HideOnList }}
                 <RA.Table.Column
                     dataIndex="{{ camel $f.Name }}"
-                    title="{{ $f.Name | title }}"
+                    title="{{ $f.Name | label }}"
                     sorter={
                         {multiple: 2}
                     }
                     render={ (value)=> {
-                        {{- if eq $f.Type.String "time.Time"}}
+                        {{- if eq $f.Type.String "time.Time" -}}
                         if (value) {
                             return <RA.DateField format="LLL" value={value}/>
                         } else {
                             return <RA.TextField value="Never"/>
                         }
-                        {{- else if eq $f.Type.String "uuid.UUID"}}
-                        return <RA.TextField value={value.substring(0, 5) + '...'} title={value}/>
-                        {{- else if eq $f.Type.String "bool"}}
+                        {{- else if eq $f.Type.String "uuid.UUID" -}}
+                        return <RA.TextField value={truncate(value, 5)} title={value}/>
+                        {{- else if eq $f.Type.String "bool" -}}
                         return <RA.TextField value={value ? "Yes" : "No"}/>
-                        {{- else}}
-                        return <RA.TextField value={value}/>
-                        {{- end}}
+                        {{- else -}}
+                        return <RA.TextField value={truncate(value.toString(), 64)}/>
+                        {{- end -}}
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -137,6 +139,7 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                     )}
                 />
             </RA.Table>
+
             <div>
                 <RA.Button
                     disabled={!Boolean(data?.pageInfo?.hasPreviousPage)}
@@ -162,7 +165,6 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                     }}>{"Next >"}
                 </RA.Button>
             </div>
-
         </RA.List>
     );
 };

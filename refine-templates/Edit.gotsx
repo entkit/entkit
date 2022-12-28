@@ -4,7 +4,7 @@
 import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
-import {Cursors} from "../graphql-relay/data-provider";
+import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 
 import CodeEditor from '@uiw/react-textarea-code-editor';
@@ -61,7 +61,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
         optionValue: "id",
         metaData:{
             cursors: {{$ed.Name}}Cursors,
-            fields: ["id","{{$titleField.Name}}"]
+            fields: ["{{ $n.ID.Name }}", "{{$titleField.Name}}"]
         },
         onSearch: (value) => [
             {
@@ -80,7 +80,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
                 {{- range $f := $n.Fields}}
                 {{if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
                 <RA.Form.Item
-                    label="{{ $f.Name }}"
+                    label="{{ $f.Name | label }}"
                     name="{{ camel $f.Name }}"
                     rules={[{required: {{ not $f.Optional }}}]}
                     {{- if eq $f.Type.String "time.Time"}}

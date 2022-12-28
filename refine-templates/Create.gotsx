@@ -5,7 +5,7 @@ import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
 import dayjs from "dayjs";
 import * as Interfaces from "./interfaces";
-import {Cursors} from "../graphql-relay/data-provider";
+import {Cursors} from ".//data-provider";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 
 import ReactQuill from 'react-quill';
@@ -50,7 +50,7 @@ export const {{$n.Name}}Create: React.FC = () => {
                 {{- range $f := $n.Fields}}
                 {{if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
                 <RA.Form.Item
-                    label="{{ $f.Name }}"
+                    label="{{ $f.Name | label }}"
                     name="{{ camel $f.Name }}"
                     rules={[{required: {{ not $f.Optional }}}]}
                         {{- if eq $f.Type.String "time.Time" -}}

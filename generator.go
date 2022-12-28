@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/entc/gen"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/diazoxide/ent-refine/common"
 	"log"
 	"os"
 	"path"
@@ -18,7 +19,10 @@ import (
 var (
 	//go:embed refine-templates/*
 	_templates embed.FS
-	funcMap    = template.FuncMap{}
+	_funcMap   = template.FuncMap{
+		"label": common.ToLabel,
+	}
+	funcMap = template.FuncMap{}
 
 	JsDependencies = map[string]string{
 		"pluralize":         "^8.0.0",
@@ -26,6 +30,7 @@ var (
 		"gql-query-builder": "^3.5.5",
 		"graphql-request":   "^4.3.0",
 		"graphql":           "^15.6.1",
+		"truncate":          "^3.0.0",
 	}
 
 	JsDevDependencies = map[string]string{
@@ -125,6 +130,10 @@ func (rg *RefineGen) saveFile(path string, content []byte) error {
 
 func parseT(path string) *gen.Template {
 	if len(funcMap) == 0 {
+		for k, v := range _funcMap {
+			funcMap[k] = v
+		}
+
 		for k, v := range sprig.FuncMap() {
 			funcMap[k] = v
 		}
