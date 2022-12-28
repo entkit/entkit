@@ -290,6 +290,8 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 } else if(key.endsWith("ID")){
                     cleanVars[camelCase("clear-"+key.replace("ID", ""))] = true
                     cleanVars[key] = variables[key]
+                } else if(variables[key] === null){
+                    cleanVars[camelCase("clear-"+key)] = true
                 } else{
                     cleanVars[key] = variables[key]
                 }

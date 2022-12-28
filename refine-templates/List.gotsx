@@ -24,16 +24,16 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
         ],
         initialFilter: [
             {
-                field: "{{$n.ID.Name}}",
+                field: "{{ $n.ID.Name | camel }}",
                 value: null,
-                operator: "{{ default $n.ID.Annotations.REFINE.FilterOperator "eq"}}",
+                operator: "{{ default "eq" $n.ID.Annotations.REFINE.FilterOperator }}",
             },
-            {{- range $f := $n.Fields }}
+            {{ range $f := $n.Fields }}
             {{- if not $f.Annotations.REFINE.HideOnList -}}
             {
-                field: "{{$f.Name}}",
+                field: "{{$f.Name | camel }}",
                 value: null,
-                operator: "{{ default $f.Annotations.REFINE.FilterOperator "eq"}}",
+                operator: "{{ default "eq" $f.Annotations.REFINE.FilterOperator }}",
             },
             {{- end -}}
             {{- end -}}
@@ -89,7 +89,7 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                         {{- else if eq $f.Type.String "bool" -}}
                         return <RA.TextField value={value ? "Yes" : "No"}/>
                         {{- else -}}
-                        return <RA.TextField value={truncate(value.toString(), 64)}/>
+                        return <RA.TextField value={truncate(String(value), 64)}/>
                         {{- end -}}
                     } }
                     filterDropdown={(props) => (
