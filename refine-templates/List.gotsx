@@ -10,6 +10,7 @@ import truncate from "truncate";
 
 {{ range $n := $.Graph.Nodes }}
 export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
+
     const [cursors, setCursors] = useState<Cursors>({
         first: 10,
     })
@@ -140,31 +141,59 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                 />
             </RA.Table>
 
-            <div>
+            <RA.Space style={ {marginTop: 20} }>
+                <RA.Typography.Text type="secondary">Total {data?.total || 0}</RA.Typography.Text>
                 <RA.Button
                     disabled={!Boolean(data?.pageInfo?.hasPreviousPage)}
                     onClick={() => {
-                        setCursors({
+                        setCursors((ov)=>({
+                            ...ov,
                             before: data?.pageInfo?.startCursor,
-                            last: 10,
                             after: undefined,
                             first: undefined,
-                        })
+                        }))
                     }
-                    }>{"< Prev"}
+                    }>
+                    <RA.Icons.LeftOutlined/>
+                    Prev
                 </RA.Button>
                 <RA.Button
                     disabled={!Boolean(data?.pageInfo?.hasNextPage)}
                     onClick={() => {
-                        setCursors({
-                            after: data?.pageInfo?.endCursor,
-                            first: 10,
-                            before: undefined,
-                            last: undefined,
+                        setCursors((ov)=>{
+                           return {
+                               ...ov,
+                               after: data?.pageInfo?.endCursor,
+                               before: undefined,
+                               last: undefined,
+                           }
                         })
-                    }}>{"Next >"}
+                    }}>
+                    Next
+                    <RA.Icons.RightOutlined/>
                 </RA.Button>
-            </div>
+                <RA.Select
+                    labelInValue
+                    defaultValue={ { value: 10, label: '10 / page' } }
+                    style={ { width: 110 } }
+                    onChange={(value)=>{
+                        setCursors((ov)=>({
+                            ...ov,
+                            // Return to first page
+                            before: undefined,
+                            after: undefined,
+                            // Set per page value
+                            first: value.value,
+                        }))
+                    }}
+                    options={[
+                        {value: 10, label: '10 / page'},
+                        {value: 20, label: '20 / page'},
+                        {value: 50, label: '50 / page'},
+                        {value: 100, label: '100 / page'},
+                    ]}
+                />
+            </RA.Space>
         </RA.List>
     );
 };
