@@ -8,6 +8,7 @@ type CodeFieldOptions struct {
 
 type RefineAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`
+	ImageField     bool              `json:"ImageField,omitempty"`
 	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`
 	RichTextField  bool              `json:"RichTextField,omitempty"`
 	HideOnList     bool              `json:"HideOnList,omitempty"`
@@ -107,6 +108,13 @@ func TitleField() RefineAnnotation {
 		TitleField: true,
 	}
 }
+
+func ImageField() RefineAnnotation {
+	return RefineAnnotation{
+		ImageField: true,
+	}
+}
+
 func RichTextField() RefineAnnotation {
 	return RefineAnnotation{
 		RichTextField: true,

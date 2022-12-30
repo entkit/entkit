@@ -90,8 +90,12 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                         {{- else if eq $f.Type.String "bool" -}}
                         return <RA.TextField value={value ? "Yes" : "No"}/>
                         {{- else -}}
+                        {{- if $f.Annotations.REFINE.ImageField }}
+                        return <RA.Image width={48} src={value}/>
+                        {{- else }}
                         return <RA.TextField value={truncate(String(value), 64)}/>
-                        {{- end -}}
+                        {{- end }}
+                        {{- end }}
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>

@@ -28,11 +28,13 @@ opts := []entc.Option{
 * TitleField (field)
 * CodeField (field)
 * RichTextField (field)
+* ImageField (field)
 * HideOnList (field)
 * HideOnShow (field)
 * HideOnForm (field)
 * FilterOperator (field) `EntRefine.FilterOperator("contains")`
 * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
+* Main image field for entity (entity) **[not supporting yet]**
 
 ## Getting ready to use 
 1. After configuration regenerate Ent.
