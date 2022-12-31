@@ -15,6 +15,8 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
         first: 10,
     })
 
+    const [perPage, setPerPage] = useState<number>(10)
+
     const table = RA.useTable<Interfaces.I{{$n.Name}}>({
         resource: "{{$n.Name}}",
         initialSorter: [
@@ -153,6 +155,7 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                         setCursors((ov)=>({
                             ...ov,
                             before: data?.pageInfo?.startCursor,
+                            last: perPage,
                             after: undefined,
                             first: undefined,
                         }))
@@ -168,6 +171,7 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                            return {
                                ...ov,
                                after: data?.pageInfo?.endCursor,
+                               first: perPage,
                                before: undefined,
                                last: undefined,
                            }
@@ -181,13 +185,14 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
                     defaultValue={ { value: 10, label: '10 / page' } }
                     style={ { width: 110 } }
                     onChange={(value)=>{
+                        setPerPage(value.value)
                         setCursors((ov)=>({
                             ...ov,
                             // Return to first page
+                            first: value.value,
+                            last: undefined,
                             before: undefined,
                             after: undefined,
-                            // Set per page value
-                            first: value.value,
                         }))
                     }}
                     options={[

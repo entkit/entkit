@@ -1,0 +1,45 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "search-component.tsx" -}}
+
+import {useState, useEffect} from "react";
+import * as RA from "@pankod/refine-antd";
+import debounce from "lodash/debounce";
+
+interface IOptionGroup {
+    value: string;
+    label: string | React.ReactNode;
+}
+
+interface IOptions {
+    label: string | React.ReactNode;
+    options: IOptionGroup[];
+}
+
+export const SearchComponent: React.FC = () => {
+    const [options, setOptions] = useState<IOptions[]>([]);
+    const [value, setValue] = useState<string>("");
+
+    return (
+        <RA.AutoComplete
+            style={
+                {
+                    width: "100%",
+                    maxWidth: "550px",
+                }
+            }
+            options={options}
+            filterOption={false}
+            onSearch={debounce(
+                (value: string) => setValue(value),
+                300,
+            )}
+        >
+            <RA.Input
+                size="large"
+                placeholder="Search"
+                suffix={<RA.Icons.SearchOutlined/>}
+            />
+        </RA.AutoComplete>
+    )
+}
+{{- end }}

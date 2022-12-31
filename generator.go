@@ -31,20 +31,23 @@ var (
 		"graphql-request":   "^4.3.0",
 		"graphql":           "^15.6.1",
 		"truncate":          "^3.0.0",
+		"lodash":            "^4.17.21",
 	}
 
 	JsDevDependencies = map[string]string{
 		"@types/pluralize": "^0.0.29",
+		"@types/lodash":    "^4.14.171",
 	}
 
-	RefineCreateTemplate       = parseT("refine-templates/Create.gotsx")
-	RefineEditTemplate         = parseT("refine-templates/Edit.gotsx")
-	RefineListTemplate         = parseT("refine-templates/List.gotsx")
-	RefineResourcesTemplate    = parseT("refine-templates/Resources.gotsx")
-	RefineShowTemplate         = parseT("refine-templates/Show.gotsx")
-	RefineInterfacesTemplate   = parseT("refine-templates/Interfaces.gots")
-	RefineDataProviderTemplate = parseT("refine-templates/DataProvider.gots")
-	AllTemplates               = []*gen.Template{
+	RefineCreateTemplate          = parseT("refine-templates/Create.gotsx")
+	RefineEditTemplate            = parseT("refine-templates/Edit.gotsx")
+	RefineListTemplate            = parseT("refine-templates/List.gotsx")
+	RefineResourcesTemplate       = parseT("refine-templates/Resources.gotsx")
+	RefineShowTemplate            = parseT("refine-templates/Show.gotsx")
+	RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
+	RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
+	RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
+	AllTemplates                  = []*gen.Template{
 		RefineCreateTemplate,
 		RefineEditTemplate,
 		RefineListTemplate,
@@ -52,6 +55,7 @@ var (
 		RefineShowTemplate,
 		RefineInterfacesTemplate,
 		RefineDataProviderTemplate,
+		RefineSearchComponentTemplate,
 	}
 )
 
