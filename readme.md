@@ -14,6 +14,15 @@ import (
 )
 
 func main() {
+	gqlEx, err := entgql.NewExtension(
+		// Make sure that EntGql configs are wrapped
+		EntRefine.EntgqlExtensionOptionsWrapper(
+			entgql.WithConfigPath("./gqlgen.yml"),
+			entgql.WithSchemaGenerator(),
+			entgql.WithSchemaPath("./graphql/ent.graphql"),
+			entgql.WithWhereInputs(true),
+		)...,
+	)
 	//...
 	opts := []entc.Option{
 		entc.Extensions(
@@ -26,7 +35,6 @@ func main() {
 	err = entc.Generate(schemaPath, config, opts...)
 	//...
 }
-
 ```
 
 ## Supporting annotations
@@ -86,6 +94,7 @@ func main() {
 Querying all fields with your defined operator (**FilterOperator Annotation**) included UUID
 
 #### Root App
+
 ```tsx
 function App() {
     return (
@@ -99,6 +108,7 @@ function App() {
 ```
 
 #### Your Header component
+
 ```tsx
 import {SearchComponent} from "../../ent-refine/search-component";
 
