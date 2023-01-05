@@ -1,0 +1,17 @@
+directive @hasPermissions(permissions: [String!]!) on OBJECT | FIELD_DEFINITION
+
+extend type Query {
+    """
+    This field is an example of extending the built-in Query type from Ent.
+    """
+    ping: String!
+}
+
+type Mutation {
+    createTodo(input: String!): String!
+    clearTodos: Custom!
+}
+
+type Custom {
+    info: String!
+}

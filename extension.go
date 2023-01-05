@@ -1,8 +1,23 @@
 package EntRefine
 
 import (
+	"embed"
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"github.com/Masterminds/sprig/v3"
+	"github.com/diazoxide/ent-refine/common"
+	"text/template"
+)
+
+var (
+	//go:embed templates/*
+	_templates embed.FS
+
+	_funcMap = template.FuncMap{
+		"label": common.ToLabel,
+	}
+	funcMap = template.FuncMap{}
 )
 
 type Extension struct {
@@ -24,14 +39,36 @@ func (ex *Extension) SrcDirName(dir string) *Extension {
 }
 
 func New() *Extension {
+	if len(funcMap) == 0 {
+		for k, v := range _funcMap {
+			funcMap[k] = v
+		}
+
+		for k, v := range sprig.FuncMap() {
+			funcMap[k] = v
+		}
+
+		for k, v := range gen.Funcs {
+			funcMap[k] = v
+		}
+
+		for k, v := range entgql.TemplateFuncs {
+			funcMap[k] = v
+		}
+	}
+
 	return &Extension{
 		srcDirName: "src",
 	}
 }
 
+func (ex *Extension) Annotations() []entc.Annotation {
+	return []entc.Annotation{}
+}
+
 func (ex *Extension) Templates() []*gen.Template {
 	return []*gen.Template{
-		//gen.MustParse(gen.NewTemplate("greet").ParseFiles("templates/many-setter.tmpl")),
+		gen.MustParse(gen.NewTemplate("greet").Funcs(funcMap).ParseFS(_templates, "templates/search_query_apply.tmpl")),
 	}
 }
 

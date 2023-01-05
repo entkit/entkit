@@ -1,9 +1,13 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "search-component.tsx" -}}
-
 import {useState, useEffect} from "react";
 import * as RA from "@pankod/refine-antd";
+import {
+    useList,
+} from "@pankod/refine-core";
+import * as Interfaces from "./interfaces"
 import debounce from "lodash/debounce";
+import RefineReactRouter from "@pankod/refine-react-router-v6";
 
 interface IOptionGroup {
     value: string;
@@ -15,9 +19,104 @@ interface IOptions {
     options: IOptionGroup[];
 }
 
+const { Link } = RefineReactRouter;
+const { Text } = RA.Typography;
+
 export const SearchComponent: React.FC = () => {
     const [options, setOptions] = useState<IOptions[]>([]);
     const [value, setValue] = useState<string>("");
+
+    const renderTitle = (title: string) => (
+        <RA.Typography.Title>
+            <RA.Typography.Text style={
+                { fontSize: "16px" }
+            }>{title}</RA.Typography.Text>
+            {{/*<Link to={`/${title.toLowerCase()}`}>More</Link>*/}}
+        </RA.Typography.Title>
+    );
+
+    const renderItem = (title: string, imageUrl: string|null, link: string) => ({
+        value: title,
+        key: link,
+        label: (
+            <Link key={title+link} to={link} style={
+                { display: "flex", alignItems: "center" }
+            }>
+                { imageUrl ? <RA.Avatar size={48} src={imageUrl} style={
+                    { minWidth: "48px" }
+                } /> : <RA.Icons.FileImageOutlined style={ {fontSize: '48px'} } />}
+                <Text style={
+                    { marginLeft: "16px" }
+                }>{title}</Text>
+            </Link>
+        ),
+    });
+
+    {{- range $n := $.Graph.Nodes }}
+
+    {{- $titleField := $n.ID }}
+    {{- range $f := $n.Fields }}
+    {{- if $f.Annotations.REFINE.TitleField }}
+    {{- $titleField = $f }}
+    {{- end }}
+    {{- end }}
+
+    {{- $mainImageField := "" }}
+    {{- range $f := $n.Fields }}
+    {{- if $f.Annotations.REFINE.MainImageField }}
+    {{- $mainImageField = camel $f.Name }}
+    {{- end }}
+    {{- end }}
+
+    const { refetch: refetch{{ $n.Name }} } = useList<Interfaces.I{{ $n.Name }}>({
+        resource: "{{ $n.Name }}",
+        metaData: {
+            fields: [
+                "{{$n.ID.Name}}",
+                "{{camel $titleField.Name}}",
+                {{- if not (empty $mainImageField)}}
+                "{{$mainImageField}}",
+                {{- end }}
+            ],
+            searchQuery: value,
+        },
+        queryOptions: {
+            enabled: false,
+            onSuccess: (data) => {
+                const storeOptionGroup = data.data.map((item) =>
+                    renderItem(
+                        item.{{ default "id" $titleField.Name }},
+                        {{- if not (empty $mainImageField) }}
+                        `${item.{{$mainImageField}}}`,
+                        {{- else }}
+                        null,
+                        {{- end }}
+                        `/{{$n.Name}}/show/${item.{{ $n.ID.Name}}}`,
+                    ),
+                );
+                if (storeOptionGroup.length > 0) {
+                    setOptions((prevOptions) => [
+                        ...prevOptions,
+                        {
+                            label: renderTitle("{{$n.Name}}"),
+                            options: storeOptionGroup,
+                        },
+                    ]);
+                }
+            },
+        },
+    });
+    {{- end }}
+
+    useEffect(() => {
+        setOptions([]);
+        if(value.length < 3){
+            return
+        }
+        {{- range $n := $.Graph.Nodes }}
+        refetch{{$n.Name}}();
+        {{- end }}
+    }, [value]);
 
     return (
         <RA.AutoComplete
@@ -42,4 +141,5 @@ export const SearchComponent: React.FC = () => {
         </RA.AutoComplete>
     )
 }
-{{- end }}
+
+{{- end -}}

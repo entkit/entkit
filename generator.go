@@ -7,22 +7,15 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/entc/gen"
-	"github.com/Masterminds/sprig/v3"
-	"github.com/diazoxide/ent-refine/common"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
-	"text/template"
 )
 
 var (
 	//go:embed refine-templates/*
-	_templates embed.FS
-	_funcMap   = template.FuncMap{
-		"label": common.ToLabel,
-	}
-	funcMap = template.FuncMap{}
+	_refineTemplates embed.FS
 
 	JsDependencies = map[string]string{
 		"pluralize":         "^8.0.0",
@@ -37,25 +30,6 @@ var (
 	JsDevDependencies = map[string]string{
 		"@types/pluralize": "^0.0.29",
 		"@types/lodash":    "^4.14.171",
-	}
-
-	RefineCreateTemplate          = parseT("refine-templates/Create.gotsx")
-	RefineEditTemplate            = parseT("refine-templates/Edit.gotsx")
-	RefineListTemplate            = parseT("refine-templates/List.gotsx")
-	RefineResourcesTemplate       = parseT("refine-templates/Resources.gotsx")
-	RefineShowTemplate            = parseT("refine-templates/Show.gotsx")
-	RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
-	RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
-	RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
-	AllTemplates                  = []*gen.Template{
-		RefineCreateTemplate,
-		RefineEditTemplate,
-		RefineListTemplate,
-		RefineResourcesTemplate,
-		RefineShowTemplate,
-		RefineInterfacesTemplate,
-		RefineDataProviderTemplate,
-		RefineSearchComponentTemplate,
 	}
 )
 
@@ -77,6 +51,7 @@ type RefineGen struct {
 	Entities  []ent.Interface
 	Graph     *gen.Graph
 	SkipModes SkipModes
+	Ops       []gen.Op
 }
 
 func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
@@ -89,6 +64,23 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 			SkipMutationUpdateInput: entgql.SkipMutationUpdateInput,
 			SkipOrderField:          entgql.SkipOrderField,
 			SkipWhereInput:          entgql.SkipWhereInput,
+		},
+		Ops: []gen.Op{
+			gen.EQ,
+			gen.NEQ,
+			gen.GT,
+			gen.GTE,
+			gen.LT,
+			gen.LTE,
+			gen.IsNil,
+			gen.NotNil,
+			gen.In,
+			gen.NotIn,
+			gen.EqualFold,
+			gen.Contains,
+			gen.ContainsFold,
+			gen.HasPrefix,
+			gen.HasSuffix,
 		},
 	}
 	return rg
@@ -133,30 +125,32 @@ func (rg *RefineGen) saveFile(path string, content []byte) error {
 }
 
 func parseT(path string) *gen.Template {
-	if len(funcMap) == 0 {
-		for k, v := range _funcMap {
-			funcMap[k] = v
-		}
-
-		for k, v := range sprig.FuncMap() {
-			funcMap[k] = v
-		}
-
-		for k, v := range gen.Funcs {
-			funcMap[k] = v
-		}
-
-		for k, v := range entgql.TemplateFuncs {
-			funcMap[k] = v
-		}
-	}
-
 	return gen.MustParse(gen.NewTemplate(path).
 		Funcs(funcMap).
-		ParseFS(_templates, path))
+		ParseFS(_refineTemplates, path))
 }
 
 func (rg *RefineGen) Generate() {
+	var (
+		RefineCreateTemplate          = parseT("refine-templates/Create.gotsx")
+		RefineEditTemplate            = parseT("refine-templates/Edit.gotsx")
+		RefineListTemplate            = parseT("refine-templates/List.gotsx")
+		RefineResourcesTemplate       = parseT("refine-templates/Resources.gotsx")
+		RefineShowTemplate            = parseT("refine-templates/Show.gotsx")
+		RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
+		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
+		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
+		AllTemplates                  = []*gen.Template{
+			RefineCreateTemplate,
+			RefineEditTemplate,
+			RefineListTemplate,
+			RefineResourcesTemplate,
+			RefineShowTemplate,
+			RefineInterfacesTemplate,
+			RefineDataProviderTemplate,
+			RefineSearchComponentTemplate,
+		}
+	)
 	for _, t := range AllTemplates {
 		rg.rendAndSave(t)
 	}

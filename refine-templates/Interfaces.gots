@@ -5,7 +5,7 @@ export type UUID = string;
 export interface I{{ $n.Name}} {
     id: UUID,
     {{- range $f := $n.Fields }}
-    {{ $f.Name }}: {{ $.FieldTypeName $f }};
+    {{ camel $f.Name }}: {{ $.FieldTypeName $f }};
     {{- end}}
 }
 {{- end -}}

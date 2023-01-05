@@ -1,26 +1,32 @@
-## Generate admin dashboard with Refine.js by ent definitions. 
+## Generate admin dashboard with Refine.js by ent definitions.
 
 > **Important:** using graphql as a data-provider interface **(GQL extension is mandatory)**
 
 Add extension to `entc.go`
+
 ```go
+package main
+
 import (
-    ...
+	//...
 	"entgo.io/contrib/entgql"
 	"github.com/diazoxide/ent-refine"
 )
 
-opts := []entc.Option{
-    entc.Extensions(
-        // GQL extension is mandatory
-        gqlEx,
-        // EntRefine configuration
-        EntRefine.
-            New().
-            AppPath(filepath.Join("..", "refine")),
-    ),
+func main() {
+	//...
+	opts := []entc.Option{
+		entc.Extensions(
+			// GQL extension is mandatory
+			gqlEx,
+			// EntRefine configuration
+			EntRefine.New().AppPath(filepath.Join("..", "refine")),
+		),
+	}
+	err = entc.Generate(schemaPath, config, opts...)
+	//...
 }
-...
+
 ```
 
 ## Supporting annotations
@@ -29,14 +35,15 @@ opts := []entc.Option{
 * CodeField (field)
 * RichTextField (field)
 * ImageField (field)
+* MainImageField (field)
 * HideOnList (field)
 * HideOnShow (field)
 * HideOnForm (field)
 * FilterOperator (field) `EntRefine.FilterOperator("contains")`
 * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
-* Main image field for entity (entity) **[not supporting yet]**
 
-## Getting ready to use 
+## Getting ready to use
+
 1. After configuration regenerate Ent.
 2. Your package.json file is changed so run `npm install` to get deps.
 3. Check directory of refine application. On src directory you can find `ent-refine` folder with generated resources.
@@ -71,3 +78,46 @@ opts := []entc.Option{
     ```
 5. Run `npm run dev`
 6. Ready
+
+## Search Component `<SearchComponent/>`
+
+### How it works?
+
+Querying all fields with your defined operator (**FilterOperator Annotation**) included UUID
+
+#### Root App
+```tsx
+function App() {
+    return (
+        <Refine
+            //...
+            Header={Header}
+            //...
+        />
+    );
+}
+```
+
+#### Your Header component
+```tsx
+import {SearchComponent} from "../../ent-refine/search-component";
+
+export const Header: React.FC = () => {
+    const screens = useBreakpoint();
+    return (
+        <AntdHeader style={{
+            padding: "0 24px",
+            background: "white",
+        }}>
+            <Row align="middle"
+                 style={{
+                     justifyContent: screens.sm ? "space-between" : "end",
+                 }}>
+                <Col xs={0} sm={12}>
+                    <SearchComponent/>
+                </Col>
+            </Row>
+        </AntdHeader>
+    );
+};
+```

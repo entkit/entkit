@@ -17,6 +17,8 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
 
     const [perPage, setPerPage] = useState<number>(10)
 
+    {{ $allFields := append $n.Fields $n.ID }}
+
     const table = RA.useTable<Interfaces.I{{$n.Name}}>({
         resource: "{{$n.Name}}",
         initialSorter: [
@@ -26,17 +28,12 @@ export const {{$n.Name}}List :React.FC<IResourceComponentsProps> = () => {
             },
         ],
         initialFilter: [
-            {
-                field: "{{ $n.ID.Name | camel }}",
-                value: null,
-                operator: "{{ default "eq" $n.ID.Annotations.REFINE.FilterOperator }}",
-            },
-            {{ range $f := $n.Fields }}
+            {{ range $f := $allFields }}
             {{- if not $f.Annotations.REFINE.HideOnList -}}
             {
                 field: "{{$f.Name | camel }}",
                 value: null,
-                operator: "{{ default "eq" $f.Annotations.REFINE.FilterOperator }}",
+                operator: "{{ lower (default "EQ" $f.Annotations.REFINE.FilterOperator) }}",
             },
             {{- end -}}
             {{- end -}}

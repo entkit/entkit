@@ -32,8 +32,8 @@ export const genereteSort = (sort?: CrudSorting) => {
     return [];
 };
 
-export const generateFilter = (filters?: CrudFilters) => {
-    const queryFilters: { [key: string]: any } = {};
+export const generateFilter = (filters?: CrudFilters): Record<string, any> => {
+    const queryFilters: Record<string, any>  = {};
 
     if (filters) {
         filters.map((filter) => {
@@ -43,23 +43,26 @@ export const generateFilter = (filters?: CrudFilters) => {
                 "field" in filter
             ) {
                 const { field, operator, value } = filter;
-
                 if (operator === "eq") {
-                    queryFilters[`${field}`] = value;
+                    queryFilters[camelCase(`${field}`, {preserveConsecutiveUppercase: true})] = value;
                 } else {
-                    queryFilters[camelCase(`${field}_${operator}`)] = value;
+                    queryFilters[camelCase(`${field}_${operator}`, {preserveConsecutiveUppercase: true})] = value;
                 }
             } else {
                 const value = filter.value as LogicalFilter[];
-
                 const orFilters: any[] = [];
                 value.map((val) => {
-                    orFilters.push({
-                        [`${val.field}_${val.operator}`]: val.value,
-                    });
+                    if (val.operator === "eq") {
+                        orFilters.push({
+                            [ camelCase(`${val.field}`, {preserveConsecutiveUppercase: true})]: val.value,
+                        });
+                    } else {
+                        orFilters.push({
+                            [ camelCase(`${val.field}_${val.operator}`, {preserveConsecutiveUppercase: true})]: val.value,
+                        });
+                    }
                 });
-
-                queryFilters["_or"] = orFilters;
+                queryFilters["or"] = orFilters;
             }
         });
     }
@@ -129,7 +132,6 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
             const where = generateFilter(filters);
 
 
-
             const pluralRes = pluralize.plural(resource);
             const camelRes = camelCase(pluralRes, {preserveConsecutiveUppercase: true});
 
@@ -141,6 +143,11 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                     // ...metaData?.variables,
                     // sort: sortBy,
                     // where: { value: filterBy, type: "JSON" },
+                    q: metaData?.searchQuery,
+                    where: {
+                        type: resource+"WhereInput",
+                        value: where,
+                    },
                     ...(hasPagination ? {
                         after: {
                             type: "Cursor",
@@ -161,10 +168,6 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                             type: "Int",
                             value: metaData?.cursors?.last,
                             required: false
-                        },
-                        where: {
-                            type: resource+"WhereInput",
-                            value: where,
                         },
                     } : {})
                 },
@@ -296,7 +299,6 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                     cleanVars[key] = variables[key]
                 }
             }
-            console.log("CV",cleanVars)
             const { query, variables: gqlVariables } = gql.mutation({
                 operation,
                 variables: {

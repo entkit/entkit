@@ -1,0 +1,46 @@
+{{- /* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */ -}}
+{{- /* gotype: entgo.io/ent/entc/gen.Graph */ -}}
+
+{{- define "serach_query_apply" -}}
+
+{{- /* Add the base header for the generated file */ -}}
+
+{{ template "header" $ }}
+
+import "context"
+
+{{ range $n := $.Nodes }}
+	{{- $builder := print $n.Name "WhereInput" }}
+	{{- $receiver := receiver $builder }}
+
+	func ({{$receiver}} *{{$n.Name}}WhereInput) ApplySearchQuery(q *string) *{{$n.Name}}WhereInput {
+		if {{$receiver}} == nil{
+			{{$receiver}} = &{{$n.Name}}WhereInput{}
+		}
+
+		if(q == nil){
+			return {{$receiver}}
+		}
+
+		var orPredicates []predicate.{{$n.Name}}
+
+		{{- $allFields := append $n.Fields $n.ID }}
+		{{- range $f := $allFields }}
+		{{- $operator := default "EQ" $f.Annotations.REFINE.FilterOperator }}
+		{{- if $f.IsUUID }}
+		// id uuid Field
+		u, err := uuid.Parse(*q)
+		if err == nil {
+			orPredicates = append(orPredicates, {{$n.Package}}.{{ pascal (print $f.Name "-" $operator) }}(u))
+		}
+		{{- else if $f.IsString}}
+			orPredicates = append(orPredicates, {{$n.Package}}.{{ pascal (print $f.Name "-" $operator) }}(*q))
+		{{- end }}
+		{{- end }}
+		{{$receiver}}.AddPredicates({{$n.Package}}.Or(orPredicates...))
+		return {{$receiver}}
+	}
+
+{{ end }}
+
+{{ end }}

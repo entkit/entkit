@@ -1,6 +1,9 @@
 package EntRefine
 
-import "entgo.io/ent/schema"
+import (
+	"entgo.io/ent/entc/gen"
+	"entgo.io/ent/schema"
+)
 
 type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
@@ -9,6 +12,9 @@ type CodeFieldOptions struct {
 type RefineAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`
 	ImageField     bool              `json:"ImageField,omitempty"`
+	Prefix         string            `json:"Prefix,omitempty"`
+	Suffix         string            `json:"Suffix,omitempty"`
+	MainImageField bool              `json:"MainImageField,omitempty"`
 	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`
 	RichTextField  bool              `json:"RichTextField,omitempty"`
 	HideOnList     bool              `json:"HideOnList,omitempty"`
@@ -49,9 +55,11 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 	if ant.HideOnList {
 		ra.HideOnList = ant.HideOnList
 	}
+
 	if ant.FilterOperator != nil {
 		ra.FilterOperator = ant.FilterOperator
 	}
+
 	if ant.Icon != nil {
 		ra.Icon = ant.Icon
 	}
@@ -115,6 +123,13 @@ func ImageField() RefineAnnotation {
 	}
 }
 
+func MainImageField() RefineAnnotation {
+	return RefineAnnotation{
+		MainImageField: true,
+		ImageField:     true,
+	}
+}
+
 func RichTextField() RefineAnnotation {
 	return RefineAnnotation{
 		RichTextField: true,
@@ -133,8 +148,9 @@ func Icon(icon string) RefineAnnotation {
 	}
 }
 
-func FilterOperator(operator string) RefineAnnotation {
+func FilterOperator(operator gen.Op) RefineAnnotation {
+	opName := operator.Name()
 	return RefineAnnotation{
-		FilterOperator: &operator,
+		FilterOperator: &opName,
 	}
 }
