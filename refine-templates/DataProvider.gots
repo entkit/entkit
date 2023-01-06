@@ -107,10 +107,10 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
             for (const property in data) {
                 if (data?.[property]?.["edges"]){
                     data[pluralize.singular(property)+"IDs"] = data[property]["edges"].map((e:any)=>e.node["id"])
-                    delete data[property]
+                    //delete data[property]
                 } else if (data?.[property]?.["id"]){
                     data[property+"ID"] = data?.[property]?.["id"]
-                    delete data[property]
+                    //delete data[property]
                 }
             }
 

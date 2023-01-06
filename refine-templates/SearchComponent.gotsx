@@ -54,19 +54,8 @@ export const SearchComponent: React.FC = () => {
 
     {{- range $n := $.Graph.Nodes }}
 
-    {{- $titleField := $n.ID }}
-    {{- range $f := $n.Fields }}
-    {{- if $f.Annotations.REFINE.TitleField }}
-    {{- $titleField = $f }}
-    {{- end }}
-    {{- end }}
-
-    {{- $mainImageField := "" }}
-    {{- range $f := $n.Fields }}
-    {{- if $f.Annotations.REFINE.MainImageField }}
-    {{- $mainImageField = camel $f.Name }}
-    {{- end }}
-    {{- end }}
+    {{- $titleField := (ER_titleField $n) }}
+    {{- $mainImageField := (ER_mainImageField $n) -}}
 
     const { refetch: refetch{{ $n.Name }} } = useList<Interfaces.I{{ $n.Name }}>({
         resource: "{{ $n.Name }}",
@@ -75,7 +64,7 @@ export const SearchComponent: React.FC = () => {
                 "{{$n.ID.Name}}",
                 "{{camel $titleField.Name}}",
                 {{- if not (empty $mainImageField)}}
-                "{{$mainImageField}}",
+                "{{camel $mainImageField.Name}}",
                 {{- end }}
             ],
             searchQuery: value,
@@ -87,7 +76,7 @@ export const SearchComponent: React.FC = () => {
                     renderItem(
                         item.{{ default "id" $titleField.Name }},
                         {{- if not (empty $mainImageField) }}
-                        `${item.{{$mainImageField}}}`,
+                        `${item.{{camel $mainImageField.Name}}}`,
                         {{- else }}
                         null,
                         {{- end }}

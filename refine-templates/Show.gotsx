@@ -1,9 +1,12 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "show.tsx" -}}
 import { useShow, useOne } from "@pankod/refine-core";
-import { Show, Typography, Tag } from "@pankod/refine-antd";
+import * as RA  from "@pankod/refine-antd";
+import RefineReactRouter from "@pankod/refine-react-router-v6";
 
 import * as Interfaces from "./interfaces";
+
+const { Link } = RefineReactRouter;
 
 {{- range $n := $.Graph.Nodes}}
 
@@ -13,9 +16,29 @@ export const {{$n.Name}}Show = () => {
         metaData: {
             fields: [
                 "{{ $n.ID.Name }}",
-                {{- range $f :=  $n.Fields}}
+                {{- range $f :=  $n.Fields }}
                 "{{ $f.Name | camel }}",
-                {{- end}}
+                {{- end -}}
+
+                {{- range $e := $n.EdgesWithID }}
+                {{- if $e.Unique }}
+                {
+                    "{{ camel $e.Name }}": [ "id", "{{ (ER_titleField $e.Type).Name }}" ]
+                },
+                {{- else }}
+                {
+                    "{{ camel $e.Name }}": [
+                        {
+                            edges: [
+                                {
+                                    node: [ "id", "{{ (ER_titleField $e.Type).Name }}" ],
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {{- end }}
+                {{- end }}
             ],
         },
     });
@@ -23,12 +46,36 @@ export const {{$n.Name}}Show = () => {
     const record = data?.data
 
     return (
-        <Show isLoading={isLoading}>
+        <RA.Show isLoading={isLoading}>
             {{- range $f := $n.Fields}}
-            <Typography.Title level={5}>{{ $f.Name | label }}</Typography.Title>
-            <Typography.Text>{ record?.{{ camel $f.Name }} }</Typography.Text>
+            <RA.Typography.Title level={5}>{{ $f.Name | label }}</RA.Typography.Title>
+            <RA.Typography.Text>{ record?.{{ camel $f.Name }} }</RA.Typography.Text>
             {{- end }}
-        </Show>
+
+
+            <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
+            {{- range $e := $n.EdgesWithID}}
+            {{- $titleField := (ER_titleField $e.Type) }}
+            <RA.Typography.Title key={ "{{$e.Name}}-label" } level={5}>{{ $e.Name | label }}</RA.Typography.Title>
+            {{- if $e.Unique }}
+            <Link key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ record?.{{ camel $e.Name }}?.id}>
+                { record?.{{ camel $e.Name }}?.{{camel $titleField.Name}} }
+            </Link>
+            {{- else}}
+            <RA.AntdList
+                size="small"
+                dataSource={ record?.{{ camel $e.Name }}?.edges }
+                renderItem={(r: any) => (
+                    <RA.AntdList.Item>
+                        <Link key={ "{{$e.Name}}-" + r?.node?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ r?.node?.id}>
+                            { r.node.{{camel $titleField.Name}} }
+                        </Link>
+                    </RA.AntdList.Item>
+                )}
+            />
+            {{- end}}
+            {{- end }}
+        </RA.Show>
     );
 };
 

@@ -15,7 +15,9 @@ var (
 	_templates embed.FS
 
 	_funcMap = template.FuncMap{
-		"label": common.ToLabel,
+		"label":             common.ToLabel,
+		"ER_titleField":     titleField,
+		"ER_mainImageField": mainImageField,
 	}
 	funcMap = template.FuncMap{}
 )
