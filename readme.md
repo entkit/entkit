@@ -37,6 +37,37 @@ func main() {
 }
 ```
 
+Then Apply search query to your query resolvers WhereInput
+> `EntityWhereInput.ApplySearchQuery(q)`
+
+```go
+package graphql
+
+import (
+	"ent"
+	"context"
+	"github.com/google/uuid"
+)
+
+func (r *queryResolver) Companies(
+	ctx context.Context,
+	after *ent.Cursor,
+	first *int,
+	before *ent.Cursor,
+	last *int,
+	orderBy *ent.CompanyOrder,
+	where *ent.CompanyWhereInput,
+	q *string, // Added by Ent-Refine
+) (*ent.CompanyConnection, error) {
+	return r.client.Company.Query().Paginate(ctx, after, first, before, last,
+		ent.WithCompanyOrder(orderBy),
+		ent.WithCompanyFilter(
+			where.ApplySearchQuery(q).Filter, // Applying query filter
+		),
+	)
+}
+```
+
 ## Supporting annotations
 
 * TitleField (field)
@@ -54,7 +85,7 @@ func main() {
 
 1. After configuration regenerate Ent.
 2. Your package.json file is changed so run `npm install` to get deps.
-3. Check directory of refine application. On src directory you can find `ent-refine` folder with generated resources.
+3. Check directory of refine application. On src directory you can find `ent-refine` folder with ent resources.
 4. Update your `App.ts` file
     ```tsx
     import React from "react";
