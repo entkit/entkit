@@ -53,18 +53,37 @@ export const {{$n.Name}}Show = () => {
             {{- end }}
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
-            {{- range $e := $n.EdgesWithID }}
-            {{- $titleField := (ER_titleField $e.Type) }}
-            <RA.Typography.Title key={ "{{$e.Name}}-label" } level={5}>{{ $e.Name | label }}</RA.Typography.Title>
-            {{- if $e.Unique }}
-            <Link key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ record?.{{ camel $e.Name }}?.id}>
-                { record?.{{ camel $e.Name }}?.{{camel $titleField.Name}} }
-            </Link>
-            {{- else -}}
-            {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
-            <Tables.{{$e.Type.Name}}Table key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} extendTable={ {permanentFilter: [{operator: "{{$filterOperator}}" as any, field: "", value: {id: record?.id}}]} }></Tables.{{$e.Type.Name}}Table>
-            {{- end }}
-            {{- end }}
+            <RA.Descriptions title="User Info">
+                {{- range $e := $n.EdgesWithID }}
+                {{- $titleField := (ER_titleField $e.Type) }}
+                {{- if $e.Unique }}
+                <RA.Descriptions.Item label="{{ $e.Name | label }}">
+                    <Link key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ record?.{{ camel $e.Name }}?.id}>
+                        { record?.{{ camel $e.Name }}?.{{camel $titleField.Name}} }
+                    </Link>
+                </RA.Descriptions.Item>
+                {{- end}}
+                {{- end}}
+            </RA.Descriptions>
+
+            <RA.Row gutter={[16,32]}>
+                {{- range $e := $n.EdgesWithID }}
+                {{- if not $e.Unique }}
+                <RA.Col span={12}>
+                    {{- $titleField := (ER_titleField $e.Type) }}
+                    <RA.Typography.Title key={ "{{$e.Name}}-label" } level={5}>
+                        <RA.Space size={8}>
+                            <RA.Icons.{{default "ApartmentOutlined" $e.Type.Annotations.REFINE.Icon}}/>
+                            {{ $e.Name | label }}
+                        </RA.Space>
+                    </RA.Typography.Title>
+
+                    {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
+                    <Tables.{{$e.Type.Name}}Table key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} extendTable={ {permanentFilter: [{operator: "{{$filterOperator}}" as any, field: "", value: {id: record?.id}}]} }></Tables.{{$e.Type.Name}}Table>
+                </RA.Col>
+                {{- end }}
+                {{- end }}
+            </RA.Row>
         </RA.Show>
     );
 };
