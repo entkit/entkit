@@ -53,7 +53,7 @@ export const {{$n.Name}}Show = () => {
             {{- end }}
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
-            <RA.Descriptions title="User Info">
+            <RA.Descriptions>
                 {{- range $e := $n.EdgesWithID }}
                 {{- $titleField := (ER_titleField $e.Type) }}
                 {{- if $e.Unique }}
