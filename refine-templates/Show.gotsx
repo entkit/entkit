@@ -3,12 +3,11 @@
 import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-
-import * as Interfaces from "./interfaces";
+import * as Tables from "./tables";
 
 const { Link } = RefineReactRouter;
 
-{{- range $n := $.Graph.Nodes}}
+{{- range $n := $.Graph.Nodes -}}
 
 export const {{$n.Name}}Show = () => {
     const { queryResult } = useShow({
@@ -42,6 +41,7 @@ export const {{$n.Name}}Show = () => {
             ],
         },
     });
+
     const { data, isLoading } = queryResult;
     const record = data?.data
 
@@ -52,28 +52,18 @@ export const {{$n.Name}}Show = () => {
             <RA.Typography.Text>{ record?.{{ camel $f.Name }} }</RA.Typography.Text>
             {{- end }}
 
-
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
-            {{- range $e := $n.EdgesWithID}}
+            {{- range $e := $n.EdgesWithID }}
             {{- $titleField := (ER_titleField $e.Type) }}
             <RA.Typography.Title key={ "{{$e.Name}}-label" } level={5}>{{ $e.Name | label }}</RA.Typography.Title>
             {{- if $e.Unique }}
             <Link key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ record?.{{ camel $e.Name }}?.id}>
                 { record?.{{ camel $e.Name }}?.{{camel $titleField.Name}} }
             </Link>
-            {{- else}}
-            <RA.AntdList
-                size="small"
-                dataSource={ record?.{{ camel $e.Name }}?.edges }
-                renderItem={(r: any) => (
-                    <RA.AntdList.Item>
-                        <Link key={ "{{$e.Name}}-" + r?.node?.id + "-link"} to={ "/{{$e.Type.Name}}/show/"+ r?.node?.id}>
-                            { r.node.{{camel $titleField.Name}} }
-                        </Link>
-                    </RA.AntdList.Item>
-                )}
-            />
-            {{- end}}
+            {{- else -}}
+            {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
+            <Tables.{{$e.Type.Name}}Table key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} extendTable={ {permanentFilter: [{operator: "{{$filterOperator}}" as any, field: "", value: {id: record?.id}}]} }></Tables.{{$e.Type.Name}}Table>
+            {{- end }}
             {{- end }}
         </RA.Show>
     );

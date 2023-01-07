@@ -134,15 +134,18 @@ func (rg *RefineGen) Generate() {
 	var (
 		RefineCreateTemplate          = parseT("refine-templates/Create.gotsx")
 		RefineEditTemplate            = parseT("refine-templates/Edit.gotsx")
+		RefineTableTemplate           = parseT("refine-templates/Table.gotsx")
 		RefineListTemplate            = parseT("refine-templates/List.gotsx")
 		RefineResourcesTemplate       = parseT("refine-templates/Resources.gotsx")
 		RefineShowTemplate            = parseT("refine-templates/Show.gotsx")
 		RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
 		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
 		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
-		AllTemplates                  = []*gen.Template{
+
+		AllTemplates = []*gen.Template{
 			RefineCreateTemplate,
 			RefineEditTemplate,
+			RefineTableTemplate,
 			RefineListTemplate,
 			RefineResourcesTemplate,
 			RefineShowTemplate,
