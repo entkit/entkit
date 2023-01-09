@@ -9,6 +9,7 @@ import {Cursors} from "./data-provider";
 import truncate from "truncate";
 
 {{ range $n := $.Graph.Nodes }}
+{{- $orderFields := orderFields $n }}
 export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError>}> = ( props ) => {
 
     const [cursors, setCursors] = useState<Cursors>({
@@ -23,7 +24,7 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
         resource: "{{$n.Name}}",
         initialSorter: [
             {
-                field: "id",
+                field: "{{ (first $orderFields).Name }}",
                 order: "asc",
             },
         ],
@@ -59,9 +60,11 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                 <RA.Table.Column
                     dataIndex="{{ $n.ID.Name }}"
                     title="{{ $n.ID.Name | label }}"
+                    {{- if  has $n.ID $orderFields }}
                     sorter={
-                        {multiple: 2}
+                        {multiple: 1}
                     }
+                    {{- end }}
                     render={ (value)=><RA.TextField value={truncate(value, 5)} title={value}/> }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -75,9 +78,11 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                 <RA.Table.Column
                     dataIndex="{{ camel $f.Name }}"
                     title="{{ $f.Name | label }}"
+                    {{- if has $f $orderFields }}
                     sorter={
-                        {multiple: 2}
+                        {}
                     }
+                    {{- end }}
                     render={ (value)=> {
                         {{- if eq $f.Type.String "time.Time" -}}
                         if (value) {

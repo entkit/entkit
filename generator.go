@@ -141,6 +141,7 @@ func (rg *RefineGen) Generate() {
 		RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
 		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
 		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
+		RefineSorterEnumsTemplate     = parseT("refine-templates/SorterEnums.gotsx")
 
 		AllTemplates = []*gen.Template{
 			RefineCreateTemplate,
@@ -152,6 +153,7 @@ func (rg *RefineGen) Generate() {
 			RefineInterfacesTemplate,
 			RefineDataProviderTemplate,
 			RefineSearchComponentTemplate,
+			RefineSorterEnumsTemplate,
 		}
 	)
 	for _, t := range AllTemplates {

@@ -1,3 +1,4 @@
+import {SorterEnums} from "./SorterEnums.gotsx";
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "data-provider.ts" -}}
 
@@ -11,7 +12,7 @@ import { GraphQLClient } from "graphql-request";
 import * as gql from "gql-query-builder";
 import pluralize from "pluralize";
 import camelCase from "camelcase";
-import {BaseKey, BaseRecord, MetaDataQuery} from "@pankod/refine-core/dist/interfaces";
+import * as SorterEnums from "./sorter-enums"
 
 export type Cursors = {
     before?: string
@@ -20,16 +21,26 @@ export type Cursors = {
     last?: number
 }
 
-export const genereteSort = (sort?: CrudSorting) => {
+export type OrderQuery = {
+    field: string,
+    direction: "ASC" | "DESC"
+}
+
+export const generateOrderQuery = (resource: string, sort?: CrudSorting): undefined|OrderQuery => {
     if (sort && sort.length > 0) {
-        const sortQuery = sort.map((i) => {
-            return `${i.field}:${i.order}`;
-        });
 
-        return sortQuery.join();
+        if (sort.length > 1) {
+            console.log("Multiple sorts not supporting because of EntGQL right not supporting multiple orders, only first order is working: https://github.com/ent/ent/issues/2198")
+        }
+
+        const fieldGroupName :keyof typeof SorterEnums = resource+"SorterEnums" as any
+        const fieldGroup = SorterEnums[fieldGroupName] as any
+        return {
+            field: fieldGroup[sort[0].field],
+            direction: sort[0].order.toUpperCase() as "ASC"|"DESC",
+        }
     }
-
-    return [];
+    return undefined;
 };
 
 export const generateFilter = (filters?: CrudFilters): Record<string, any> => {
@@ -128,7 +139,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                         }) => {
 
 
-            const sortBy = genereteSort(sort);
+            const orderBy = generateOrderQuery(resource, sort);
             const where = generateFilter(filters);
 
 
@@ -147,6 +158,10 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                     where: {
                         type: resource+"WhereInput",
                         value: where,
+                    },
+                    orderBy: {
+                        type: resource + "Order",
+                        value: orderBy,
                     },
                     ...(hasPagination ? {
                         after: {

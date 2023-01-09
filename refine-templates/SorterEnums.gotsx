@@ -1,0 +1,13 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "sorter-enums.tsx" -}}
+{{- range $n := $.Graph.Nodes -}}
+export const {{$n.Name}}SorterEnums = {
+{{- $allFields := orderFields $n}}
+{{- range $f := $allFields -}}
+{{- if not (empty $f.Annotations.EntGQL.OrderField) }}
+    "{{$f.Name}}": "{{ $f.Annotations.EntGQL.OrderField }}",
+{{- end}}
+{{- end}}
+}
+{{ end }}
+{{- end -}}
