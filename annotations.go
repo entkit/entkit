@@ -9,6 +9,40 @@ type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
 }
 
+type Action struct {
+	Name  string         `json:"Name,omitempty"`
+	Attrs map[string]any `json:"Attrs,omitempty"`
+}
+
+var (
+	/*
+		<RA.EditButton
+			hideText
+			resource="Country"
+			resourceNameOrRouteName="Country"
+			size="small"
+			recordItemId={record.id}
+		/>
+	*/
+	EditAction = Action{
+		Name:  "RA.EditButton",
+		Attrs: map[string]any{},
+	}
+	/*
+		<RA.ShowButton
+
+			/>
+	*/
+	ShowAction = Action{
+		Name:  "RA.ShowButton",
+		Attrs: map[string]any{},
+	}
+	DeleteAction = Action{
+		Name:  "RA.DeleteButton",
+		Attrs: map[string]any{},
+	}
+)
+
 type RefineAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`
 	ImageField     bool              `json:"ImageField,omitempty"`
@@ -24,6 +58,8 @@ type RefineAnnotation struct {
 	Description    *string           `json:"Description,omitempty"`
 	Prefix         *string           `json:"Prefix,omitempty"`
 	Suffix         *string           `json:"Suffix,omitempty"`
+	ListActions    []Action          `json:"ListActions,omitempty"`
+	ShowActions    []Action          `json:"ShowActions,omitempty"`
 }
 
 // Merge implements the schema.Merger interface.
@@ -87,10 +123,31 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 	if ant.Suffix != nil {
 		ra.Suffix = ant.Suffix
 	}
+
+	if len(ant.ListActions) > 0 {
+		ra.ListActions = append(ra.ListActions, ant.ListActions...)
+	}
+
+	if len(ant.ShowActions) > 0 {
+		ra.ShowActions = append(ra.ShowActions, ant.ShowActions...)
+	}
+
 	return ra
 }
 func (ra RefineAnnotation) Name() string {
 	return "REFINE"
+}
+
+func ListActions(actions ...Action) RefineAnnotation {
+	return RefineAnnotation{
+		ListActions: actions,
+	}
+}
+
+func ShowActions(actions ...Action) RefineAnnotation {
+	return RefineAnnotation{
+		ShowActions: actions,
+	}
 }
 
 func OnlyOnList() RefineAnnotation {

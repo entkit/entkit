@@ -7,6 +7,7 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import truncate from "truncate";
+import * as Custom from "./custom";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
@@ -130,27 +131,15 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.EditButton
-                                hideText
-                                resource="{{ $n.Name }}"
-                                resourceNameOrRouteName="{{ $n.Name }}"
+                            {{- range $a := $n.Annotations.REFINE.ListActions }}
+                            <{{ $a.Name }}
+                                hideText={true}
+                                resource="{{$n.Name}}"
+                                resourceNameOrRouteName="{{$n.Name}}"
                                 size="small"
                                 recordItemId={record.id}
                             />
-                            <RA.ShowButton
-                                hideText
-                                resource="{{ $n.Name }}"
-                                resourceNameOrRouteName="{{ $n.Name }}"
-                                size="small"
-                                recordItemId={record.id}
-                            />
-                            <RA.DeleteButton
-                                hideText
-                                resource="{{ $n.Name }}"
-                                resourceNameOrRouteName="{{ $n.Name }}"
-                                size="small"
-                                recordItemId={record.id}
-                            />
+                            {{- end }}
                         </RA.Space>
                     )}
                 />

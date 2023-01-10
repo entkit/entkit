@@ -97,7 +97,7 @@ func (rg *RefineGen) FieldTypeName(field gen.Field) string {
 	}
 }
 
-func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer) error {
+func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
 	dir := path.Join(rg.Extension.appPath, rg.Extension.srcDirName, "ent-refine")
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
@@ -106,11 +106,19 @@ func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer) error {
 
 	p := filepath.Join(dir, name)
 
-	return rg.saveFile(p, content.Bytes())
+	return rg.saveFile(p, content.Bytes(), override)
 }
 
-func (rg *RefineGen) saveFile(path string, content []byte) error {
-	_ = os.Remove(path)
+func (rg *RefineGen) exists(name string) bool {
+	_, err := os.Stat(name)
+	return !os.IsNotExist(err)
+}
+func (rg *RefineGen) saveFile(path string, content []byte, override bool) error {
+	if override {
+		_ = os.Remove(path)
+	} else if rg.exists(path) {
+		return nil
+	}
 
 	f, err := os.Create(path)
 	if err != nil {
@@ -142,8 +150,9 @@ func (rg *RefineGen) Generate() {
 		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
 		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
 		RefineSorterEnumsTemplate     = parseT("refine-templates/SorterEnums.gotsx")
+		CustomTemplate                = parseT("refine-templates/Custom.gotsx")
 
-		AllTemplates = []*gen.Template{
+		DynamicTemplates = []*gen.Template{
 			RefineCreateTemplate,
 			RefineEditTemplate,
 			RefineTableTemplate,
@@ -155,9 +164,16 @@ func (rg *RefineGen) Generate() {
 			RefineSearchComponentTemplate,
 			RefineSorterEnumsTemplate,
 		}
+		StaticTemplates = []*gen.Template{
+			CustomTemplate,
+		}
 	)
-	for _, t := range AllTemplates {
-		rg.rendAndSave(t)
+	for _, t := range DynamicTemplates {
+		rg.rendAndSave(t, true)
+	}
+
+	for _, t := range StaticTemplates {
+		rg.rendAndSave(t, false)
 	}
 
 	rg.updatePackageJson()
@@ -198,13 +214,13 @@ func (rg *RefineGen) updatePackageJson() {
 
 	r, err := json.MarshalIndent(p, "", "  ")
 
-	err = rg.saveFile(packageJsonPath, r)
+	err = rg.saveFile(packageJsonPath, r, true)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
-func (rg *RefineGen) rendAndSave(tmpl *gen.Template) {
+func (rg *RefineGen) rendAndSave(tmpl *gen.Template, override bool) {
 	var b bytes.Buffer
 	rootName := path.Base(tmpl.Name())
 
@@ -218,7 +234,7 @@ func (rg *RefineGen) rendAndSave(tmpl *gen.Template) {
 			panic(err)
 		}
 
-		err = rg.saveGenerated(t.Name(), b)
+		err = rg.saveGenerated(t.Name(), b, override)
 		if err != nil {
 			panic(err)
 		}

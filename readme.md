@@ -80,7 +80,7 @@ func (r *queryResolver) Companies(
 * HideOnForm (field)
 * FilterOperator (field) `EntRefine.FilterOperator("contains")`
 * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
-
+* [ListActions](#custom-list-actions) (entity)
 ## Getting ready to use
 
 1. After configuration regenerate Ent.
@@ -161,4 +161,44 @@ export const Header: React.FC = () => {
         </AntdHeader>
     );
 };
+```
+
+# Custom List Actions Annotation
+
+Add entity annotation to your schema
+
+### Annotation Example
+```
+EntRefine.ListActions(
+   EntRefine.ShowAction,
+   EntRefine.DeleteAction,
+   EntRefine.EditAction,
+   EntRefine.Action{
+       Name:  "Custom.MyPrettyButton",
+       Attrs: map[string]any{},
+   },
+),
+```
+
+### Implementation Example
+
+`./ent-refine/custom.tsx`
+```tsx
+//...
+export type MyPrettyButtonProps = ButtonProps &
+    RefineButtonCommonProps &
+    RefineButtonResourceProps &
+    RefineButtonSingleProps &
+    RefineButtonLinkingProps
+
+export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
+    return <Button
+        icon={<RA.Icons.RadarChartOutlined/>}
+        onClick={
+            () => {
+                alert(props.recordItemId)
+            }
+        }></Button>
+}
+//...
 ```
