@@ -12,8 +12,6 @@ type CodeFieldOptions struct {
 type RefineAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`
 	ImageField     bool              `json:"ImageField,omitempty"`
-	Prefix         string            `json:"Prefix,omitempty"`
-	Suffix         string            `json:"Suffix,omitempty"`
 	MainImageField bool              `json:"MainImageField,omitempty"`
 	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`
 	RichTextField  bool              `json:"RichTextField,omitempty"`
@@ -22,6 +20,10 @@ type RefineAnnotation struct {
 	HideOnForm     bool              `json:"HideOnForm,omitempty"`
 	FilterOperator *string           `json:"FilterOperator,omitempty"`
 	Icon           *string           `json:"Icon,omitempty"`
+	Label          *string           `json:"Label,omitempty"`
+	Description    *string           `json:"Description,omitempty"`
+	Prefix         *string           `json:"Prefix,omitempty"`
+	Suffix         *string           `json:"Suffix,omitempty"`
 }
 
 // Merge implements the schema.Merger interface.
@@ -37,21 +39,27 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 	default:
 		return ra
 	}
+
 	if ant.TitleField {
 		ra.TitleField = ant.TitleField
 	}
+
 	if ant.CodeField != nil {
 		ra.CodeField = ant.CodeField
 	}
+
 	if ant.RichTextField {
 		ra.RichTextField = ant.RichTextField
 	}
+
 	if ant.HideOnShow {
 		ra.HideOnList = ant.HideOnList
 	}
+
 	if ant.HideOnForm {
 		ra.HideOnForm = ant.HideOnForm
 	}
+
 	if ant.HideOnList {
 		ra.HideOnList = ant.HideOnList
 	}
@@ -60,8 +68,24 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.FilterOperator = ant.FilterOperator
 	}
 
+	if ant.Label != nil {
+		ra.Label = ant.Label
+	}
+
+	if ant.Description != nil {
+		ra.Description = ant.Description
+	}
+
 	if ant.Icon != nil {
 		ra.Icon = ant.Icon
+	}
+
+	if ant.Prefix != nil {
+		ra.Prefix = ant.Prefix
+	}
+
+	if ant.Suffix != nil {
+		ra.Suffix = ant.Suffix
 	}
 	return ra
 }
@@ -145,6 +169,30 @@ func CodeField(config *CodeFieldOptions) RefineAnnotation {
 func Icon(icon string) RefineAnnotation {
 	return RefineAnnotation{
 		Icon: &icon,
+	}
+}
+
+func Label(label string) RefineAnnotation {
+	return RefineAnnotation{
+		Label: &label,
+	}
+}
+
+func Description(description string) RefineAnnotation {
+	return RefineAnnotation{
+		Label: &description,
+	}
+}
+
+func Prefix(prefix string) RefineAnnotation {
+	return RefineAnnotation{
+		Prefix: &prefix,
+	}
+}
+
+func Suffix(suffix string) RefineAnnotation {
+	return RefineAnnotation{
+		Prefix: &suffix,
 	}
 }
 
