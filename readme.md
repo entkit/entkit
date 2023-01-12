@@ -1,12 +1,23 @@
-## Generate admin dashboard with Refine.js by ent definitions.
+# Ent-Refine "Everything is generated"
 
-> **Important:** using graphql as a data-provider interface **(GQL extension is mandatory)**
+## Generate very flexible admin dashboard with Refine.js by ent definitions.
 
-Add extension to `entc.go`
+![main.png](docs%2Fimages%2Fmain.png)
+
+## Smart search as a killer future
+![search.gif](docs%2Fimages%2Fsearch.gif)
+
+
+> **Important:** platform is using a graphql as a data-provider interface **(GQL extension is mandatory)**
+
+## How to setup
+
+### Add extension to your Ent framework `entc.go` file.
+
+#### Example
 
 ```go
 package main
-
 import (
 	//...
 	"entgo.io/contrib/entgql"
@@ -37,9 +48,13 @@ func main() {
 }
 ```
 
-Then Apply search query to your query resolvers WhereInput
+### Then Apply search query to your query resolvers WhereInput
+
+This is important for smart-search component
+
 > `EntityWhereInput.ApplySearchQuery(q)`
 
+#### Example
 ```go
 package graphql
 
@@ -68,6 +83,10 @@ func (r *queryResolver) Companies(
 }
 ```
 
+### Configure your ent schemas with annotations
+
+e.g. `EntRefine.FilterOperator("contains")`
+
 ## Supporting annotations
 
 * TitleField (field)
@@ -80,7 +99,7 @@ func (r *queryResolver) Companies(
 * HideOnForm (field)
 * FilterOperator (field) `EntRefine.FilterOperator("contains")`
 * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
-* [ListActions](#custom-list-actions) (entity)
+* [ListActions](#custom-list-actions-annotation) (entity)
 ## Getting ready to use
 
 1. After configuration regenerate Ent.
@@ -181,9 +200,9 @@ EntRefine.ListActions(
 ```
 
 ### Implementation Example
-
-`./ent-refine/custom.tsx`
+#### Example
 ```tsx
+// ./ent-refine/custom.tsx
 //...
 export type MyPrettyButtonProps = ButtonProps &
     RefineButtonCommonProps &
@@ -202,3 +221,11 @@ export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
 }
 //...
 ```
+
+## Contacts
+
+**Linkedin**:  https://www.linkedin.com/in/aaron-yor/
+
+**Discord**:   aaron․yordanyan#7556
+
+**Phone**:     +374 98 471111
