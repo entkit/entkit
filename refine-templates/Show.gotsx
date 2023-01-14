@@ -45,11 +45,26 @@ export const {{$n.Name}}Show = () => {
     const { data, isLoading } = queryResult;
     const record = data?.data
 
+    {{ $allFields := prepend $n.Fields $n.ID}}
     return (
         <RA.Show isLoading={isLoading}>
-            {{- range $f := $n.Fields}}
+            {{- range $f := $allFields}}
             <RA.Typography.Title level={5}>{{ $f.Name | label }}</RA.Typography.Title>
-            <RA.Typography.Text>{ record?.{{ camel $f.Name }} }</RA.Typography.Text>
+            {{- if eq $f.Type.String "time.Time" -}}
+            {record?.{{ camel $f.Name }} ? <RA.DateField format="LLL" value={ record?.{{ camel $f.Name }} }/> : <RA.TextField value="Never"/>}
+            {{- else if eq $f.Type.String "uuid.UUID" -}}
+            <RA.Typography.Text copyable={true}>{ record?.{{ camel $f.Name }} }</RA.Typography.Text>
+            {{- else if eq $f.Type.String "bool" -}}
+            <RA.TextField value={record?.{{ camel $f.Name }}  ? "Yes" : "No"}/>
+            {{- else -}}
+            {{- if $f.Annotations.REFINE.ImageField }}
+            <RA.Image width={128} src={record?.{{ camel $f.Name }} }/>
+            {{- else if $f.Annotations.REFINE.URLField }}
+            <RA.Button type="primary" href={record?.{{ camel $f.Name }} } target="_blank" icon={<RA.Icons.LinkOutlined/>}>{ record?.{{ camel $f.Name }} }</RA.Button>
+            {{- else }}
+            <RA.Typography.Text copyable={true}>{record?.{{ camel $f.Name }}}</RA.Typography.Text>
+            {{- end }}
+            {{- end }}
             {{- end }}
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>

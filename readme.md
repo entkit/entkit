@@ -91,6 +91,7 @@ e.g. `EntRefine.FilterOperator("contains")`
 
 * TitleField (field)
 * CodeField (field)
+* URLField (field)
 * RichTextField (field)
 * ImageField (field)
 * MainImageField (field)

@@ -23,7 +23,6 @@ var (
 		"gql-query-builder": "^3.5.5",
 		"graphql-request":   "^4.3.0",
 		"graphql":           "^15.6.1",
-		"truncate":          "^3.0.0",
 		"lodash":            "^4.17.21",
 	}
 
@@ -150,6 +149,7 @@ func (rg *RefineGen) Generate() {
 		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
 		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
 		RefineSorterEnumsTemplate     = parseT("refine-templates/SorterEnums.gotsx")
+		HelpersTemplate               = parseT("refine-templates/Helpers.gotsx")
 		CustomTemplate                = parseT("refine-templates/Custom.gotsx")
 
 		DynamicTemplates = []*gen.Template{
@@ -163,6 +163,7 @@ func (rg *RefineGen) Generate() {
 			RefineDataProviderTemplate,
 			RefineSearchComponentTemplate,
 			RefineSorterEnumsTemplate,
+			HelpersTemplate,
 		}
 		StaticTemplates = []*gen.Template{
 			CustomTemplate,

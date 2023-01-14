@@ -15,24 +15,10 @@ type Action struct {
 }
 
 var (
-	/*
-		<RA.EditButton
-			hideText
-			resource="Country"
-			resourceNameOrRouteName="Country"
-			size="small"
-			recordItemId={record.id}
-		/>
-	*/
 	EditAction = Action{
 		Name:  "RA.EditButton",
 		Attrs: map[string]any{},
 	}
-	/*
-		<RA.ShowButton
-
-			/>
-	*/
 	ShowAction = Action{
 		Name:  "RA.ShowButton",
 		Attrs: map[string]any{},
@@ -44,11 +30,12 @@ var (
 )
 
 type RefineAnnotation struct {
-	TitleField     bool              `json:"TitleField,omitempty"`
-	ImageField     bool              `json:"ImageField,omitempty"`
-	MainImageField bool              `json:"MainImageField,omitempty"`
-	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`
-	RichTextField  bool              `json:"RichTextField,omitempty"`
+	TitleField     bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
+	ImageField     bool              `json:"ImageField,omitempty"`     // Mark field as image
+	MainImageField bool              `json:"MainImageField,omitempty"` // Mark field as main image of entity
+	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
+	URLField       bool              `json:"URLField,omitempty"`       // Mark field as url field
+	RichTextField  bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
 	HideOnList     bool              `json:"HideOnList,omitempty"`
 	HideOnShow     bool              `json:"HideOnShow,omitempty"`
 	HideOnForm     bool              `json:"HideOnForm,omitempty"`
@@ -82,6 +69,22 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 
 	if ant.CodeField != nil {
 		ra.CodeField = ant.CodeField
+	}
+
+	if ant.TitleField {
+		ra.TitleField = ant.TitleField
+	}
+
+	if ant.URLField {
+		ra.URLField = ant.URLField
+	}
+
+	if ant.ImageField {
+		ra.ImageField = ant.ImageField
+	}
+
+	if ant.MainImageField {
+		ra.MainImageField = ant.MainImageField
 	}
 
 	if ant.RichTextField {
@@ -134,6 +137,7 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 
 	return ra
 }
+
 func (ra RefineAnnotation) Name() string {
 	return "REFINE"
 }
@@ -220,6 +224,12 @@ func RichTextField() RefineAnnotation {
 func CodeField(config *CodeFieldOptions) RefineAnnotation {
 	return RefineAnnotation{
 		CodeField: config,
+	}
+}
+
+func URLField() RefineAnnotation {
+	return RefineAnnotation{
+		URLField: true,
 	}
 }
 

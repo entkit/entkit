@@ -5,8 +5,7 @@ import React, {useState} from "react";
 import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
-import {Cursors} from "./data-provider";
-import truncate from "truncate";
+import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 
 {{ range $n := $.Graph.Nodes }}
@@ -19,8 +18,7 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
 
     const [perPage, setPerPage] = useState<number>(10)
 
-    {{- $allFields := append $n.Fields $n.ID }}
-
+    {{- $allFields := prepend $n.Fields $n.ID }}
     const table = RA.useTable<Interfaces.I{{$n.Name}}>({
         resource: "{{$n.Name}}",
         initialSorter: [
@@ -58,23 +56,7 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
     return (
         <>
             <RA.Table {...table.tableProps} pagination={false} rowKey="id">
-                <RA.Table.Column
-                    dataIndex="{{ $n.ID.Name }}"
-                    title="{{ $n.ID.Name | label }}"
-                    {{- if  has $n.ID $orderFields }}
-                    sorter={
-                        {multiple: 1}
-                    }
-                    {{- end }}
-                    render={ (value)=><RA.TextField value={truncate(value, 5)} title={value}/> }
-                    filterDropdown={(props) => (
-                        <RA.FilterDropdown {...props}>
-                            <RA.Input />
-                        </RA.FilterDropdown>
-                    )}
-                    defaultSortOrder={RA.getDefaultSortOrder("{{ $n.ID.Name }}", table.sorter)}
-                />
-                {{- range $f := $n.Fields }}
+                {{- range $f := $allFields }}
                 {{- if not $f.Annotations.REFINE.HideOnList }}
                 <RA.Table.Column
                     dataIndex="{{ camel $f.Name }}"
@@ -92,14 +74,20 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                             return <RA.TextField value="Never"/>
                         }
                         {{- else if eq $f.Type.String "uuid.UUID" -}}
-                        return <RA.TextField value={truncate(value, 5)} title={value}/>
+                        return <RA.Tooltip title={value}>
+                            <RA.TextField value={value} ellipsis={true} style={ {width: '80px'} }/>
+                        </RA.Tooltip>
                         {{- else if eq $f.Type.String "bool" -}}
                         return <RA.TextField value={value ? "Yes" : "No"}/>
                         {{- else -}}
                         {{- if $f.Annotations.REFINE.ImageField }}
                         return <RA.Image width={48} src={value}/>
+                        {{- else if $f.Annotations.REFINE.URLField }}
+                        return <RA.Tooltip title={value}>
+                            <RA.Button type="primary" href={value} target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>
+                        </RA.Tooltip>
                         {{- else }}
-                        return <RA.TextField value={truncate(String(value), 64)}/>
+                        return <RA.TextField value={value} ellipsis={true} style={ {width: '100px'} }/>
                         {{- end }}
                         {{- end }}
                     } }
