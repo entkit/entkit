@@ -1,6 +1,7 @@
 package common
 
 import (
+	"entgo.io/ent/entc/gen"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
@@ -25,4 +26,61 @@ func LcFirst(str string) string {
 		return string(unicode.ToLower(v)) + str[i+1:]
 	}
 	return ""
+}
+
+func TSType(gotype string) string {
+	unique := true
+	if strings.HasPrefix(gotype, "[]") {
+		unique = false
+	}
+
+	gotypeSingle := strings.TrimPrefix(gotype, "[]")
+
+	var t string
+
+	switch gotypeSingle {
+	case "uuid.UUID":
+		t = "UUID"
+	case "uint8", "uint16", "uint32", "uint64", "int", "int8", "int16", "int32", "int64":
+		t = "Number"
+	case "time.Time":
+		t = "Date"
+	case "bool":
+		t = "Boolean"
+	default:
+		t = "String"
+	}
+
+	if !unique {
+		t = UcFirst(t) + "List"
+	}
+	return "ER_" + t
+}
+
+func FieldTSType(field gen.Field) string {
+	ant, ok := field.Annotations["REFINE"].(map[string]any)
+
+	if field.IsEnum() {
+		return "ER_" + UcFirst(strings.Replace(field.Type.String(), ".", "_", -1))
+	}
+
+	if ok {
+		isImage, ok := ant["ImageField"].(bool)
+		if ok && isImage {
+			return "ER_Image"
+		}
+		isURLField, ok := ant["URLField"].(bool)
+		if ok && isURLField {
+			return "ER_URL"
+		}
+		isRichTextField, ok := ant["RichTextField"].(bool)
+		if ok && isRichTextField {
+			return "ER_RichText"
+		}
+		if ant["CodeField"] != nil {
+			return "ER_Code"
+		}
+	}
+
+	return TSType(field.Type.String())
 }

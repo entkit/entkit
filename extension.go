@@ -16,6 +16,8 @@ var (
 
 	_funcMap = template.FuncMap{
 		"label":             common.ToLabel,
+		"ER_fieldTSType":    common.FieldTSType,
+		"ER_tsType":         common.TSType,
 		"ER_titleField":     titleField,
 		"ER_mainImageField": mainImageField,
 	}

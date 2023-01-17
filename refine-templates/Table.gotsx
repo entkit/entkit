@@ -7,6 +7,7 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
+import * as FieldView from "./field-view";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
@@ -67,29 +68,11 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                     }
                     {{- end }}
                     render={ (value)=> {
-                        {{- if eq $f.Type.String "time.Time" -}}
-                        if (value) {
-                            return <RA.DateField format="LLL" value={value}/>
-                        } else {
-                            return <RA.TextField value="Never"/>
-                        }
-                        {{- else if eq $f.Type.String "uuid.UUID" -}}
-                        return <RA.Tooltip title={value}>
-                            <RA.TextField value={value} ellipsis={true} style={ {width: '80px'} }/>
-                        </RA.Tooltip>
-                        {{- else if eq $f.Type.String "bool" -}}
-                        return <RA.TextField value={value ? "Yes" : "No"}/>
-                        {{- else -}}
-                        {{- if $f.Annotations.REFINE.ImageField }}
-                        return <RA.Image width={48} src={value}/>
-                        {{- else if $f.Annotations.REFINE.URLField }}
-                        return <RA.Tooltip title={value}>
-                            <RA.Button type="primary" href={value} target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>
-                        </RA.Tooltip>
-                        {{- else }}
-                        return <RA.TextField value={value} ellipsis={true} style={ {width: '100px'} }/>
-                        {{- end }}
-                        {{- end }}
+                        {{- $viewName := ( print "FieldView." (ER_fieldTSType $f) "ViewOnList" ) }}
+                        {{- if not (empty $f.Annotations.REFINE.FieldViewOnList) }}
+                        {{ $viewName = print "Custom." $f.Annotations.REFINE.FieldViewOnList }}
+                        {{- end}}
+                        return <{{$viewName}} value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>

@@ -1,4 +1,4 @@
 {{- define "custom.tsx" -}}
 // Write your custom components here
-
+export {}
 {{- end -}}

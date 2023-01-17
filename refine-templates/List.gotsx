@@ -7,7 +7,8 @@ import * as RA from "@pankod/refine-antd";
 import * as Tables from "./tables";
 import * as Interfaces from "./interfaces";
 
-{{ range $n := $.Graph.Nodes }}
+{{- range $n := $.Graph.Nodes }}
+
 export const {{$n.Name}}List :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError>}> = ( props ) => {
     return <RA.List>
         <Tables.{{$n.Name}}Table {...props} />

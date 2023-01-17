@@ -6,6 +6,8 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
+import * as FieldView from "./field-view";
+import * as Custom from "./custom";
 
 import CodeEditor from '@uiw/react-textarea-code-editor';
 
@@ -48,7 +50,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
     );
     {{- range $ed := $n.EdgesWithID }}
     const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
-    {{- $titleField := "id" }}
+    {{- $titleField := $ed.Type.ID }}
     {{- range $f:=$ed.Type.Fields }}
     {{- if $f.Annotations.REFINE.TitleField }}
     {{- $titleField = $f }}
@@ -89,45 +91,11 @@ export const {{$n.Name}}Edit: React.FC = () => {
                     })}
                     {{- end}}
                 >
-                    {{- if eq $f.Type.String "time.Time"}}
-                    <RA.DatePicker showTime={true} />
-                    {{- else if eq $f.Type.String "[]string"}}
-                    <RA.Select mode="tags" />
-                    {{- else if $f.IsEnum }}
-                    <RA.Select
-                        options={[
-                            {{- range $v := $f.EnumValues }}
-                            {
-                                value: "{{$v}}",
-                                label: "{{$v}}",
-                            },
-                            {{- end }}
-                        ]}
-                    />
-                    {{- else if hasPrefix $f.Type.String "float"}}
-                    <RA.InputNumber />
-                    {{- else if eq $f.Type.String "bool"}}
-                    <RA.Radio.Group>
-                        <RA.Radio value={true}>Yes</RA.Radio>
-                        <RA.Radio value={false}>No</RA.Radio>
-                    </RA.Radio.Group>
-                    {{- else if eq $f.Type.String "string"}}
-                    {{- if $f.Annotations.REFINE.CodeField }}
-                    <CodeEditor
-                        language="{{ default $f.Annotations.REFINE.CodeField.Language "js" }}"
-                        padding={15}
-                        style={ {
-                            fontSize: 12,
-                            backgroundColor: "#000",
-                            fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-                        } }
-                        />
-                    {{- else if $f.Annotations.REFINE.RichTextField }}
-                    <ReactQuill theme="snow"/>
-                    {{- else }}
-                    <RA.Input/>
-                    {{- end }}
-                    {{- end }}
+                    {{- $viewName := ( print "FieldView." (ER_fieldTSType $f) "ViewOnForm" ) }}
+                    {{- if not (empty $f.Annotations.REFINE.FieldViewOnForm) }}
+                    {{ $viewName = print "Custom." $f.Annotations.REFINE.FieldViewOnForm }}
+                    {{- end}}
+                    <{{$viewName}}/>
                 </RA.Form.Item>
                 {{- end}}
                 {{- end }}

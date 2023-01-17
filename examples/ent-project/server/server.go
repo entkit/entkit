@@ -1,0 +1,80 @@
+// Copyright 2019-present Facebook
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+package main
+
+import (
+	"context"
+	todo "github.com/diazoxide/ent-refine/examples/ent-project"
+	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
+	"time"
+
+	"entgo.io/contrib/entgql"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/debug"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/alecthomas/kong"
+	"go.uber.org/zap"
+
+	_ "github.com/diazoxide/ent-refine/examples/ent-project/ent/runtime"
+	_ "github.com/mattn/go-sqlite3"
+)
+
+func main() {
+	var cli struct {
+		Addr  string `name:"address" default:":8081" help:"Address to listen on."`
+		Debug bool   `name:"debug" help:"Enable debugging mode."`
+	}
+	kong.Parse(&cli)
+
+	log, _ := zap.NewDevelopment()
+	r := gin.New()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	client, err := ent.Open(
+		"sqlite3",
+		"file:ent?mode=memory&cache=shared&_fk=1",
+	)
+	if err != nil {
+		log.Fatal("opening ent client", zap.Error(err))
+	}
+	if err := client.Schema.Create(
+		context.Background(),
+		//migrate.WithGlobalUniqueID(true),
+	); err != nil {
+		log.Fatal("running schema migration", zap.Error(err))
+	}
+
+	r.GET("/", gin.WrapF(playground.Handler("Todo", "/query")))
+
+	srv := handler.NewDefaultServer(todo.NewSchema(client))
+
+	srv.Use(entgql.Transactioner{TxOpener: client})
+
+	srv.Use(&debug.Tracer{})
+
+	r.Any("/query", gin.WrapH(srv))
+
+	panic(r.Run(":8081"))
+}

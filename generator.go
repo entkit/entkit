@@ -85,25 +85,15 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 	return rg
 }
 
-func (rg *RefineGen) FieldTypeName(field gen.Field) string {
-	switch field.Type.String() {
-	case "uuid.UUID":
-		return "string"
-	case "time.Time":
-		return "Date"
-	default:
-		return "string"
-	}
-}
-
+// saveGenerated Save generated file
 func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	dir := path.Join(rg.Extension.appPath, rg.Extension.srcDirName, "ent-refine")
-	err := os.MkdirAll(dir, 0777)
+	resDir := path.Join(rg.Extension.appPath, rg.Extension.srcDirName, "ent-refine")
+	p := filepath.Join(resDir, name)
+
+	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
-
-	p := filepath.Join(dir, name)
 
 	return rg.saveFile(p, content.Bytes(), override)
 }
@@ -149,6 +139,7 @@ func (rg *RefineGen) Generate() {
 		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
 		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
 		RefineSorterEnumsTemplate     = parseT("refine-templates/SorterEnums.gotsx")
+		RefineFieldViewsTemplate      = parseT("refine-templates/FieldViews.gotsx")
 		HelpersTemplate               = parseT("refine-templates/Helpers.gotsx")
 		CustomTemplate                = parseT("refine-templates/Custom.gotsx")
 
@@ -163,6 +154,7 @@ func (rg *RefineGen) Generate() {
 			RefineDataProviderTemplate,
 			RefineSearchComponentTemplate,
 			RefineSorterEnumsTemplate,
+			RefineFieldViewsTemplate,
 			HelpersTemplate,
 		}
 		StaticTemplates = []*gen.Template{

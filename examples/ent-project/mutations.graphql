@@ -1,0 +1,41 @@
+type Mutation {
+    createVendor(input: CreateVendorInput!): Vendor!
+    updateVendor(id: ID!, input: UpdateVendorInput!): Vendor!
+    deleteVendors(where: VendorWhereInput!): Int!
+
+    createWarehouse(input: CreateWarehouseInput!): Warehouse!
+    updateWarehouse(id: ID!, input: UpdateWarehouseInput!): Warehouse!
+    deleteWarehouses(where: WarehouseWhereInput!): Int!
+
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!): Product!
+    deleteProducts(where: ProductWhereInput!): Int!
+
+    createCompany(input: CreateCompanyInput!): Company!
+    updateCompany(id: ID!, input: UpdateCompanyInput!): Company!
+    deleteCompanies(where: CompanyWhereInput!): Int!
+
+    createCountry(input: CreateCountryInput!): Country!
+    updateCountry(id: ID!, input: UpdateCountryInput!): Country!
+    deleteCountries(where: CountryWhereInput!): Int!
+
+    createPhone(input: CreatePhoneInput!): Phone!
+    updatePhone(id: ID!, input: UpdatePhoneInput!): Phone!
+    deletePhones(where: PhoneWhereInput!): Int!
+
+    createLocation(input: CreateLocationInput!): Location!
+    updateLocation(id: ID!, input: UpdateLocationInput!): Location!
+    deleteLocations(where: LocationWhereInput!): Int!
+
+    createWebsite(input: CreateWebsiteInput!): Website!
+    updateWebsite(id: ID!, input: UpdateWebsiteInput!): Website!
+    deleteWebsites(where: WebsiteWhereInput!): Int!
+
+    createEmail(input: CreateEmailInput!): Email!
+    updateEmail(id: ID!, input: UpdateEmailInput!): Email!
+    deleteEmails(where: EmailWhereInput!): Int!
+
+    createImage(input: CreateImageInput!): Image!
+    updateImage(id: ID!, input: UpdateImageInput!): Image!
+    deleteImages(where: ImageWhereInput!): Int!
+}

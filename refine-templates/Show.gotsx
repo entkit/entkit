@@ -4,13 +4,16 @@ import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as Tables from "./tables";
+import * as Interfaces from "./interfaces";
+import * as FieldView from "./field-view";
+import * as Custom from "./custom";
 
 const { Link } = RefineReactRouter;
 
 {{- range $n := $.Graph.Nodes -}}
 
 export const {{$n.Name}}Show = () => {
-    const { queryResult } = useShow({
+    const { queryResult } = useShow<Interfaces.I{{$n.Name}}>({
         resource: "{{ $n.Name }}",
         metaData: {
             fields: [
@@ -50,21 +53,11 @@ export const {{$n.Name}}Show = () => {
         <RA.Show isLoading={isLoading}>
             {{- range $f := $allFields}}
             <RA.Typography.Title level={5}>{{ $f.Name | label }}</RA.Typography.Title>
-            {{- if eq $f.Type.String "time.Time" -}}
-            {record?.{{ camel $f.Name }} ? <RA.DateField format="LLL" value={ record?.{{ camel $f.Name }} }/> : <RA.TextField value="Never"/>}
-            {{- else if eq $f.Type.String "uuid.UUID" -}}
-            <RA.Typography.Text copyable={true}>{ record?.{{ camel $f.Name }} }</RA.Typography.Text>
-            {{- else if eq $f.Type.String "bool" -}}
-            <RA.TextField value={record?.{{ camel $f.Name }}  ? "Yes" : "No"}/>
-            {{- else -}}
-            {{- if $f.Annotations.REFINE.ImageField }}
-            <RA.Image width={128} src={record?.{{ camel $f.Name }} }/>
-            {{- else if $f.Annotations.REFINE.URLField }}
-            <RA.Button type="primary" href={record?.{{ camel $f.Name }} } target="_blank" icon={<RA.Icons.LinkOutlined/>}>{ record?.{{ camel $f.Name }} }</RA.Button>
-            {{- else }}
-            <RA.Typography.Text copyable={true}>{record?.{{ camel $f.Name }}}</RA.Typography.Text>
-            {{- end }}
-            {{- end }}
+            {{- $viewName := ( print "FieldView." (ER_fieldTSType $f) "ViewOnShow" ) }}
+            {{- if not (empty $f.Annotations.REFINE.FieldViewOnShow) }}
+            {{ $viewName = print "Custom." $f.Annotations.REFINE.FieldViewOnShow }}
+            {{- end}}
+            <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
             {{- end }}
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -83,6 +76,7 @@ export const {{$n.Name}}Show = () => {
 
             <RA.Row gutter={[16,32]}>
                 {{- range $e := $n.EdgesWithID }}
+                {{- if not (isNil $e.Ref) }}
                 {{- if not $e.Unique }}
                 <RA.Col span={12}>
                     {{- $titleField := (ER_titleField $e.Type) }}
@@ -94,8 +88,9 @@ export const {{$n.Name}}Show = () => {
                     </RA.Typography.Title>
 
                     {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
-                    <Tables.{{$e.Type.Name}}Table key={ "{{$e.Name}}-" + record?.{{ camel $e.Name }}?.id + "-link"} extendTable={ {permanentFilter: [{operator: "{{$filterOperator}}" as any, field: "", value: {id: record?.id}}]} }></Tables.{{$e.Type.Name}}Table>
+                    <Tables.{{$e.Type.Name}}Table key={ "{{$e.Name}}-{{ plural $e.Ref.Name}}"} extendTable={ {permanentFilter: [{operator: "{{$filterOperator}}" as any, field: "", value: {id: record?.id}}]} }></Tables.{{$e.Type.Name}}Table>
                 </RA.Col>
+                {{- end }}
                 {{- end }}
                 {{- end }}
             </RA.Row>

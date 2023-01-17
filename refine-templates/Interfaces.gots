@@ -1,12 +1,49 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "interfaces.tsx" -}}
-export type UUID = string;
-{{ range $n := $.Graph.Nodes }}
-export interface I{{ $n.Name}} {
-    id: UUID,
-    {{- range $f := $n.Fields }}
-    {{ camel $f.Name }}: {{ $.FieldTypeName $f }};
+
+// Custom types
+export type ER_String = string
+export type ER_Number = number
+export type ER_Boolean = boolean
+export type ER_Date = Date
+export type ER_UUID = string
+export type ER_Image = string
+export type ER_Code = string
+export type ER_URL = string
+export type ER_RichText = string
+export type ER_StringList = ER_String[]
+export type ER_NumberList = ER_Number[]
+
+{{ $enums := list }}
+{{- range $n := $.Graph.Nodes }}
+{{- range $f := $n.Fields }}
+
+{{- if $f.IsEnum }}
+{{- if not (has $f.Type.String $enums) }}
+{{- $enums = append $enums $f.Type.String }}
+export enum {{ ER_fieldTSType $f }}{
+    {{- range $v := $f.EnumValues }}
+    {{$v}} = "{{$v}}",
     {{- end}}
+}
+{{- end}}
+{{- end}}
+{{- end}}
+{{- end}}
+
+{{ range $n := $.Graph.Nodes }}
+{{- $allFields:=prepend $n.Fields $n.ID}}
+export interface I{{ $n.Name}} {
+    {{- range $f := $allFields }}
+    {{ camel $f.Name }}: {{ ER_fieldTSType $f }}, // {{$f.Type.String}}
+    {{- end}}
+    {{- range $e := $n.Edges}}
+    {{- if $e.Unique }}
+    {{ camel $e.Name }}?: I{{$e.Type.Name}},
+    {{- else }}
+    {{ camel $e.Name }}?: I{{$e.Type.Name}}[],
+    {{- end }}
+    {{- end }}
 }
 {{- end -}}
 {{- end -}}

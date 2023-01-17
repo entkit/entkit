@@ -101,6 +101,10 @@ e.g. `EntRefine.FilterOperator("contains")`
 * FilterOperator (field) `EntRefine.FilterOperator("contains")`
 * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
 * [ListActions](#custom-list-actions-annotation) (entity)
+* [FieldView](#custom-field-views) (field)
+  * FieldViewOnList
+  * FieldViewOnShow
+  * FieldViewOnForm
 ## Getting ready to use
 
 1. After configuration regenerate Ent.
@@ -222,6 +226,48 @@ export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
 }
 //...
 ```
+
+## Custom.tsx
+
+To customize Ent-Refine components you can find `./ent-refine/custom.tsx` file on your refine root directory.  
+
+## Custom field views
+
+On Ent-Refine every view of field is customizable for every type of layout.
+
+### Special annotations
+1. FieldView - *Forcing list and show views*
+2. FieldViewOnList
+3. FieldViewOnShow
+4. FieldViewOnForm
+
+### How to customize?
+
+1. First create new React Component on [Custom.tsx](#customtsx) (e.g. `MyCustomTitle`) with `ViewProps` type props.
+   ```tsx
+   import {ViewProps} from "./field-view";
+   
+   export const MyCustomTitle: React.FC<ViewProps<string>> = ({value}) => {
+      return <RA.Typography.Text copyable={true} style={ {color: "red"} }>{ value }</RA.Typography.Text>
+   }
+   ```
+2. Define type of field on schema by `EntRefine.FieldView` annotation
+   ```go
+   field.String("title").
+        Annotations(
+            ...
+            EntRefine.FieldView("MyCustomTitle"),
+            ...
+        ),
+   ```
+   
+3. Regenerate and check
+    ![custom-list-field.png](docs%2Fimages%2Fcustom-list-field.png)
+ 
+## Example
+For more information please check example folder.
+
+Both frameworks (Ent and Refine) are configured as described in documentation. 
 
 ## Contacts
 
