@@ -417,7 +417,6 @@ func HasCompany() predicate.Website {
 	return predicate.Website(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CompanyTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, CompanyTable, CompanyColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -445,7 +444,6 @@ func HasCountry() predicate.Website {
 	return predicate.Website(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CountryTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, CountryTable, CountryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

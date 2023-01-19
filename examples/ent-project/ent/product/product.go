@@ -29,8 +29,8 @@ const (
 	Label = "product"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldImage holds the string denoting the image field in the database.
@@ -45,21 +45,12 @@ const (
 	FieldStatus = "status"
 	// FieldBuildStatus holds the string denoting the build_status field in the database.
 	FieldBuildStatus = "build_status"
-	// EdgeCompany holds the string denoting the company edge name in mutations.
-	EdgeCompany = "company"
 	// EdgeWarehouse holds the string denoting the warehouse edge name in mutations.
 	EdgeWarehouse = "warehouse"
 	// EdgeVendor holds the string denoting the vendor edge name in mutations.
 	EdgeVendor = "vendor"
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// CompanyTable is the table that holds the company relation/edge.
-	CompanyTable = "companies"
-	// CompanyInverseTable is the table name for the Company entity.
-	// It exists in this package in order to avoid circular dependency with the "company" package.
-	CompanyInverseTable = "companies"
-	// CompanyColumn is the table column denoting the company relation/edge.
-	CompanyColumn = "product_company"
 	// WarehouseTable is the table that holds the warehouse relation/edge.
 	WarehouseTable = "products"
 	// WarehouseInverseTable is the table name for the Warehouse entity.
@@ -79,7 +70,7 @@ const (
 // Columns holds all SQL columns for product fields.
 var Columns = []string{
 	FieldID,
-	FieldTitle,
+	FieldName,
 	FieldDescription,
 	FieldImage,
 	FieldURL,
@@ -112,8 +103,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	TitleValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// ImageValidator is a validator for the "image" field. It is called by the builders before save.

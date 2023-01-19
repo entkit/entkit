@@ -53,7 +53,8 @@ export const SearchComponent: React.FC = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
+                "logo",
             ],
             searchQuery: value,
         },
@@ -62,8 +63,8 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
-                        null,
+                        item.name,
+                        `${item.logo}`,
                         `/Company/show/${item.id}`,
                     ),
                 );
@@ -234,7 +235,7 @@ export const SearchComponent: React.FC = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
                 "image",
             ],
             searchQuery: value,
@@ -244,7 +245,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        item.name,
                         `${item.image}`,
                         `/Product/show/${item.id}`,
                     ),
@@ -265,7 +266,7 @@ export const SearchComponent: React.FC = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
             ],
             searchQuery: value,
         },
@@ -274,7 +275,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        item.name,
                         null,
                         `/Vendor/show/${item.id}`,
                     ),
@@ -295,7 +296,7 @@ export const SearchComponent: React.FC = () => {
         metaData: {
             fields: [
                 "id",
-                "url",
+                "name",
             ],
             searchQuery: value,
         },
@@ -304,7 +305,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.url,
+                        item.name,
                         null,
                         `/Warehouse/show/${item.id}`,
                     ),

@@ -22,18 +22,27 @@ func (Company) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("ID"),
 			),
-		field.String("title").
+		field.String("name").
 			MaxLen(128).
 			Annotations(
 				EntRefine.TitleField(),
 				EntRefine.FilterOperator(gen.Contains),
 				EntRefine.FieldView("MyCustomTitle"),
-				entgql.OrderField("TITLE"),
+				entgql.OrderField("NAME"),
+			),
+		field.String("logo").
+			MaxLen(128).
+			Nillable().
+			Optional().
+			Annotations(
+				entgql.OrderField("LOGO"),
+				EntRefine.MainImageField(),
 			),
 		field.String("description").
 			MaxLen(512).
 			Annotations(
 				EntRefine.RichTextField(),
+				EntRefine.HideOnList(),
 				EntRefine.FilterOperator(gen.Contains),
 				entgql.OrderField("DESCRIPTION"),
 			),
@@ -42,8 +51,6 @@ func (Company) Fields() []ent.Field {
 
 func (Company) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("product", Product.Type).Ref("company").
-			Unique(),
 		edge.To("countries", Country.Type).
 			Annotations(entgql.RelayConnection()),
 		edge.To("phones", Phone.Type).

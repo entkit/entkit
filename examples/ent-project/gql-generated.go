@@ -55,10 +55,10 @@ type ComplexityRoot struct {
 		GalleryImages func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ImageOrder, where *ent.ImageWhereInput) int
 		ID            func(childComplexity int) int
 		Locations     func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.LocationOrder, where *ent.LocationWhereInput) int
+		Logo          func(childComplexity int) int
 		LogoImage     func(childComplexity int) int
+		Name          func(childComplexity int) int
 		Phones        func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.PhoneOrder, where *ent.PhoneWhereInput) int
-		Product       func(childComplexity int) int
-		Title         func(childComplexity int) int
 		Websites      func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.WebsiteOrder, where *ent.WebsiteWhereInput) int
 	}
 
@@ -225,14 +225,13 @@ type ComplexityRoot struct {
 
 	Product struct {
 		BuildStatus func(childComplexity int) int
-		Company     func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Image       func(childComplexity int) int
 		LastSell    func(childComplexity int) int
+		Name        func(childComplexity int) int
 		Status      func(childComplexity int) int
-		Title       func(childComplexity int) int
 		URL         func(childComplexity int) int
 		Vendor      func(childComplexity int) int
 		Warehouse   func(childComplexity int) int
@@ -266,10 +265,9 @@ type ComplexityRoot struct {
 
 	Vendor struct {
 		ID         func(childComplexity int) int
+		Name       func(childComplexity int) int
 		Products   func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ProductOrder, where *ent.ProductWhereInput) int
 		Schema     func(childComplexity int) int
-		Title      func(childComplexity int) int
-		URL        func(childComplexity int) int
 		Warehouses func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.WarehouseOrder, where *ent.WarehouseWhereInput) int
 	}
 
@@ -289,9 +287,9 @@ type ComplexityRoot struct {
 		Filters      func(childComplexity int) int
 		ID           func(childComplexity int) int
 		LastUpdate   func(childComplexity int) int
+		Name         func(childComplexity int) int
 		OriginalData func(childComplexity int) int
 		Products     func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ProductOrder, where *ent.ProductWhereInput) int
-		URL          func(childComplexity int) int
 		Vendor       func(childComplexity int) int
 	}
 
@@ -451,12 +449,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Company.Locations(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.LocationOrder), args["where"].(*ent.LocationWhereInput)), true
 
+	case "Company.logo":
+		if e.complexity.Company.Logo == nil {
+			break
+		}
+
+		return e.complexity.Company.Logo(childComplexity), true
+
 	case "Company.logoImage":
 		if e.complexity.Company.LogoImage == nil {
 			break
 		}
 
 		return e.complexity.Company.LogoImage(childComplexity), true
+
+	case "Company.name":
+		if e.complexity.Company.Name == nil {
+			break
+		}
+
+		return e.complexity.Company.Name(childComplexity), true
 
 	case "Company.phones":
 		if e.complexity.Company.Phones == nil {
@@ -469,20 +481,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Company.Phones(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.PhoneOrder), args["where"].(*ent.PhoneWhereInput)), true
-
-	case "Company.product":
-		if e.complexity.Company.Product == nil {
-			break
-		}
-
-		return e.complexity.Company.Product(childComplexity), true
-
-	case "Company.title":
-		if e.complexity.Company.Title == nil {
-			break
-		}
-
-		return e.complexity.Company.Title(childComplexity), true
 
 	case "Company.websites":
 		if e.complexity.Company.Websites == nil {
@@ -1406,13 +1404,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.BuildStatus(childComplexity), true
 
-	case "Product.company":
-		if e.complexity.Product.Company == nil {
-			break
-		}
-
-		return e.complexity.Product.Company(childComplexity), true
-
 	case "Product.createdAt":
 		if e.complexity.Product.CreatedAt == nil {
 			break
@@ -1448,19 +1439,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.LastSell(childComplexity), true
 
+	case "Product.name":
+		if e.complexity.Product.Name == nil {
+			break
+		}
+
+		return e.complexity.Product.Name(childComplexity), true
+
 	case "Product.status":
 		if e.complexity.Product.Status == nil {
 			break
 		}
 
 		return e.complexity.Product.Status(childComplexity), true
-
-	case "Product.title":
-		if e.complexity.Product.Title == nil {
-			break
-		}
-
-		return e.complexity.Product.Title(childComplexity), true
 
 	case "Product.url":
 		if e.complexity.Product.URL == nil {
@@ -1669,6 +1660,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Vendor.ID(childComplexity), true
 
+	case "Vendor.name":
+		if e.complexity.Vendor.Name == nil {
+			break
+		}
+
+		return e.complexity.Vendor.Name(childComplexity), true
+
 	case "Vendor.products":
 		if e.complexity.Vendor.Products == nil {
 			break
@@ -1687,20 +1685,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Vendor.Schema(childComplexity), true
-
-	case "Vendor.title":
-		if e.complexity.Vendor.Title == nil {
-			break
-		}
-
-		return e.complexity.Vendor.Title(childComplexity), true
-
-	case "Vendor.url":
-		if e.complexity.Vendor.URL == nil {
-			break
-		}
-
-		return e.complexity.Vendor.URL(childComplexity), true
 
 	case "Vendor.warehouses":
 		if e.complexity.Vendor.Warehouses == nil {
@@ -1777,6 +1761,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Warehouse.LastUpdate(childComplexity), true
 
+	case "Warehouse.name":
+		if e.complexity.Warehouse.Name == nil {
+			break
+		}
+
+		return e.complexity.Warehouse.Name(childComplexity), true
+
 	case "Warehouse.originalData":
 		if e.complexity.Warehouse.OriginalData == nil {
 			break
@@ -1795,13 +1786,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Warehouse.Products(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.ProductOrder), args["where"].(*ent.ProductWhereInput)), true
-
-	case "Warehouse.url":
-		if e.complexity.Warehouse.URL == nil {
-			break
-		}
-
-		return e.complexity.Warehouse.URL(childComplexity), true
 
 	case "Warehouse.vendor":
 		if e.complexity.Warehouse.Vendor == nil {
@@ -2034,9 +2018,9 @@ var sources = []*ast.Source{
 directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 type Company implements Node {
   id: ID!
-  title: String!
+  name: String!
+  logo: String
   description: String!
-  product: Product
   countries(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -2178,7 +2162,8 @@ input CompanyOrder {
 }
 """Properties by which Company connections can be ordered."""
 enum CompanyOrderField {
-  TITLE
+  NAME
+  LOGO
   DESCRIPTION
 }
 """
@@ -2198,20 +2183,36 @@ input CompanyWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  """logo field predicates"""
+  logo: String
+  logoNEQ: String
+  logoIn: [String!]
+  logoNotIn: [String!]
+  logoGT: String
+  logoGTE: String
+  logoLT: String
+  logoLTE: String
+  logoContains: String
+  logoHasPrefix: String
+  logoHasSuffix: String
+  logoIsNil: Boolean
+  logoNotNil: Boolean
+  logoEqualFold: String
+  logoContainsFold: String
   """description field predicates"""
   description: String
   descriptionNEQ: String
@@ -2226,9 +2227,6 @@ input CompanyWhereInput {
   descriptionHasSuffix: String
   descriptionEqualFold: String
   descriptionContainsFold: String
-  """product edge predicates"""
-  hasProduct: Boolean
-  hasProductWith: [ProductWhereInput!]
   """countries edge predicates"""
   hasCountries: Boolean
   hasCountriesWith: [CountryWhereInput!]
@@ -2445,9 +2443,9 @@ CreateCompanyInput is used for create Company object.
 Input was generated by ent.
 """
 input CreateCompanyInput {
-  title: String!
+  name: String!
+  logo: String
   description: String!
-  productID: ID
   countryIDs: [ID!]
   phoneIDs: [ID!]
   emailIDs: [ID!]
@@ -2526,13 +2524,12 @@ CreateProductInput is used for create Product object.
 Input was generated by ent.
 """
 input CreateProductInput {
-  title: String!
+  name: String!
   description: String!
   image: String!
   url: String!
   status: ProductProcessStatus
   buildStatus: ProductProcessStatus
-  companyID: ID
   warehouseID: ID
   vendorID: ID
 }
@@ -2541,8 +2538,7 @@ CreateVendorInput is used for create Vendor object.
 Input was generated by ent.
 """
 input CreateVendorInput {
-  title: String!
-  url: String!
+  name: String!
   schema: String!
   warehouseIDs: [ID!]
   productIDs: [ID!]
@@ -2552,7 +2548,7 @@ CreateWarehouseInput is used for create Warehouse object.
 Input was generated by ent.
 """
 input CreateWarehouseInput {
-  url: String!
+  name: String!
   originalData: String
   enabled: Boolean
   filters: [String!]
@@ -3136,7 +3132,7 @@ input PhoneWhereInput {
 }
 type Product implements Node {
   id: ID!
-  title: String!
+  name: String!
   description: String!
   image: String!
   url: String!
@@ -3144,7 +3140,6 @@ type Product implements Node {
   createdAt: Time
   status: ProductProcessStatus!
   buildStatus: ProductProcessStatus!
-  company: Company
   warehouse: Warehouse
   vendor: Vendor
 }
@@ -3207,20 +3202,20 @@ input ProductWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
   """description field predicates"""
   description: String
   descriptionNEQ: String
@@ -3295,9 +3290,6 @@ input ProductWhereInput {
   buildStatusNEQ: ProductProcessStatus
   buildStatusIn: [ProductProcessStatus!]
   buildStatusNotIn: [ProductProcessStatus!]
-  """company edge predicates"""
-  hasCompany: Boolean
-  hasCompanyWith: [CompanyWhereInput!]
   """warehouse edge predicates"""
   hasWarehouse: Boolean
   hasWarehouseWith: [WarehouseWhereInput!]
@@ -3544,24 +3536,30 @@ UpdateCompanyInput is used for update Company object.
 Input was generated by ent.
 """
 input UpdateCompanyInput {
-  title: String
+  name: String
+  logo: String
+  clearLogo: Boolean
   description: String
-  clearProduct: Boolean
-  productID: ID
   addCountryIDs: [ID!]
   removeCountryIDs: [ID!]
+  clearCountries: Boolean
   addPhoneIDs: [ID!]
   removePhoneIDs: [ID!]
+  clearPhones: Boolean
   addEmailIDs: [ID!]
   removeEmailIDs: [ID!]
+  clearEmails: Boolean
   addWebsiteIDs: [ID!]
   removeWebsiteIDs: [ID!]
+  clearWebsites: Boolean
   addLocationIDs: [ID!]
   removeLocationIDs: [ID!]
-  clearLogoImage: Boolean
+  clearLocations: Boolean
   logoImageID: ID
+  clearLogoImage: Boolean
   addGalleryImageIDs: [ID!]
   removeGalleryImageIDs: [ID!]
+  clearGalleryImages: Boolean
 }
 """
 UpdateCountryInput is used for update Country object.
@@ -3572,14 +3570,19 @@ input UpdateCountryInput {
   code: String
   addCompanyIDs: [ID!]
   removeCompanyIDs: [ID!]
+  clearCompanies: Boolean
   addPhoneIDs: [ID!]
   removePhoneIDs: [ID!]
+  clearPhones: Boolean
   addEmailIDs: [ID!]
   removeEmailIDs: [ID!]
+  clearEmails: Boolean
   addWebsiteIDs: [ID!]
   removeWebsiteIDs: [ID!]
+  clearWebsites: Boolean
   addLocationIDs: [ID!]
   removeLocationIDs: [ID!]
+  clearLocations: Boolean
 }
 """
 UpdateEmailInput is used for update Email object.
@@ -3589,10 +3592,10 @@ input UpdateEmailInput {
   title: String
   description: String
   address: String
-  clearCompany: Boolean
   companyID: ID
-  clearCountry: Boolean
+  clearCompany: Boolean
   countryID: ID
+  clearCountry: Boolean
 }
 """
 UpdateImageInput is used for update Image object.
@@ -3601,10 +3604,10 @@ Input was generated by ent.
 input UpdateImageInput {
   title: String
   originalURL: String
-  clearGalleryCompany: Boolean
   galleryCompanyID: ID
-  clearLogoCompany: Boolean
+  clearGalleryCompany: Boolean
   logoCompanyID: ID
+  clearLogoCompany: Boolean
 }
 """
 UpdateLocationInput is used for update Location object.
@@ -3622,10 +3625,10 @@ input UpdateLocationInput {
   suburb: String
   streetType: String
   streetName: String
-  clearCompany: Boolean
   companyID: ID
-  clearCountry: Boolean
+  clearCompany: Boolean
   countryID: ID
+  clearCountry: Boolean
 }
 """
 UpdatePhoneInput is used for update Phone object.
@@ -3636,64 +3639,64 @@ input UpdatePhoneInput {
   description: String
   number: String
   type: String
-  clearCompany: Boolean
   companyID: ID
-  clearCountry: Boolean
+  clearCompany: Boolean
   countryID: ID
+  clearCountry: Boolean
 }
 """
 UpdateProductInput is used for update Product object.
 Input was generated by ent.
 """
 input UpdateProductInput {
-  title: String
+  name: String
   description: String
   image: String
   url: String
-  clearLastSell: Boolean
   lastSell: Time
-  clearCreatedAt: Boolean
+  clearLastSell: Boolean
   createdAt: Time
+  clearCreatedAt: Boolean
   status: ProductProcessStatus
   buildStatus: ProductProcessStatus
-  clearCompany: Boolean
-  companyID: ID
-  clearWarehouse: Boolean
   warehouseID: ID
-  clearVendor: Boolean
+  clearWarehouse: Boolean
   vendorID: ID
+  clearVendor: Boolean
 }
 """
 UpdateVendorInput is used for update Vendor object.
 Input was generated by ent.
 """
 input UpdateVendorInput {
-  title: String
-  url: String
+  name: String
   schema: String
   addWarehouseIDs: [ID!]
   removeWarehouseIDs: [ID!]
+  clearWarehouses: Boolean
   addProductIDs: [ID!]
   removeProductIDs: [ID!]
+  clearProducts: Boolean
 }
 """
 UpdateWarehouseInput is used for update Warehouse object.
 Input was generated by ent.
 """
 input UpdateWarehouseInput {
-  url: String
-  clearLastUpdate: Boolean
+  name: String
   lastUpdate: Time
-  clearOriginalData: Boolean
+  clearLastUpdate: Boolean
   originalData: String
+  clearOriginalData: Boolean
   enabled: Boolean
-  clearFilters: Boolean
   filters: [String!]
   appendFilters: [String!]
+  clearFilters: Boolean
   addProductIDs: [ID!]
   removeProductIDs: [ID!]
-  clearVendor: Boolean
+  clearProducts: Boolean
   vendorID: ID
+  clearVendor: Boolean
 }
 """
 UpdateWebsiteInput is used for update Website object.
@@ -3703,15 +3706,14 @@ input UpdateWebsiteInput {
   title: String
   description: String
   url: String
-  clearCompany: Boolean
   companyID: ID
-  clearCountry: Boolean
+  clearCompany: Boolean
   countryID: ID
+  clearCountry: Boolean
 }
 type Vendor implements Node {
   id: ID!
-  title: String!
-  url: String!
+  name: String!
   schema: String!
   warehouses(
     """Returns the elements in the list that come after the specified cursor."""
@@ -3777,8 +3779,7 @@ input VendorOrder {
 }
 """Properties by which Vendor connections can be ordered."""
 enum VendorOrderField {
-  TITLE
-  URL
+  NAME
   SCHEMA
 }
 """
@@ -3798,34 +3799,20 @@ input VendorWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """url field predicates"""
-  url: String
-  urlNEQ: String
-  urlIn: [String!]
-  urlNotIn: [String!]
-  urlGT: String
-  urlGTE: String
-  urlLT: String
-  urlLTE: String
-  urlContains: String
-  urlHasPrefix: String
-  urlHasSuffix: String
-  urlEqualFold: String
-  urlContainsFold: String
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
   """schema field predicates"""
   schema: String
   schemaNEQ: String
@@ -3849,7 +3836,7 @@ input VendorWhereInput {
 }
 type Warehouse implements Node {
   id: ID!
-  url: String!
+  name: String!
   lastUpdate: Time
   originalData: String
   enabled: Boolean!
@@ -3900,7 +3887,7 @@ input WarehouseOrder {
 }
 """Properties by which Warehouse connections can be ordered."""
 enum WarehouseOrderField {
-  URL
+  NAME
   LAST_UPDATE
   ENABLED
 }
@@ -3921,20 +3908,20 @@ input WarehouseWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """url field predicates"""
-  url: String
-  urlNEQ: String
-  urlIn: [String!]
-  urlNotIn: [String!]
-  urlGT: String
-  urlGTE: String
-  urlLT: String
-  urlLTE: String
-  urlContains: String
-  urlHasPrefix: String
-  urlHasSuffix: String
-  urlEqualFold: String
-  urlContainsFold: String
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
   """last_update field predicates"""
   lastUpdate: Time
   lastUpdateNEQ: Time
@@ -6322,8 +6309,8 @@ func (ec *executionContext) fieldContext_Company_id(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Company_title(ctx context.Context, field graphql.CollectedField, obj *ent.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_title(ctx, field)
+func (ec *executionContext) _Company_name(ctx context.Context, field graphql.CollectedField, obj *ent.Company) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Company_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6336,7 +6323,7 @@ func (ec *executionContext) _Company_title(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6353,7 +6340,48 @@ func (ec *executionContext) _Company_title(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Company_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Company_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Company",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Company_logo(ctx context.Context, field graphql.CollectedField, obj *ent.Company) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Company_logo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Logo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Company_logo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Company",
 		Field:      field,
@@ -6405,73 +6433,6 @@ func (ec *executionContext) fieldContext_Company_description(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_product(ctx context.Context, field graphql.CollectedField, obj *ent.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_product(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Product(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Product)
-	fc.Result = res
-	return ec.marshalOProduct2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_product(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Product_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Product_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Product_description(ctx, field)
-			case "image":
-				return ec.fieldContext_Product_image(ctx, field)
-			case "url":
-				return ec.fieldContext_Product_url(ctx, field)
-			case "lastSell":
-				return ec.fieldContext_Product_lastSell(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Product_createdAt(ctx, field)
-			case "status":
-				return ec.fieldContext_Product_status(ctx, field)
-			case "buildStatus":
-				return ec.fieldContext_Product_buildStatus(ctx, field)
-			case "company":
-				return ec.fieldContext_Product_company(ctx, field)
-			case "warehouse":
-				return ec.fieldContext_Product_warehouse(ctx, field)
-			case "vendor":
-				return ec.fieldContext_Product_vendor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
 	}
 	return fc, nil
@@ -7091,12 +7052,12 @@ func (ec *executionContext) fieldContext_CompanyEdge_node(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -8071,12 +8032,12 @@ func (ec *executionContext) fieldContext_Email_company(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -8571,12 +8532,12 @@ func (ec *executionContext) fieldContext_Image_galleryCompany(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -8636,12 +8597,12 @@ func (ec *executionContext) fieldContext_Image_logoCompany(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -9471,12 +9432,12 @@ func (ec *executionContext) fieldContext_Location_company(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -9858,10 +9819,8 @@ func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Vendor_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Vendor_title(ctx, field)
-			case "url":
-				return ec.fieldContext_Vendor_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
 			case "schema":
 				return ec.fieldContext_Vendor_schema(ctx, field)
 			case "warehouses":
@@ -9927,10 +9886,8 @@ func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Vendor_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Vendor_title(ctx, field)
-			case "url":
-				return ec.fieldContext_Vendor_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
 			case "schema":
 				return ec.fieldContext_Vendor_schema(ctx, field)
 			case "warehouses":
@@ -10051,8 +10008,8 @@ func (ec *executionContext) fieldContext_Mutation_createWarehouse(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Warehouse_id(ctx, field)
-			case "url":
-				return ec.fieldContext_Warehouse_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Warehouse_name(ctx, field)
 			case "lastUpdate":
 				return ec.fieldContext_Warehouse_lastUpdate(ctx, field)
 			case "originalData":
@@ -10124,8 +10081,8 @@ func (ec *executionContext) fieldContext_Mutation_updateWarehouse(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Warehouse_id(ctx, field)
-			case "url":
-				return ec.fieldContext_Warehouse_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Warehouse_name(ctx, field)
 			case "lastUpdate":
 				return ec.fieldContext_Warehouse_lastUpdate(ctx, field)
 			case "originalData":
@@ -10252,8 +10209,8 @@ func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Product_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Product_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
 			case "image":
@@ -10268,8 +10225,6 @@ func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Cont
 				return ec.fieldContext_Product_status(ctx, field)
 			case "buildStatus":
 				return ec.fieldContext_Product_buildStatus(ctx, field)
-			case "company":
-				return ec.fieldContext_Product_company(ctx, field)
 			case "warehouse":
 				return ec.fieldContext_Product_warehouse(ctx, field)
 			case "vendor":
@@ -10333,8 +10288,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Product_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Product_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
 			case "image":
@@ -10349,8 +10304,6 @@ func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Cont
 				return ec.fieldContext_Product_status(ctx, field)
 			case "buildStatus":
 				return ec.fieldContext_Product_buildStatus(ctx, field)
-			case "company":
-				return ec.fieldContext_Product_company(ctx, field)
 			case "warehouse":
 				return ec.fieldContext_Product_warehouse(ctx, field)
 			case "vendor":
@@ -10469,12 +10422,12 @@ func (ec *executionContext) fieldContext_Mutation_createCompany(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -10548,12 +10501,12 @@ func (ec *executionContext) fieldContext_Mutation_updateCompany(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -12267,12 +12220,12 @@ func (ec *executionContext) fieldContext_Phone_company(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -12643,8 +12596,8 @@ func (ec *executionContext) fieldContext_Product_id(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Product_title(ctx context.Context, field graphql.CollectedField, obj *ent.Product) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Product_title(ctx, field)
+func (ec *executionContext) _Product_name(ctx context.Context, field graphql.CollectedField, obj *ent.Product) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Product_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -12657,7 +12610,7 @@ func (ec *executionContext) _Product_title(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12674,7 +12627,7 @@ func (ec *executionContext) _Product_title(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Product_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Product_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Product",
 		Field:      field,
@@ -12989,71 +12942,6 @@ func (ec *executionContext) fieldContext_Product_buildStatus(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Product_company(ctx context.Context, field graphql.CollectedField, obj *ent.Product) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Product_company(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Company(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Company)
-	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Product_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
-			case "countries":
-				return ec.fieldContext_Company_countries(ctx, field)
-			case "phones":
-				return ec.fieldContext_Company_phones(ctx, field)
-			case "emails":
-				return ec.fieldContext_Company_emails(ctx, field)
-			case "websites":
-				return ec.fieldContext_Company_websites(ctx, field)
-			case "locations":
-				return ec.fieldContext_Company_locations(ctx, field)
-			case "logoImage":
-				return ec.fieldContext_Company_logoImage(ctx, field)
-			case "galleryImages":
-				return ec.fieldContext_Company_galleryImages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Product_warehouse(ctx context.Context, field graphql.CollectedField, obj *ent.Product) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Product_warehouse(ctx, field)
 	if err != nil {
@@ -13092,8 +12980,8 @@ func (ec *executionContext) fieldContext_Product_warehouse(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Warehouse_id(ctx, field)
-			case "url":
-				return ec.fieldContext_Warehouse_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Warehouse_name(ctx, field)
 			case "lastUpdate":
 				return ec.fieldContext_Warehouse_lastUpdate(ctx, field)
 			case "originalData":
@@ -13151,10 +13039,8 @@ func (ec *executionContext) fieldContext_Product_vendor(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Vendor_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Vendor_title(ctx, field)
-			case "url":
-				return ec.fieldContext_Vendor_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
 			case "schema":
 				return ec.fieldContext_Vendor_schema(ctx, field)
 			case "warehouses":
@@ -13351,8 +13237,8 @@ func (ec *executionContext) fieldContext_ProductEdge_node(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Product_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Product_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
 			case "image":
@@ -13367,8 +13253,6 @@ func (ec *executionContext) fieldContext_ProductEdge_node(ctx context.Context, f
 				return ec.fieldContext_Product_status(ctx, field)
 			case "buildStatus":
 				return ec.fieldContext_Product_buildStatus(ctx, field)
-			case "company":
-				return ec.fieldContext_Product_company(ctx, field)
 			case "warehouse":
 				return ec.fieldContext_Product_warehouse(ctx, field)
 			case "vendor":
@@ -14334,8 +14218,8 @@ func (ec *executionContext) fieldContext_Vendor_id(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Vendor_title(ctx context.Context, field graphql.CollectedField, obj *ent.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_title(ctx, field)
+func (ec *executionContext) _Vendor_name(ctx context.Context, field graphql.CollectedField, obj *ent.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14348,7 +14232,7 @@ func (ec *executionContext) _Vendor_title(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14365,51 +14249,7 @@ func (ec *executionContext) _Vendor_title(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Vendor_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vendor",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vendor_url(ctx context.Context, field graphql.CollectedField, obj *ent.Vendor) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Vendor_url(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Vendor_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Vendor_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Vendor",
 		Field:      field,
@@ -14775,10 +14615,8 @@ func (ec *executionContext) fieldContext_VendorEdge_node(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Vendor_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Vendor_title(ctx, field)
-			case "url":
-				return ec.fieldContext_Vendor_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
 			case "schema":
 				return ec.fieldContext_Vendor_schema(ctx, field)
 			case "warehouses":
@@ -14880,8 +14718,8 @@ func (ec *executionContext) fieldContext_Warehouse_id(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Warehouse_url(ctx context.Context, field graphql.CollectedField, obj *ent.Warehouse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Warehouse_url(ctx, field)
+func (ec *executionContext) _Warehouse_name(ctx context.Context, field graphql.CollectedField, obj *ent.Warehouse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Warehouse_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14894,7 +14732,7 @@ func (ec *executionContext) _Warehouse_url(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14911,7 +14749,7 @@ func (ec *executionContext) _Warehouse_url(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Warehouse_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Warehouse_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Warehouse",
 		Field:      field,
@@ -15192,10 +15030,8 @@ func (ec *executionContext) fieldContext_Warehouse_vendor(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Vendor_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Vendor_title(ctx, field)
-			case "url":
-				return ec.fieldContext_Vendor_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
 			case "schema":
 				return ec.fieldContext_Vendor_schema(ctx, field)
 			case "warehouses":
@@ -15392,8 +15228,8 @@ func (ec *executionContext) fieldContext_WarehouseEdge_node(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Warehouse_id(ctx, field)
-			case "url":
-				return ec.fieldContext_Warehouse_url(ctx, field)
+			case "name":
+				return ec.fieldContext_Warehouse_name(ctx, field)
 			case "lastUpdate":
 				return ec.fieldContext_Warehouse_lastUpdate(ctx, field)
 			case "originalData":
@@ -15671,12 +15507,12 @@ func (ec *executionContext) fieldContext_Website_company(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Company_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Company_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
 			case "description":
 				return ec.fieldContext_Company_description(ctx, field)
-			case "product":
-				return ec.fieldContext_Company_product(ctx, field)
 			case "countries":
 				return ec.fieldContext_Company_countries(ctx, field)
 			case "phones":
@@ -17906,107 +17742,227 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNEQ":
+		case "nameNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNEQ"))
-			it.TitleNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			it.NameNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleIn":
+		case "nameIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleIn"))
-			it.TitleIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			it.NameIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNotIn":
+		case "nameNotIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNotIn"))
-			it.TitleNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			it.NameNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGT":
+		case "nameGT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGT"))
-			it.TitleGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			it.NameGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGTE":
+		case "nameGTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGTE"))
-			it.TitleGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			it.NameGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLT":
+		case "nameLT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLT"))
-			it.TitleLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			it.NameLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLTE":
+		case "nameLTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLTE"))
-			it.TitleLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			it.NameLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContains":
+		case "nameContains":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContains"))
-			it.TitleContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			it.NameContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasPrefix":
+		case "nameHasPrefix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasPrefix"))
-			it.TitleHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			it.NameHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasSuffix":
+		case "nameHasSuffix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasSuffix"))
-			it.TitleHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			it.NameHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleEqualFold":
+		case "nameEqualFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleEqualFold"))
-			it.TitleEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			it.NameEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContainsFold":
+		case "nameContainsFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContainsFold"))
-			it.TitleContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logo":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logo"))
+			it.Logo, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoNEQ"))
+			it.LogoNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoIn"))
+			it.LogoIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoNotIn"))
+			it.LogoNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoGT"))
+			it.LogoGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoGTE"))
+			it.LogoGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoLT"))
+			it.LogoLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoLTE"))
+			it.LogoLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoContains"))
+			it.LogoContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoHasPrefix"))
+			it.LogoHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoHasSuffix"))
+			it.LogoHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoIsNil"))
+			it.LogoIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoNotNil"))
+			it.LogoNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoEqualFold"))
+			it.LogoEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logoContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoContainsFold"))
+			it.LogoContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18111,22 +18067,6 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionContainsFold"))
 			it.DescriptionContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasProduct":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProduct"))
-			it.HasProduct, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasProductWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProductWith"))
-			it.HasProductWith, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18683,11 +18623,19 @@ func (ec *executionContext) unmarshalInputCreateCompanyInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logo":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logo"))
+			it.Logo, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18696,14 +18644,6 @@ func (ec *executionContext) unmarshalInputCreateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "productID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productID"))
-			it.ProductID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19133,11 +19073,11 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19181,14 +19121,6 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "companyID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyID"))
-			it.CompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "warehouseID":
 			var err error
 
@@ -19220,19 +19152,11 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "url":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19275,11 +19199,11 @@ func (ec *executionContext) unmarshalInputCreateWarehouseInput(ctx context.Conte
 
 	for k, v := range asMap {
 		switch k {
-		case "url":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22196,107 +22120,107 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNEQ":
+		case "nameNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNEQ"))
-			it.TitleNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			it.NameNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleIn":
+		case "nameIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleIn"))
-			it.TitleIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			it.NameIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNotIn":
+		case "nameNotIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNotIn"))
-			it.TitleNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			it.NameNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGT":
+		case "nameGT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGT"))
-			it.TitleGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			it.NameGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGTE":
+		case "nameGTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGTE"))
-			it.TitleGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			it.NameGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLT":
+		case "nameLT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLT"))
-			it.TitleLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			it.NameLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLTE":
+		case "nameLTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLTE"))
-			it.TitleLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			it.NameLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContains":
+		case "nameContains":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContains"))
-			it.TitleContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			it.NameContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasPrefix":
+		case "nameHasPrefix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasPrefix"))
-			it.TitleHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			it.NameHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasSuffix":
+		case "nameHasSuffix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasSuffix"))
-			it.TitleHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			it.NameHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleEqualFold":
+		case "nameEqualFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleEqualFold"))
-			it.TitleEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			it.NameEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContainsFold":
+		case "nameContainsFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContainsFold"))
-			it.TitleContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22836,22 +22760,6 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "hasCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompany"))
-			it.HasCompany, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasCompanyWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompanyWith"))
-			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "hasWarehouse":
 			var err error
 
@@ -22899,11 +22807,27 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "logo":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logo"))
+			it.Logo, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearLogo":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogo"))
+			it.ClearLogo, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22912,22 +22836,6 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "clearProduct":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearProduct"))
-			it.ClearProduct, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "productID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productID"))
-			it.ProductID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22947,6 +22855,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "clearCountries":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountries"))
+			it.ClearCountries, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addPhoneIDs":
 			var err error
 
@@ -22960,6 +22876,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removePhoneIDs"))
 			it.RemovePhoneIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearPhones":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPhones"))
+			it.ClearPhones, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22979,6 +22903,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "clearEmails":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearEmails"))
+			it.ClearEmails, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addWebsiteIDs":
 			var err error
 
@@ -22992,6 +22924,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeWebsiteIDs"))
 			it.RemoveWebsiteIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearWebsites":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearWebsites"))
+			it.ClearWebsites, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23011,11 +22951,11 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearLogoImage":
+		case "clearLocations":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogoImage"))
-			it.ClearLogoImage, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLocations"))
+			it.ClearLocations, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23024,6 +22964,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoImageID"))
 			it.LogoImageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearLogoImage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogoImage"))
+			it.ClearLogoImage, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23040,6 +22988,14 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeGalleryImageIDs"))
 			it.RemoveGalleryImageIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearGalleryImages":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearGalleryImages"))
+			it.ClearGalleryImages, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23090,6 +23046,14 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "clearCompanies":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompanies"))
+			it.ClearCompanies, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addPhoneIDs":
 			var err error
 
@@ -23103,6 +23067,14 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removePhoneIDs"))
 			it.RemovePhoneIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearPhones":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPhones"))
+			it.ClearPhones, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23122,6 +23094,14 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "clearEmails":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearEmails"))
+			it.ClearEmails, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addWebsiteIDs":
 			var err error
 
@@ -23138,6 +23118,14 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "clearWebsites":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearWebsites"))
+			it.ClearWebsites, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addLocationIDs":
 			var err error
 
@@ -23151,6 +23139,14 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeLocationIDs"))
 			it.RemoveLocationIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearLocations":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLocations"))
+			it.ClearLocations, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23193,14 +23189,6 @@ func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
-			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "companyID":
 			var err error
 
@@ -23209,11 +23197,11 @@ func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearCountry":
+		case "clearCompany":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
-			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
+			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23222,6 +23210,14 @@ func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryID"))
 			it.CountryID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCountry":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
+			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23256,14 +23252,6 @@ func (ec *executionContext) unmarshalInputUpdateImageInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearGalleryCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearGalleryCompany"))
-			it.ClearGalleryCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "galleryCompanyID":
 			var err error
 
@@ -23272,11 +23260,11 @@ func (ec *executionContext) unmarshalInputUpdateImageInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearLogoCompany":
+		case "clearGalleryCompany":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogoCompany"))
-			it.ClearLogoCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearGalleryCompany"))
+			it.ClearGalleryCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23285,6 +23273,14 @@ func (ec *executionContext) unmarshalInputUpdateImageInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoCompanyID"))
 			it.LogoCompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearLogoCompany":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogoCompany"))
+			it.ClearLogoCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23391,14 +23387,6 @@ func (ec *executionContext) unmarshalInputUpdateLocationInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
-		case "clearCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
-			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "companyID":
 			var err error
 
@@ -23407,11 +23395,11 @@ func (ec *executionContext) unmarshalInputUpdateLocationInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
-		case "clearCountry":
+		case "clearCompany":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
-			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
+			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23420,6 +23408,14 @@ func (ec *executionContext) unmarshalInputUpdateLocationInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryID"))
 			it.CountryID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCountry":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
+			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23470,14 +23466,6 @@ func (ec *executionContext) unmarshalInputUpdatePhoneInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
-			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "companyID":
 			var err error
 
@@ -23486,11 +23474,11 @@ func (ec *executionContext) unmarshalInputUpdatePhoneInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "clearCountry":
+		case "clearCompany":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
-			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
+			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23499,6 +23487,14 @@ func (ec *executionContext) unmarshalInputUpdatePhoneInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryID"))
 			it.CountryID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCountry":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
+			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23517,11 +23513,11 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23549,14 +23545,6 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearLastSell":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLastSell"))
-			it.ClearLastSell, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "lastSell":
 			var err error
 
@@ -23565,11 +23553,11 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearCreatedAt":
+		case "clearLastSell":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
-			it.ClearCreatedAt, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLastSell"))
+			it.ClearLastSell, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23578,6 +23566,14 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			it.CreatedAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCreatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
+			it.ClearCreatedAt, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23597,19 +23593,11 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearCompany":
+		case "warehouseID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
-			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "companyID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyID"))
-			it.CompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("warehouseID"))
+			it.WarehouseID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23621,11 +23609,11 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "warehouseID":
+		case "vendorID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("warehouseID"))
-			it.WarehouseID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorID"))
+			it.VendorID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23634,14 +23622,6 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearVendor"))
 			it.ClearVendor, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "vendorID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorID"))
-			it.VendorID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23660,19 +23640,11 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 
 	for k, v := range asMap {
 		switch k {
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "url":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23700,6 +23672,14 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
+		case "clearWarehouses":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearWarehouses"))
+			it.ClearWarehouses, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addProductIDs":
 			var err error
 
@@ -23713,6 +23693,14 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeProductIDs"))
 			it.RemoveProductIDs, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearProducts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearProducts"))
+			it.ClearProducts, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23731,19 +23719,11 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 
 	for k, v := range asMap {
 		switch k {
-		case "url":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "clearLastUpdate":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLastUpdate"))
-			it.ClearLastUpdate, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23755,11 +23735,11 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "clearOriginalData":
+		case "clearLastUpdate":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearOriginalData"))
-			it.ClearOriginalData, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLastUpdate"))
+			it.ClearLastUpdate, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23771,19 +23751,19 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
+		case "clearOriginalData":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearOriginalData"))
+			it.ClearOriginalData, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "enabled":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
 			it.Enabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "clearFilters":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearFilters"))
-			it.ClearFilters, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23803,6 +23783,14 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
+		case "clearFilters":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearFilters"))
+			it.ClearFilters, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "addProductIDs":
 			var err error
 
@@ -23819,11 +23807,11 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "clearVendor":
+		case "clearProducts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearVendor"))
-			it.ClearVendor, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearProducts"))
+			it.ClearProducts, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23832,6 +23820,14 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorID"))
 			it.VendorID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearVendor":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearVendor"))
+			it.ClearVendor, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23874,14 +23870,6 @@ func (ec *executionContext) unmarshalInputUpdateWebsiteInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearCompany":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
-			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "companyID":
 			var err error
 
@@ -23890,11 +23878,11 @@ func (ec *executionContext) unmarshalInputUpdateWebsiteInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "clearCountry":
+		case "clearCompany":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
-			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCompany"))
+			it.ClearCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23903,6 +23891,14 @@ func (ec *executionContext) unmarshalInputUpdateWebsiteInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryID"))
 			it.CountryID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCountry":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCountry"))
+			it.ClearCountry, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24044,211 +24040,107 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNEQ":
+		case "nameNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNEQ"))
-			it.TitleNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			it.NameNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleIn":
+		case "nameIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleIn"))
-			it.TitleIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			it.NameIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleNotIn":
+		case "nameNotIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleNotIn"))
-			it.TitleNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			it.NameNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGT":
+		case "nameGT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGT"))
-			it.TitleGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			it.NameGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleGTE":
+		case "nameGTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleGTE"))
-			it.TitleGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			it.NameGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLT":
+		case "nameLT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLT"))
-			it.TitleLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			it.NameLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleLTE":
+		case "nameLTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleLTE"))
-			it.TitleLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			it.NameLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContains":
+		case "nameContains":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContains"))
-			it.TitleContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			it.NameContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasPrefix":
+		case "nameHasPrefix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasPrefix"))
-			it.TitleHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			it.NameHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleHasSuffix":
+		case "nameHasSuffix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleHasSuffix"))
-			it.TitleHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			it.NameHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleEqualFold":
+		case "nameEqualFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleEqualFold"))
-			it.TitleEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			it.NameEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "titleContainsFold":
+		case "nameContainsFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("titleContainsFold"))
-			it.TitleContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "url":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlNEQ"))
-			it.URLNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlIn"))
-			it.URLIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlNotIn"))
-			it.URLNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlGT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlGT"))
-			it.URLGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlGTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlGTE"))
-			it.URLGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlLT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlLT"))
-			it.URLLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlLTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlLTE"))
-			it.URLLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlContains":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlContains"))
-			it.URLContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlHasPrefix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlHasPrefix"))
-			it.URLHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlHasSuffix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlHasSuffix"))
-			it.URLHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlEqualFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlEqualFold"))
-			it.URLEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "urlContainsFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlContainsFold"))
-			it.URLContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24526,107 +24418,107 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
-		case "url":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlNEQ":
+		case "nameNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlNEQ"))
-			it.URLNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			it.NameNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlIn":
+		case "nameIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlIn"))
-			it.URLIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			it.NameIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlNotIn":
+		case "nameNotIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlNotIn"))
-			it.URLNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			it.NameNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlGT":
+		case "nameGT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlGT"))
-			it.URLGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			it.NameGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlGTE":
+		case "nameGTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlGTE"))
-			it.URLGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			it.NameGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlLT":
+		case "nameLT":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlLT"))
-			it.URLLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			it.NameLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlLTE":
+		case "nameLTE":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlLTE"))
-			it.URLLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			it.NameLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlContains":
+		case "nameContains":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlContains"))
-			it.URLContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			it.NameContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlHasPrefix":
+		case "nameHasPrefix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlHasPrefix"))
-			it.URLHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			it.NameHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlHasSuffix":
+		case "nameHasSuffix":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlHasSuffix"))
-			it.URLHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			it.NameHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlEqualFold":
+		case "nameEqualFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlEqualFold"))
-			it.URLEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			it.NameEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "urlContainsFold":
+		case "nameContainsFold":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlContainsFold"))
-			it.URLContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25450,13 +25342,17 @@ func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "title":
+		case "name":
 
-			out.Values[i] = ec._Company_title(ctx, field, obj)
+			out.Values[i] = ec._Company_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "logo":
+
+			out.Values[i] = ec._Company_logo(ctx, field, obj)
+
 		case "description":
 
 			out.Values[i] = ec._Company_description(ctx, field, obj)
@@ -25464,23 +25360,6 @@ func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "product":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_product(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "countries":
 			field := field
 
@@ -26945,9 +26824,9 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "title":
+		case "name":
 
-			out.Values[i] = ec._Product_title(ctx, field, obj)
+			out.Values[i] = ec._Product_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -26995,23 +26874,6 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "company":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Product_company(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "warehouse":
 			field := field
 
@@ -27460,16 +27322,9 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "title":
+		case "name":
 
-			out.Values[i] = ec._Vendor_title(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "url":
-
-			out.Values[i] = ec._Vendor_url(ctx, field, obj)
+			out.Values[i] = ec._Vendor_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -27620,9 +27475,9 @@ func (ec *executionContext) _Warehouse(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "url":
+		case "name":
 
-			out.Values[i] = ec._Warehouse_url(ctx, field, obj)
+			out.Values[i] = ec._Warehouse_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)

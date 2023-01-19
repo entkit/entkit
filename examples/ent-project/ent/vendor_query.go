@@ -281,10 +281,14 @@ func (vq *VendorQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (vq *VendorQuery) Exist(ctx context.Context) (bool, error) {
-	if err := vq.prepareQuery(ctx); err != nil {
-		return false, err
+	switch _, err := vq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return vq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -345,12 +349,12 @@ func (vq *VendorQuery) WithProducts(opts ...func(*ProductQuery)) *VendorQuery {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Vendor.Query().
-//		GroupBy(vendor.FieldTitle).
+//		GroupBy(vendor.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (vq *VendorQuery) GroupBy(field string, fields ...string) *VendorGroupBy {
@@ -373,11 +377,11 @@ func (vq *VendorQuery) GroupBy(field string, fields ...string) *VendorGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Vendor.Query().
-//		Select(vendor.FieldTitle).
+//		Select(vendor.FieldName).
 //		Scan(ctx, &v)
 func (vq *VendorQuery) Select(fields ...string) *VendorSelect {
 	vq.fields = append(vq.fields, fields...)
@@ -547,17 +551,6 @@ func (vq *VendorQuery) sqlCount(ctx context.Context) (int, error) {
 		_spec.Unique = vq.unique != nil && *vq.unique
 	}
 	return sqlgraph.CountNodes(ctx, vq.driver, _spec)
-}
-
-func (vq *VendorQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := vq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (vq *VendorQuery) querySpec() *sqlgraph.QuerySpec {

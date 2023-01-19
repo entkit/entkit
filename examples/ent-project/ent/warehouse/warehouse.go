@@ -25,8 +25,8 @@ const (
 	Label = "warehouse"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldLastUpdate holds the string denoting the last_update field in the database.
 	FieldLastUpdate = "last_update"
 	// FieldOriginalData holds the string denoting the original_data field in the database.
@@ -60,7 +60,7 @@ const (
 // Columns holds all SQL columns for warehouse fields.
 var Columns = []string{
 	FieldID,
-	FieldURL,
+	FieldName,
 	FieldLastUpdate,
 	FieldOriginalData,
 	FieldEnabled,
@@ -89,8 +89,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// URLValidator is a validator for the "url" field. It is called by the builders before save.
-	URLValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 	// DefaultEnabled holds the default value on creation for the "enabled" field.
 	DefaultEnabled bool
 	// DefaultID holds the default value on creation for the "id" field.

@@ -1,5 +1,6 @@
 export const CompanySorterEnums = {
-    "title": "TITLE",
+    "name": "NAME",
+    "logo": "LOGO",
     "description": "DESCRIPTION",
 }
 export const CountrySorterEnums = {
@@ -35,7 +36,7 @@ export const PhoneSorterEnums = {
     "type": "TYPE",
 }
 export const ProductSorterEnums = {
-    "title": "TITLE",
+    "name": "TITLE",
     "description": "DESCRIPTION",
     "image": "IMAGE",
     "url": "URL",
@@ -45,12 +46,11 @@ export const ProductSorterEnums = {
     "buildStatus": "BUILD_STATUS",
 }
 export const VendorSorterEnums = {
-    "title": "TITLE",
-    "url": "URL",
+    "name": "NAME",
     "schema": "SCHEMA",
 }
 export const WarehouseSorterEnums = {
-    "url": "URL",
+    "name": "NAME",
     "lastUpdate": "LAST_UPDATE",
     "enabled": "ENABLED",
 }

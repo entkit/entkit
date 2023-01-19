@@ -279,10 +279,14 @@ func (pq *PhoneQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (pq *PhoneQuery) Exist(ctx context.Context) (bool, error) {
-	if err := pq.prepareQuery(ctx); err != nil {
-		return false, err
+	switch _, err := pq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return pq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -532,17 +536,6 @@ func (pq *PhoneQuery) sqlCount(ctx context.Context) (int, error) {
 		_spec.Unique = pq.unique != nil && *pq.unique
 	}
 	return sqlgraph.CountNodes(ctx, pq.driver, _spec)
-}
-
-func (pq *PhoneQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := pq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (pq *PhoneQuery) querySpec() *sqlgraph.QuerySpec {

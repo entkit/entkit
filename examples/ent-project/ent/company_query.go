@@ -32,7 +32,6 @@ import (
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/phone"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
@@ -46,7 +45,6 @@ type CompanyQuery struct {
 	order                  []OrderFunc
 	fields                 []string
 	predicates             []predicate.Company
-	withProduct            *ProductQuery
 	withCountries          *CountryQuery
 	withPhones             *PhoneQuery
 	withEmails             *EmailQuery
@@ -54,7 +52,6 @@ type CompanyQuery struct {
 	withLocations          *LocationQuery
 	withLogoImage          *ImageQuery
 	withGalleryImages      *ImageQuery
-	withFKs                bool
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*Company) error
 	withNamedCountries     map[string]*CountryQuery
@@ -97,28 +94,6 @@ func (cq *CompanyQuery) Unique(unique bool) *CompanyQuery {
 func (cq *CompanyQuery) Order(o ...OrderFunc) *CompanyQuery {
 	cq.order = append(cq.order, o...)
 	return cq
-}
-
-// QueryProduct chains the current query on the "product" edge.
-func (cq *CompanyQuery) QueryProduct() *ProductQuery {
-	query := &ProductQuery{config: cq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(company.Table, company.FieldID, selector),
-			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, company.ProductTable, company.ProductColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryCountries chains the current query on the "countries" edge.
@@ -429,10 +404,14 @@ func (cq *CompanyQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *CompanyQuery) Exist(ctx context.Context) (bool, error) {
-	if err := cq.prepareQuery(ctx); err != nil {
-		return false, err
+	switch _, err := cq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return cq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -456,7 +435,6 @@ func (cq *CompanyQuery) Clone() *CompanyQuery {
 		offset:            cq.offset,
 		order:             append([]OrderFunc{}, cq.order...),
 		predicates:        append([]predicate.Company{}, cq.predicates...),
-		withProduct:       cq.withProduct.Clone(),
 		withCountries:     cq.withCountries.Clone(),
 		withPhones:        cq.withPhones.Clone(),
 		withEmails:        cq.withEmails.Clone(),
@@ -469,17 +447,6 @@ func (cq *CompanyQuery) Clone() *CompanyQuery {
 		path:   cq.path,
 		unique: cq.unique,
 	}
-}
-
-// WithProduct tells the query-builder to eager-load the nodes that are connected to
-// the "product" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CompanyQuery) WithProduct(opts ...func(*ProductQuery)) *CompanyQuery {
-	query := &ProductQuery{config: cq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withProduct = query
-	return cq
 }
 
 // WithCountries tells the query-builder to eager-load the nodes that are connected to
@@ -565,12 +532,12 @@ func (cq *CompanyQuery) WithGalleryImages(opts ...func(*ImageQuery)) *CompanyQue
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Company.Query().
-//		GroupBy(company.FieldTitle).
+//		GroupBy(company.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CompanyQuery) GroupBy(field string, fields ...string) *CompanyGroupBy {
@@ -593,11 +560,11 @@ func (cq *CompanyQuery) GroupBy(field string, fields ...string) *CompanyGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Company.Query().
-//		Select(company.FieldTitle).
+//		Select(company.FieldName).
 //		Scan(ctx, &v)
 func (cq *CompanyQuery) Select(fields ...string) *CompanySelect {
 	cq.fields = append(cq.fields, fields...)
@@ -631,10 +598,8 @@ func (cq *CompanyQuery) prepareQuery(ctx context.Context) error {
 func (cq *CompanyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Company, error) {
 	var (
 		nodes       = []*Company{}
-		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [8]bool{
-			cq.withProduct != nil,
+		loadedTypes = [7]bool{
 			cq.withCountries != nil,
 			cq.withPhones != nil,
 			cq.withEmails != nil,
@@ -644,12 +609,6 @@ func (cq *CompanyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comp
 			cq.withGalleryImages != nil,
 		}
 	)
-	if cq.withProduct != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, company.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Company).scanValues(nil, columns)
 	}
@@ -670,12 +629,6 @@ func (cq *CompanyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comp
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
-	}
-	if query := cq.withProduct; query != nil {
-		if err := cq.loadProduct(ctx, query, nodes, nil,
-			func(n *Company, e *Product) { n.Edges.Product = e }); err != nil {
-			return nil, err
-		}
 	}
 	if query := cq.withCountries; query != nil {
 		if err := cq.loadCountries(ctx, query, nodes,
@@ -775,35 +728,6 @@ func (cq *CompanyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comp
 	return nodes, nil
 }
 
-func (cq *CompanyQuery) loadProduct(ctx context.Context, query *ProductQuery, nodes []*Company, init func(*Company), assign func(*Company, *Product)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Company)
-	for i := range nodes {
-		if nodes[i].product_company == nil {
-			continue
-		}
-		fk := *nodes[i].product_company
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	query.Where(product.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "product_company" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 func (cq *CompanyQuery) loadCountries(ctx context.Context, query *CountryQuery, nodes []*Company, init func(*Company), assign func(*Company, *Country)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[uuid.UUID]*Company)
@@ -1056,17 +980,6 @@ func (cq *CompanyQuery) sqlCount(ctx context.Context) (int, error) {
 		_spec.Unique = cq.unique != nil && *cq.unique
 	}
 	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
-}
-
-func (cq *CompanyQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := cq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (cq *CompanyQuery) querySpec() *sqlgraph.QuerySpec {

@@ -29,7 +29,6 @@ import (
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/image"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
@@ -41,9 +40,23 @@ type CompanyCreate struct {
 	hooks    []Hook
 }
 
-// SetTitle sets the "title" field.
-func (cc *CompanyCreate) SetTitle(s string) *CompanyCreate {
-	cc.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (cc *CompanyCreate) SetName(s string) *CompanyCreate {
+	cc.mutation.SetName(s)
+	return cc
+}
+
+// SetLogo sets the "logo" field.
+func (cc *CompanyCreate) SetLogo(s string) *CompanyCreate {
+	cc.mutation.SetLogo(s)
+	return cc
+}
+
+// SetNillableLogo sets the "logo" field if the given value is not nil.
+func (cc *CompanyCreate) SetNillableLogo(s *string) *CompanyCreate {
+	if s != nil {
+		cc.SetLogo(*s)
+	}
 	return cc
 }
 
@@ -65,25 +78,6 @@ func (cc *CompanyCreate) SetNillableID(u *uuid.UUID) *CompanyCreate {
 		cc.SetID(*u)
 	}
 	return cc
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (cc *CompanyCreate) SetProductID(id uuid.UUID) *CompanyCreate {
-	cc.mutation.SetProductID(id)
-	return cc
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (cc *CompanyCreate) SetNillableProductID(id *uuid.UUID) *CompanyCreate {
-	if id != nil {
-		cc = cc.SetProductID(*id)
-	}
-	return cc
-}
-
-// SetProduct sets the "product" edge to the Product entity.
-func (cc *CompanyCreate) SetProduct(p *Product) *CompanyCreate {
-	return cc.SetProductID(p.ID)
 }
 
 // AddCountryIDs adds the "countries" edge to the Country entity by IDs.
@@ -280,12 +274,17 @@ func (cc *CompanyCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CompanyCreate) check() error {
-	if _, ok := cc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Company.title"`)}
+	if _, ok := cc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Company.name"`)}
 	}
-	if v, ok := cc.mutation.Title(); ok {
-		if err := company.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Company.title": %w`, err)}
+	if v, ok := cc.mutation.Name(); ok {
+		if err := company.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
+		}
+	}
+	if v, ok := cc.mutation.Logo(); ok {
+		if err := company.LogoValidator(v); err != nil {
+			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
 		}
 	}
 	if _, ok := cc.mutation.Description(); !ok {
@@ -332,33 +331,17 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := cc.mutation.Title(); ok {
-		_spec.SetField(company.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := cc.mutation.Name(); ok {
+		_spec.SetField(company.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := cc.mutation.Logo(); ok {
+		_spec.SetField(company.FieldLogo, field.TypeString, value)
+		_node.Logo = &value
 	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)
 		_node.Description = value
-	}
-	if nodes := cc.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   company.ProductTable,
-			Columns: []string{company.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.product_company = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.CountriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

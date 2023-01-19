@@ -9,6 +9,9 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
+// EntgqlExtensionOptionsWrapper Wrap options of EntGQL
+// Sometimes Ent-Refine using some custom GraphQL queries and mutations
+// Wrapper can add custom configs/hooks
 func EntgqlExtensionOptionsWrapper(opts ...entgql.ExtensionOption) []entgql.ExtensionOption {
 	plural := gen.Funcs["plural"].(func(string) string)
 

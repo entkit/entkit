@@ -23,7 +23,7 @@ func (Product) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("ID"),
 			),
-		field.String("title").
+		field.String("name").
 			MaxLen(128).
 			Annotations(
 				EntRefine.TitleField(),
@@ -35,6 +35,7 @@ func (Product) Fields() []ent.Field {
 			Annotations(
 				EntRefine.RichTextField(),
 				EntRefine.FilterOperator(gen.Contains),
+				EntRefine.HideOnList(),
 				entgql.OrderField("DESCRIPTION"),
 			),
 		field.String("image").
@@ -82,7 +83,6 @@ func (Product) Fields() []ent.Field {
 
 func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("company", Company.Type).Unique(),
 		edge.From("warehouse", Warehouse.Type).
 			Ref("products").
 			Unique(),

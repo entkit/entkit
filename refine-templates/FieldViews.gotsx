@@ -65,7 +65,7 @@ export const ER_UUIDViewOnList: React.FC<ViewProps<types.ER_UUID>> = ER_StringVi
 export const ER_UUIDViewOnForm: React.FC = ER_StringListViewOnForm
 
 export const ER_CodeViewOnShow: React.FC<ViewProps<types.ER_Code>> = ({value}) => {
-    return <RA.Typography.Text copyable={true} code={true}>{ value }</RA.Typography.Text>
+    return <ER_CodeViewOnForm value={value} readOnly={true}/>
 }
 export const ER_CodeViewOnList: React.FC<ViewProps<types.ER_Code>> = ({value}) => {
     return <RA.TextField value={value} code={true} ellipsis={true} style={ {width: '100px'} }/>

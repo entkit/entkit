@@ -12,11 +12,9 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
+                "logo",
                 "description",
-                {
-                    "product": [ "id", "title" ]
-                },
                 {
                     "countries": [
                         {
@@ -98,19 +96,16 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         <RA.Show isLoading={isLoading}>
             <RA.Typography.Title level={5}>Id</RA.Typography.Title>
             <FieldView.ER_UUIDViewOnShow value={ record?.id } />
-            <RA.Typography.Title level={5}>Title</RA.Typography.Title>
+            <RA.Typography.Title level={5}>Name</RA.Typography.Title>
             
-            <Custom.MyCustomTitle value={ record?.title } />
+            <Custom.MyCustomTitle value={ record?.name } />
+            <RA.Typography.Title level={5}>Logo</RA.Typography.Title>
+            <FieldView.ER_ImageViewOnShow value={ record?.logo } />
             <RA.Typography.Title level={5}>Description</RA.Typography.Title>
             <FieldView.ER_RichTextViewOnShow value={ record?.description } />
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
             <RA.Descriptions>
-                <RA.Descriptions.Item label="Product">
-                    <Link key={ "product-" + record?.product?.id + "-link"} to={ "/Product/show/"+ record?.product?.id}>
-                        { record?.product?.title }
-                    </Link>
-                </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Logo Image">
                     <Link key={ "logo_image-" + record?.logoImage?.id + "-link"} to={ "/Image/show/"+ record?.logoImage?.id}>
                         { record?.logoImage?.title }
@@ -189,7 +184,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [ "id", "name" ],
                                 }
                             ]
                         }
@@ -319,7 +314,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "description",
                 "address",
                 {
-                    "company": [ "id", "title" ]
+                    "company": [ "id", "name" ]
                 },
                 {
                     "country": [ "id", "name" ]
@@ -347,7 +342,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Company">
                     <Link key={ "company-" + record?.company?.id + "-link"} to={ "/Company/show/"+ record?.company?.id}>
-                        { record?.company?.title }
+                        { record?.company?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Country">
@@ -370,10 +365,10 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "title",
                 "originalURL",
                 {
-                    "galleryCompany": [ "id", "title" ]
+                    "galleryCompany": [ "id", "name" ]
                 },
                 {
-                    "logoCompany": [ "id", "title" ]
+                    "logoCompany": [ "id", "name" ]
                 },
             ],
         },
@@ -396,12 +391,12 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Gallery Company">
                     <Link key={ "gallery_company-" + record?.galleryCompany?.id + "-link"} to={ "/Company/show/"+ record?.galleryCompany?.id}>
-                        { record?.galleryCompany?.title }
+                        { record?.galleryCompany?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Logo Company">
                     <Link key={ "logo_company-" + record?.logoCompany?.id + "-link"} to={ "/Company/show/"+ record?.logoCompany?.id}>
-                        { record?.logoCompany?.title }
+                        { record?.logoCompany?.name }
                     </Link>
                 </RA.Descriptions.Item>
             </RA.Descriptions>
@@ -428,7 +423,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "streetType",
                 "streetName",
                 {
-                    "company": [ "id", "title" ]
+                    "company": [ "id", "name" ]
                 },
                 {
                     "country": [ "id", "name" ]
@@ -472,7 +467,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Company">
                     <Link key={ "company-" + record?.company?.id + "-link"} to={ "/Company/show/"+ record?.company?.id}>
-                        { record?.company?.title }
+                        { record?.company?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Country">
@@ -497,7 +492,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "number",
                 "type",
                 {
-                    "company": [ "id", "title" ]
+                    "company": [ "id", "name" ]
                 },
                 {
                     "country": [ "id", "name" ]
@@ -527,7 +522,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Company">
                     <Link key={ "company-" + record?.company?.id + "-link"} to={ "/Company/show/"+ record?.company?.id}>
-                        { record?.company?.title }
+                        { record?.company?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Country">
@@ -547,7 +542,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
                 "description",
                 "image",
                 "url",
@@ -556,13 +551,10 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "status",
                 "buildStatus",
                 {
-                    "company": [ "id", "title" ]
+                    "warehouse": [ "id", "name" ]
                 },
                 {
-                    "warehouse": [ "id", "url" ]
-                },
-                {
-                    "vendor": [ "id", "title" ]
+                    "vendor": [ "id", "name" ]
                 },
             ],
         },
@@ -576,8 +568,8 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         <RA.Show isLoading={isLoading}>
             <RA.Typography.Title level={5}>Id</RA.Typography.Title>
             <FieldView.ER_UUIDViewOnShow value={ record?.id } />
-            <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-            <FieldView.ER_StringViewOnShow value={ record?.title } />
+            <RA.Typography.Title level={5}>Name</RA.Typography.Title>
+            <FieldView.ER_StringViewOnShow value={ record?.name } />
             <RA.Typography.Title level={5}>Description</RA.Typography.Title>
             <FieldView.ER_RichTextViewOnShow value={ record?.description } />
             <RA.Typography.Title level={5}>Image</RA.Typography.Title>
@@ -595,19 +587,14 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
             <RA.Descriptions>
-                <RA.Descriptions.Item label="Company">
-                    <Link key={ "company-" + record?.company?.id + "-link"} to={ "/Company/show/"+ record?.company?.id}>
-                        { record?.company?.title }
-                    </Link>
-                </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Warehouse">
                     <Link key={ "warehouse-" + record?.warehouse?.id + "-link"} to={ "/Warehouse/show/"+ record?.warehouse?.id}>
-                        { record?.warehouse?.url }
+                        { record?.warehouse?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Vendor">
                     <Link key={ "vendor-" + record?.vendor?.id + "-link"} to={ "/Vendor/show/"+ record?.vendor?.id}>
-                        { record?.vendor?.title }
+                        { record?.vendor?.name }
                     </Link>
                 </RA.Descriptions.Item>
             </RA.Descriptions>
@@ -622,15 +609,14 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         metaData: {
             fields: [
                 "id",
-                "title",
-                "url",
+                "name",
                 "schema",
                 {
                     "warehouses": [
                         {
                             edges: [
                                 {
-                                    node: [ "id", "url" ],
+                                    node: [ "id", "name" ],
                                 }
                             ]
                         }
@@ -641,7 +627,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [ "id", "name" ],
                                 }
                             ]
                         }
@@ -659,10 +645,8 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         <RA.Show isLoading={isLoading}>
             <RA.Typography.Title level={5}>Id</RA.Typography.Title>
             <FieldView.ER_UUIDViewOnShow value={ record?.id } />
-            <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-            <FieldView.ER_StringViewOnShow value={ record?.title } />
-            <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-            <FieldView.ER_StringViewOnShow value={ record?.url } />
+            <RA.Typography.Title level={5}>Name</RA.Typography.Title>
+            <FieldView.ER_StringViewOnShow value={ record?.name } />
             <RA.Typography.Title level={5}>Schema</RA.Typography.Title>
             <FieldView.ER_CodeViewOnShow value={ record?.schema } />
 
@@ -698,7 +682,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         metaData: {
             fields: [
                 "id",
-                "url",
+                "name",
                 "lastUpdate",
                 "originalData",
                 "enabled",
@@ -708,14 +692,14 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [ "id", "name" ],
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "vendor": [ "id", "title" ]
+                    "vendor": [ "id", "name" ]
                 },
             ],
         },
@@ -729,8 +713,8 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
         <RA.Show isLoading={isLoading}>
             <RA.Typography.Title level={5}>Id</RA.Typography.Title>
             <FieldView.ER_UUIDViewOnShow value={ record?.id } />
-            <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-            <FieldView.ER_StringViewOnShow value={ record?.url } />
+            <RA.Typography.Title level={5}>Name</RA.Typography.Title>
+            <FieldView.ER_StringViewOnShow value={ record?.name } />
             <RA.Typography.Title level={5}>Last Update</RA.Typography.Title>
             <FieldView.ER_DateViewOnShow value={ record?.lastUpdate } />
             <RA.Typography.Title level={5}>Original Data</RA.Typography.Title>
@@ -744,7 +728,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Vendor">
                     <Link key={ "vendor-" + record?.vendor?.id + "-link"} to={ "/Vendor/show/"+ record?.vendor?.id}>
-                        { record?.vendor?.title }
+                        { record?.vendor?.name }
                     </Link>
                 </RA.Descriptions.Item>
             </RA.Descriptions>
@@ -772,7 +756,7 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 "description",
                 "url",
                 {
-                    "company": [ "id", "title" ]
+                    "company": [ "id", "name" ]
                 },
                 {
                     "country": [ "id", "name" ]
@@ -794,13 +778,13 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Typography.Title level={5}>Description</RA.Typography.Title>
             <FieldView.ER_StringViewOnShow value={ record?.description } />
             <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-            <FieldView.ER_StringViewOnShow value={ record?.url } />
+            <FieldView.ER_URLViewOnShow value={ record?.url } />
 
             <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
             <RA.Descriptions>
                 <RA.Descriptions.Item label="Company">
                     <Link key={ "company-" + record?.company?.id + "-link"} to={ "/Company/show/"+ record?.company?.id}>
-                        { record?.company?.title }
+                        { record?.company?.name }
                     </Link>
                 </RA.Descriptions.Item>
                 <RA.Descriptions.Item label="Country">

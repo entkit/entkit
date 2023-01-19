@@ -44,15 +44,9 @@ func (vu *VendorUpdate) Where(ps ...predicate.Vendor) *VendorUpdate {
 	return vu
 }
 
-// SetTitle sets the "title" field.
-func (vu *VendorUpdate) SetTitle(s string) *VendorUpdate {
-	vu.mutation.SetTitle(s)
-	return vu
-}
-
-// SetURL sets the "url" field.
-func (vu *VendorUpdate) SetURL(s string) *VendorUpdate {
-	vu.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (vu *VendorUpdate) SetName(s string) *VendorUpdate {
+	vu.mutation.SetName(s)
 	return vu
 }
 
@@ -201,14 +195,9 @@ func (vu *VendorUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vu *VendorUpdate) check() error {
-	if v, ok := vu.mutation.Title(); ok {
-		if err := vendor.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Vendor.title": %w`, err)}
-		}
-	}
-	if v, ok := vu.mutation.URL(); ok {
-		if err := vendor.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Vendor.url": %w`, err)}
+	if v, ok := vu.mutation.Name(); ok {
+		if err := vendor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vendor.name": %w`, err)}
 		}
 	}
 	return nil
@@ -232,11 +221,8 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := vu.mutation.Title(); ok {
-		_spec.SetField(vendor.FieldTitle, field.TypeString, value)
-	}
-	if value, ok := vu.mutation.URL(); ok {
-		_spec.SetField(vendor.FieldURL, field.TypeString, value)
+	if value, ok := vu.mutation.Name(); ok {
+		_spec.SetField(vendor.FieldName, field.TypeString, value)
 	}
 	if value, ok := vu.mutation.Schema(); ok {
 		_spec.SetField(vendor.FieldSchema, field.TypeString, value)
@@ -368,15 +354,9 @@ type VendorUpdateOne struct {
 	mutation *VendorMutation
 }
 
-// SetTitle sets the "title" field.
-func (vuo *VendorUpdateOne) SetTitle(s string) *VendorUpdateOne {
-	vuo.mutation.SetTitle(s)
-	return vuo
-}
-
-// SetURL sets the "url" field.
-func (vuo *VendorUpdateOne) SetURL(s string) *VendorUpdateOne {
-	vuo.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (vuo *VendorUpdateOne) SetName(s string) *VendorUpdateOne {
+	vuo.mutation.SetName(s)
 	return vuo
 }
 
@@ -538,14 +518,9 @@ func (vuo *VendorUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vuo *VendorUpdateOne) check() error {
-	if v, ok := vuo.mutation.Title(); ok {
-		if err := vendor.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Vendor.title": %w`, err)}
-		}
-	}
-	if v, ok := vuo.mutation.URL(); ok {
-		if err := vendor.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Vendor.url": %w`, err)}
+	if v, ok := vuo.mutation.Name(); ok {
+		if err := vendor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vendor.name": %w`, err)}
 		}
 	}
 	return nil
@@ -586,11 +561,8 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			}
 		}
 	}
-	if value, ok := vuo.mutation.Title(); ok {
-		_spec.SetField(vendor.FieldTitle, field.TypeString, value)
-	}
-	if value, ok := vuo.mutation.URL(); ok {
-		_spec.SetField(vendor.FieldURL, field.TypeString, value)
+	if value, ok := vuo.mutation.Name(); ok {
+		_spec.SetField(vendor.FieldName, field.TypeString, value)
 	}
 	if value, ok := vuo.mutation.Schema(); ok {
 		_spec.SetField(vendor.FieldSchema, field.TypeString, value)

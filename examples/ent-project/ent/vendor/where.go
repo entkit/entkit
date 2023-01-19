@@ -94,17 +94,10 @@ func IDLTE(id uuid.UUID) predicate.Vendor {
 	})
 }
 
-// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
-func Title(v string) predicate.Vendor {
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTitle), v))
-	})
-}
-
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldURL), v))
+		s.Where(sql.EQ(s.C(FieldName), v))
 	})
 }
 
@@ -115,201 +108,102 @@ func Schema(v string) predicate.Vendor {
 	})
 }
 
-// TitleEQ applies the EQ predicate on the "title" field.
-func TitleEQ(v string) predicate.Vendor {
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTitle), v))
+		s.Where(sql.EQ(s.C(FieldName), v))
 	})
 }
 
-// TitleNEQ applies the NEQ predicate on the "title" field.
-func TitleNEQ(v string) predicate.Vendor {
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTitle), v))
+		s.Where(sql.NEQ(s.C(FieldName), v))
 	})
 }
 
-// TitleIn applies the In predicate on the "title" field.
-func TitleIn(vs ...string) predicate.Vendor {
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Vendor {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTitle), v...))
+		s.Where(sql.In(s.C(FieldName), v...))
 	})
 }
 
-// TitleNotIn applies the NotIn predicate on the "title" field.
-func TitleNotIn(vs ...string) predicate.Vendor {
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Vendor {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTitle), v...))
+		s.Where(sql.NotIn(s.C(FieldName), v...))
 	})
 }
 
-// TitleGT applies the GT predicate on the "title" field.
-func TitleGT(v string) predicate.Vendor {
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTitle), v))
+		s.Where(sql.GT(s.C(FieldName), v))
 	})
 }
 
-// TitleGTE applies the GTE predicate on the "title" field.
-func TitleGTE(v string) predicate.Vendor {
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTitle), v))
+		s.Where(sql.GTE(s.C(FieldName), v))
 	})
 }
 
-// TitleLT applies the LT predicate on the "title" field.
-func TitleLT(v string) predicate.Vendor {
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTitle), v))
+		s.Where(sql.LT(s.C(FieldName), v))
 	})
 }
 
-// TitleLTE applies the LTE predicate on the "title" field.
-func TitleLTE(v string) predicate.Vendor {
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTitle), v))
+		s.Where(sql.LTE(s.C(FieldName), v))
 	})
 }
 
-// TitleContains applies the Contains predicate on the "title" field.
-func TitleContains(v string) predicate.Vendor {
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldTitle), v))
+		s.Where(sql.Contains(s.C(FieldName), v))
 	})
 }
 
-// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
-func TitleHasPrefix(v string) predicate.Vendor {
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldTitle), v))
+		s.Where(sql.HasPrefix(s.C(FieldName), v))
 	})
 }
 
-// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
-func TitleHasSuffix(v string) predicate.Vendor {
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldTitle), v))
+		s.Where(sql.HasSuffix(s.C(FieldName), v))
 	})
 }
 
-// TitleEqualFold applies the EqualFold predicate on the "title" field.
-func TitleEqualFold(v string) predicate.Vendor {
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldTitle), v))
+		s.Where(sql.EqualFold(s.C(FieldName), v))
 	})
 }
 
-// TitleContainsFold applies the ContainsFold predicate on the "title" field.
-func TitleContainsFold(v string) predicate.Vendor {
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldTitle), v))
-	})
-}
-
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldURL), v))
-	})
-}
-
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldURL), v))
-	})
-}
-
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.Vendor {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldURL), v...))
-	})
-}
-
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.Vendor {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldURL), v...))
-	})
-}
-
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldURL), v))
-	})
-}
-
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldURL), v))
-	})
-}
-
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldURL), v))
-	})
-}
-
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldURL), v))
-	})
-}
-
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldURL), v))
-	})
-}
-
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldURL), v))
-	})
-}
-
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldURL), v))
-	})
-}
-
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldURL), v))
-	})
-}
-
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.Vendor {
-	return predicate.Vendor(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldURL), v))
+		s.Where(sql.ContainsFold(s.C(FieldName), v))
 	})
 }
 
@@ -417,7 +311,6 @@ func HasWarehouses() predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(WarehousesTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, WarehousesTable, WarehousesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -445,7 +338,6 @@ func HasProducts() predicate.Vendor {
 	return predicate.Vendor(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ProductsTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, ProductsTable, ProductsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

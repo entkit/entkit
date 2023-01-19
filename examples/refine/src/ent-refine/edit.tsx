@@ -17,11 +17,9 @@ export const CompanyEdit: React.FC = () => {
             redirect: false,
             metaData: {
                 fields: [
-                    "title",
+                    "name",
+                    "logo",
                     "description",
-                    {
-                        "product": [ "id" ]
-                    },
                     {
                         "countries": [
                             {
@@ -95,23 +93,6 @@ export const CompanyEdit: React.FC = () => {
             }
         }
     );
-    const [ productCursors, setProductCursors] = useState<Cursors>({})
-    const { selectProps: productSelectProps } = RA.useSelect<Interfaces.ICompany>({
-        resource: "Product",
-        optionLabel: "url",
-        optionValue: "id",
-        metaData:{
-            cursors: productCursors,
-            fields: ["id", "url"]
-        },
-        onSearch: (value) => [
-            {
-                field: "url",
-                operator: "contains",
-                value,
-            },
-        ],
-    });
     const [ countriesCursors, setCountriesCursors] = useState<Cursors>({})
     const { selectProps: countriesSelectProps } = RA.useSelect<Interfaces.ICompany>({
         resource: "Country",
@@ -237,11 +218,19 @@ export const CompanyEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                     <FieldView.ER_StringViewOnForm/>
+                </RA.Form.Item>
+                
+                <RA.Form.Item
+                    label="Logo"
+                    name="logo"
+                    rules={[{required: false}]}
+                >
+                    <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -250,9 +239,6 @@ export const CompanyEdit: React.FC = () => {
                     rules={[{required: true}]}
                 >
                     <FieldView.ER_RichTextViewOnForm/>
-                </RA.Form.Item>
-                <RA.Form.Item label="product" name="productID" rules={[{required: false}]}>
-                    <RA.Select {...productSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
                 <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
                     <RA.Select {...countriesSelectProps} mode={ "multiple" }/>
@@ -350,15 +336,15 @@ export const CountryEdit: React.FC = () => {
     const [ companiesCursors, setCompaniesCursors] = useState<Cursors>({})
     const { selectProps: companiesSelectProps } = RA.useSelect<Interfaces.ICountry>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: companiesCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -494,15 +480,15 @@ export const EmailEdit: React.FC = () => {
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IEmail>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -585,15 +571,15 @@ export const ImageEdit: React.FC = () => {
     const [ gallery_companyCursors, setGalleryCompanyCursors] = useState<Cursors>({})
     const { selectProps: gallery_companySelectProps } = RA.useSelect<Interfaces.IImage>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: gallery_companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -602,15 +588,15 @@ export const ImageEdit: React.FC = () => {
     const [ logo_companyCursors, setLogoCompanyCursors] = useState<Cursors>({})
     const { selectProps: logo_companySelectProps } = RA.useSelect<Interfaces.IImage>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: logo_companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -677,15 +663,15 @@ export const LocationEdit: React.FC = () => {
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.ILocation>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -834,15 +820,15 @@ export const PhoneEdit: React.FC = () => {
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IPhone>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -918,7 +904,7 @@ export const ProductEdit: React.FC = () => {
             redirect: false,
             metaData: {
                 fields: [
-                    "title",
+                    "name",
                     "description",
                     "image",
                     "url",
@@ -926,9 +912,6 @@ export const ProductEdit: React.FC = () => {
                     "createdAt",
                     "status",
                     "buildStatus",
-                    {
-                        "company": [ "id" ]
-                    },
                     {
                         "warehouse": [ "id" ]
                     },
@@ -939,35 +922,18 @@ export const ProductEdit: React.FC = () => {
             }
         }
     );
-    const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
-    const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IProduct>({
-        resource: "Company",
-        optionLabel: "title",
-        optionValue: "id",
-        metaData:{
-            cursors: companyCursors,
-            fields: ["id", "title"]
-        },
-        onSearch: (value) => [
-            {
-                field: "title",
-                operator: "contains",
-                value,
-            },
-        ],
-    });
     const [ warehouseCursors, setWarehouseCursors] = useState<Cursors>({})
     const { selectProps: warehouseSelectProps } = RA.useSelect<Interfaces.IProduct>({
         resource: "Warehouse",
-        optionLabel: "url",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: warehouseCursors,
-            fields: ["id", "url"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "url",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -976,15 +942,15 @@ export const ProductEdit: React.FC = () => {
     const [ vendorCursors, setVendorCursors] = useState<Cursors>({})
     const { selectProps: vendorSelectProps } = RA.useSelect<Interfaces.IProduct>({
         resource: "Vendor",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: vendorCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -996,8 +962,8 @@ export const ProductEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                     <FieldView.ER_StringViewOnForm/>
@@ -1064,9 +1030,6 @@ export const ProductEdit: React.FC = () => {
                 >
                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
-                    <RA.Select {...companySelectProps} mode={ undefined }/>
-                </RA.Form.Item>
                 <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
                     <RA.Select {...warehouseSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
@@ -1084,8 +1047,7 @@ export const VendorEdit: React.FC = () => {
             redirect: false,
             metaData: {
                 fields: [
-                    "title",
-                    "url",
+                    "name",
                     "schema",
                     {
                         "warehouses": [
@@ -1116,15 +1078,15 @@ export const VendorEdit: React.FC = () => {
     const [ warehousesCursors, setWarehousesCursors] = useState<Cursors>({})
     const { selectProps: warehousesSelectProps } = RA.useSelect<Interfaces.IVendor>({
         resource: "Warehouse",
-        optionLabel: "url",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: warehousesCursors,
-            fields: ["id", "url"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "url",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -1153,16 +1115,8 @@ export const VendorEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
-                    rules={[{required: true}]}
-                >
-                    <FieldView.ER_StringViewOnForm/>
-                </RA.Form.Item>
-                
-                <RA.Form.Item
-                    label="Url"
-                    name="url"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                     <FieldView.ER_StringViewOnForm/>
@@ -1192,7 +1146,7 @@ export const WarehouseEdit: React.FC = () => {
             redirect: false,
             metaData: {
                 fields: [
-                    "url",
+                    "name",
                     "lastUpdate",
                     "originalData",
                     "enabled",
@@ -1235,15 +1189,15 @@ export const WarehouseEdit: React.FC = () => {
     const [ vendorCursors, setVendorCursors] = useState<Cursors>({})
     const { selectProps: vendorSelectProps } = RA.useSelect<Interfaces.IWarehouse>({
         resource: "Vendor",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: vendorCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -1255,8 +1209,8 @@ export const WarehouseEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Url"
-                    name="url"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                     <FieldView.ER_StringViewOnForm/>
@@ -1329,15 +1283,15 @@ export const WebsiteEdit: React.FC = () => {
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IWebsite>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData:{
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -1386,7 +1340,7 @@ export const WebsiteEdit: React.FC = () => {
                     name="url"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                    <FieldView.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>

@@ -24,6 +24,7 @@ var (
 	funcMap = template.FuncMap{}
 )
 
+// Extension main struct
 type Extension struct {
 	entc.DefaultExtension
 	appPath    string
@@ -42,6 +43,7 @@ func (ex *Extension) SrcDirName(dir string) *Extension {
 	return ex
 }
 
+// New Initialize extension
 func New() *Extension {
 	if len(funcMap) == 0 {
 		for k, v := range _funcMap {
@@ -66,26 +68,21 @@ func New() *Extension {
 	}
 }
 
+// Annotations Define Ent annotations
 func (ex *Extension) Annotations() []entc.Annotation {
 	return []entc.Annotation{}
 }
 
+// Templates Define Ent templates
 func (ex *Extension) Templates() []*gen.Template {
 	return []*gen.Template{
 		gen.MustParse(gen.NewTemplate("greet").Funcs(funcMap).ParseFS(_templates, "templates/search_query_apply.tmpl")),
 	}
 }
 
+// Hooks Define Ent hooks
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{
 		GenerateRefineScripts(ex),
-	}
-}
-func GenerateRefineScripts(ex *Extension) gen.Hook {
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			NewRefineGen(ex, g).Generate()
-			return next.Generate(g)
-		})
 	}
 }

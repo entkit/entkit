@@ -311,7 +311,6 @@ func HasCompanies() predicate.Country {
 	return predicate.Country(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CompaniesTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, CompaniesTable, CompaniesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -339,7 +338,6 @@ func HasPhones() predicate.Country {
 	return predicate.Country(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PhonesTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, PhonesTable, PhonesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -367,7 +365,6 @@ func HasEmails() predicate.Country {
 	return predicate.Country(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(EmailsTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -395,7 +392,6 @@ func HasWebsites() predicate.Country {
 	return predicate.Country(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(WebsitesTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, WebsitesTable, WebsitesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -423,7 +419,6 @@ func HasLocations() predicate.Country {
 	return predicate.Country(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(LocationsTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, LocationsTable, LocationsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

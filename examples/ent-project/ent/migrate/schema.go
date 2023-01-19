@@ -25,23 +25,15 @@ var (
 	// CompaniesColumns holds the columns for the "companies" table.
 	CompaniesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "title", Type: field.TypeString, Size: 128},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "logo", Type: field.TypeString, Nullable: true, Size: 128},
 		{Name: "description", Type: field.TypeString, Size: 512},
-		{Name: "product_company", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
 	// CompaniesTable holds the schema information for the "companies" table.
 	CompaniesTable = &schema.Table{
 		Name:       "companies",
 		Columns:    CompaniesColumns,
 		PrimaryKey: []*schema.Column{CompaniesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "companies_products_company",
-				Columns:    []*schema.Column{CompaniesColumns[3]},
-				RefColumns: []*schema.Column{ProductsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// CountriesColumns holds the columns for the "countries" table.
 	CountriesColumns = []*schema.Column{
@@ -182,7 +174,7 @@ var (
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "title", Type: field.TypeString, Size: 128},
+		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "description", Type: field.TypeString, Size: 512},
 		{Name: "image", Type: field.TypeString, Size: 128},
 		{Name: "url", Type: field.TypeString, Size: 128},
@@ -216,8 +208,7 @@ var (
 	// VendorsColumns holds the columns for the "vendors" table.
 	VendorsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "title", Type: field.TypeString, Size: 128},
-		{Name: "url", Type: field.TypeString, Size: 128},
+		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "schema", Type: field.TypeString, Size: 2147483647},
 	}
 	// VendorsTable holds the schema information for the "vendors" table.
@@ -229,7 +220,7 @@ var (
 	// WarehousesColumns holds the columns for the "warehouses" table.
 	WarehousesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "url", Type: field.TypeString, Size: 128},
+		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "last_update", Type: field.TypeTime, Nullable: true},
 		{Name: "original_data", Type: field.TypeString, Nullable: true},
 		{Name: "enabled", Type: field.TypeBool, Default: true},
@@ -321,7 +312,6 @@ var (
 )
 
 func init() {
-	CompaniesTable.ForeignKeys[0].RefTable = ProductsTable
 	EmailsTable.ForeignKeys[0].RefTable = CompaniesTable
 	EmailsTable.ForeignKeys[1].RefTable = CountriesTable
 	ImagesTable.ForeignKeys[0].RefTable = CompaniesTable

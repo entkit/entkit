@@ -22,12 +22,12 @@ func (Warehouse) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("ID"),
 			),
-		field.String("url").
+		field.String("name").
 			MaxLen(128).
 			Annotations(
 				EntRefine.TitleField(),
 				EntRefine.FilterOperator(gen.Contains),
-				entgql.OrderField("URL"),
+				entgql.OrderField("NAME"),
 			),
 		field.Time("last_update").
 			Nillable().

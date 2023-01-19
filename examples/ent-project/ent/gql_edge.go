@@ -22,14 +22,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (c *Company) Product(ctx context.Context) (*Product, error) {
-	result, err := c.Edges.ProductOrErr()
-	if IsNotLoaded(err) {
-		result, err = c.QueryProduct().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
 func (c *Company) Countries(
 	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *CountryOrder, where *CountryWhereInput,
 ) (*CountryConnection, error) {
@@ -38,7 +30,7 @@ func (c *Company) Countries(
 		WithCountryFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[1][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[0][alias]
 	if nodes, err := c.NamedCountries(alias); err == nil || hasTotalCount {
 		pager, err := newCountryPager(opts)
 		if err != nil {
@@ -59,7 +51,7 @@ func (c *Company) Phones(
 		WithPhoneFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[2][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[1][alias]
 	if nodes, err := c.NamedPhones(alias); err == nil || hasTotalCount {
 		pager, err := newPhonePager(opts)
 		if err != nil {
@@ -80,7 +72,7 @@ func (c *Company) Emails(
 		WithEmailFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[3][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[2][alias]
 	if nodes, err := c.NamedEmails(alias); err == nil || hasTotalCount {
 		pager, err := newEmailPager(opts)
 		if err != nil {
@@ -101,7 +93,7 @@ func (c *Company) Websites(
 		WithWebsiteFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[4][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[3][alias]
 	if nodes, err := c.NamedWebsites(alias); err == nil || hasTotalCount {
 		pager, err := newWebsitePager(opts)
 		if err != nil {
@@ -122,7 +114,7 @@ func (c *Company) Locations(
 		WithLocationFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[5][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[4][alias]
 	if nodes, err := c.NamedLocations(alias); err == nil || hasTotalCount {
 		pager, err := newLocationPager(opts)
 		if err != nil {
@@ -151,7 +143,7 @@ func (c *Company) GalleryImages(
 		WithImageFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := c.Edges.totalCount[7][alias]
+	totalCount, hasTotalCount := c.Edges.totalCount[6][alias]
 	if nodes, err := c.NamedGalleryImages(alias); err == nil || hasTotalCount {
 		pager, err := newImagePager(opts)
 		if err != nil {
@@ -329,14 +321,6 @@ func (ph *Phone) Country(ctx context.Context) (*Country, error) {
 	result, err := ph.Edges.CountryOrErr()
 	if IsNotLoaded(err) {
 		result, err = ph.QueryCountry().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
-func (pr *Product) Company(ctx context.Context) (*Company, error) {
-	result, err := pr.Edges.CompanyOrErr()
-	if IsNotLoaded(err) {
-		result, err = pr.QueryCompany().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/enums"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
@@ -35,8 +34,8 @@ type Product struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Image holds the value of the "image" field.
@@ -60,36 +59,21 @@ type Product struct {
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Company holds the value of the company edge.
-	Company *Company `json:"company,omitempty"`
 	// Warehouse holds the value of the warehouse edge.
 	Warehouse *Warehouse `json:"warehouse,omitempty"`
 	// Vendor holds the value of the vendor edge.
 	Vendor *Vendor `json:"vendor,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
-}
-
-// CompanyOrErr returns the Company value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProductEdges) CompanyOrErr() (*Company, error) {
-	if e.loadedTypes[0] {
-		if e.Company == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: company.Label}
-		}
-		return e.Company, nil
-	}
-	return nil, &NotLoadedError{edge: "company"}
+	totalCount [2]map[string]int
 }
 
 // WarehouseOrErr returns the Warehouse value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductEdges) WarehouseOrErr() (*Warehouse, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		if e.Warehouse == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: warehouse.Label}
@@ -102,7 +86,7 @@ func (e ProductEdges) WarehouseOrErr() (*Warehouse, error) {
 // VendorOrErr returns the Vendor value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductEdges) VendorOrErr() (*Vendor, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		if e.Vendor == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: vendor.Label}
@@ -117,7 +101,7 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case product.FieldTitle, product.FieldDescription, product.FieldImage, product.FieldURL, product.FieldStatus, product.FieldBuildStatus:
+		case product.FieldName, product.FieldDescription, product.FieldImage, product.FieldURL, product.FieldStatus, product.FieldBuildStatus:
 			values[i] = new(sql.NullString)
 		case product.FieldLastSell, product.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -148,11 +132,11 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				pr.ID = *value
 			}
-		case product.FieldTitle:
+		case product.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				pr.Title = value.String
+				pr.Name = value.String
 			}
 		case product.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -217,11 +201,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryCompany queries the "company" edge of the Product entity.
-func (pr *Product) QueryCompany() *CompanyQuery {
-	return (&ProductClient{config: pr.config}).QueryCompany(pr)
-}
-
 // QueryWarehouse queries the "warehouse" edge of the Product entity.
 func (pr *Product) QueryWarehouse() *WarehouseQuery {
 	return (&ProductClient{config: pr.config}).QueryWarehouse(pr)
@@ -255,8 +234,8 @@ func (pr *Product) String() string {
 	var builder strings.Builder
 	builder.WriteString("Product(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pr.ID))
-	builder.WriteString("title=")
-	builder.WriteString(pr.Title)
+	builder.WriteString("name=")
+	builder.WriteString(pr.Name)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(pr.Description)

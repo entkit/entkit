@@ -5,6 +5,8 @@ import * as Tables from "./tables";
 import * as Interfaces from "./interfaces";
 
 export const CompanyList :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError>}> = ( props ) => {
+
+
     return <RA.List>
         <Tables.CompanyTable {...props} />
     </RA.List>

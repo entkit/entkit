@@ -10,25 +10,6 @@ import * as Custom from "./custom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = () => {
     const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.ICompany>();
-    const [productCursors, setProductCursors] = useState<Cursors>({
-        first: 10,
-    })
-    const {selectProps: productSelectProps} = RA.useSelect<Interfaces.ICompany>({
-        resource: "Product",
-        optionLabel: "url",
-        optionValue: "id",
-        metaData: {
-            cursors: productCursors,
-            fields: ["id", "url"]
-        },
-        onSearch: (value) => [
-            {
-                field: "url",
-                operator: "contains",
-                value,
-            },
-        ],
-    });
     const [countriesCursors, setCountriesCursors] = useState<Cursors>({
         first: 10,
     })
@@ -167,11 +148,19 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                      <FieldView.ER_StringViewOnForm/>
+                </RA.Form.Item>
+                
+                <RA.Form.Item
+                    label="Logo"
+                    name="logo"
+                    rules={[{required: false}]}
+                >
+                     <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -180,10 +169,6 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     rules={[{required: true}]}
                 >
                      <FieldView.ER_RichTextViewOnForm/>
-                </RA.Form.Item>
-                <RA.Form.Item label="product"
-                              name="productID"rules={[{required: false}]}>
-                    <RA.Select {...productSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
                 <RA.Form.Item label="countries"
                               name={["countryIDs"]}rules={[{required: false}]}>
@@ -223,15 +208,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: companiesSelectProps} = RA.useSelect<Interfaces.ICountry>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: companiesCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -362,15 +347,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: companySelectProps} = RA.useSelect<Interfaces.IEmail>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -440,15 +425,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: gallery_companySelectProps} = RA.useSelect<Interfaces.IImage>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: gallery_companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -459,15 +444,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: logo_companySelectProps} = RA.useSelect<Interfaces.IImage>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: logo_companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -510,15 +495,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: companySelectProps} = RA.useSelect<Interfaces.ILocation>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -652,15 +637,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: companySelectProps} = RA.useSelect<Interfaces.IPhone>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -733,39 +718,20 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     );
 };export const ProductCreate: React.FC = () => {
     const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.IProduct>();
-    const [companyCursors, setCompanyCursors] = useState<Cursors>({
-        first: 10,
-    })
-    const {selectProps: companySelectProps} = RA.useSelect<Interfaces.IProduct>({
-        resource: "Company",
-        optionLabel: "title",
-        optionValue: "id",
-        metaData: {
-            cursors: companyCursors,
-            fields: ["id", "title"]
-        },
-        onSearch: (value) => [
-            {
-                field: "title",
-                operator: "contains",
-                value,
-            },
-        ],
-    });
     const [warehouseCursors, setWarehouseCursors] = useState<Cursors>({
         first: 10,
     })
     const {selectProps: warehouseSelectProps} = RA.useSelect<Interfaces.IProduct>({
         resource: "Warehouse",
-        optionLabel: "url",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: warehouseCursors,
-            fields: ["id", "url"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "url",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -776,15 +742,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: vendorSelectProps} = RA.useSelect<Interfaces.IProduct>({
         resource: "Vendor",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: vendorCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -795,8 +761,8 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                      <FieldView.ER_StringViewOnForm/>
@@ -843,10 +809,6 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                 >
                      <FieldView.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
-                <RA.Form.Item label="company"
-                              name="companyID"rules={[{required: false}]}>
-                    <RA.Select {...companySelectProps} mode={ undefined }/>
-                </RA.Form.Item>
                 <RA.Form.Item label="warehouse"
                               name="warehouseID"rules={[{required: false}]}>
                     <RA.Select {...warehouseSelectProps} mode={ undefined }/>
@@ -865,15 +827,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: warehousesSelectProps} = RA.useSelect<Interfaces.IVendor>({
         resource: "Warehouse",
-        optionLabel: "url",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: warehousesCursors,
-            fields: ["id", "url"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "url",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -903,16 +865,8 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
-                    name="title"
-                    rules={[{required: true}]}
-                >
-                     <FieldView.ER_StringViewOnForm/>
-                </RA.Form.Item>
-                
-                <RA.Form.Item
-                    label="Url"
-                    name="url"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                      <FieldView.ER_StringViewOnForm/>
@@ -962,15 +916,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: vendorSelectProps} = RA.useSelect<Interfaces.IWarehouse>({
         resource: "Vendor",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: vendorCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -981,8 +935,8 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Url"
-                    name="url"
+                    label="Name"
+                    name="name"
                     rules={[{required: true}]}
                 >
                      <FieldView.ER_StringViewOnForm/>
@@ -1030,15 +984,15 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
     })
     const {selectProps: companySelectProps} = RA.useSelect<Interfaces.IWebsite>({
         resource: "Company",
-        optionLabel: "title",
+        optionLabel: "name",
         optionValue: "id",
         metaData: {
             cursors: companyCursors,
-            fields: ["id", "title"]
+            fields: ["id", "name"]
         },
         onSearch: (value) => [
             {
-                field: "title",
+                field: "name",
                 operator: "contains",
                 value,
             },
@@ -1088,7 +1042,7 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     name="url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item label="company"
                               name="companyID"rules={[{required: false}]}>

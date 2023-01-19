@@ -18,14 +18,12 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
@@ -42,7 +40,6 @@ type ProductQuery struct {
 	order         []OrderFunc
 	fields        []string
 	predicates    []predicate.Product
-	withCompany   *CompanyQuery
 	withWarehouse *WarehouseQuery
 	withVendor    *VendorQuery
 	withFKs       bool
@@ -82,28 +79,6 @@ func (pq *ProductQuery) Unique(unique bool) *ProductQuery {
 func (pq *ProductQuery) Order(o ...OrderFunc) *ProductQuery {
 	pq.order = append(pq.order, o...)
 	return pq
-}
-
-// QueryCompany chains the current query on the "company" edge.
-func (pq *ProductQuery) QueryCompany() *CompanyQuery {
-	query := &CompanyQuery{config: pq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(product.Table, product.FieldID, selector),
-			sqlgraph.To(company.Table, company.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, product.CompanyTable, product.CompanyColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryWarehouse chains the current query on the "warehouse" edge.
@@ -304,10 +279,14 @@ func (pq *ProductQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (pq *ProductQuery) Exist(ctx context.Context) (bool, error) {
-	if err := pq.prepareQuery(ctx); err != nil {
-		return false, err
+	switch _, err := pq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return pq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -331,7 +310,6 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		offset:        pq.offset,
 		order:         append([]OrderFunc{}, pq.order...),
 		predicates:    append([]predicate.Product{}, pq.predicates...),
-		withCompany:   pq.withCompany.Clone(),
 		withWarehouse: pq.withWarehouse.Clone(),
 		withVendor:    pq.withVendor.Clone(),
 		// clone intermediate query.
@@ -339,17 +317,6 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		path:   pq.path,
 		unique: pq.unique,
 	}
-}
-
-// WithCompany tells the query-builder to eager-load the nodes that are connected to
-// the "company" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithCompany(opts ...func(*CompanyQuery)) *ProductQuery {
-	query := &CompanyQuery{config: pq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withCompany = query
-	return pq
 }
 
 // WithWarehouse tells the query-builder to eager-load the nodes that are connected to
@@ -380,12 +347,12 @@ func (pq *ProductQuery) WithVendor(opts ...func(*VendorQuery)) *ProductQuery {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Product.Query().
-//		GroupBy(product.FieldTitle).
+//		GroupBy(product.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy {
@@ -408,11 +375,11 @@ func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Product.Query().
-//		Select(product.FieldTitle).
+//		Select(product.FieldName).
 //		Scan(ctx, &v)
 func (pq *ProductQuery) Select(fields ...string) *ProductSelect {
 	pq.fields = append(pq.fields, fields...)
@@ -448,8 +415,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		nodes       = []*Product{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [3]bool{
-			pq.withCompany != nil,
+		loadedTypes = [2]bool{
 			pq.withWarehouse != nil,
 			pq.withVendor != nil,
 		}
@@ -481,12 +447,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pq.withCompany; query != nil {
-		if err := pq.loadCompany(ctx, query, nodes, nil,
-			func(n *Product, e *Company) { n.Edges.Company = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := pq.withWarehouse; query != nil {
 		if err := pq.loadWarehouse(ctx, query, nodes, nil,
 			func(n *Product, e *Warehouse) { n.Edges.Warehouse = e }); err != nil {
@@ -507,34 +467,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	return nodes, nil
 }
 
-func (pq *ProductQuery) loadCompany(ctx context.Context, query *CompanyQuery, nodes []*Product, init func(*Product), assign func(*Product, *Company)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Product)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.Company(func(s *sql.Selector) {
-		s.Where(sql.InValues(product.CompanyColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.product_company
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "product_company" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "product_company" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (pq *ProductQuery) loadWarehouse(ctx context.Context, query *WarehouseQuery, nodes []*Product, init func(*Product), assign func(*Product, *Warehouse)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Product)
@@ -604,17 +536,6 @@ func (pq *ProductQuery) sqlCount(ctx context.Context) (int, error) {
 		_spec.Unique = pq.unique != nil && *pq.unique
 	}
 	return sqlgraph.CountNodes(ctx, pq.driver, _spec)
-}
-
-func (pq *ProductQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := pq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {

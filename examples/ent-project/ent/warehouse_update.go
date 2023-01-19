@@ -46,9 +46,9 @@ func (wu *WarehouseUpdate) Where(ps ...predicate.Warehouse) *WarehouseUpdate {
 	return wu
 }
 
-// SetURL sets the "url" field.
-func (wu *WarehouseUpdate) SetURL(s string) *WarehouseUpdate {
-	wu.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (wu *WarehouseUpdate) SetName(s string) *WarehouseUpdate {
+	wu.mutation.SetName(s)
 	return wu
 }
 
@@ -252,9 +252,9 @@ func (wu *WarehouseUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wu *WarehouseUpdate) check() error {
-	if v, ok := wu.mutation.URL(); ok {
-		if err := warehouse.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Warehouse.url": %w`, err)}
+	if v, ok := wu.mutation.Name(); ok {
+		if err := warehouse.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Warehouse.name": %w`, err)}
 		}
 	}
 	return nil
@@ -278,8 +278,8 @@ func (wu *WarehouseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := wu.mutation.URL(); ok {
-		_spec.SetField(warehouse.FieldURL, field.TypeString, value)
+	if value, ok := wu.mutation.Name(); ok {
+		_spec.SetField(warehouse.FieldName, field.TypeString, value)
 	}
 	if value, ok := wu.mutation.LastUpdate(); ok {
 		_spec.SetField(warehouse.FieldLastUpdate, field.TypeTime, value)
@@ -415,9 +415,9 @@ type WarehouseUpdateOne struct {
 	mutation *WarehouseMutation
 }
 
-// SetURL sets the "url" field.
-func (wuo *WarehouseUpdateOne) SetURL(s string) *WarehouseUpdateOne {
-	wuo.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (wuo *WarehouseUpdateOne) SetName(s string) *WarehouseUpdateOne {
+	wuo.mutation.SetName(s)
 	return wuo
 }
 
@@ -634,9 +634,9 @@ func (wuo *WarehouseUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wuo *WarehouseUpdateOne) check() error {
-	if v, ok := wuo.mutation.URL(); ok {
-		if err := warehouse.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Warehouse.url": %w`, err)}
+	if v, ok := wuo.mutation.Name(); ok {
+		if err := warehouse.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Warehouse.name": %w`, err)}
 		}
 	}
 	return nil
@@ -677,8 +677,8 @@ func (wuo *WarehouseUpdateOne) sqlSave(ctx context.Context) (_node *Warehouse, e
 			}
 		}
 	}
-	if value, ok := wuo.mutation.URL(); ok {
-		_spec.SetField(warehouse.FieldURL, field.TypeString, value)
+	if value, ok := wuo.mutation.Name(); ok {
+		_spec.SetField(warehouse.FieldName, field.TypeString, value)
 	}
 	if value, ok := wuo.mutation.LastUpdate(); ok {
 		_spec.SetField(warehouse.FieldLastUpdate, field.TypeTime, value)

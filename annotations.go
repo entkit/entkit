@@ -5,30 +5,39 @@ import (
 	"entgo.io/ent/schema"
 )
 
+// CodeFieldOptions code field is configurable
 type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
 }
 
+// Action item related action
+// e.g. show, edit, delete
+// also you can create custom actions
 type Action struct {
 	Name  string         `json:"Name,omitempty"`
 	Attrs map[string]any `json:"Attrs,omitempty"`
 }
 
 var (
+
+	// EditAction standard edit action
 	EditAction = Action{
 		Name:  "RA.EditButton",
 		Attrs: map[string]any{},
 	}
+	// ShowAction standard show action
 	ShowAction = Action{
 		Name:  "RA.ShowButton",
 		Attrs: map[string]any{},
 	}
+	// DeleteAction standard delete action
 	DeleteAction = Action{
 		Name:  "RA.DeleteButton",
 		Attrs: map[string]any{},
 	}
 )
 
+// RefineAnnotation struct container of all annotations
 type RefineAnnotation struct {
 	TitleField      bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
 	ImageField      bool              `json:"ImageField,omitempty"`     // Mark field as image
@@ -154,22 +163,26 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 	return ra
 }
 
+// Name annotation
 func (ra RefineAnnotation) Name() string {
 	return "REFINE"
 }
 
+// ListActions actions/buttons on list items
 func ListActions(actions ...Action) RefineAnnotation {
 	return RefineAnnotation{
 		ListActions: actions,
 	}
 }
 
+// ShowActions actions/buttons on show page
 func ShowActions(actions ...Action) RefineAnnotation {
 	return RefineAnnotation{
 		ShowActions: actions,
 	}
 }
 
+// OnlyOnList show field only on list
 func OnlyOnList() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnList: false,
@@ -178,6 +191,7 @@ func OnlyOnList() RefineAnnotation {
 	}
 }
 
+// OnlyOnForm show field only on form
 func OnlyOnForm() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnList: true,
@@ -186,6 +200,7 @@ func OnlyOnForm() RefineAnnotation {
 	}
 }
 
+// OnlyOnShow show field only on show page
 func OnlyOnShow() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnList: true,
@@ -194,36 +209,42 @@ func OnlyOnShow() RefineAnnotation {
 	}
 }
 
+// HideOnList hide field on list
 func HideOnList() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnList: true,
 	}
 }
 
+// HideOnShow hide field on show page
 func HideOnShow() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnShow: true,
 	}
 }
 
+// HideOnForm hide field on form
 func HideOnForm() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnForm: true,
 	}
 }
 
+// TitleField mark field as a title field
 func TitleField() RefineAnnotation {
 	return RefineAnnotation{
 		TitleField: true,
 	}
 }
 
+// ImageField mark field as an image field
 func ImageField() RefineAnnotation {
 	return RefineAnnotation{
 		ImageField: true,
 	}
 }
 
+// MainImageField mark field as a main image field
 func MainImageField() RefineAnnotation {
 	return RefineAnnotation{
 		MainImageField: true,
@@ -231,54 +252,66 @@ func MainImageField() RefineAnnotation {
 	}
 }
 
+// RichTextField mark field as a rich text field (wysiwyg editor)
 func RichTextField() RefineAnnotation {
 	return RefineAnnotation{
 		RichTextField: true,
 	}
 }
 
+// CodeField mark field as a code field
 func CodeField(config *CodeFieldOptions) RefineAnnotation {
 	return RefineAnnotation{
 		CodeField: config,
 	}
 }
 
+// URLField mark field as an url field
 func URLField() RefineAnnotation {
 	return RefineAnnotation{
 		URLField: true,
 	}
 }
 
+// Icon define icon of entity that will be shown on navigations, breadcrumbs e.t.c.
 func Icon(icon string) RefineAnnotation {
 	return RefineAnnotation{
 		Icon: &icon,
 	}
 }
 
+// Label define label of field
+// todo: implement generator
 func Label(label string) RefineAnnotation {
 	return RefineAnnotation{
 		Label: &label,
 	}
 }
 
+// Description define description of field/entity
+// todo: implement generator
 func Description(description string) RefineAnnotation {
 	return RefineAnnotation{
 		Label: &description,
 	}
 }
 
+// Prefix add prefix to value of field
+// todo: implement generator
 func Prefix(prefix string) RefineAnnotation {
 	return RefineAnnotation{
 		Prefix: &prefix,
 	}
 }
 
+// Suffix add suffix to value of field
 func Suffix(suffix string) RefineAnnotation {
 	return RefineAnnotation{
 		Prefix: &suffix,
 	}
 }
 
+// FieldView define field views on list and show
 func FieldView(name string) RefineAnnotation {
 	return RefineAnnotation{
 		FieldView:       &name,
@@ -287,24 +320,28 @@ func FieldView(name string) RefineAnnotation {
 	}
 }
 
+// FieldViewOnList define field view on list
 func FieldViewOnList(name string) RefineAnnotation {
 	return RefineAnnotation{
 		FieldViewOnList: &name,
 	}
 }
 
+// FieldViewOnShow define field view on show page
 func FieldViewOnShow(name string) RefineAnnotation {
 	return RefineAnnotation{
 		FieldViewOnShow: &name,
 	}
 }
 
+// FieldViewOnForm define field view on form
 func FieldViewOnForm(name string) RefineAnnotation {
 	return RefineAnnotation{
 		FieldViewOnForm: &name,
 	}
 }
 
+// FilterOperator define entity field filter operator
 func FilterOperator(operator gen.Op) RefineAnnotation {
 	opName := operator.Name()
 	return RefineAnnotation{

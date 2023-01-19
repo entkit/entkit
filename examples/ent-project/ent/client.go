@@ -201,6 +201,34 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Website.Use(hooks...)
 }
 
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *CompanyMutation:
+		return c.Company.mutate(ctx, m)
+	case *CountryMutation:
+		return c.Country.mutate(ctx, m)
+	case *EmailMutation:
+		return c.Email.mutate(ctx, m)
+	case *ImageMutation:
+		return c.Image.mutate(ctx, m)
+	case *LocationMutation:
+		return c.Location.mutate(ctx, m)
+	case *PhoneMutation:
+		return c.Phone.mutate(ctx, m)
+	case *ProductMutation:
+		return c.Product.mutate(ctx, m)
+	case *VendorMutation:
+		return c.Vendor.mutate(ctx, m)
+	case *WarehouseMutation:
+		return c.Warehouse.mutate(ctx, m)
+	case *WebsiteMutation:
+		return c.Website.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // CompanyClient is a client for the Company schema.
 type CompanyClient struct {
 	config
@@ -284,22 +312,6 @@ func (c *CompanyClient) GetX(ctx context.Context, id uuid.UUID) *Company {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryProduct queries the product edge of a Company.
-func (c *CompanyClient) QueryProduct(co *Company) *ProductQuery {
-	query := &ProductQuery{config: c.config}
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(company.Table, company.FieldID, id),
-			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, company.ProductTable, company.ProductColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // QueryCountries queries the countries edge of a Company.
@@ -417,6 +429,21 @@ func (c *CompanyClient) QueryGalleryImages(co *Company) *ImageQuery {
 // Hooks returns the client hooks.
 func (c *CompanyClient) Hooks() []Hook {
 	return c.hooks.Company
+}
+
+func (c *CompanyClient) mutate(ctx context.Context, m *CompanyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CompanyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CompanyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CompanyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CompanyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Company mutation op: %q", m.Op())
+	}
 }
 
 // CountryClient is a client for the Country schema.
@@ -589,6 +616,21 @@ func (c *CountryClient) Hooks() []Hook {
 	return c.hooks.Country
 }
 
+func (c *CountryClient) mutate(ctx context.Context, m *CountryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CountryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CountryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CountryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CountryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Country mutation op: %q", m.Op())
+	}
+}
+
 // EmailClient is a client for the Email schema.
 type EmailClient struct {
 	config
@@ -709,6 +751,21 @@ func (c *EmailClient) QueryCountry(e *Email) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *EmailClient) Hooks() []Hook {
 	return c.hooks.Email
+}
+
+func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EmailCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EmailUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EmailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EmailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Email mutation op: %q", m.Op())
+	}
 }
 
 // ImageClient is a client for the Image schema.
@@ -833,6 +890,21 @@ func (c *ImageClient) Hooks() []Hook {
 	return c.hooks.Image
 }
 
+func (c *ImageClient) mutate(ctx context.Context, m *ImageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ImageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ImageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ImageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Image mutation op: %q", m.Op())
+	}
+}
+
 // LocationClient is a client for the Location schema.
 type LocationClient struct {
 	config
@@ -953,6 +1025,21 @@ func (c *LocationClient) QueryCountry(l *Location) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *LocationClient) Hooks() []Hook {
 	return c.hooks.Location
+}
+
+func (c *LocationClient) mutate(ctx context.Context, m *LocationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LocationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LocationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LocationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LocationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Location mutation op: %q", m.Op())
+	}
 }
 
 // PhoneClient is a client for the Phone schema.
@@ -1077,6 +1164,21 @@ func (c *PhoneClient) Hooks() []Hook {
 	return c.hooks.Phone
 }
 
+func (c *PhoneClient) mutate(ctx context.Context, m *PhoneMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PhoneCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PhoneUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PhoneUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PhoneDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Phone mutation op: %q", m.Op())
+	}
+}
+
 // ProductClient is a client for the Product schema.
 type ProductClient struct {
 	config
@@ -1162,22 +1264,6 @@ func (c *ProductClient) GetX(ctx context.Context, id uuid.UUID) *Product {
 	return obj
 }
 
-// QueryCompany queries the company edge of a Product.
-func (c *ProductClient) QueryCompany(pr *Product) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(product.Table, product.FieldID, id),
-			sqlgraph.To(company.Table, company.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, product.CompanyTable, product.CompanyColumn),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryWarehouse queries the warehouse edge of a Product.
 func (c *ProductClient) QueryWarehouse(pr *Product) *WarehouseQuery {
 	query := &WarehouseQuery{config: c.config}
@@ -1213,6 +1299,21 @@ func (c *ProductClient) QueryVendor(pr *Product) *VendorQuery {
 // Hooks returns the client hooks.
 func (c *ProductClient) Hooks() []Hook {
 	return c.hooks.Product
+}
+
+func (c *ProductClient) mutate(ctx context.Context, m *ProductMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProductCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProductUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProductDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Product mutation op: %q", m.Op())
+	}
 }
 
 // VendorClient is a client for the Vendor schema.
@@ -1337,6 +1438,21 @@ func (c *VendorClient) Hooks() []Hook {
 	return c.hooks.Vendor
 }
 
+func (c *VendorClient) mutate(ctx context.Context, m *VendorMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VendorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VendorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VendorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VendorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Vendor mutation op: %q", m.Op())
+	}
+}
+
 // WarehouseClient is a client for the Warehouse schema.
 type WarehouseClient struct {
 	config
@@ -1459,6 +1575,21 @@ func (c *WarehouseClient) Hooks() []Hook {
 	return c.hooks.Warehouse
 }
 
+func (c *WarehouseClient) mutate(ctx context.Context, m *WarehouseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WarehouseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WarehouseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WarehouseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WarehouseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Warehouse mutation op: %q", m.Op())
+	}
+}
+
 // WebsiteClient is a client for the Website schema.
 type WebsiteClient struct {
 	config
@@ -1579,4 +1710,19 @@ func (c *WebsiteClient) QueryCountry(w *Website) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *WebsiteClient) Hooks() []Hook {
 	return c.hooks.Website
+}
+
+func (c *WebsiteClient) mutate(ctx context.Context, m *WebsiteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WebsiteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WebsiteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WebsiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WebsiteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Website mutation op: %q", m.Op())
+	}
 }

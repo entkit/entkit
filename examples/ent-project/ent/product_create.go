@@ -24,7 +24,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/enums"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
@@ -39,9 +38,9 @@ type ProductCreate struct {
 	hooks    []Hook
 }
 
-// SetTitle sets the "title" field.
-func (pc *ProductCreate) SetTitle(s string) *ProductCreate {
-	pc.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (pc *ProductCreate) SetName(s string) *ProductCreate {
+	pc.mutation.SetName(s)
 	return pc
 }
 
@@ -131,25 +130,6 @@ func (pc *ProductCreate) SetNillableID(u *uuid.UUID) *ProductCreate {
 		pc.SetID(*u)
 	}
 	return pc
-}
-
-// SetCompanyID sets the "company" edge to the Company entity by ID.
-func (pc *ProductCreate) SetCompanyID(id uuid.UUID) *ProductCreate {
-	pc.mutation.SetCompanyID(id)
-	return pc
-}
-
-// SetNillableCompanyID sets the "company" edge to the Company entity by ID if the given value is not nil.
-func (pc *ProductCreate) SetNillableCompanyID(id *uuid.UUID) *ProductCreate {
-	if id != nil {
-		pc = pc.SetCompanyID(*id)
-	}
-	return pc
-}
-
-// SetCompany sets the "company" edge to the Company entity.
-func (pc *ProductCreate) SetCompany(c *Company) *ProductCreate {
-	return pc.SetCompanyID(c.ID)
 }
 
 // SetWarehouseID sets the "warehouse" edge to the Warehouse entity by ID.
@@ -283,12 +263,12 @@ func (pc *ProductCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *ProductCreate) check() error {
-	if _, ok := pc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Product.title"`)}
+	if _, ok := pc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Product.name"`)}
 	}
-	if v, ok := pc.mutation.Title(); ok {
-		if err := product.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Product.title": %w`, err)}
+	if v, ok := pc.mutation.Name(); ok {
+		if err := product.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
 	if _, ok := pc.mutation.Description(); !ok {
@@ -367,9 +347,9 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := pc.mutation.Title(); ok {
-		_spec.SetField(product.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := pc.mutation.Name(); ok {
+		_spec.SetField(product.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := pc.mutation.Description(); ok {
 		_spec.SetField(product.FieldDescription, field.TypeString, value)
@@ -398,25 +378,6 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.BuildStatus(); ok {
 		_spec.SetField(product.FieldBuildStatus, field.TypeEnum, value)
 		_node.BuildStatus = value
-	}
-	if nodes := pc.mutation.CompanyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   product.CompanyTable,
-			Columns: []string{product.CompanyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.WarehouseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

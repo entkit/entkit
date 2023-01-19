@@ -46,16 +46,6 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 	path = append([]string(nil), path...)
 	for _, field := range graphql.CollectFields(op, field.Selections, satisfies) {
 		switch field.Name {
-		case "product":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = &ProductQuery{config: c.config}
-			)
-			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.withProduct = query
 		case "countries":
 			var (
 				alias = field.Alias
@@ -103,10 +93,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[1] == nil {
-								nodes[i].Edges.totalCount[1] = make(map[string]int)
+							if nodes[i].Edges.totalCount[0] == nil {
+								nodes[i].Edges.totalCount[0] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[1][alias] = n
+							nodes[i].Edges.totalCount[0][alias] = n
 						}
 						return nil
 					})
@@ -114,10 +104,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.Countries)
-							if nodes[i].Edges.totalCount[1] == nil {
-								nodes[i].Edges.totalCount[1] = make(map[string]int)
+							if nodes[i].Edges.totalCount[0] == nil {
+								nodes[i].Edges.totalCount[0] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[1][alias] = n
+							nodes[i].Edges.totalCount[0][alias] = n
 						}
 						return nil
 					})
@@ -186,10 +176,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[2] == nil {
-								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							if nodes[i].Edges.totalCount[1] == nil {
+								nodes[i].Edges.totalCount[1] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[2][alias] = n
+							nodes[i].Edges.totalCount[1][alias] = n
 						}
 						return nil
 					})
@@ -197,10 +187,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.Phones)
-							if nodes[i].Edges.totalCount[2] == nil {
-								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							if nodes[i].Edges.totalCount[1] == nil {
+								nodes[i].Edges.totalCount[1] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[2][alias] = n
+							nodes[i].Edges.totalCount[1][alias] = n
 						}
 						return nil
 					})
@@ -269,10 +259,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[3] == nil {
-								nodes[i].Edges.totalCount[3] = make(map[string]int)
+							if nodes[i].Edges.totalCount[2] == nil {
+								nodes[i].Edges.totalCount[2] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[3][alias] = n
+							nodes[i].Edges.totalCount[2][alias] = n
 						}
 						return nil
 					})
@@ -280,10 +270,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.Emails)
-							if nodes[i].Edges.totalCount[3] == nil {
-								nodes[i].Edges.totalCount[3] = make(map[string]int)
+							if nodes[i].Edges.totalCount[2] == nil {
+								nodes[i].Edges.totalCount[2] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[3][alias] = n
+							nodes[i].Edges.totalCount[2][alias] = n
 						}
 						return nil
 					})
@@ -352,10 +342,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[4] == nil {
-								nodes[i].Edges.totalCount[4] = make(map[string]int)
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[4][alias] = n
+							nodes[i].Edges.totalCount[3][alias] = n
 						}
 						return nil
 					})
@@ -363,10 +353,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.Websites)
-							if nodes[i].Edges.totalCount[4] == nil {
-								nodes[i].Edges.totalCount[4] = make(map[string]int)
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[4][alias] = n
+							nodes[i].Edges.totalCount[3][alias] = n
 						}
 						return nil
 					})
@@ -435,10 +425,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[5] == nil {
-								nodes[i].Edges.totalCount[5] = make(map[string]int)
+							if nodes[i].Edges.totalCount[4] == nil {
+								nodes[i].Edges.totalCount[4] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[5][alias] = n
+							nodes[i].Edges.totalCount[4][alias] = n
 						}
 						return nil
 					})
@@ -446,10 +436,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.Locations)
-							if nodes[i].Edges.totalCount[5] == nil {
-								nodes[i].Edges.totalCount[5] = make(map[string]int)
+							if nodes[i].Edges.totalCount[4] == nil {
+								nodes[i].Edges.totalCount[4] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[5][alias] = n
+							nodes[i].Edges.totalCount[4][alias] = n
 						}
 						return nil
 					})
@@ -528,10 +518,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[7] == nil {
-								nodes[i].Edges.totalCount[7] = make(map[string]int)
+							if nodes[i].Edges.totalCount[6] == nil {
+								nodes[i].Edges.totalCount[6] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[7][alias] = n
+							nodes[i].Edges.totalCount[6][alias] = n
 						}
 						return nil
 					})
@@ -539,10 +529,10 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 					c.loadTotal = append(c.loadTotal, func(_ context.Context, nodes []*Company) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.GalleryImages)
-							if nodes[i].Edges.totalCount[7] == nil {
-								nodes[i].Edges.totalCount[7] = make(map[string]int)
+							if nodes[i].Edges.totalCount[6] == nil {
+								nodes[i].Edges.totalCount[6] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[7][alias] = n
+							nodes[i].Edges.totalCount[6][alias] = n
 						}
 						return nil
 					})
@@ -1499,16 +1489,6 @@ func (pr *ProductQuery) collectField(ctx context.Context, op *graphql.OperationC
 	path = append([]string(nil), path...)
 	for _, field := range graphql.CollectFields(op, field.Selections, satisfies) {
 		switch field.Name {
-		case "company":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = &CompanyQuery{config: pr.config}
-			)
-			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.withCompany = query
 		case "warehouse":
 			var (
 				alias = field.Alias

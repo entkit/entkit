@@ -311,7 +311,6 @@ func HasGalleryCompany() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(GalleryCompanyTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, GalleryCompanyTable, GalleryCompanyColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -339,7 +338,6 @@ func HasLogoCompany() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(LogoCompanyTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, LogoCompanyTable, LogoCompanyColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

@@ -463,13 +463,23 @@ func (c *CompanyQuery) Paginate(
 }
 
 var (
-	// CompanyOrderFieldTitle orders Company by title.
-	CompanyOrderFieldTitle = &CompanyOrderField{
-		field: company.FieldTitle,
+	// CompanyOrderFieldName orders Company by name.
+	CompanyOrderFieldName = &CompanyOrderField{
+		field: company.FieldName,
 		toCursor: func(c *Company) Cursor {
 			return Cursor{
 				ID:    c.ID,
-				Value: c.Title,
+				Value: c.Name,
+			}
+		},
+	}
+	// CompanyOrderFieldLogo orders Company by logo.
+	CompanyOrderFieldLogo = &CompanyOrderField{
+		field: company.FieldLogo,
+		toCursor: func(c *Company) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Logo,
 			}
 		},
 	}
@@ -489,8 +499,10 @@ var (
 func (f CompanyOrderField) String() string {
 	var str string
 	switch f.field {
-	case company.FieldTitle:
-		str = "TITLE"
+	case company.FieldName:
+		str = "NAME"
+	case company.FieldLogo:
+		str = "LOGO"
 	case company.FieldDescription:
 		str = "DESCRIPTION"
 	}
@@ -509,8 +521,10 @@ func (f *CompanyOrderField) UnmarshalGQL(v interface{}) error {
 		return fmt.Errorf("CompanyOrderField %T must be a string", v)
 	}
 	switch str {
-	case "TITLE":
-		*f = *CompanyOrderFieldTitle
+	case "NAME":
+		*f = *CompanyOrderFieldName
+	case "LOGO":
+		*f = *CompanyOrderFieldLogo
 	case "DESCRIPTION":
 		*f = *CompanyOrderFieldDescription
 	default:
@@ -2359,13 +2373,13 @@ func (pr *ProductQuery) Paginate(
 }
 
 var (
-	// ProductOrderFieldTitle orders Product by title.
-	ProductOrderFieldTitle = &ProductOrderField{
-		field: product.FieldTitle,
+	// ProductOrderFieldName orders Product by name.
+	ProductOrderFieldName = &ProductOrderField{
+		field: product.FieldName,
 		toCursor: func(pr *Product) Cursor {
 			return Cursor{
 				ID:    pr.ID,
-				Value: pr.Title,
+				Value: pr.Name,
 			}
 		},
 	}
@@ -2445,7 +2459,7 @@ var (
 func (f ProductOrderField) String() string {
 	var str string
 	switch f.field {
-	case product.FieldTitle:
+	case product.FieldName:
 		str = "TITLE"
 	case product.FieldDescription:
 		str = "DESCRIPTION"
@@ -2478,7 +2492,7 @@ func (f *ProductOrderField) UnmarshalGQL(v interface{}) error {
 	}
 	switch str {
 	case "TITLE":
-		*f = *ProductOrderFieldTitle
+		*f = *ProductOrderFieldName
 	case "DESCRIPTION":
 		*f = *ProductOrderFieldDescription
 	case "IMAGE":
@@ -2731,23 +2745,13 @@ func (v *VendorQuery) Paginate(
 }
 
 var (
-	// VendorOrderFieldTitle orders Vendor by title.
-	VendorOrderFieldTitle = &VendorOrderField{
-		field: vendor.FieldTitle,
+	// VendorOrderFieldName orders Vendor by name.
+	VendorOrderFieldName = &VendorOrderField{
+		field: vendor.FieldName,
 		toCursor: func(v *Vendor) Cursor {
 			return Cursor{
 				ID:    v.ID,
-				Value: v.Title,
-			}
-		},
-	}
-	// VendorOrderFieldURL orders Vendor by url.
-	VendorOrderFieldURL = &VendorOrderField{
-		field: vendor.FieldURL,
-		toCursor: func(v *Vendor) Cursor {
-			return Cursor{
-				ID:    v.ID,
-				Value: v.URL,
+				Value: v.Name,
 			}
 		},
 	}
@@ -2767,10 +2771,8 @@ var (
 func (f VendorOrderField) String() string {
 	var str string
 	switch f.field {
-	case vendor.FieldTitle:
-		str = "TITLE"
-	case vendor.FieldURL:
-		str = "URL"
+	case vendor.FieldName:
+		str = "NAME"
 	case vendor.FieldSchema:
 		str = "SCHEMA"
 	}
@@ -2789,10 +2791,8 @@ func (f *VendorOrderField) UnmarshalGQL(v interface{}) error {
 		return fmt.Errorf("VendorOrderField %T must be a string", v)
 	}
 	switch str {
-	case "TITLE":
-		*f = *VendorOrderFieldTitle
-	case "URL":
-		*f = *VendorOrderFieldURL
+	case "NAME":
+		*f = *VendorOrderFieldName
 	case "SCHEMA":
 		*f = *VendorOrderFieldSchema
 	default:
@@ -3033,13 +3033,13 @@ func (w *WarehouseQuery) Paginate(
 }
 
 var (
-	// WarehouseOrderFieldURL orders Warehouse by url.
-	WarehouseOrderFieldURL = &WarehouseOrderField{
-		field: warehouse.FieldURL,
+	// WarehouseOrderFieldName orders Warehouse by name.
+	WarehouseOrderFieldName = &WarehouseOrderField{
+		field: warehouse.FieldName,
 		toCursor: func(w *Warehouse) Cursor {
 			return Cursor{
 				ID:    w.ID,
-				Value: w.URL,
+				Value: w.Name,
 			}
 		},
 	}
@@ -3069,8 +3069,8 @@ var (
 func (f WarehouseOrderField) String() string {
 	var str string
 	switch f.field {
-	case warehouse.FieldURL:
-		str = "URL"
+	case warehouse.FieldName:
+		str = "NAME"
 	case warehouse.FieldLastUpdate:
 		str = "LAST_UPDATE"
 	case warehouse.FieldEnabled:
@@ -3091,8 +3091,8 @@ func (f *WarehouseOrderField) UnmarshalGQL(v interface{}) error {
 		return fmt.Errorf("WarehouseOrderField %T must be a string", v)
 	}
 	switch str {
-	case "URL":
-		*f = *WarehouseOrderFieldURL
+	case "NAME":
+		*f = *WarehouseOrderFieldName
 	case "LAST_UPDATE":
 		*f = *WarehouseOrderFieldLastUpdate
 	case "ENABLED":

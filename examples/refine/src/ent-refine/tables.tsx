@@ -18,7 +18,7 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         resource: "Company",
         initialSorter: [
             {
-                field: "title",
+                field: "name",
                 order: "asc",
             },
         ],
@@ -28,18 +28,19 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                 value: null,
                 operator: "eq",
             },{
-                field: "title",
+                field: "name",
                 value: null,
                 operator: "contains",
             },{
-                field: "description",
+                field: "logo",
                 value: null,
-                operator: "contains",
+                operator: "eq",
             },],
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
+                "logo",
                 "description",
             ],
             cursors,
@@ -67,8 +68,8 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     defaultSortOrder={RA.getDefaultSortOrder("id", table.sorter)}
                 />
                 <RA.Table.Column
-                    dataIndex="title"
-                    title="Title"
+                    dataIndex="name"
+                    title="Name"
                     sorter={
                         {}
                     }
@@ -81,23 +82,23 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                             <RA.Input />
                         </RA.FilterDropdown>
                     )}
-                    defaultSortOrder={RA.getDefaultSortOrder("title", table.sorter)}
+                    defaultSortOrder={RA.getDefaultSortOrder("name", table.sorter)}
                 />
                 <RA.Table.Column
-                    dataIndex="description"
-                    title="Description"
+                    dataIndex="logo"
+                    title="Logo"
                     sorter={
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_RichTextViewOnList value={ value } />
+                        return <FieldView.ER_ImageViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
                             <RA.Input />
                         </RA.FilterDropdown>
                     )}
-                    defaultSortOrder={RA.getDefaultSortOrder("description", table.sorter)}
+                    defaultSortOrder={RA.getDefaultSortOrder("logo", table.sorter)}
                 />
                 <RA.Table.Column<Interfaces.ICompany>
                     title="Actions"
@@ -1357,7 +1358,7 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         resource: "Product",
         initialSorter: [
             {
-                field: "title",
+                field: "name",
                 order: "asc",
             },
         ],
@@ -1367,11 +1368,7 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                 value: null,
                 operator: "eq",
             },{
-                field: "title",
-                value: null,
-                operator: "contains",
-            },{
-                field: "description",
+                field: "name",
                 value: null,
                 operator: "contains",
             },{
@@ -1402,7 +1399,7 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         metaData: {
             fields: [
                 "id",
-                "title",
+                "name",
                 "description",
                 "image",
                 "url",
@@ -1436,8 +1433,8 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     defaultSortOrder={RA.getDefaultSortOrder("id", table.sorter)}
                 />
                 <RA.Table.Column
-                    dataIndex="title"
-                    title="Title"
+                    dataIndex="name"
+                    title="Name"
                     sorter={
                         {}
                     }
@@ -1449,23 +1446,7 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                             <RA.Input />
                         </RA.FilterDropdown>
                     )}
-                    defaultSortOrder={RA.getDefaultSortOrder("title", table.sorter)}
-                />
-                <RA.Table.Column
-                    dataIndex="description"
-                    title="Description"
-                    sorter={
-                        {}
-                    }
-                    render={ (value)=> {
-                        return <FieldView.ER_RichTextViewOnList value={ value } />
-                    } }
-                    filterDropdown={(props) => (
-                        <RA.FilterDropdown {...props}>
-                            <RA.Input />
-                        </RA.FilterDropdown>
-                    )}
-                    defaultSortOrder={RA.getDefaultSortOrder("description", table.sorter)}
+                    defaultSortOrder={RA.getDefaultSortOrder("name", table.sorter)}
                 />
                 <RA.Table.Column
                     dataIndex="image"
@@ -1719,7 +1700,7 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
         resource: "Vendor",
         initialSorter: [
             {
-                field: "title",
+                field: "name",
                 order: "asc",
             },
         ],
@@ -1729,11 +1710,7 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
                 value: null,
                 operator: "eq",
             },{
-                field: "title",
-                value: null,
-                operator: "contains",
-            },{
-                field: "url",
+                field: "name",
                 value: null,
                 operator: "contains",
             },{
@@ -1744,8 +1721,7 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
         metaData: {
             fields: [
                 "id",
-                "title",
-                "url",
+                "name",
                 "schema",
             ],
             cursors,
@@ -1773,8 +1749,8 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
                     defaultSortOrder={RA.getDefaultSortOrder("id", table.sorter)}
                 />
                 <RA.Table.Column
-                    dataIndex="title"
-                    title="Title"
+                    dataIndex="name"
+                    title="Name"
                     sorter={
                         {}
                     }
@@ -1786,23 +1762,7 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
                             <RA.Input />
                         </RA.FilterDropdown>
                     )}
-                    defaultSortOrder={RA.getDefaultSortOrder("title", table.sorter)}
-                />
-                <RA.Table.Column
-                    dataIndex="url"
-                    title="Url"
-                    sorter={
-                        {}
-                    }
-                    render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
-                    } }
-                    filterDropdown={(props) => (
-                        <RA.FilterDropdown {...props}>
-                            <RA.Input />
-                        </RA.FilterDropdown>
-                    )}
-                    defaultSortOrder={RA.getDefaultSortOrder("url", table.sorter)}
+                    defaultSortOrder={RA.getDefaultSortOrder("name", table.sorter)}
                 />
                 <RA.Table.Column
                     dataIndex="schema"
@@ -1921,7 +1881,7 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
         resource: "Warehouse",
         initialSorter: [
             {
-                field: "url",
+                field: "name",
                 order: "asc",
             },
         ],
@@ -1931,7 +1891,7 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
                 value: null,
                 operator: "eq",
             },{
-                field: "url",
+                field: "name",
                 value: null,
                 operator: "contains",
             },{
@@ -1954,7 +1914,7 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
         metaData: {
             fields: [
                 "id",
-                "url",
+                "name",
                 "lastUpdate",
                 "originalData",
                 "enabled",
@@ -1985,8 +1945,8 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
                     defaultSortOrder={RA.getDefaultSortOrder("id", table.sorter)}
                 />
                 <RA.Table.Column
-                    dataIndex="url"
-                    title="Url"
+                    dataIndex="name"
+                    title="Name"
                     sorter={
                         {}
                     }
@@ -1998,7 +1958,7 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
                             <RA.Input />
                         </RA.FilterDropdown>
                     )}
-                    defaultSortOrder={RA.getDefaultSortOrder("url", table.sorter)}
+                    defaultSortOrder={RA.getDefaultSortOrder("name", table.sorter)}
                 />
                 <RA.Table.Column
                     dataIndex="lastUpdate"
@@ -2251,7 +2211,7 @@ export const WebsiteTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <FieldView.ER_URLViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>

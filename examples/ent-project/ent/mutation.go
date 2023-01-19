@@ -67,11 +67,10 @@ type CompanyMutation struct {
 	op                    Op
 	typ                   string
 	id                    *uuid.UUID
-	title                 *string
+	name                  *string
+	logo                  *string
 	description           *string
 	clearedFields         map[string]struct{}
-	product               *uuid.UUID
-	clearedproduct        bool
 	countries             map[uuid.UUID]struct{}
 	removedcountries      map[uuid.UUID]struct{}
 	clearedcountries      bool
@@ -201,40 +200,89 @@ func (m *CompanyMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	}
 }
 
-// SetTitle sets the "title" field.
-func (m *CompanyMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *CompanyMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *CompanyMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *CompanyMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Company entity.
+// OldName returns the old "name" field's value of the Company entity.
 // If the Company object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CompanyMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *CompanyMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *CompanyMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *CompanyMutation) ResetName() {
+	m.name = nil
+}
+
+// SetLogo sets the "logo" field.
+func (m *CompanyMutation) SetLogo(s string) {
+	m.logo = &s
+}
+
+// Logo returns the value of the "logo" field in the mutation.
+func (m *CompanyMutation) Logo() (r string, exists bool) {
+	v := m.logo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLogo returns the old "logo" field's value of the Company entity.
+// If the Company object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanyMutation) OldLogo(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLogo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLogo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLogo: %w", err)
+	}
+	return oldValue.Logo, nil
+}
+
+// ClearLogo clears the value of the "logo" field.
+func (m *CompanyMutation) ClearLogo() {
+	m.logo = nil
+	m.clearedFields[company.FieldLogo] = struct{}{}
+}
+
+// LogoCleared returns if the "logo" field was cleared in this mutation.
+func (m *CompanyMutation) LogoCleared() bool {
+	_, ok := m.clearedFields[company.FieldLogo]
+	return ok
+}
+
+// ResetLogo resets all changes to the "logo" field.
+func (m *CompanyMutation) ResetLogo() {
+	m.logo = nil
+	delete(m.clearedFields, company.FieldLogo)
 }
 
 // SetDescription sets the "description" field.
@@ -271,45 +319,6 @@ func (m *CompanyMutation) OldDescription(ctx context.Context) (v string, err err
 // ResetDescription resets all changes to the "description" field.
 func (m *CompanyMutation) ResetDescription() {
 	m.description = nil
-}
-
-// SetProductID sets the "product" edge to the Product entity by id.
-func (m *CompanyMutation) SetProductID(id uuid.UUID) {
-	m.product = &id
-}
-
-// ClearProduct clears the "product" edge to the Product entity.
-func (m *CompanyMutation) ClearProduct() {
-	m.clearedproduct = true
-}
-
-// ProductCleared reports if the "product" edge to the Product entity was cleared.
-func (m *CompanyMutation) ProductCleared() bool {
-	return m.clearedproduct
-}
-
-// ProductID returns the "product" edge ID in the mutation.
-func (m *CompanyMutation) ProductID() (id uuid.UUID, exists bool) {
-	if m.product != nil {
-		return *m.product, true
-	}
-	return
-}
-
-// ProductIDs returns the "product" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ProductID instead. It exists only for internal usage by the builders.
-func (m *CompanyMutation) ProductIDs() (ids []uuid.UUID) {
-	if id := m.product; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetProduct resets all changes to the "product" edge.
-func (m *CompanyMutation) ResetProduct() {
-	m.product = nil
-	m.clearedproduct = false
 }
 
 // AddCountryIDs adds the "countries" edge to the Country entity by ids.
@@ -685,6 +694,11 @@ func (m *CompanyMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *CompanyMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Company).
 func (m *CompanyMutation) Type() string {
 	return m.typ
@@ -694,9 +708,12 @@ func (m *CompanyMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CompanyMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.title != nil {
-		fields = append(fields, company.FieldTitle)
+	fields := make([]string, 0, 3)
+	if m.name != nil {
+		fields = append(fields, company.FieldName)
+	}
+	if m.logo != nil {
+		fields = append(fields, company.FieldLogo)
 	}
 	if m.description != nil {
 		fields = append(fields, company.FieldDescription)
@@ -709,8 +726,10 @@ func (m *CompanyMutation) Fields() []string {
 // schema.
 func (m *CompanyMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case company.FieldTitle:
-		return m.Title()
+	case company.FieldName:
+		return m.Name()
+	case company.FieldLogo:
+		return m.Logo()
 	case company.FieldDescription:
 		return m.Description()
 	}
@@ -722,8 +741,10 @@ func (m *CompanyMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CompanyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case company.FieldTitle:
-		return m.OldTitle(ctx)
+	case company.FieldName:
+		return m.OldName(ctx)
+	case company.FieldLogo:
+		return m.OldLogo(ctx)
 	case company.FieldDescription:
 		return m.OldDescription(ctx)
 	}
@@ -735,12 +756,19 @@ func (m *CompanyMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *CompanyMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case company.FieldTitle:
+	case company.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
+		return nil
+	case company.FieldLogo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLogo(v)
 		return nil
 	case company.FieldDescription:
 		v, ok := value.(string)
@@ -778,7 +806,11 @@ func (m *CompanyMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CompanyMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(company.FieldLogo) {
+		fields = append(fields, company.FieldLogo)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -791,6 +823,11 @@ func (m *CompanyMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CompanyMutation) ClearField(name string) error {
+	switch name {
+	case company.FieldLogo:
+		m.ClearLogo()
+		return nil
+	}
 	return fmt.Errorf("unknown Company nullable field %s", name)
 }
 
@@ -798,8 +835,11 @@ func (m *CompanyMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CompanyMutation) ResetField(name string) error {
 	switch name {
-	case company.FieldTitle:
-		m.ResetTitle()
+	case company.FieldName:
+		m.ResetName()
+		return nil
+	case company.FieldLogo:
+		m.ResetLogo()
 		return nil
 	case company.FieldDescription:
 		m.ResetDescription()
@@ -810,10 +850,7 @@ func (m *CompanyMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CompanyMutation) AddedEdges() []string {
-	edges := make([]string, 0, 8)
-	if m.product != nil {
-		edges = append(edges, company.EdgeProduct)
-	}
+	edges := make([]string, 0, 7)
 	if m.countries != nil {
 		edges = append(edges, company.EdgeCountries)
 	}
@@ -842,10 +879,6 @@ func (m *CompanyMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *CompanyMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case company.EdgeProduct:
-		if id := m.product; id != nil {
-			return []ent.Value{*id}
-		}
 	case company.EdgeCountries:
 		ids := make([]ent.Value, 0, len(m.countries))
 		for id := range m.countries {
@@ -892,7 +925,7 @@ func (m *CompanyMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CompanyMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 7)
 	if m.removedcountries != nil {
 		edges = append(edges, company.EdgeCountries)
 	}
@@ -960,10 +993,7 @@ func (m *CompanyMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CompanyMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 8)
-	if m.clearedproduct {
-		edges = append(edges, company.EdgeProduct)
-	}
+	edges := make([]string, 0, 7)
 	if m.clearedcountries {
 		edges = append(edges, company.EdgeCountries)
 	}
@@ -992,8 +1022,6 @@ func (m *CompanyMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *CompanyMutation) EdgeCleared(name string) bool {
 	switch name {
-	case company.EdgeProduct:
-		return m.clearedproduct
 	case company.EdgeCountries:
 		return m.clearedcountries
 	case company.EdgePhones:
@@ -1016,9 +1044,6 @@ func (m *CompanyMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CompanyMutation) ClearEdge(name string) error {
 	switch name {
-	case company.EdgeProduct:
-		m.ClearProduct()
-		return nil
 	case company.EdgeLogoImage:
 		m.ClearLogoImage()
 		return nil
@@ -1030,9 +1055,6 @@ func (m *CompanyMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CompanyMutation) ResetEdge(name string) error {
 	switch name {
-	case company.EdgeProduct:
-		m.ResetProduct()
-		return nil
 	case company.EdgeCountries:
 		m.ResetCountries()
 		return nil
@@ -1541,6 +1563,11 @@ func (m *CountryMutation) Where(ps ...predicate.Country) {
 // Op returns the operation name.
 func (m *CountryMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CountryMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Country).
@@ -2173,6 +2200,11 @@ func (m *EmailMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *EmailMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Email).
 func (m *EmailMutation) Type() string {
 	return m.typ
@@ -2685,6 +2717,11 @@ func (m *ImageMutation) Where(ps ...predicate.Image) {
 // Op returns the operation name.
 func (m *ImageMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ImageMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Image).
@@ -3559,6 +3596,11 @@ func (m *LocationMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *LocationMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Location).
 func (m *LocationMutation) Type() string {
 	return m.typ
@@ -4310,6 +4352,11 @@ func (m *PhoneMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *PhoneMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Phone).
 func (m *PhoneMutation) Type() string {
 	return m.typ
@@ -4565,7 +4612,7 @@ type ProductMutation struct {
 	op               Op
 	typ              string
 	id               *uuid.UUID
-	title            *string
+	name             *string
 	description      *string
 	image            *string
 	url              *string
@@ -4574,8 +4621,6 @@ type ProductMutation struct {
 	status           *enums.ProcessStatus
 	build_status     *enums.ProcessStatus
 	clearedFields    map[string]struct{}
-	company          *uuid.UUID
-	clearedcompany   bool
 	warehouse        *uuid.UUID
 	clearedwarehouse bool
 	vendor           *uuid.UUID
@@ -4689,40 +4734,40 @@ func (m *ProductMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	}
 }
 
-// SetTitle sets the "title" field.
-func (m *ProductMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *ProductMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *ProductMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *ProductMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Product entity.
+// OldName returns the old "name" field's value of the Product entity.
 // If the Product object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProductMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *ProductMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *ProductMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *ProductMutation) ResetName() {
+	m.name = nil
 }
 
 // SetDescription sets the "description" field.
@@ -5003,45 +5048,6 @@ func (m *ProductMutation) ResetBuildStatus() {
 	m.build_status = nil
 }
 
-// SetCompanyID sets the "company" edge to the Company entity by id.
-func (m *ProductMutation) SetCompanyID(id uuid.UUID) {
-	m.company = &id
-}
-
-// ClearCompany clears the "company" edge to the Company entity.
-func (m *ProductMutation) ClearCompany() {
-	m.clearedcompany = true
-}
-
-// CompanyCleared reports if the "company" edge to the Company entity was cleared.
-func (m *ProductMutation) CompanyCleared() bool {
-	return m.clearedcompany
-}
-
-// CompanyID returns the "company" edge ID in the mutation.
-func (m *ProductMutation) CompanyID() (id uuid.UUID, exists bool) {
-	if m.company != nil {
-		return *m.company, true
-	}
-	return
-}
-
-// CompanyIDs returns the "company" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CompanyID instead. It exists only for internal usage by the builders.
-func (m *ProductMutation) CompanyIDs() (ids []uuid.UUID) {
-	if id := m.company; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCompany resets all changes to the "company" edge.
-func (m *ProductMutation) ResetCompany() {
-	m.company = nil
-	m.clearedcompany = false
-}
-
 // SetWarehouseID sets the "warehouse" edge to the Warehouse entity by id.
 func (m *ProductMutation) SetWarehouseID(id uuid.UUID) {
 	m.warehouse = &id
@@ -5130,6 +5136,11 @@ func (m *ProductMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *ProductMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Product).
 func (m *ProductMutation) Type() string {
 	return m.typ
@@ -5140,8 +5151,8 @@ func (m *ProductMutation) Type() string {
 // AddedFields().
 func (m *ProductMutation) Fields() []string {
 	fields := make([]string, 0, 8)
-	if m.title != nil {
-		fields = append(fields, product.FieldTitle)
+	if m.name != nil {
+		fields = append(fields, product.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, product.FieldDescription)
@@ -5172,8 +5183,8 @@ func (m *ProductMutation) Fields() []string {
 // schema.
 func (m *ProductMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case product.FieldTitle:
-		return m.Title()
+	case product.FieldName:
+		return m.Name()
 	case product.FieldDescription:
 		return m.Description()
 	case product.FieldImage:
@@ -5197,8 +5208,8 @@ func (m *ProductMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ProductMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case product.FieldTitle:
-		return m.OldTitle(ctx)
+	case product.FieldName:
+		return m.OldName(ctx)
 	case product.FieldDescription:
 		return m.OldDescription(ctx)
 	case product.FieldImage:
@@ -5222,12 +5233,12 @@ func (m *ProductMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *ProductMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case product.FieldTitle:
+	case product.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
 		return nil
 	case product.FieldDescription:
 		v, ok := value.(string)
@@ -5342,8 +5353,8 @@ func (m *ProductMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ProductMutation) ResetField(name string) error {
 	switch name {
-	case product.FieldTitle:
-		m.ResetTitle()
+	case product.FieldName:
+		m.ResetName()
 		return nil
 	case product.FieldDescription:
 		m.ResetDescription()
@@ -5372,10 +5383,7 @@ func (m *ProductMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProductMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.company != nil {
-		edges = append(edges, product.EdgeCompany)
-	}
+	edges := make([]string, 0, 2)
 	if m.warehouse != nil {
 		edges = append(edges, product.EdgeWarehouse)
 	}
@@ -5389,10 +5397,6 @@ func (m *ProductMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case product.EdgeCompany:
-		if id := m.company; id != nil {
-			return []ent.Value{*id}
-		}
 	case product.EdgeWarehouse:
 		if id := m.warehouse; id != nil {
 			return []ent.Value{*id}
@@ -5407,7 +5411,7 @@ func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProductMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -5419,10 +5423,7 @@ func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProductMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.clearedcompany {
-		edges = append(edges, product.EdgeCompany)
-	}
+	edges := make([]string, 0, 2)
 	if m.clearedwarehouse {
 		edges = append(edges, product.EdgeWarehouse)
 	}
@@ -5436,8 +5437,6 @@ func (m *ProductMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ProductMutation) EdgeCleared(name string) bool {
 	switch name {
-	case product.EdgeCompany:
-		return m.clearedcompany
 	case product.EdgeWarehouse:
 		return m.clearedwarehouse
 	case product.EdgeVendor:
@@ -5450,9 +5449,6 @@ func (m *ProductMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ProductMutation) ClearEdge(name string) error {
 	switch name {
-	case product.EdgeCompany:
-		m.ClearCompany()
-		return nil
 	case product.EdgeWarehouse:
 		m.ClearWarehouse()
 		return nil
@@ -5467,9 +5463,6 @@ func (m *ProductMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ProductMutation) ResetEdge(name string) error {
 	switch name {
-	case product.EdgeCompany:
-		m.ResetCompany()
-		return nil
 	case product.EdgeWarehouse:
 		m.ResetWarehouse()
 		return nil
@@ -5486,8 +5479,7 @@ type VendorMutation struct {
 	op                Op
 	typ               string
 	id                *uuid.UUID
-	title             *string
-	url               *string
+	name              *string
 	schema            *string
 	clearedFields     map[string]struct{}
 	warehouses        map[uuid.UUID]struct{}
@@ -5605,76 +5597,40 @@ func (m *VendorMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	}
 }
 
-// SetTitle sets the "title" field.
-func (m *VendorMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *VendorMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *VendorMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *VendorMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Vendor entity.
+// OldName returns the old "name" field's value of the Vendor entity.
 // If the Vendor object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *VendorMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *VendorMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *VendorMutation) ResetTitle() {
-	m.title = nil
-}
-
-// SetURL sets the "url" field.
-func (m *VendorMutation) SetURL(s string) {
-	m.url = &s
-}
-
-// URL returns the value of the "url" field in the mutation.
-func (m *VendorMutation) URL() (r string, exists bool) {
-	v := m.url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURL returns the old "url" field's value of the Vendor entity.
-// If the Vendor object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *VendorMutation) OldURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
-	}
-	return oldValue.URL, nil
-}
-
-// ResetURL resets all changes to the "url" field.
-func (m *VendorMutation) ResetURL() {
-	m.url = nil
+// ResetName resets all changes to the "name" field.
+func (m *VendorMutation) ResetName() {
+	m.name = nil
 }
 
 // SetSchema sets the "schema" field.
@@ -5831,6 +5787,11 @@ func (m *VendorMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *VendorMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Vendor).
 func (m *VendorMutation) Type() string {
 	return m.typ
@@ -5840,12 +5801,9 @@ func (m *VendorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VendorMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.title != nil {
-		fields = append(fields, vendor.FieldTitle)
-	}
-	if m.url != nil {
-		fields = append(fields, vendor.FieldURL)
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, vendor.FieldName)
 	}
 	if m.schema != nil {
 		fields = append(fields, vendor.FieldSchema)
@@ -5858,10 +5816,8 @@ func (m *VendorMutation) Fields() []string {
 // schema.
 func (m *VendorMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case vendor.FieldTitle:
-		return m.Title()
-	case vendor.FieldURL:
-		return m.URL()
+	case vendor.FieldName:
+		return m.Name()
 	case vendor.FieldSchema:
 		return m.Schema()
 	}
@@ -5873,10 +5829,8 @@ func (m *VendorMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *VendorMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case vendor.FieldTitle:
-		return m.OldTitle(ctx)
-	case vendor.FieldURL:
-		return m.OldURL(ctx)
+	case vendor.FieldName:
+		return m.OldName(ctx)
 	case vendor.FieldSchema:
 		return m.OldSchema(ctx)
 	}
@@ -5888,19 +5842,12 @@ func (m *VendorMutation) OldField(ctx context.Context, name string) (ent.Value, 
 // type.
 func (m *VendorMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case vendor.FieldTitle:
+	case vendor.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
-		return nil
-	case vendor.FieldURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURL(v)
+		m.SetName(v)
 		return nil
 	case vendor.FieldSchema:
 		v, ok := value.(string)
@@ -5958,11 +5905,8 @@ func (m *VendorMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *VendorMutation) ResetField(name string) error {
 	switch name {
-	case vendor.FieldTitle:
-		m.ResetTitle()
-		return nil
-	case vendor.FieldURL:
-		m.ResetURL()
+	case vendor.FieldName:
+		m.ResetName()
 		return nil
 	case vendor.FieldSchema:
 		m.ResetSchema()
@@ -6087,7 +6031,7 @@ type WarehouseMutation struct {
 	op              Op
 	typ             string
 	id              *uuid.UUID
-	url             *string
+	name            *string
 	last_update     *time.Time
 	original_data   *string
 	enabled         *bool
@@ -6208,40 +6152,40 @@ func (m *WarehouseMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	}
 }
 
-// SetURL sets the "url" field.
-func (m *WarehouseMutation) SetURL(s string) {
-	m.url = &s
+// SetName sets the "name" field.
+func (m *WarehouseMutation) SetName(s string) {
+	m.name = &s
 }
 
-// URL returns the value of the "url" field in the mutation.
-func (m *WarehouseMutation) URL() (r string, exists bool) {
-	v := m.url
+// Name returns the value of the "name" field in the mutation.
+func (m *WarehouseMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldURL returns the old "url" field's value of the Warehouse entity.
+// OldName returns the old "name" field's value of the Warehouse entity.
 // If the Warehouse object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WarehouseMutation) OldURL(ctx context.Context) (v string, err error) {
+func (m *WarehouseMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.URL, nil
+	return oldValue.Name, nil
 }
 
-// ResetURL resets all changes to the "url" field.
-func (m *WarehouseMutation) ResetURL() {
-	m.url = nil
+// ResetName resets all changes to the "name" field.
+func (m *WarehouseMutation) ResetName() {
+	m.name = nil
 }
 
 // SetLastUpdate sets the "last_update" field.
@@ -6546,6 +6490,11 @@ func (m *WarehouseMutation) Op() Op {
 	return m.op
 }
 
+// SetOp allows setting the mutation operation.
+func (m *WarehouseMutation) SetOp(op Op) {
+	m.op = op
+}
+
 // Type returns the node type of this mutation (Warehouse).
 func (m *WarehouseMutation) Type() string {
 	return m.typ
@@ -6556,8 +6505,8 @@ func (m *WarehouseMutation) Type() string {
 // AddedFields().
 func (m *WarehouseMutation) Fields() []string {
 	fields := make([]string, 0, 5)
-	if m.url != nil {
-		fields = append(fields, warehouse.FieldURL)
+	if m.name != nil {
+		fields = append(fields, warehouse.FieldName)
 	}
 	if m.last_update != nil {
 		fields = append(fields, warehouse.FieldLastUpdate)
@@ -6579,8 +6528,8 @@ func (m *WarehouseMutation) Fields() []string {
 // schema.
 func (m *WarehouseMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case warehouse.FieldURL:
-		return m.URL()
+	case warehouse.FieldName:
+		return m.Name()
 	case warehouse.FieldLastUpdate:
 		return m.LastUpdate()
 	case warehouse.FieldOriginalData:
@@ -6598,8 +6547,8 @@ func (m *WarehouseMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *WarehouseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case warehouse.FieldURL:
-		return m.OldURL(ctx)
+	case warehouse.FieldName:
+		return m.OldName(ctx)
 	case warehouse.FieldLastUpdate:
 		return m.OldLastUpdate(ctx)
 	case warehouse.FieldOriginalData:
@@ -6617,12 +6566,12 @@ func (m *WarehouseMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *WarehouseMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case warehouse.FieldURL:
+	case warehouse.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetURL(v)
+		m.SetName(v)
 		return nil
 	case warehouse.FieldLastUpdate:
 		v, ok := value.(time.Time)
@@ -6722,8 +6671,8 @@ func (m *WarehouseMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *WarehouseMutation) ResetField(name string) error {
 	switch name {
-	case warehouse.FieldURL:
-		m.ResetURL()
+	case warehouse.FieldName:
+		m.ResetName()
 		return nil
 	case warehouse.FieldLastUpdate:
 		m.ResetLastUpdate()
@@ -7160,6 +7109,11 @@ func (m *WebsiteMutation) Where(ps ...predicate.Website) {
 // Op returns the operation name.
 func (m *WebsiteMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WebsiteMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Website).

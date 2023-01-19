@@ -53,20 +53,37 @@ type CompanyWhereInput struct {
 	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
 	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
 
-	// "title" field predicates.
-	Title             *string  `json:"title,omitempty"`
-	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
-	TitleIn           []string `json:"titleIn,omitempty"`
-	TitleNotIn        []string `json:"titleNotIn,omitempty"`
-	TitleGT           *string  `json:"titleGT,omitempty"`
-	TitleGTE          *string  `json:"titleGTE,omitempty"`
-	TitleLT           *string  `json:"titleLT,omitempty"`
-	TitleLTE          *string  `json:"titleLTE,omitempty"`
-	TitleContains     *string  `json:"titleContains,omitempty"`
-	TitleHasPrefix    *string  `json:"titleHasPrefix,omitempty"`
-	TitleHasSuffix    *string  `json:"titleHasSuffix,omitempty"`
-	TitleEqualFold    *string  `json:"titleEqualFold,omitempty"`
-	TitleContainsFold *string  `json:"titleContainsFold,omitempty"`
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "logo" field predicates.
+	Logo             *string  `json:"logo,omitempty"`
+	LogoNEQ          *string  `json:"logoNEQ,omitempty"`
+	LogoIn           []string `json:"logoIn,omitempty"`
+	LogoNotIn        []string `json:"logoNotIn,omitempty"`
+	LogoGT           *string  `json:"logoGT,omitempty"`
+	LogoGTE          *string  `json:"logoGTE,omitempty"`
+	LogoLT           *string  `json:"logoLT,omitempty"`
+	LogoLTE          *string  `json:"logoLTE,omitempty"`
+	LogoContains     *string  `json:"logoContains,omitempty"`
+	LogoHasPrefix    *string  `json:"logoHasPrefix,omitempty"`
+	LogoHasSuffix    *string  `json:"logoHasSuffix,omitempty"`
+	LogoIsNil        bool     `json:"logoIsNil,omitempty"`
+	LogoNotNil       bool     `json:"logoNotNil,omitempty"`
+	LogoEqualFold    *string  `json:"logoEqualFold,omitempty"`
+	LogoContainsFold *string  `json:"logoContainsFold,omitempty"`
 
 	// "description" field predicates.
 	Description             *string  `json:"description,omitempty"`
@@ -82,10 +99,6 @@ type CompanyWhereInput struct {
 	DescriptionHasSuffix    *string  `json:"descriptionHasSuffix,omitempty"`
 	DescriptionEqualFold    *string  `json:"descriptionEqualFold,omitempty"`
 	DescriptionContainsFold *string  `json:"descriptionContainsFold,omitempty"`
-
-	// "product" edge predicates.
-	HasProduct     *bool                `json:"hasProduct,omitempty"`
-	HasProductWith []*ProductWhereInput `json:"hasProductWith,omitempty"`
 
 	// "countries" edge predicates.
 	HasCountries     *bool                `json:"hasCountries,omitempty"`
@@ -211,44 +224,89 @@ func (i *CompanyWhereInput) P() (predicate.Company, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, company.IDLTE(*i.IDLTE))
 	}
-	if i.Title != nil {
-		predicates = append(predicates, company.TitleEQ(*i.Title))
+	if i.Name != nil {
+		predicates = append(predicates, company.NameEQ(*i.Name))
 	}
-	if i.TitleNEQ != nil {
-		predicates = append(predicates, company.TitleNEQ(*i.TitleNEQ))
+	if i.NameNEQ != nil {
+		predicates = append(predicates, company.NameNEQ(*i.NameNEQ))
 	}
-	if len(i.TitleIn) > 0 {
-		predicates = append(predicates, company.TitleIn(i.TitleIn...))
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, company.NameIn(i.NameIn...))
 	}
-	if len(i.TitleNotIn) > 0 {
-		predicates = append(predicates, company.TitleNotIn(i.TitleNotIn...))
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, company.NameNotIn(i.NameNotIn...))
 	}
-	if i.TitleGT != nil {
-		predicates = append(predicates, company.TitleGT(*i.TitleGT))
+	if i.NameGT != nil {
+		predicates = append(predicates, company.NameGT(*i.NameGT))
 	}
-	if i.TitleGTE != nil {
-		predicates = append(predicates, company.TitleGTE(*i.TitleGTE))
+	if i.NameGTE != nil {
+		predicates = append(predicates, company.NameGTE(*i.NameGTE))
 	}
-	if i.TitleLT != nil {
-		predicates = append(predicates, company.TitleLT(*i.TitleLT))
+	if i.NameLT != nil {
+		predicates = append(predicates, company.NameLT(*i.NameLT))
 	}
-	if i.TitleLTE != nil {
-		predicates = append(predicates, company.TitleLTE(*i.TitleLTE))
+	if i.NameLTE != nil {
+		predicates = append(predicates, company.NameLTE(*i.NameLTE))
 	}
-	if i.TitleContains != nil {
-		predicates = append(predicates, company.TitleContains(*i.TitleContains))
+	if i.NameContains != nil {
+		predicates = append(predicates, company.NameContains(*i.NameContains))
 	}
-	if i.TitleHasPrefix != nil {
-		predicates = append(predicates, company.TitleHasPrefix(*i.TitleHasPrefix))
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, company.NameHasPrefix(*i.NameHasPrefix))
 	}
-	if i.TitleHasSuffix != nil {
-		predicates = append(predicates, company.TitleHasSuffix(*i.TitleHasSuffix))
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, company.NameHasSuffix(*i.NameHasSuffix))
 	}
-	if i.TitleEqualFold != nil {
-		predicates = append(predicates, company.TitleEqualFold(*i.TitleEqualFold))
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, company.NameEqualFold(*i.NameEqualFold))
 	}
-	if i.TitleContainsFold != nil {
-		predicates = append(predicates, company.TitleContainsFold(*i.TitleContainsFold))
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, company.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Logo != nil {
+		predicates = append(predicates, company.LogoEQ(*i.Logo))
+	}
+	if i.LogoNEQ != nil {
+		predicates = append(predicates, company.LogoNEQ(*i.LogoNEQ))
+	}
+	if len(i.LogoIn) > 0 {
+		predicates = append(predicates, company.LogoIn(i.LogoIn...))
+	}
+	if len(i.LogoNotIn) > 0 {
+		predicates = append(predicates, company.LogoNotIn(i.LogoNotIn...))
+	}
+	if i.LogoGT != nil {
+		predicates = append(predicates, company.LogoGT(*i.LogoGT))
+	}
+	if i.LogoGTE != nil {
+		predicates = append(predicates, company.LogoGTE(*i.LogoGTE))
+	}
+	if i.LogoLT != nil {
+		predicates = append(predicates, company.LogoLT(*i.LogoLT))
+	}
+	if i.LogoLTE != nil {
+		predicates = append(predicates, company.LogoLTE(*i.LogoLTE))
+	}
+	if i.LogoContains != nil {
+		predicates = append(predicates, company.LogoContains(*i.LogoContains))
+	}
+	if i.LogoHasPrefix != nil {
+		predicates = append(predicates, company.LogoHasPrefix(*i.LogoHasPrefix))
+	}
+	if i.LogoHasSuffix != nil {
+		predicates = append(predicates, company.LogoHasSuffix(*i.LogoHasSuffix))
+	}
+	if i.LogoIsNil {
+		predicates = append(predicates, company.LogoIsNil())
+	}
+	if i.LogoNotNil {
+		predicates = append(predicates, company.LogoNotNil())
+	}
+	if i.LogoEqualFold != nil {
+		predicates = append(predicates, company.LogoEqualFold(*i.LogoEqualFold))
+	}
+	if i.LogoContainsFold != nil {
+		predicates = append(predicates, company.LogoContainsFold(*i.LogoContainsFold))
 	}
 	if i.Description != nil {
 		predicates = append(predicates, company.DescriptionEQ(*i.Description))
@@ -290,24 +348,6 @@ func (i *CompanyWhereInput) P() (predicate.Company, error) {
 		predicates = append(predicates, company.DescriptionContainsFold(*i.DescriptionContainsFold))
 	}
 
-	if i.HasProduct != nil {
-		p := company.HasProduct()
-		if !*i.HasProduct {
-			p = company.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasProductWith) > 0 {
-		with := make([]predicate.Product, 0, len(i.HasProductWith))
-		for _, w := range i.HasProductWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProductWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, company.HasProductWith(with...))
-	}
 	if i.HasCountries != nil {
 		p := company.HasCountries()
 		if !*i.HasCountries {
@@ -2515,20 +2555,20 @@ type ProductWhereInput struct {
 	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
 	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
 
-	// "title" field predicates.
-	Title             *string  `json:"title,omitempty"`
-	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
-	TitleIn           []string `json:"titleIn,omitempty"`
-	TitleNotIn        []string `json:"titleNotIn,omitempty"`
-	TitleGT           *string  `json:"titleGT,omitempty"`
-	TitleGTE          *string  `json:"titleGTE,omitempty"`
-	TitleLT           *string  `json:"titleLT,omitempty"`
-	TitleLTE          *string  `json:"titleLTE,omitempty"`
-	TitleContains     *string  `json:"titleContains,omitempty"`
-	TitleHasPrefix    *string  `json:"titleHasPrefix,omitempty"`
-	TitleHasSuffix    *string  `json:"titleHasSuffix,omitempty"`
-	TitleEqualFold    *string  `json:"titleEqualFold,omitempty"`
-	TitleContainsFold *string  `json:"titleContainsFold,omitempty"`
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
 	// "description" field predicates.
 	Description             *string  `json:"description,omitempty"`
@@ -2610,10 +2650,6 @@ type ProductWhereInput struct {
 	BuildStatusNEQ   *enums.ProcessStatus  `json:"buildStatusNEQ,omitempty"`
 	BuildStatusIn    []enums.ProcessStatus `json:"buildStatusIn,omitempty"`
 	BuildStatusNotIn []enums.ProcessStatus `json:"buildStatusNotIn,omitempty"`
-
-	// "company" edge predicates.
-	HasCompany     *bool                `json:"hasCompany,omitempty"`
-	HasCompanyWith []*CompanyWhereInput `json:"hasCompanyWith,omitempty"`
 
 	// "warehouse" edge predicates.
 	HasWarehouse     *bool                  `json:"hasWarehouse,omitempty"`
@@ -2719,44 +2755,44 @@ func (i *ProductWhereInput) P() (predicate.Product, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, product.IDLTE(*i.IDLTE))
 	}
-	if i.Title != nil {
-		predicates = append(predicates, product.TitleEQ(*i.Title))
+	if i.Name != nil {
+		predicates = append(predicates, product.NameEQ(*i.Name))
 	}
-	if i.TitleNEQ != nil {
-		predicates = append(predicates, product.TitleNEQ(*i.TitleNEQ))
+	if i.NameNEQ != nil {
+		predicates = append(predicates, product.NameNEQ(*i.NameNEQ))
 	}
-	if len(i.TitleIn) > 0 {
-		predicates = append(predicates, product.TitleIn(i.TitleIn...))
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, product.NameIn(i.NameIn...))
 	}
-	if len(i.TitleNotIn) > 0 {
-		predicates = append(predicates, product.TitleNotIn(i.TitleNotIn...))
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, product.NameNotIn(i.NameNotIn...))
 	}
-	if i.TitleGT != nil {
-		predicates = append(predicates, product.TitleGT(*i.TitleGT))
+	if i.NameGT != nil {
+		predicates = append(predicates, product.NameGT(*i.NameGT))
 	}
-	if i.TitleGTE != nil {
-		predicates = append(predicates, product.TitleGTE(*i.TitleGTE))
+	if i.NameGTE != nil {
+		predicates = append(predicates, product.NameGTE(*i.NameGTE))
 	}
-	if i.TitleLT != nil {
-		predicates = append(predicates, product.TitleLT(*i.TitleLT))
+	if i.NameLT != nil {
+		predicates = append(predicates, product.NameLT(*i.NameLT))
 	}
-	if i.TitleLTE != nil {
-		predicates = append(predicates, product.TitleLTE(*i.TitleLTE))
+	if i.NameLTE != nil {
+		predicates = append(predicates, product.NameLTE(*i.NameLTE))
 	}
-	if i.TitleContains != nil {
-		predicates = append(predicates, product.TitleContains(*i.TitleContains))
+	if i.NameContains != nil {
+		predicates = append(predicates, product.NameContains(*i.NameContains))
 	}
-	if i.TitleHasPrefix != nil {
-		predicates = append(predicates, product.TitleHasPrefix(*i.TitleHasPrefix))
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, product.NameHasPrefix(*i.NameHasPrefix))
 	}
-	if i.TitleHasSuffix != nil {
-		predicates = append(predicates, product.TitleHasSuffix(*i.TitleHasSuffix))
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, product.NameHasSuffix(*i.NameHasSuffix))
 	}
-	if i.TitleEqualFold != nil {
-		predicates = append(predicates, product.TitleEqualFold(*i.TitleEqualFold))
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, product.NameEqualFold(*i.NameEqualFold))
 	}
-	if i.TitleContainsFold != nil {
-		predicates = append(predicates, product.TitleContainsFold(*i.TitleContainsFold))
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, product.NameContainsFold(*i.NameContainsFold))
 	}
 	if i.Description != nil {
 		predicates = append(predicates, product.DescriptionEQ(*i.Description))
@@ -2960,24 +2996,6 @@ func (i *ProductWhereInput) P() (predicate.Product, error) {
 		predicates = append(predicates, product.BuildStatusNotIn(i.BuildStatusNotIn...))
 	}
 
-	if i.HasCompany != nil {
-		p := product.HasCompany()
-		if !*i.HasCompany {
-			p = product.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasCompanyWith) > 0 {
-		with := make([]predicate.Company, 0, len(i.HasCompanyWith))
-		for _, w := range i.HasCompanyWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasCompanyWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, product.HasCompanyWith(with...))
-	}
 	if i.HasWarehouse != nil {
 		p := product.HasWarehouse()
 		if !*i.HasWarehouse {
@@ -3041,35 +3059,20 @@ type VendorWhereInput struct {
 	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
 	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
 
-	// "title" field predicates.
-	Title             *string  `json:"title,omitempty"`
-	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
-	TitleIn           []string `json:"titleIn,omitempty"`
-	TitleNotIn        []string `json:"titleNotIn,omitempty"`
-	TitleGT           *string  `json:"titleGT,omitempty"`
-	TitleGTE          *string  `json:"titleGTE,omitempty"`
-	TitleLT           *string  `json:"titleLT,omitempty"`
-	TitleLTE          *string  `json:"titleLTE,omitempty"`
-	TitleContains     *string  `json:"titleContains,omitempty"`
-	TitleHasPrefix    *string  `json:"titleHasPrefix,omitempty"`
-	TitleHasSuffix    *string  `json:"titleHasSuffix,omitempty"`
-	TitleEqualFold    *string  `json:"titleEqualFold,omitempty"`
-	TitleContainsFold *string  `json:"titleContainsFold,omitempty"`
-
-	// "url" field predicates.
-	URL             *string  `json:"url,omitempty"`
-	URLNEQ          *string  `json:"urlNEQ,omitempty"`
-	URLIn           []string `json:"urlIn,omitempty"`
-	URLNotIn        []string `json:"urlNotIn,omitempty"`
-	URLGT           *string  `json:"urlGT,omitempty"`
-	URLGTE          *string  `json:"urlGTE,omitempty"`
-	URLLT           *string  `json:"urlLT,omitempty"`
-	URLLTE          *string  `json:"urlLTE,omitempty"`
-	URLContains     *string  `json:"urlContains,omitempty"`
-	URLHasPrefix    *string  `json:"urlHasPrefix,omitempty"`
-	URLHasSuffix    *string  `json:"urlHasSuffix,omitempty"`
-	URLEqualFold    *string  `json:"urlEqualFold,omitempty"`
-	URLContainsFold *string  `json:"urlContainsFold,omitempty"`
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
 	// "schema" field predicates.
 	Schema             *string  `json:"schema,omitempty"`
@@ -3190,83 +3193,44 @@ func (i *VendorWhereInput) P() (predicate.Vendor, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, vendor.IDLTE(*i.IDLTE))
 	}
-	if i.Title != nil {
-		predicates = append(predicates, vendor.TitleEQ(*i.Title))
+	if i.Name != nil {
+		predicates = append(predicates, vendor.NameEQ(*i.Name))
 	}
-	if i.TitleNEQ != nil {
-		predicates = append(predicates, vendor.TitleNEQ(*i.TitleNEQ))
+	if i.NameNEQ != nil {
+		predicates = append(predicates, vendor.NameNEQ(*i.NameNEQ))
 	}
-	if len(i.TitleIn) > 0 {
-		predicates = append(predicates, vendor.TitleIn(i.TitleIn...))
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, vendor.NameIn(i.NameIn...))
 	}
-	if len(i.TitleNotIn) > 0 {
-		predicates = append(predicates, vendor.TitleNotIn(i.TitleNotIn...))
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, vendor.NameNotIn(i.NameNotIn...))
 	}
-	if i.TitleGT != nil {
-		predicates = append(predicates, vendor.TitleGT(*i.TitleGT))
+	if i.NameGT != nil {
+		predicates = append(predicates, vendor.NameGT(*i.NameGT))
 	}
-	if i.TitleGTE != nil {
-		predicates = append(predicates, vendor.TitleGTE(*i.TitleGTE))
+	if i.NameGTE != nil {
+		predicates = append(predicates, vendor.NameGTE(*i.NameGTE))
 	}
-	if i.TitleLT != nil {
-		predicates = append(predicates, vendor.TitleLT(*i.TitleLT))
+	if i.NameLT != nil {
+		predicates = append(predicates, vendor.NameLT(*i.NameLT))
 	}
-	if i.TitleLTE != nil {
-		predicates = append(predicates, vendor.TitleLTE(*i.TitleLTE))
+	if i.NameLTE != nil {
+		predicates = append(predicates, vendor.NameLTE(*i.NameLTE))
 	}
-	if i.TitleContains != nil {
-		predicates = append(predicates, vendor.TitleContains(*i.TitleContains))
+	if i.NameContains != nil {
+		predicates = append(predicates, vendor.NameContains(*i.NameContains))
 	}
-	if i.TitleHasPrefix != nil {
-		predicates = append(predicates, vendor.TitleHasPrefix(*i.TitleHasPrefix))
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, vendor.NameHasPrefix(*i.NameHasPrefix))
 	}
-	if i.TitleHasSuffix != nil {
-		predicates = append(predicates, vendor.TitleHasSuffix(*i.TitleHasSuffix))
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, vendor.NameHasSuffix(*i.NameHasSuffix))
 	}
-	if i.TitleEqualFold != nil {
-		predicates = append(predicates, vendor.TitleEqualFold(*i.TitleEqualFold))
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, vendor.NameEqualFold(*i.NameEqualFold))
 	}
-	if i.TitleContainsFold != nil {
-		predicates = append(predicates, vendor.TitleContainsFold(*i.TitleContainsFold))
-	}
-	if i.URL != nil {
-		predicates = append(predicates, vendor.URLEQ(*i.URL))
-	}
-	if i.URLNEQ != nil {
-		predicates = append(predicates, vendor.URLNEQ(*i.URLNEQ))
-	}
-	if len(i.URLIn) > 0 {
-		predicates = append(predicates, vendor.URLIn(i.URLIn...))
-	}
-	if len(i.URLNotIn) > 0 {
-		predicates = append(predicates, vendor.URLNotIn(i.URLNotIn...))
-	}
-	if i.URLGT != nil {
-		predicates = append(predicates, vendor.URLGT(*i.URLGT))
-	}
-	if i.URLGTE != nil {
-		predicates = append(predicates, vendor.URLGTE(*i.URLGTE))
-	}
-	if i.URLLT != nil {
-		predicates = append(predicates, vendor.URLLT(*i.URLLT))
-	}
-	if i.URLLTE != nil {
-		predicates = append(predicates, vendor.URLLTE(*i.URLLTE))
-	}
-	if i.URLContains != nil {
-		predicates = append(predicates, vendor.URLContains(*i.URLContains))
-	}
-	if i.URLHasPrefix != nil {
-		predicates = append(predicates, vendor.URLHasPrefix(*i.URLHasPrefix))
-	}
-	if i.URLHasSuffix != nil {
-		predicates = append(predicates, vendor.URLHasSuffix(*i.URLHasSuffix))
-	}
-	if i.URLEqualFold != nil {
-		predicates = append(predicates, vendor.URLEqualFold(*i.URLEqualFold))
-	}
-	if i.URLContainsFold != nil {
-		predicates = append(predicates, vendor.URLContainsFold(*i.URLContainsFold))
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, vendor.NameContainsFold(*i.NameContainsFold))
 	}
 	if i.Schema != nil {
 		predicates = append(predicates, vendor.SchemaEQ(*i.Schema))
@@ -3371,20 +3335,20 @@ type WarehouseWhereInput struct {
 	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
 	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
 
-	// "url" field predicates.
-	URL             *string  `json:"url,omitempty"`
-	URLNEQ          *string  `json:"urlNEQ,omitempty"`
-	URLIn           []string `json:"urlIn,omitempty"`
-	URLNotIn        []string `json:"urlNotIn,omitempty"`
-	URLGT           *string  `json:"urlGT,omitempty"`
-	URLGTE          *string  `json:"urlGTE,omitempty"`
-	URLLT           *string  `json:"urlLT,omitempty"`
-	URLLTE          *string  `json:"urlLTE,omitempty"`
-	URLContains     *string  `json:"urlContains,omitempty"`
-	URLHasPrefix    *string  `json:"urlHasPrefix,omitempty"`
-	URLHasSuffix    *string  `json:"urlHasSuffix,omitempty"`
-	URLEqualFold    *string  `json:"urlEqualFold,omitempty"`
-	URLContainsFold *string  `json:"urlContainsFold,omitempty"`
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
 	// "last_update" field predicates.
 	LastUpdate       *time.Time  `json:"lastUpdate,omitempty"`
@@ -3523,44 +3487,44 @@ func (i *WarehouseWhereInput) P() (predicate.Warehouse, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, warehouse.IDLTE(*i.IDLTE))
 	}
-	if i.URL != nil {
-		predicates = append(predicates, warehouse.URLEQ(*i.URL))
+	if i.Name != nil {
+		predicates = append(predicates, warehouse.NameEQ(*i.Name))
 	}
-	if i.URLNEQ != nil {
-		predicates = append(predicates, warehouse.URLNEQ(*i.URLNEQ))
+	if i.NameNEQ != nil {
+		predicates = append(predicates, warehouse.NameNEQ(*i.NameNEQ))
 	}
-	if len(i.URLIn) > 0 {
-		predicates = append(predicates, warehouse.URLIn(i.URLIn...))
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, warehouse.NameIn(i.NameIn...))
 	}
-	if len(i.URLNotIn) > 0 {
-		predicates = append(predicates, warehouse.URLNotIn(i.URLNotIn...))
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, warehouse.NameNotIn(i.NameNotIn...))
 	}
-	if i.URLGT != nil {
-		predicates = append(predicates, warehouse.URLGT(*i.URLGT))
+	if i.NameGT != nil {
+		predicates = append(predicates, warehouse.NameGT(*i.NameGT))
 	}
-	if i.URLGTE != nil {
-		predicates = append(predicates, warehouse.URLGTE(*i.URLGTE))
+	if i.NameGTE != nil {
+		predicates = append(predicates, warehouse.NameGTE(*i.NameGTE))
 	}
-	if i.URLLT != nil {
-		predicates = append(predicates, warehouse.URLLT(*i.URLLT))
+	if i.NameLT != nil {
+		predicates = append(predicates, warehouse.NameLT(*i.NameLT))
 	}
-	if i.URLLTE != nil {
-		predicates = append(predicates, warehouse.URLLTE(*i.URLLTE))
+	if i.NameLTE != nil {
+		predicates = append(predicates, warehouse.NameLTE(*i.NameLTE))
 	}
-	if i.URLContains != nil {
-		predicates = append(predicates, warehouse.URLContains(*i.URLContains))
+	if i.NameContains != nil {
+		predicates = append(predicates, warehouse.NameContains(*i.NameContains))
 	}
-	if i.URLHasPrefix != nil {
-		predicates = append(predicates, warehouse.URLHasPrefix(*i.URLHasPrefix))
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, warehouse.NameHasPrefix(*i.NameHasPrefix))
 	}
-	if i.URLHasSuffix != nil {
-		predicates = append(predicates, warehouse.URLHasSuffix(*i.URLHasSuffix))
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, warehouse.NameHasSuffix(*i.NameHasSuffix))
 	}
-	if i.URLEqualFold != nil {
-		predicates = append(predicates, warehouse.URLEqualFold(*i.URLEqualFold))
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, warehouse.NameEqualFold(*i.NameEqualFold))
 	}
-	if i.URLContainsFold != nil {
-		predicates = append(predicates, warehouse.URLContainsFold(*i.URLContainsFold))
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, warehouse.NameContainsFold(*i.NameContainsFold))
 	}
 	if i.LastUpdate != nil {
 		predicates = append(predicates, warehouse.LastUpdateEQ(*i.LastUpdate))

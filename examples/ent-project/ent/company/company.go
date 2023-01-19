@@ -25,12 +25,12 @@ const (
 	Label = "company"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldLogo holds the string denoting the logo field in the database.
+	FieldLogo = "logo"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// EdgeProduct holds the string denoting the product edge name in mutations.
-	EdgeProduct = "product"
 	// EdgeCountries holds the string denoting the countries edge name in mutations.
 	EdgeCountries = "countries"
 	// EdgePhones holds the string denoting the phones edge name in mutations.
@@ -47,13 +47,6 @@ const (
 	EdgeGalleryImages = "gallery_images"
 	// Table holds the table name of the company in the database.
 	Table = "companies"
-	// ProductTable is the table that holds the product relation/edge.
-	ProductTable = "companies"
-	// ProductInverseTable is the table name for the Product entity.
-	// It exists in this package in order to avoid circular dependency with the "product" package.
-	ProductInverseTable = "products"
-	// ProductColumn is the table column denoting the product relation/edge.
-	ProductColumn = "product_company"
 	// CountriesTable is the table that holds the countries relation/edge. The primary key declared below.
 	CountriesTable = "company_countries"
 	// CountriesInverseTable is the table name for the Country entity.
@@ -106,14 +99,9 @@ const (
 // Columns holds all SQL columns for company fields.
 var Columns = []string{
 	FieldID,
-	FieldTitle,
+	FieldName,
+	FieldLogo,
 	FieldDescription,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "companies"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"product_company",
 }
 
 var (
@@ -129,17 +117,14 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
-	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	TitleValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
+	// LogoValidator is a validator for the "logo" field. It is called by the builders before save.
+	LogoValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.

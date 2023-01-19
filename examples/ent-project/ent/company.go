@@ -23,7 +23,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/image"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/google/uuid"
 )
 
@@ -32,20 +31,19 @@ type Company struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Logo holds the value of the "logo" field.
+	Logo *string `json:"logo,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CompanyQuery when eager-loading is set.
-	Edges           CompanyEdges `json:"edges"`
-	product_company *uuid.UUID
+	Edges CompanyEdges `json:"edges"`
 }
 
 // CompanyEdges holds the relations/edges for other nodes in the graph.
 type CompanyEdges struct {
-	// Product holds the value of the product edge.
-	Product *Product `json:"product,omitempty"`
 	// Countries holds the value of the countries edge.
 	Countries []*Country `json:"countries,omitempty"`
 	// Phones holds the value of the phones edge.
@@ -62,9 +60,9 @@ type CompanyEdges struct {
 	GalleryImages []*Image `json:"gallery_images,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [7]bool
 	// totalCount holds the count of the edges above.
-	totalCount [8]map[string]int
+	totalCount [7]map[string]int
 
 	namedCountries     map[string][]*Country
 	namedPhones        map[string][]*Phone
@@ -74,23 +72,10 @@ type CompanyEdges struct {
 	namedGalleryImages map[string][]*Image
 }
 
-// ProductOrErr returns the Product value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CompanyEdges) ProductOrErr() (*Product, error) {
-	if e.loadedTypes[0] {
-		if e.Product == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
-		return e.Product, nil
-	}
-	return nil, &NotLoadedError{edge: "product"}
-}
-
 // CountriesOrErr returns the Countries value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) CountriesOrErr() ([]*Country, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Countries, nil
 	}
 	return nil, &NotLoadedError{edge: "countries"}
@@ -99,7 +84,7 @@ func (e CompanyEdges) CountriesOrErr() ([]*Country, error) {
 // PhonesOrErr returns the Phones value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) PhonesOrErr() ([]*Phone, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Phones, nil
 	}
 	return nil, &NotLoadedError{edge: "phones"}
@@ -108,7 +93,7 @@ func (e CompanyEdges) PhonesOrErr() ([]*Phone, error) {
 // EmailsOrErr returns the Emails value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) EmailsOrErr() ([]*Email, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Emails, nil
 	}
 	return nil, &NotLoadedError{edge: "emails"}
@@ -117,7 +102,7 @@ func (e CompanyEdges) EmailsOrErr() ([]*Email, error) {
 // WebsitesOrErr returns the Websites value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) WebsitesOrErr() ([]*Website, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Websites, nil
 	}
 	return nil, &NotLoadedError{edge: "websites"}
@@ -126,7 +111,7 @@ func (e CompanyEdges) WebsitesOrErr() ([]*Website, error) {
 // LocationsOrErr returns the Locations value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) LocationsOrErr() ([]*Location, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.Locations, nil
 	}
 	return nil, &NotLoadedError{edge: "locations"}
@@ -135,7 +120,7 @@ func (e CompanyEdges) LocationsOrErr() ([]*Location, error) {
 // LogoImageOrErr returns the LogoImage value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CompanyEdges) LogoImageOrErr() (*Image, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[5] {
 		if e.LogoImage == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: image.Label}
@@ -148,7 +133,7 @@ func (e CompanyEdges) LogoImageOrErr() (*Image, error) {
 // GalleryImagesOrErr returns the GalleryImages value or an error if the edge
 // was not loaded in eager-loading.
 func (e CompanyEdges) GalleryImagesOrErr() ([]*Image, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[6] {
 		return e.GalleryImages, nil
 	}
 	return nil, &NotLoadedError{edge: "gallery_images"}
@@ -159,12 +144,10 @@ func (*Company) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case company.FieldTitle, company.FieldDescription:
+		case company.FieldName, company.FieldLogo, company.FieldDescription:
 			values[i] = new(sql.NullString)
 		case company.FieldID:
 			values[i] = new(uuid.UUID)
-		case company.ForeignKeys[0]: // product_company
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Company", columns[i])
 		}
@@ -186,11 +169,18 @@ func (c *Company) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				c.ID = *value
 			}
-		case company.FieldTitle:
+		case company.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				c.Title = value.String
+				c.Name = value.String
+			}
+		case company.FieldLogo:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field logo", values[i])
+			} else if value.Valid {
+				c.Logo = new(string)
+				*c.Logo = value.String
 			}
 		case company.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -198,21 +188,9 @@ func (c *Company) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Description = value.String
 			}
-		case company.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field product_company", values[i])
-			} else if value.Valid {
-				c.product_company = new(uuid.UUID)
-				*c.product_company = *value.S.(*uuid.UUID)
-			}
 		}
 	}
 	return nil
-}
-
-// QueryProduct queries the "product" edge of the Company entity.
-func (c *Company) QueryProduct() *ProductQuery {
-	return (&CompanyClient{config: c.config}).QueryProduct(c)
 }
 
 // QueryCountries queries the "countries" edge of the Company entity.
@@ -273,8 +251,13 @@ func (c *Company) String() string {
 	var builder strings.Builder
 	builder.WriteString("Company(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("title=")
-	builder.WriteString(c.Title)
+	builder.WriteString("name=")
+	builder.WriteString(c.Name)
+	builder.WriteString(", ")
+	if v := c.Logo; v != nil {
+		builder.WriteString("logo=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)

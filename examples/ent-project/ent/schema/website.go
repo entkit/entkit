@@ -40,6 +40,7 @@ func (Website) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("URL"),
 				EntRefine.FilterOperator(gen.Contains),
+				EntRefine.URLField(),
 			),
 	}
 }

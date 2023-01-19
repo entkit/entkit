@@ -37,12 +37,16 @@ import (
 func init() {
 	companyFields := schema.Company{}.Fields()
 	_ = companyFields
-	// companyDescTitle is the schema descriptor for title field.
-	companyDescTitle := companyFields[1].Descriptor()
-	// company.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	company.TitleValidator = companyDescTitle.Validators[0].(func(string) error)
+	// companyDescName is the schema descriptor for name field.
+	companyDescName := companyFields[1].Descriptor()
+	// company.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	company.NameValidator = companyDescName.Validators[0].(func(string) error)
+	// companyDescLogo is the schema descriptor for logo field.
+	companyDescLogo := companyFields[2].Descriptor()
+	// company.LogoValidator is a validator for the "logo" field. It is called by the builders before save.
+	company.LogoValidator = companyDescLogo.Validators[0].(func(string) error)
 	// companyDescDescription is the schema descriptor for description field.
-	companyDescDescription := companyFields[2].Descriptor()
+	companyDescDescription := companyFields[3].Descriptor()
 	// company.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	company.DescriptionValidator = companyDescDescription.Validators[0].(func(string) error)
 	// companyDescID is the schema descriptor for id field.
@@ -161,10 +165,10 @@ func init() {
 	phone.DefaultID = phoneDescID.Default.(func() uuid.UUID)
 	productFields := schema.Product{}.Fields()
 	_ = productFields
-	// productDescTitle is the schema descriptor for title field.
-	productDescTitle := productFields[1].Descriptor()
-	// product.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	product.TitleValidator = productDescTitle.Validators[0].(func(string) error)
+	// productDescName is the schema descriptor for name field.
+	productDescName := productFields[1].Descriptor()
+	// product.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	product.NameValidator = productDescName.Validators[0].(func(string) error)
 	// productDescDescription is the schema descriptor for description field.
 	productDescDescription := productFields[2].Descriptor()
 	// product.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
@@ -183,24 +187,20 @@ func init() {
 	product.DefaultID = productDescID.Default.(func() uuid.UUID)
 	vendorFields := schema.Vendor{}.Fields()
 	_ = vendorFields
-	// vendorDescTitle is the schema descriptor for title field.
-	vendorDescTitle := vendorFields[1].Descriptor()
-	// vendor.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	vendor.TitleValidator = vendorDescTitle.Validators[0].(func(string) error)
-	// vendorDescURL is the schema descriptor for url field.
-	vendorDescURL := vendorFields[2].Descriptor()
-	// vendor.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	vendor.URLValidator = vendorDescURL.Validators[0].(func(string) error)
+	// vendorDescName is the schema descriptor for name field.
+	vendorDescName := vendorFields[1].Descriptor()
+	// vendor.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	vendor.NameValidator = vendorDescName.Validators[0].(func(string) error)
 	// vendorDescID is the schema descriptor for id field.
 	vendorDescID := vendorFields[0].Descriptor()
 	// vendor.DefaultID holds the default value on creation for the id field.
 	vendor.DefaultID = vendorDescID.Default.(func() uuid.UUID)
 	warehouseFields := schema.Warehouse{}.Fields()
 	_ = warehouseFields
-	// warehouseDescURL is the schema descriptor for url field.
-	warehouseDescURL := warehouseFields[1].Descriptor()
-	// warehouse.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	warehouse.URLValidator = warehouseDescURL.Validators[0].(func(string) error)
+	// warehouseDescName is the schema descriptor for name field.
+	warehouseDescName := warehouseFields[1].Descriptor()
+	// warehouse.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	warehouse.NameValidator = warehouseDescName.Validators[0].(func(string) error)
 	// warehouseDescEnabled is the schema descriptor for enabled field.
 	warehouseDescEnabled := warehouseFields[4].Descriptor()
 	// warehouse.DefaultEnabled holds the default value on creation for the enabled field.

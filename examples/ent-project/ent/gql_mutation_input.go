@@ -25,9 +25,9 @@ import (
 
 // CreateCompanyInput represents a mutation input for creating companies.
 type CreateCompanyInput struct {
-	Title           string
+	Name            string
+	Logo            *string
 	Description     string
-	ProductID       *uuid.UUID
 	CountryIDs      []uuid.UUID
 	PhoneIDs        []uuid.UUID
 	EmailIDs        []uuid.UUID
@@ -39,11 +39,11 @@ type CreateCompanyInput struct {
 
 // Mutate applies the CreateCompanyInput on the CompanyMutation builder.
 func (i *CreateCompanyInput) Mutate(m *CompanyMutation) {
-	m.SetTitle(i.Title)
-	m.SetDescription(i.Description)
-	if v := i.ProductID; v != nil {
-		m.SetProductID(*v)
+	m.SetName(i.Name)
+	if v := i.Logo; v != nil {
+		m.SetLogo(*v)
 	}
+	m.SetDescription(i.Description)
 	if v := i.CountryIDs; len(v) > 0 {
 		m.AddCountryIDs(v...)
 	}
@@ -75,39 +75,48 @@ func (c *CompanyCreate) SetInput(i CreateCompanyInput) *CompanyCreate {
 
 // UpdateCompanyInput represents a mutation input for updating companies.
 type UpdateCompanyInput struct {
-	Title                 *string
+	Name                  *string
+	ClearLogo             bool
+	Logo                  *string
 	Description           *string
-	ClearProduct          bool
-	ProductID             *uuid.UUID
+	ClearCountries        bool
 	AddCountryIDs         []uuid.UUID
 	RemoveCountryIDs      []uuid.UUID
+	ClearPhones           bool
 	AddPhoneIDs           []uuid.UUID
 	RemovePhoneIDs        []uuid.UUID
+	ClearEmails           bool
 	AddEmailIDs           []uuid.UUID
 	RemoveEmailIDs        []uuid.UUID
+	ClearWebsites         bool
 	AddWebsiteIDs         []uuid.UUID
 	RemoveWebsiteIDs      []uuid.UUID
+	ClearLocations        bool
 	AddLocationIDs        []uuid.UUID
 	RemoveLocationIDs     []uuid.UUID
 	ClearLogoImage        bool
 	LogoImageID           *uuid.UUID
+	ClearGalleryImages    bool
 	AddGalleryImageIDs    []uuid.UUID
 	RemoveGalleryImageIDs []uuid.UUID
 }
 
 // Mutate applies the UpdateCompanyInput on the CompanyMutation builder.
 func (i *UpdateCompanyInput) Mutate(m *CompanyMutation) {
-	if v := i.Title; v != nil {
-		m.SetTitle(*v)
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if i.ClearLogo {
+		m.ClearLogo()
+	}
+	if v := i.Logo; v != nil {
+		m.SetLogo(*v)
 	}
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)
 	}
-	if i.ClearProduct {
-		m.ClearProduct()
-	}
-	if v := i.ProductID; v != nil {
-		m.SetProductID(*v)
+	if i.ClearCountries {
+		m.ClearCountries()
 	}
 	if v := i.AddCountryIDs; len(v) > 0 {
 		m.AddCountryIDs(v...)
@@ -115,11 +124,17 @@ func (i *UpdateCompanyInput) Mutate(m *CompanyMutation) {
 	if v := i.RemoveCountryIDs; len(v) > 0 {
 		m.RemoveCountryIDs(v...)
 	}
+	if i.ClearPhones {
+		m.ClearPhones()
+	}
 	if v := i.AddPhoneIDs; len(v) > 0 {
 		m.AddPhoneIDs(v...)
 	}
 	if v := i.RemovePhoneIDs; len(v) > 0 {
 		m.RemovePhoneIDs(v...)
+	}
+	if i.ClearEmails {
+		m.ClearEmails()
 	}
 	if v := i.AddEmailIDs; len(v) > 0 {
 		m.AddEmailIDs(v...)
@@ -127,11 +142,17 @@ func (i *UpdateCompanyInput) Mutate(m *CompanyMutation) {
 	if v := i.RemoveEmailIDs; len(v) > 0 {
 		m.RemoveEmailIDs(v...)
 	}
+	if i.ClearWebsites {
+		m.ClearWebsites()
+	}
 	if v := i.AddWebsiteIDs; len(v) > 0 {
 		m.AddWebsiteIDs(v...)
 	}
 	if v := i.RemoveWebsiteIDs; len(v) > 0 {
 		m.RemoveWebsiteIDs(v...)
+	}
+	if i.ClearLocations {
+		m.ClearLocations()
 	}
 	if v := i.AddLocationIDs; len(v) > 0 {
 		m.AddLocationIDs(v...)
@@ -144,6 +165,9 @@ func (i *UpdateCompanyInput) Mutate(m *CompanyMutation) {
 	}
 	if v := i.LogoImageID; v != nil {
 		m.SetLogoImageID(*v)
+	}
+	if i.ClearGalleryImages {
+		m.ClearGalleryImages()
 	}
 	if v := i.AddGalleryImageIDs; len(v) > 0 {
 		m.AddGalleryImageIDs(v...)
@@ -207,14 +231,19 @@ func (c *CountryCreate) SetInput(i CreateCountryInput) *CountryCreate {
 type UpdateCountryInput struct {
 	Name              *string
 	Code              *string
+	ClearCompanies    bool
 	AddCompanyIDs     []uuid.UUID
 	RemoveCompanyIDs  []uuid.UUID
+	ClearPhones       bool
 	AddPhoneIDs       []uuid.UUID
 	RemovePhoneIDs    []uuid.UUID
+	ClearEmails       bool
 	AddEmailIDs       []uuid.UUID
 	RemoveEmailIDs    []uuid.UUID
+	ClearWebsites     bool
 	AddWebsiteIDs     []uuid.UUID
 	RemoveWebsiteIDs  []uuid.UUID
+	ClearLocations    bool
 	AddLocationIDs    []uuid.UUID
 	RemoveLocationIDs []uuid.UUID
 }
@@ -227,11 +256,17 @@ func (i *UpdateCountryInput) Mutate(m *CountryMutation) {
 	if v := i.Code; v != nil {
 		m.SetCode(*v)
 	}
+	if i.ClearCompanies {
+		m.ClearCompanies()
+	}
 	if v := i.AddCompanyIDs; len(v) > 0 {
 		m.AddCompanyIDs(v...)
 	}
 	if v := i.RemoveCompanyIDs; len(v) > 0 {
 		m.RemoveCompanyIDs(v...)
+	}
+	if i.ClearPhones {
+		m.ClearPhones()
 	}
 	if v := i.AddPhoneIDs; len(v) > 0 {
 		m.AddPhoneIDs(v...)
@@ -239,17 +274,26 @@ func (i *UpdateCountryInput) Mutate(m *CountryMutation) {
 	if v := i.RemovePhoneIDs; len(v) > 0 {
 		m.RemovePhoneIDs(v...)
 	}
+	if i.ClearEmails {
+		m.ClearEmails()
+	}
 	if v := i.AddEmailIDs; len(v) > 0 {
 		m.AddEmailIDs(v...)
 	}
 	if v := i.RemoveEmailIDs; len(v) > 0 {
 		m.RemoveEmailIDs(v...)
 	}
+	if i.ClearWebsites {
+		m.ClearWebsites()
+	}
 	if v := i.AddWebsiteIDs; len(v) > 0 {
 		m.AddWebsiteIDs(v...)
 	}
 	if v := i.RemoveWebsiteIDs; len(v) > 0 {
 		m.RemoveWebsiteIDs(v...)
+	}
+	if i.ClearLocations {
+		m.ClearLocations()
 	}
 	if v := i.AddLocationIDs; len(v) > 0 {
 		m.AddLocationIDs(v...)
@@ -625,20 +669,19 @@ func (c *PhoneUpdateOne) SetInput(i UpdatePhoneInput) *PhoneUpdateOne {
 
 // CreateProductInput represents a mutation input for creating products.
 type CreateProductInput struct {
-	Title       string
+	Name        string
 	Description string
 	Image       string
 	URL         string
 	Status      *enums.ProcessStatus
 	BuildStatus *enums.ProcessStatus
-	CompanyID   *uuid.UUID
 	WarehouseID *uuid.UUID
 	VendorID    *uuid.UUID
 }
 
 // Mutate applies the CreateProductInput on the ProductMutation builder.
 func (i *CreateProductInput) Mutate(m *ProductMutation) {
-	m.SetTitle(i.Title)
+	m.SetName(i.Name)
 	m.SetDescription(i.Description)
 	m.SetImage(i.Image)
 	m.SetURL(i.URL)
@@ -647,9 +690,6 @@ func (i *CreateProductInput) Mutate(m *ProductMutation) {
 	}
 	if v := i.BuildStatus; v != nil {
 		m.SetBuildStatus(*v)
-	}
-	if v := i.CompanyID; v != nil {
-		m.SetCompanyID(*v)
 	}
 	if v := i.WarehouseID; v != nil {
 		m.SetWarehouseID(*v)
@@ -667,7 +707,7 @@ func (c *ProductCreate) SetInput(i CreateProductInput) *ProductCreate {
 
 // UpdateProductInput represents a mutation input for updating products.
 type UpdateProductInput struct {
-	Title          *string
+	Name           *string
 	Description    *string
 	Image          *string
 	URL            *string
@@ -677,8 +717,6 @@ type UpdateProductInput struct {
 	CreatedAt      *time.Time
 	Status         *enums.ProcessStatus
 	BuildStatus    *enums.ProcessStatus
-	ClearCompany   bool
-	CompanyID      *uuid.UUID
 	ClearWarehouse bool
 	WarehouseID    *uuid.UUID
 	ClearVendor    bool
@@ -687,8 +725,8 @@ type UpdateProductInput struct {
 
 // Mutate applies the UpdateProductInput on the ProductMutation builder.
 func (i *UpdateProductInput) Mutate(m *ProductMutation) {
-	if v := i.Title; v != nil {
-		m.SetTitle(*v)
+	if v := i.Name; v != nil {
+		m.SetName(*v)
 	}
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)
@@ -716,12 +754,6 @@ func (i *UpdateProductInput) Mutate(m *ProductMutation) {
 	}
 	if v := i.BuildStatus; v != nil {
 		m.SetBuildStatus(*v)
-	}
-	if i.ClearCompany {
-		m.ClearCompany()
-	}
-	if v := i.CompanyID; v != nil {
-		m.SetCompanyID(*v)
 	}
 	if i.ClearWarehouse {
 		m.ClearWarehouse()
@@ -751,8 +783,7 @@ func (c *ProductUpdateOne) SetInput(i UpdateProductInput) *ProductUpdateOne {
 
 // CreateVendorInput represents a mutation input for creating vendors.
 type CreateVendorInput struct {
-	Title        string
-	URL          string
+	Name         string
 	Schema       string
 	WarehouseIDs []uuid.UUID
 	ProductIDs   []uuid.UUID
@@ -760,8 +791,7 @@ type CreateVendorInput struct {
 
 // Mutate applies the CreateVendorInput on the VendorMutation builder.
 func (i *CreateVendorInput) Mutate(m *VendorMutation) {
-	m.SetTitle(i.Title)
-	m.SetURL(i.URL)
+	m.SetName(i.Name)
 	m.SetSchema(i.Schema)
 	if v := i.WarehouseIDs; len(v) > 0 {
 		m.AddWarehouseIDs(v...)
@@ -779,31 +809,35 @@ func (c *VendorCreate) SetInput(i CreateVendorInput) *VendorCreate {
 
 // UpdateVendorInput represents a mutation input for updating vendors.
 type UpdateVendorInput struct {
-	Title              *string
-	URL                *string
+	Name               *string
 	Schema             *string
+	ClearWarehouses    bool
 	AddWarehouseIDs    []uuid.UUID
 	RemoveWarehouseIDs []uuid.UUID
+	ClearProducts      bool
 	AddProductIDs      []uuid.UUID
 	RemoveProductIDs   []uuid.UUID
 }
 
 // Mutate applies the UpdateVendorInput on the VendorMutation builder.
 func (i *UpdateVendorInput) Mutate(m *VendorMutation) {
-	if v := i.Title; v != nil {
-		m.SetTitle(*v)
-	}
-	if v := i.URL; v != nil {
-		m.SetURL(*v)
+	if v := i.Name; v != nil {
+		m.SetName(*v)
 	}
 	if v := i.Schema; v != nil {
 		m.SetSchema(*v)
+	}
+	if i.ClearWarehouses {
+		m.ClearWarehouses()
 	}
 	if v := i.AddWarehouseIDs; len(v) > 0 {
 		m.AddWarehouseIDs(v...)
 	}
 	if v := i.RemoveWarehouseIDs; len(v) > 0 {
 		m.RemoveWarehouseIDs(v...)
+	}
+	if i.ClearProducts {
+		m.ClearProducts()
 	}
 	if v := i.AddProductIDs; len(v) > 0 {
 		m.AddProductIDs(v...)
@@ -827,7 +861,7 @@ func (c *VendorUpdateOne) SetInput(i UpdateVendorInput) *VendorUpdateOne {
 
 // CreateWarehouseInput represents a mutation input for creating warehouses.
 type CreateWarehouseInput struct {
-	URL          string
+	Name         string
 	OriginalData *string
 	Enabled      *bool
 	Filters      []string
@@ -837,7 +871,7 @@ type CreateWarehouseInput struct {
 
 // Mutate applies the CreateWarehouseInput on the WarehouseMutation builder.
 func (i *CreateWarehouseInput) Mutate(m *WarehouseMutation) {
-	m.SetURL(i.URL)
+	m.SetName(i.Name)
 	if v := i.OriginalData; v != nil {
 		m.SetOriginalData(*v)
 	}
@@ -863,7 +897,7 @@ func (c *WarehouseCreate) SetInput(i CreateWarehouseInput) *WarehouseCreate {
 
 // UpdateWarehouseInput represents a mutation input for updating warehouses.
 type UpdateWarehouseInput struct {
-	URL               *string
+	Name              *string
 	ClearLastUpdate   bool
 	LastUpdate        *time.Time
 	ClearOriginalData bool
@@ -872,6 +906,7 @@ type UpdateWarehouseInput struct {
 	ClearFilters      bool
 	Filters           []string
 	AppendFilters     []string
+	ClearProducts     bool
 	AddProductIDs     []uuid.UUID
 	RemoveProductIDs  []uuid.UUID
 	ClearVendor       bool
@@ -880,8 +915,8 @@ type UpdateWarehouseInput struct {
 
 // Mutate applies the UpdateWarehouseInput on the WarehouseMutation builder.
 func (i *UpdateWarehouseInput) Mutate(m *WarehouseMutation) {
-	if v := i.URL; v != nil {
-		m.SetURL(*v)
+	if v := i.Name; v != nil {
+		m.SetName(*v)
 	}
 	if i.ClearLastUpdate {
 		m.ClearLastUpdate()
@@ -906,6 +941,9 @@ func (i *UpdateWarehouseInput) Mutate(m *WarehouseMutation) {
 	}
 	if i.AppendFilters != nil {
 		m.AppendFilters(i.Filters)
+	}
+	if i.ClearProducts {
+		m.ClearProducts()
 	}
 	if v := i.AddProductIDs; len(v) > 0 {
 		m.AddProductIDs(v...)

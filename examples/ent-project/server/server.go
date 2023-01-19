@@ -1,21 +1,8 @@
-// Copyright 2019-present Facebook
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 package main
 
 import (
 	"context"
-	todo "github.com/diazoxide/ent-refine/examples/ent-project"
+	example "github.com/diazoxide/ent-refine/examples/ent-project"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
 	"time"
 
@@ -54,7 +41,7 @@ func main() {
 
 	client, err := ent.Open(
 		"sqlite3",
-		"file:ent?mode=memory&cache=shared&_fk=1",
+		"file:examples/example.db?mode=rwc&cache=shared&_fk=1",
 	)
 	if err != nil {
 		log.Fatal("opening ent client", zap.Error(err))
@@ -66,9 +53,9 @@ func main() {
 		log.Fatal("running schema migration", zap.Error(err))
 	}
 
-	r.GET("/", gin.WrapF(playground.Handler("Todo", "/query")))
+	r.GET("/", gin.WrapF(playground.Handler("Example", "/query")))
 
-	srv := handler.NewDefaultServer(todo.NewSchema(client))
+	srv := handler.NewDefaultServer(example.NewSchema(client))
 
 	srv.Use(entgql.Transactioner{TxOpener: client})
 

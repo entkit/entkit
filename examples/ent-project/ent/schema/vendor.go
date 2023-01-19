@@ -22,18 +22,12 @@ func (Vendor) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("ID"),
 			),
-		field.String("title").
+		field.String("name").
 			MaxLen(128).
 			Annotations(
 				EntRefine.TitleField(),
 				EntRefine.FilterOperator(gen.Contains),
-				entgql.OrderField("TITLE"),
-			),
-		field.String("url").
-			MaxLen(128).
-			Annotations(
-				entgql.OrderField("URL"),
-				EntRefine.FilterOperator(gen.Contains),
+				entgql.OrderField("NAME"),
 			),
 		field.Text("schema").
 			Annotations(

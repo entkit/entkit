@@ -25,7 +25,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/enums"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
@@ -47,9 +46,9 @@ func (pu *ProductUpdate) Where(ps ...predicate.Product) *ProductUpdate {
 	return pu
 }
 
-// SetTitle sets the "title" field.
-func (pu *ProductUpdate) SetTitle(s string) *ProductUpdate {
-	pu.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (pu *ProductUpdate) SetName(s string) *ProductUpdate {
+	pu.mutation.SetName(s)
 	return pu
 }
 
@@ -139,25 +138,6 @@ func (pu *ProductUpdate) SetNillableBuildStatus(es *enums.ProcessStatus) *Produc
 	return pu
 }
 
-// SetCompanyID sets the "company" edge to the Company entity by ID.
-func (pu *ProductUpdate) SetCompanyID(id uuid.UUID) *ProductUpdate {
-	pu.mutation.SetCompanyID(id)
-	return pu
-}
-
-// SetNillableCompanyID sets the "company" edge to the Company entity by ID if the given value is not nil.
-func (pu *ProductUpdate) SetNillableCompanyID(id *uuid.UUID) *ProductUpdate {
-	if id != nil {
-		pu = pu.SetCompanyID(*id)
-	}
-	return pu
-}
-
-// SetCompany sets the "company" edge to the Company entity.
-func (pu *ProductUpdate) SetCompany(c *Company) *ProductUpdate {
-	return pu.SetCompanyID(c.ID)
-}
-
 // SetWarehouseID sets the "warehouse" edge to the Warehouse entity by ID.
 func (pu *ProductUpdate) SetWarehouseID(id uuid.UUID) *ProductUpdate {
 	pu.mutation.SetWarehouseID(id)
@@ -199,12 +179,6 @@ func (pu *ProductUpdate) SetVendor(v *Vendor) *ProductUpdate {
 // Mutation returns the ProductMutation object of the builder.
 func (pu *ProductUpdate) Mutation() *ProductMutation {
 	return pu.mutation
-}
-
-// ClearCompany clears the "company" edge to the Company entity.
-func (pu *ProductUpdate) ClearCompany() *ProductUpdate {
-	pu.mutation.ClearCompany()
-	return pu
 }
 
 // ClearWarehouse clears the "warehouse" edge to the Warehouse entity.
@@ -281,9 +255,9 @@ func (pu *ProductUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *ProductUpdate) check() error {
-	if v, ok := pu.mutation.Title(); ok {
-		if err := product.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Product.title": %w`, err)}
+	if v, ok := pu.mutation.Name(); ok {
+		if err := product.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
 	if v, ok := pu.mutation.Description(); ok {
@@ -332,8 +306,8 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := pu.mutation.Title(); ok {
-		_spec.SetField(product.FieldTitle, field.TypeString, value)
+	if value, ok := pu.mutation.Name(); ok {
+		_spec.SetField(product.FieldName, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.Description(); ok {
 		_spec.SetField(product.FieldDescription, field.TypeString, value)
@@ -361,41 +335,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.BuildStatus(); ok {
 		_spec.SetField(product.FieldBuildStatus, field.TypeEnum, value)
-	}
-	if pu.mutation.CompanyCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   product.CompanyTable,
-			Columns: []string{product.CompanyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.CompanyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   product.CompanyTable,
-			Columns: []string{product.CompanyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if pu.mutation.WarehouseCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -486,9 +425,9 @@ type ProductUpdateOne struct {
 	mutation *ProductMutation
 }
 
-// SetTitle sets the "title" field.
-func (puo *ProductUpdateOne) SetTitle(s string) *ProductUpdateOne {
-	puo.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (puo *ProductUpdateOne) SetName(s string) *ProductUpdateOne {
+	puo.mutation.SetName(s)
 	return puo
 }
 
@@ -578,25 +517,6 @@ func (puo *ProductUpdateOne) SetNillableBuildStatus(es *enums.ProcessStatus) *Pr
 	return puo
 }
 
-// SetCompanyID sets the "company" edge to the Company entity by ID.
-func (puo *ProductUpdateOne) SetCompanyID(id uuid.UUID) *ProductUpdateOne {
-	puo.mutation.SetCompanyID(id)
-	return puo
-}
-
-// SetNillableCompanyID sets the "company" edge to the Company entity by ID if the given value is not nil.
-func (puo *ProductUpdateOne) SetNillableCompanyID(id *uuid.UUID) *ProductUpdateOne {
-	if id != nil {
-		puo = puo.SetCompanyID(*id)
-	}
-	return puo
-}
-
-// SetCompany sets the "company" edge to the Company entity.
-func (puo *ProductUpdateOne) SetCompany(c *Company) *ProductUpdateOne {
-	return puo.SetCompanyID(c.ID)
-}
-
 // SetWarehouseID sets the "warehouse" edge to the Warehouse entity by ID.
 func (puo *ProductUpdateOne) SetWarehouseID(id uuid.UUID) *ProductUpdateOne {
 	puo.mutation.SetWarehouseID(id)
@@ -638,12 +558,6 @@ func (puo *ProductUpdateOne) SetVendor(v *Vendor) *ProductUpdateOne {
 // Mutation returns the ProductMutation object of the builder.
 func (puo *ProductUpdateOne) Mutation() *ProductMutation {
 	return puo.mutation
-}
-
-// ClearCompany clears the "company" edge to the Company entity.
-func (puo *ProductUpdateOne) ClearCompany() *ProductUpdateOne {
-	puo.mutation.ClearCompany()
-	return puo
 }
 
 // ClearWarehouse clears the "warehouse" edge to the Warehouse entity.
@@ -733,9 +647,9 @@ func (puo *ProductUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *ProductUpdateOne) check() error {
-	if v, ok := puo.mutation.Title(); ok {
-		if err := product.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Product.title": %w`, err)}
+	if v, ok := puo.mutation.Name(); ok {
+		if err := product.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
 	if v, ok := puo.mutation.Description(); ok {
@@ -801,8 +715,8 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			}
 		}
 	}
-	if value, ok := puo.mutation.Title(); ok {
-		_spec.SetField(product.FieldTitle, field.TypeString, value)
+	if value, ok := puo.mutation.Name(); ok {
+		_spec.SetField(product.FieldName, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.Description(); ok {
 		_spec.SetField(product.FieldDescription, field.TypeString, value)
@@ -830,41 +744,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	}
 	if value, ok := puo.mutation.BuildStatus(); ok {
 		_spec.SetField(product.FieldBuildStatus, field.TypeEnum, value)
-	}
-	if puo.mutation.CompanyCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   product.CompanyTable,
-			Columns: []string{product.CompanyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.CompanyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   product.CompanyTable,
-			Columns: []string{product.CompanyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if puo.mutation.WarehouseCleared() {
 		edge := &sqlgraph.EdgeSpec{

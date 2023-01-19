@@ -36,15 +36,9 @@ type VendorCreate struct {
 	hooks    []Hook
 }
 
-// SetTitle sets the "title" field.
-func (vc *VendorCreate) SetTitle(s string) *VendorCreate {
-	vc.mutation.SetTitle(s)
-	return vc
-}
-
-// SetURL sets the "url" field.
-func (vc *VendorCreate) SetURL(s string) *VendorCreate {
-	vc.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (vc *VendorCreate) SetName(s string) *VendorCreate {
+	vc.mutation.SetName(s)
 	return vc
 }
 
@@ -183,20 +177,12 @@ func (vc *VendorCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (vc *VendorCreate) check() error {
-	if _, ok := vc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Vendor.title"`)}
+	if _, ok := vc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Vendor.name"`)}
 	}
-	if v, ok := vc.mutation.Title(); ok {
-		if err := vendor.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Vendor.title": %w`, err)}
-		}
-	}
-	if _, ok := vc.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Vendor.url"`)}
-	}
-	if v, ok := vc.mutation.URL(); ok {
-		if err := vendor.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Vendor.url": %w`, err)}
+	if v, ok := vc.mutation.Name(); ok {
+		if err := vendor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vendor.name": %w`, err)}
 		}
 	}
 	if _, ok := vc.mutation.Schema(); !ok {
@@ -238,13 +224,9 @@ func (vc *VendorCreate) createSpec() (*Vendor, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := vc.mutation.Title(); ok {
-		_spec.SetField(vendor.FieldTitle, field.TypeString, value)
-		_node.Title = value
-	}
-	if value, ok := vc.mutation.URL(); ok {
-		_spec.SetField(vendor.FieldURL, field.TypeString, value)
-		_node.URL = value
+	if value, ok := vc.mutation.Name(); ok {
+		_spec.SetField(vendor.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := vc.mutation.Schema(); ok {
 		_spec.SetField(vendor.FieldSchema, field.TypeString, value)

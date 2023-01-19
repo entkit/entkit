@@ -31,7 +31,6 @@ import (
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/phone"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
@@ -49,9 +48,29 @@ func (cu *CompanyUpdate) Where(ps ...predicate.Company) *CompanyUpdate {
 	return cu
 }
 
-// SetTitle sets the "title" field.
-func (cu *CompanyUpdate) SetTitle(s string) *CompanyUpdate {
-	cu.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (cu *CompanyUpdate) SetName(s string) *CompanyUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
+// SetLogo sets the "logo" field.
+func (cu *CompanyUpdate) SetLogo(s string) *CompanyUpdate {
+	cu.mutation.SetLogo(s)
+	return cu
+}
+
+// SetNillableLogo sets the "logo" field if the given value is not nil.
+func (cu *CompanyUpdate) SetNillableLogo(s *string) *CompanyUpdate {
+	if s != nil {
+		cu.SetLogo(*s)
+	}
+	return cu
+}
+
+// ClearLogo clears the value of the "logo" field.
+func (cu *CompanyUpdate) ClearLogo() *CompanyUpdate {
+	cu.mutation.ClearLogo()
 	return cu
 }
 
@@ -59,25 +78,6 @@ func (cu *CompanyUpdate) SetTitle(s string) *CompanyUpdate {
 func (cu *CompanyUpdate) SetDescription(s string) *CompanyUpdate {
 	cu.mutation.SetDescription(s)
 	return cu
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (cu *CompanyUpdate) SetProductID(id uuid.UUID) *CompanyUpdate {
-	cu.mutation.SetProductID(id)
-	return cu
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (cu *CompanyUpdate) SetNillableProductID(id *uuid.UUID) *CompanyUpdate {
-	if id != nil {
-		cu = cu.SetProductID(*id)
-	}
-	return cu
-}
-
-// SetProduct sets the "product" edge to the Product entity.
-func (cu *CompanyUpdate) SetProduct(p *Product) *CompanyUpdate {
-	return cu.SetProductID(p.ID)
 }
 
 // AddCountryIDs adds the "countries" edge to the Country entity by IDs.
@@ -192,12 +192,6 @@ func (cu *CompanyUpdate) AddGalleryImages(i ...*Image) *CompanyUpdate {
 // Mutation returns the CompanyMutation object of the builder.
 func (cu *CompanyUpdate) Mutation() *CompanyMutation {
 	return cu.mutation
-}
-
-// ClearProduct clears the "product" edge to the Product entity.
-func (cu *CompanyUpdate) ClearProduct() *CompanyUpdate {
-	cu.mutation.ClearProduct()
-	return cu
 }
 
 // ClearCountries clears all "countries" edges to the Country entity.
@@ -394,9 +388,14 @@ func (cu *CompanyUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CompanyUpdate) check() error {
-	if v, ok := cu.mutation.Title(); ok {
-		if err := company.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Company.title": %w`, err)}
+	if v, ok := cu.mutation.Name(); ok {
+		if err := company.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Logo(); ok {
+		if err := company.LogoValidator(v); err != nil {
+			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
 		}
 	}
 	if v, ok := cu.mutation.Description(); ok {
@@ -425,46 +424,17 @@ func (cu *CompanyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.Title(); ok {
-		_spec.SetField(company.FieldTitle, field.TypeString, value)
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.SetField(company.FieldName, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Logo(); ok {
+		_spec.SetField(company.FieldLogo, field.TypeString, value)
+	}
+	if cu.mutation.LogoCleared() {
+		_spec.ClearField(company.FieldLogo, field.TypeString)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)
-	}
-	if cu.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   company.ProductTable,
-			Columns: []string{company.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   company.ProductTable,
-			Columns: []string{company.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cu.mutation.CountriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -844,9 +814,29 @@ type CompanyUpdateOne struct {
 	mutation *CompanyMutation
 }
 
-// SetTitle sets the "title" field.
-func (cuo *CompanyUpdateOne) SetTitle(s string) *CompanyUpdateOne {
-	cuo.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (cuo *CompanyUpdateOne) SetName(s string) *CompanyUpdateOne {
+	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetLogo sets the "logo" field.
+func (cuo *CompanyUpdateOne) SetLogo(s string) *CompanyUpdateOne {
+	cuo.mutation.SetLogo(s)
+	return cuo
+}
+
+// SetNillableLogo sets the "logo" field if the given value is not nil.
+func (cuo *CompanyUpdateOne) SetNillableLogo(s *string) *CompanyUpdateOne {
+	if s != nil {
+		cuo.SetLogo(*s)
+	}
+	return cuo
+}
+
+// ClearLogo clears the value of the "logo" field.
+func (cuo *CompanyUpdateOne) ClearLogo() *CompanyUpdateOne {
+	cuo.mutation.ClearLogo()
 	return cuo
 }
 
@@ -854,25 +844,6 @@ func (cuo *CompanyUpdateOne) SetTitle(s string) *CompanyUpdateOne {
 func (cuo *CompanyUpdateOne) SetDescription(s string) *CompanyUpdateOne {
 	cuo.mutation.SetDescription(s)
 	return cuo
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (cuo *CompanyUpdateOne) SetProductID(id uuid.UUID) *CompanyUpdateOne {
-	cuo.mutation.SetProductID(id)
-	return cuo
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (cuo *CompanyUpdateOne) SetNillableProductID(id *uuid.UUID) *CompanyUpdateOne {
-	if id != nil {
-		cuo = cuo.SetProductID(*id)
-	}
-	return cuo
-}
-
-// SetProduct sets the "product" edge to the Product entity.
-func (cuo *CompanyUpdateOne) SetProduct(p *Product) *CompanyUpdateOne {
-	return cuo.SetProductID(p.ID)
 }
 
 // AddCountryIDs adds the "countries" edge to the Country entity by IDs.
@@ -987,12 +958,6 @@ func (cuo *CompanyUpdateOne) AddGalleryImages(i ...*Image) *CompanyUpdateOne {
 // Mutation returns the CompanyMutation object of the builder.
 func (cuo *CompanyUpdateOne) Mutation() *CompanyMutation {
 	return cuo.mutation
-}
-
-// ClearProduct clears the "product" edge to the Product entity.
-func (cuo *CompanyUpdateOne) ClearProduct() *CompanyUpdateOne {
-	cuo.mutation.ClearProduct()
-	return cuo
 }
 
 // ClearCountries clears all "countries" edges to the Country entity.
@@ -1202,9 +1167,14 @@ func (cuo *CompanyUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CompanyUpdateOne) check() error {
-	if v, ok := cuo.mutation.Title(); ok {
-		if err := company.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Company.title": %w`, err)}
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := company.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Logo(); ok {
+		if err := company.LogoValidator(v); err != nil {
+			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
 		}
 	}
 	if v, ok := cuo.mutation.Description(); ok {
@@ -1250,46 +1220,17 @@ func (cuo *CompanyUpdateOne) sqlSave(ctx context.Context) (_node *Company, err e
 			}
 		}
 	}
-	if value, ok := cuo.mutation.Title(); ok {
-		_spec.SetField(company.FieldTitle, field.TypeString, value)
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.SetField(company.FieldName, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Logo(); ok {
+		_spec.SetField(company.FieldLogo, field.TypeString, value)
+	}
+	if cuo.mutation.LogoCleared() {
+		_spec.ClearField(company.FieldLogo, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)
-	}
-	if cuo.mutation.ProductCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   company.ProductTable,
-			Columns: []string{company.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.ProductIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   company.ProductTable,
-			Columns: []string{company.ProductColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cuo.mutation.CountriesCleared() {
 		edge := &sqlgraph.EdgeSpec{

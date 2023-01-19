@@ -30,10 +30,8 @@ type Vendor struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Schema holds the value of the "schema" field.
 	Schema string `json:"schema,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -80,7 +78,7 @@ func (*Vendor) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case vendor.FieldTitle, vendor.FieldURL, vendor.FieldSchema:
+		case vendor.FieldName, vendor.FieldSchema:
 			values[i] = new(sql.NullString)
 		case vendor.FieldID:
 			values[i] = new(uuid.UUID)
@@ -105,17 +103,11 @@ func (v *Vendor) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				v.ID = *value
 			}
-		case vendor.FieldTitle:
+		case vendor.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				v.Title = value.String
-			}
-		case vendor.FieldURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
-			} else if value.Valid {
-				v.URL = value.String
+				v.Name = value.String
 			}
 		case vendor.FieldSchema:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -161,11 +153,8 @@ func (v *Vendor) String() string {
 	var builder strings.Builder
 	builder.WriteString("Vendor(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", v.ID))
-	builder.WriteString("title=")
-	builder.WriteString(v.Title)
-	builder.WriteString(", ")
-	builder.WriteString("url=")
-	builder.WriteString(v.URL)
+	builder.WriteString("name=")
+	builder.WriteString(v.Name)
 	builder.WriteString(", ")
 	builder.WriteString("schema=")
 	builder.WriteString(v.Schema)

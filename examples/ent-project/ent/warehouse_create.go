@@ -37,9 +37,9 @@ type WarehouseCreate struct {
 	hooks    []Hook
 }
 
-// SetURL sets the "url" field.
-func (wc *WarehouseCreate) SetURL(s string) *WarehouseCreate {
-	wc.mutation.SetURL(s)
+// SetName sets the "name" field.
+func (wc *WarehouseCreate) SetName(s string) *WarehouseCreate {
+	wc.mutation.SetName(s)
 	return wc
 }
 
@@ -228,12 +228,12 @@ func (wc *WarehouseCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (wc *WarehouseCreate) check() error {
-	if _, ok := wc.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Warehouse.url"`)}
+	if _, ok := wc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Warehouse.name"`)}
 	}
-	if v, ok := wc.mutation.URL(); ok {
-		if err := warehouse.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Warehouse.url": %w`, err)}
+	if v, ok := wc.mutation.Name(); ok {
+		if err := warehouse.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Warehouse.name": %w`, err)}
 		}
 	}
 	if _, ok := wc.mutation.Enabled(); !ok {
@@ -275,9 +275,9 @@ func (wc *WarehouseCreate) createSpec() (*Warehouse, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := wc.mutation.URL(); ok {
-		_spec.SetField(warehouse.FieldURL, field.TypeString, value)
-		_node.URL = value
+	if value, ok := wc.mutation.Name(); ok {
+		_spec.SetField(warehouse.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := wc.mutation.LastUpdate(); ok {
 		_spec.SetField(warehouse.FieldLastUpdate, field.TypeTime, value)

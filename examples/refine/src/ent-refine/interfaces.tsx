@@ -23,9 +23,9 @@ export enum ER_Enums_ProcessStatus{
 
 export interface ICompany {
     id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
+    name: ER_String, // string
+    logo: ER_Image, // string
     description: ER_RichText, // string
-    product?: IProduct,
     countries?: ICountry[],
     phones?: IPhone[],
     emails?: IEmail[],
@@ -86,7 +86,7 @@ export interface IPhone {
 }
 export interface IProduct {
     id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
+    name: ER_String, // string
     description: ER_RichText, // string
     image: ER_Image, // string
     url: ER_URL, // string
@@ -94,21 +94,19 @@ export interface IProduct {
     createdAt: ER_Date, // time.Time
     status: ER_Enums_ProcessStatus, // enums.ProcessStatus
     buildStatus: ER_Enums_ProcessStatus, // enums.ProcessStatus
-    company?: ICompany,
     warehouse?: IWarehouse,
     vendor?: IVendor,
 }
 export interface IVendor {
     id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    url: ER_String, // string
+    name: ER_String, // string
     schema: ER_Code, // string
     warehouses?: IWarehouse[],
     products?: IProduct[],
 }
 export interface IWarehouse {
     id: ER_UUID, // uuid.UUID
-    url: ER_String, // string
+    name: ER_String, // string
     lastUpdate: ER_Date, // time.Time
     originalData: ER_Code, // string
     enabled: ER_Boolean, // bool
@@ -120,7 +118,7 @@ export interface IWebsite {
     id: ER_UUID, // uuid.UUID
     title: ER_String, // string
     description: ER_String, // string
-    url: ER_String, // string
+    url: ER_URL, // string
     company?: ICompany,
     country?: ICountry,
 }

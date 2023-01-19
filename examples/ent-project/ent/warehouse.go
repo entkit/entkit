@@ -33,8 +33,8 @@ type Warehouse struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// LastUpdate holds the value of the "last_update" field.
 	LastUpdate *time.Time `json:"last_update,omitempty"`
 	// OriginalData holds the value of the "original_data" field.
@@ -95,7 +95,7 @@ func (*Warehouse) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case warehouse.FieldEnabled:
 			values[i] = new(sql.NullBool)
-		case warehouse.FieldURL, warehouse.FieldOriginalData:
+		case warehouse.FieldName, warehouse.FieldOriginalData:
 			values[i] = new(sql.NullString)
 		case warehouse.FieldLastUpdate:
 			values[i] = new(sql.NullTime)
@@ -124,11 +124,11 @@ func (w *Warehouse) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				w.ID = *value
 			}
-		case warehouse.FieldURL:
+		case warehouse.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				w.URL = value.String
+				w.Name = value.String
 			}
 		case warehouse.FieldLastUpdate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -203,8 +203,8 @@ func (w *Warehouse) String() string {
 	var builder strings.Builder
 	builder.WriteString("Warehouse(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", w.ID))
-	builder.WriteString("url=")
-	builder.WriteString(w.URL)
+	builder.WriteString("name=")
+	builder.WriteString(w.Name)
 	builder.WriteString(", ")
 	if v := w.LastUpdate; v != nil {
 		builder.WriteString("last_update=")

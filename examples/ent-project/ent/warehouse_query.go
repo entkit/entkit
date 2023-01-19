@@ -281,10 +281,14 @@ func (wq *WarehouseQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (wq *WarehouseQuery) Exist(ctx context.Context) (bool, error) {
-	if err := wq.prepareQuery(ctx); err != nil {
-		return false, err
+	switch _, err := wq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return wq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -345,12 +349,12 @@ func (wq *WarehouseQuery) WithVendor(opts ...func(*VendorQuery)) *WarehouseQuery
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Warehouse.Query().
-//		GroupBy(warehouse.FieldURL).
+//		GroupBy(warehouse.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (wq *WarehouseQuery) GroupBy(field string, fields ...string) *WarehouseGroupBy {
@@ -373,11 +377,11 @@ func (wq *WarehouseQuery) GroupBy(field string, fields ...string) *WarehouseGrou
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Warehouse.Query().
-//		Select(warehouse.FieldURL).
+//		Select(warehouse.FieldName).
 //		Scan(ctx, &v)
 func (wq *WarehouseQuery) Select(fields ...string) *WarehouseSelect {
 	wq.fields = append(wq.fields, fields...)
@@ -544,17 +548,6 @@ func (wq *WarehouseQuery) sqlCount(ctx context.Context) (int, error) {
 		_spec.Unique = wq.unique != nil && *wq.unique
 	}
 	return sqlgraph.CountNodes(ctx, wq.driver, _spec)
-}
-
-func (wq *WarehouseQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := wq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
 }
 
 func (wq *WarehouseQuery) querySpec() *sqlgraph.QuerySpec {
