@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
+import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
@@ -7,12 +8,10 @@ import * as Custom from "./custom";
 import * as FieldView from "./field-view";
 
 
-export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError>}> = ( props ) => {
+export type CompanyTableProps = RA.TableProps<Interfaces.ICompany> & { extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError> }
+export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.ICompany>({
         resource: "Company",
@@ -42,18 +41,22 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                 "name",
                 "logo",
                 "description",
+                {"logoImage": [ "id", "title" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -100,6 +103,20 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("logo", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="logoImage"
+                    title="Logo Image"
+                    render={
+                        (value)=>(<Link to={ "/Image/show/"+ value?.id}>
+                            { value?.title }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.ICompany>
                     title="Actions"
                     dataIndex="actions"
@@ -190,12 +207,10 @@ export const CompanyTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         </>
     );
 };
-export const CountryTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.ICountry, HttpError>}> = ( props ) => {
+export type CountryTableProps = RA.TableProps<Interfaces.ICountry> & { extendTable?: RA.useTableProps<Interfaces.ICountry, HttpError> }
+export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.ICountry>({
         resource: "Country",
@@ -228,14 +243,17 @@ export const CountryTable :React.FC<IResourceComponentsProps & {extendTable?: RA
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -281,6 +299,11 @@ export const CountryTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("code", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.ICountry>
                     title="Actions"
                     dataIndex="actions"
@@ -371,12 +394,10 @@ export const CountryTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         </>
     );
 };
-export const EmailTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IEmail, HttpError>}> = ( props ) => {
+export type EmailTableProps = RA.TableProps<Interfaces.IEmail> & { extendTable?: RA.useTableProps<Interfaces.IEmail, HttpError> }
+export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IEmail>({
         resource: "Email",
@@ -410,18 +431,23 @@ export const EmailTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                 "title",
                 "description",
                 "address",
+                {"company": [ "id", "name" ]},
+                {"country": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -483,6 +509,29 @@ export const EmailTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("address", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="company"
+                    title="Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="country"
+                    title="Country"
+                    render={
+                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IEmail>
                     title="Actions"
                     dataIndex="actions"
@@ -573,12 +622,10 @@ export const EmailTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
         </>
     );
 };
-export const ImageTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IImage, HttpError>}> = ( props ) => {
+export type ImageTableProps = RA.TableProps<Interfaces.IImage> & { extendTable?: RA.useTableProps<Interfaces.IImage, HttpError> }
+export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IImage>({
         resource: "Image",
@@ -607,18 +654,23 @@ export const ImageTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                 "id",
                 "title",
                 "originalURL",
+                {"galleryCompany": [ "id", "name" ]},
+                {"logoCompany": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -664,6 +716,29 @@ export const ImageTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("original_url", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="galleryCompany"
+                    title="Gallery Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="logoCompany"
+                    title="Logo Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IImage>
                     title="Actions"
                     dataIndex="actions"
@@ -754,12 +829,10 @@ export const ImageTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
         </>
     );
 };
-export const LocationTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.ILocation, HttpError>}> = ( props ) => {
+export type LocationTableProps = RA.TableProps<Interfaces.ILocation> & { extendTable?: RA.useTableProps<Interfaces.ILocation, HttpError> }
+export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.ILocation>({
         resource: "Location",
@@ -833,18 +906,23 @@ export const LocationTable :React.FC<IResourceComponentsProps & {extendTable?: R
                 "suburb",
                 "streetType",
                 "streetName",
+                {"company": [ "id", "name" ]},
+                {"country": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -1034,6 +1112,29 @@ export const LocationTable :React.FC<IResourceComponentsProps & {extendTable?: R
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("street_name", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="company"
+                    title="Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="country"
+                    title="Country"
+                    render={
+                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.ILocation>
                     title="Actions"
                     dataIndex="actions"
@@ -1124,12 +1225,10 @@ export const LocationTable :React.FC<IResourceComponentsProps & {extendTable?: R
         </>
     );
 };
-export const PhoneTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IPhone, HttpError>}> = ( props ) => {
+export type PhoneTableProps = RA.TableProps<Interfaces.IPhone> & { extendTable?: RA.useTableProps<Interfaces.IPhone, HttpError> }
+export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IPhone>({
         resource: "Phone",
@@ -1168,18 +1267,23 @@ export const PhoneTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                 "description",
                 "number",
                 "type",
+                {"company": [ "id", "name" ]},
+                {"country": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -1257,6 +1361,29 @@ export const PhoneTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("type", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="company"
+                    title="Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="country"
+                    title="Country"
+                    render={
+                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IPhone>
                     title="Actions"
                     dataIndex="actions"
@@ -1347,12 +1474,10 @@ export const PhoneTable :React.FC<IResourceComponentsProps & {extendTable?: RA.u
         </>
     );
 };
-export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IProduct, HttpError>}> = ( props ) => {
+export type ProductTableProps = RA.TableProps<Interfaces.IProduct> & { extendTable?: RA.useTableProps<Interfaces.IProduct, HttpError> }
+export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IProduct>({
         resource: "Product",
@@ -1407,18 +1532,23 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                 "createdAt",
                 "status",
                 "buildStatus",
+                {"warehouse": [ "id", "name" ]},
+                {"vendor": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -1592,6 +1722,29 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("build_status", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="warehouse"
+                    title="Warehouse"
+                    render={
+                        (value)=>(<Link to={ "/Warehouse/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="vendor"
+                    title="Vendor"
+                    render={
+                        (value)=>(<Link to={ "/Vendor/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IProduct>
                     title="Actions"
                     dataIndex="actions"
@@ -1689,12 +1842,10 @@ export const ProductTable :React.FC<IResourceComponentsProps & {extendTable?: RA
         </>
     );
 };
-export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IVendor, HttpError>}> = ( props ) => {
+export type VendorTableProps = RA.TableProps<Interfaces.IVendor> & { extendTable?: RA.useTableProps<Interfaces.IVendor, HttpError> }
+export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IVendor>({
         resource: "Vendor",
@@ -1727,14 +1878,17 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -1780,6 +1934,11 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("schema", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IVendor>
                     title="Actions"
                     dataIndex="actions"
@@ -1870,12 +2029,10 @@ export const VendorTable :React.FC<IResourceComponentsProps & {extendTable?: RA.
         </>
     );
 };
-export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IWarehouse, HttpError>}> = ( props ) => {
+export type WarehouseTableProps = RA.TableProps<Interfaces.IWarehouse> & { extendTable?: RA.useTableProps<Interfaces.IWarehouse, HttpError> }
+export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IWarehouse>({
         resource: "Warehouse",
@@ -1919,18 +2076,22 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
                 "originalData",
                 "enabled",
                 "filters",
+                {"vendor": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -2018,6 +2179,20 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("filters", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="vendor"
+                    title="Vendor"
+                    render={
+                        (value)=>(<Link to={ "/Vendor/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IWarehouse>
                     title="Actions"
                     dataIndex="actions"
@@ -2108,12 +2283,10 @@ export const WarehouseTable :React.FC<IResourceComponentsProps & {extendTable?: 
         </>
     );
 };
-export const WebsiteTable :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.IWebsite, HttpError>}> = ( props ) => {
+export type WebsiteTableProps = RA.TableProps<Interfaces.IWebsite> & { extendTable?: RA.useTableProps<Interfaces.IWebsite, HttpError> }
+export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
     const table = RA.useTable<Interfaces.IWebsite>({
         resource: "Website",
@@ -2147,18 +2320,23 @@ export const WebsiteTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                 "title",
                 "description",
                 "url",
+                {"company": [ "id", "name" ]},
+                {"country": [ "id", "name" ]},
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="id" {...props}>
+                { /* region Fields */ }
                 <RA.Table.Column
                     dataIndex="id"
                     title="Id"
@@ -2220,6 +2398,29 @@ export const WebsiteTable :React.FC<IResourceComponentsProps & {extendTable?: RA
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("url", table.sorter)}
                 />
+                {/* endregion */}
+
+                { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="company"
+                    title="Company"
+                    render={
+                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="country"
+                    title="Country"
+                    render={
+                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
+                            { value?.name }
+                        </Link>)
+                    }
+                />
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.IWebsite>
                     title="Actions"
                     dataIndex="actions"

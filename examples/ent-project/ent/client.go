@@ -70,7 +70,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -201,6 +201,21 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Website.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Company.Intercept(interceptors...)
+	c.Country.Intercept(interceptors...)
+	c.Email.Intercept(interceptors...)
+	c.Image.Intercept(interceptors...)
+	c.Location.Intercept(interceptors...)
+	c.Phone.Intercept(interceptors...)
+	c.Product.Intercept(interceptors...)
+	c.Vendor.Intercept(interceptors...)
+	c.Warehouse.Intercept(interceptors...)
+	c.Website.Intercept(interceptors...)
+}
+
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
@@ -243,6 +258,12 @@ func NewCompanyClient(c config) *CompanyClient {
 // A call to `Use(f, g, h)` equals to `company.Hooks(f(g(h())))`.
 func (c *CompanyClient) Use(hooks ...Hook) {
 	c.hooks.Company = append(c.hooks.Company, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `company.Intercept(f(g(h())))`.
+func (c *CompanyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Company = append(c.inters.Company, interceptors...)
 }
 
 // Create returns a builder for creating a Company entity.
@@ -297,6 +318,8 @@ func (c *CompanyClient) DeleteOneID(id uuid.UUID) *CompanyDeleteOne {
 func (c *CompanyClient) Query() *CompanyQuery {
 	return &CompanyQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCompany},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -316,7 +339,7 @@ func (c *CompanyClient) GetX(ctx context.Context, id uuid.UUID) *Company {
 
 // QueryCountries queries the countries edge of a Company.
 func (c *CompanyClient) QueryCountries(co *Company) *CountryQuery {
-	query := &CountryQuery{config: c.config}
+	query := (&CountryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -332,7 +355,7 @@ func (c *CompanyClient) QueryCountries(co *Company) *CountryQuery {
 
 // QueryPhones queries the phones edge of a Company.
 func (c *CompanyClient) QueryPhones(co *Company) *PhoneQuery {
-	query := &PhoneQuery{config: c.config}
+	query := (&PhoneClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -348,7 +371,7 @@ func (c *CompanyClient) QueryPhones(co *Company) *PhoneQuery {
 
 // QueryEmails queries the emails edge of a Company.
 func (c *CompanyClient) QueryEmails(co *Company) *EmailQuery {
-	query := &EmailQuery{config: c.config}
+	query := (&EmailClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -364,7 +387,7 @@ func (c *CompanyClient) QueryEmails(co *Company) *EmailQuery {
 
 // QueryWebsites queries the websites edge of a Company.
 func (c *CompanyClient) QueryWebsites(co *Company) *WebsiteQuery {
-	query := &WebsiteQuery{config: c.config}
+	query := (&WebsiteClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -380,7 +403,7 @@ func (c *CompanyClient) QueryWebsites(co *Company) *WebsiteQuery {
 
 // QueryLocations queries the locations edge of a Company.
 func (c *CompanyClient) QueryLocations(co *Company) *LocationQuery {
-	query := &LocationQuery{config: c.config}
+	query := (&LocationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -396,7 +419,7 @@ func (c *CompanyClient) QueryLocations(co *Company) *LocationQuery {
 
 // QueryLogoImage queries the logo_image edge of a Company.
 func (c *CompanyClient) QueryLogoImage(co *Company) *ImageQuery {
-	query := &ImageQuery{config: c.config}
+	query := (&ImageClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -412,7 +435,7 @@ func (c *CompanyClient) QueryLogoImage(co *Company) *ImageQuery {
 
 // QueryGalleryImages queries the gallery_images edge of a Company.
 func (c *CompanyClient) QueryGalleryImages(co *Company) *ImageQuery {
-	query := &ImageQuery{config: c.config}
+	query := (&ImageClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -429,6 +452,11 @@ func (c *CompanyClient) QueryGalleryImages(co *Company) *ImageQuery {
 // Hooks returns the client hooks.
 func (c *CompanyClient) Hooks() []Hook {
 	return c.hooks.Company
+}
+
+// Interceptors returns the client interceptors.
+func (c *CompanyClient) Interceptors() []Interceptor {
+	return c.inters.Company
 }
 
 func (c *CompanyClient) mutate(ctx context.Context, m *CompanyMutation) (Value, error) {
@@ -460,6 +488,12 @@ func NewCountryClient(c config) *CountryClient {
 // A call to `Use(f, g, h)` equals to `country.Hooks(f(g(h())))`.
 func (c *CountryClient) Use(hooks ...Hook) {
 	c.hooks.Country = append(c.hooks.Country, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `country.Intercept(f(g(h())))`.
+func (c *CountryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Country = append(c.inters.Country, interceptors...)
 }
 
 // Create returns a builder for creating a Country entity.
@@ -514,6 +548,8 @@ func (c *CountryClient) DeleteOneID(id uuid.UUID) *CountryDeleteOne {
 func (c *CountryClient) Query() *CountryQuery {
 	return &CountryQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCountry},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -533,7 +569,7 @@ func (c *CountryClient) GetX(ctx context.Context, id uuid.UUID) *Country {
 
 // QueryCompanies queries the companies edge of a Country.
 func (c *CountryClient) QueryCompanies(co *Country) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -549,7 +585,7 @@ func (c *CountryClient) QueryCompanies(co *Country) *CompanyQuery {
 
 // QueryPhones queries the phones edge of a Country.
 func (c *CountryClient) QueryPhones(co *Country) *PhoneQuery {
-	query := &PhoneQuery{config: c.config}
+	query := (&PhoneClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -565,7 +601,7 @@ func (c *CountryClient) QueryPhones(co *Country) *PhoneQuery {
 
 // QueryEmails queries the emails edge of a Country.
 func (c *CountryClient) QueryEmails(co *Country) *EmailQuery {
-	query := &EmailQuery{config: c.config}
+	query := (&EmailClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -581,7 +617,7 @@ func (c *CountryClient) QueryEmails(co *Country) *EmailQuery {
 
 // QueryWebsites queries the websites edge of a Country.
 func (c *CountryClient) QueryWebsites(co *Country) *WebsiteQuery {
-	query := &WebsiteQuery{config: c.config}
+	query := (&WebsiteClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -597,7 +633,7 @@ func (c *CountryClient) QueryWebsites(co *Country) *WebsiteQuery {
 
 // QueryLocations queries the locations edge of a Country.
 func (c *CountryClient) QueryLocations(co *Country) *LocationQuery {
-	query := &LocationQuery{config: c.config}
+	query := (&LocationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -614,6 +650,11 @@ func (c *CountryClient) QueryLocations(co *Country) *LocationQuery {
 // Hooks returns the client hooks.
 func (c *CountryClient) Hooks() []Hook {
 	return c.hooks.Country
+}
+
+// Interceptors returns the client interceptors.
+func (c *CountryClient) Interceptors() []Interceptor {
+	return c.inters.Country
 }
 
 func (c *CountryClient) mutate(ctx context.Context, m *CountryMutation) (Value, error) {
@@ -645,6 +686,12 @@ func NewEmailClient(c config) *EmailClient {
 // A call to `Use(f, g, h)` equals to `email.Hooks(f(g(h())))`.
 func (c *EmailClient) Use(hooks ...Hook) {
 	c.hooks.Email = append(c.hooks.Email, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `email.Intercept(f(g(h())))`.
+func (c *EmailClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Email = append(c.inters.Email, interceptors...)
 }
 
 // Create returns a builder for creating a Email entity.
@@ -699,6 +746,8 @@ func (c *EmailClient) DeleteOneID(id uuid.UUID) *EmailDeleteOne {
 func (c *EmailClient) Query() *EmailQuery {
 	return &EmailQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeEmail},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -718,7 +767,7 @@ func (c *EmailClient) GetX(ctx context.Context, id uuid.UUID) *Email {
 
 // QueryCompany queries the company edge of a Email.
 func (c *EmailClient) QueryCompany(e *Email) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
@@ -734,7 +783,7 @@ func (c *EmailClient) QueryCompany(e *Email) *CompanyQuery {
 
 // QueryCountry queries the country edge of a Email.
 func (c *EmailClient) QueryCountry(e *Email) *CountryQuery {
-	query := &CountryQuery{config: c.config}
+	query := (&CountryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
@@ -751,6 +800,11 @@ func (c *EmailClient) QueryCountry(e *Email) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *EmailClient) Hooks() []Hook {
 	return c.hooks.Email
+}
+
+// Interceptors returns the client interceptors.
+func (c *EmailClient) Interceptors() []Interceptor {
+	return c.inters.Email
 }
 
 func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, error) {
@@ -782,6 +836,12 @@ func NewImageClient(c config) *ImageClient {
 // A call to `Use(f, g, h)` equals to `image.Hooks(f(g(h())))`.
 func (c *ImageClient) Use(hooks ...Hook) {
 	c.hooks.Image = append(c.hooks.Image, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `image.Intercept(f(g(h())))`.
+func (c *ImageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Image = append(c.inters.Image, interceptors...)
 }
 
 // Create returns a builder for creating a Image entity.
@@ -836,6 +896,8 @@ func (c *ImageClient) DeleteOneID(id uuid.UUID) *ImageDeleteOne {
 func (c *ImageClient) Query() *ImageQuery {
 	return &ImageQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeImage},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -855,7 +917,7 @@ func (c *ImageClient) GetX(ctx context.Context, id uuid.UUID) *Image {
 
 // QueryGalleryCompany queries the gallery_company edge of a Image.
 func (c *ImageClient) QueryGalleryCompany(i *Image) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := i.ID
 		step := sqlgraph.NewStep(
@@ -871,7 +933,7 @@ func (c *ImageClient) QueryGalleryCompany(i *Image) *CompanyQuery {
 
 // QueryLogoCompany queries the logo_company edge of a Image.
 func (c *ImageClient) QueryLogoCompany(i *Image) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := i.ID
 		step := sqlgraph.NewStep(
@@ -888,6 +950,11 @@ func (c *ImageClient) QueryLogoCompany(i *Image) *CompanyQuery {
 // Hooks returns the client hooks.
 func (c *ImageClient) Hooks() []Hook {
 	return c.hooks.Image
+}
+
+// Interceptors returns the client interceptors.
+func (c *ImageClient) Interceptors() []Interceptor {
+	return c.inters.Image
 }
 
 func (c *ImageClient) mutate(ctx context.Context, m *ImageMutation) (Value, error) {
@@ -919,6 +986,12 @@ func NewLocationClient(c config) *LocationClient {
 // A call to `Use(f, g, h)` equals to `location.Hooks(f(g(h())))`.
 func (c *LocationClient) Use(hooks ...Hook) {
 	c.hooks.Location = append(c.hooks.Location, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `location.Intercept(f(g(h())))`.
+func (c *LocationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Location = append(c.inters.Location, interceptors...)
 }
 
 // Create returns a builder for creating a Location entity.
@@ -973,6 +1046,8 @@ func (c *LocationClient) DeleteOneID(id uuid.UUID) *LocationDeleteOne {
 func (c *LocationClient) Query() *LocationQuery {
 	return &LocationQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeLocation},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -992,7 +1067,7 @@ func (c *LocationClient) GetX(ctx context.Context, id uuid.UUID) *Location {
 
 // QueryCompany queries the company edge of a Location.
 func (c *LocationClient) QueryCompany(l *Location) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := l.ID
 		step := sqlgraph.NewStep(
@@ -1008,7 +1083,7 @@ func (c *LocationClient) QueryCompany(l *Location) *CompanyQuery {
 
 // QueryCountry queries the country edge of a Location.
 func (c *LocationClient) QueryCountry(l *Location) *CountryQuery {
-	query := &CountryQuery{config: c.config}
+	query := (&CountryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := l.ID
 		step := sqlgraph.NewStep(
@@ -1025,6 +1100,11 @@ func (c *LocationClient) QueryCountry(l *Location) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *LocationClient) Hooks() []Hook {
 	return c.hooks.Location
+}
+
+// Interceptors returns the client interceptors.
+func (c *LocationClient) Interceptors() []Interceptor {
+	return c.inters.Location
 }
 
 func (c *LocationClient) mutate(ctx context.Context, m *LocationMutation) (Value, error) {
@@ -1056,6 +1136,12 @@ func NewPhoneClient(c config) *PhoneClient {
 // A call to `Use(f, g, h)` equals to `phone.Hooks(f(g(h())))`.
 func (c *PhoneClient) Use(hooks ...Hook) {
 	c.hooks.Phone = append(c.hooks.Phone, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `phone.Intercept(f(g(h())))`.
+func (c *PhoneClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Phone = append(c.inters.Phone, interceptors...)
 }
 
 // Create returns a builder for creating a Phone entity.
@@ -1110,6 +1196,8 @@ func (c *PhoneClient) DeleteOneID(id uuid.UUID) *PhoneDeleteOne {
 func (c *PhoneClient) Query() *PhoneQuery {
 	return &PhoneQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypePhone},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1129,7 +1217,7 @@ func (c *PhoneClient) GetX(ctx context.Context, id uuid.UUID) *Phone {
 
 // QueryCompany queries the company edge of a Phone.
 func (c *PhoneClient) QueryCompany(ph *Phone) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ph.ID
 		step := sqlgraph.NewStep(
@@ -1145,7 +1233,7 @@ func (c *PhoneClient) QueryCompany(ph *Phone) *CompanyQuery {
 
 // QueryCountry queries the country edge of a Phone.
 func (c *PhoneClient) QueryCountry(ph *Phone) *CountryQuery {
-	query := &CountryQuery{config: c.config}
+	query := (&CountryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ph.ID
 		step := sqlgraph.NewStep(
@@ -1162,6 +1250,11 @@ func (c *PhoneClient) QueryCountry(ph *Phone) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *PhoneClient) Hooks() []Hook {
 	return c.hooks.Phone
+}
+
+// Interceptors returns the client interceptors.
+func (c *PhoneClient) Interceptors() []Interceptor {
+	return c.inters.Phone
 }
 
 func (c *PhoneClient) mutate(ctx context.Context, m *PhoneMutation) (Value, error) {
@@ -1193,6 +1286,12 @@ func NewProductClient(c config) *ProductClient {
 // A call to `Use(f, g, h)` equals to `product.Hooks(f(g(h())))`.
 func (c *ProductClient) Use(hooks ...Hook) {
 	c.hooks.Product = append(c.hooks.Product, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `product.Intercept(f(g(h())))`.
+func (c *ProductClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Product = append(c.inters.Product, interceptors...)
 }
 
 // Create returns a builder for creating a Product entity.
@@ -1247,6 +1346,8 @@ func (c *ProductClient) DeleteOneID(id uuid.UUID) *ProductDeleteOne {
 func (c *ProductClient) Query() *ProductQuery {
 	return &ProductQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeProduct},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1266,7 +1367,7 @@ func (c *ProductClient) GetX(ctx context.Context, id uuid.UUID) *Product {
 
 // QueryWarehouse queries the warehouse edge of a Product.
 func (c *ProductClient) QueryWarehouse(pr *Product) *WarehouseQuery {
-	query := &WarehouseQuery{config: c.config}
+	query := (&WarehouseClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
@@ -1282,7 +1383,7 @@ func (c *ProductClient) QueryWarehouse(pr *Product) *WarehouseQuery {
 
 // QueryVendor queries the vendor edge of a Product.
 func (c *ProductClient) QueryVendor(pr *Product) *VendorQuery {
-	query := &VendorQuery{config: c.config}
+	query := (&VendorClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
@@ -1299,6 +1400,11 @@ func (c *ProductClient) QueryVendor(pr *Product) *VendorQuery {
 // Hooks returns the client hooks.
 func (c *ProductClient) Hooks() []Hook {
 	return c.hooks.Product
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProductClient) Interceptors() []Interceptor {
+	return c.inters.Product
 }
 
 func (c *ProductClient) mutate(ctx context.Context, m *ProductMutation) (Value, error) {
@@ -1330,6 +1436,12 @@ func NewVendorClient(c config) *VendorClient {
 // A call to `Use(f, g, h)` equals to `vendor.Hooks(f(g(h())))`.
 func (c *VendorClient) Use(hooks ...Hook) {
 	c.hooks.Vendor = append(c.hooks.Vendor, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `vendor.Intercept(f(g(h())))`.
+func (c *VendorClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Vendor = append(c.inters.Vendor, interceptors...)
 }
 
 // Create returns a builder for creating a Vendor entity.
@@ -1384,6 +1496,8 @@ func (c *VendorClient) DeleteOneID(id uuid.UUID) *VendorDeleteOne {
 func (c *VendorClient) Query() *VendorQuery {
 	return &VendorQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeVendor},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1403,7 +1517,7 @@ func (c *VendorClient) GetX(ctx context.Context, id uuid.UUID) *Vendor {
 
 // QueryWarehouses queries the warehouses edge of a Vendor.
 func (c *VendorClient) QueryWarehouses(v *Vendor) *WarehouseQuery {
-	query := &WarehouseQuery{config: c.config}
+	query := (&WarehouseClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
@@ -1419,7 +1533,7 @@ func (c *VendorClient) QueryWarehouses(v *Vendor) *WarehouseQuery {
 
 // QueryProducts queries the products edge of a Vendor.
 func (c *VendorClient) QueryProducts(v *Vendor) *ProductQuery {
-	query := &ProductQuery{config: c.config}
+	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
@@ -1436,6 +1550,11 @@ func (c *VendorClient) QueryProducts(v *Vendor) *ProductQuery {
 // Hooks returns the client hooks.
 func (c *VendorClient) Hooks() []Hook {
 	return c.hooks.Vendor
+}
+
+// Interceptors returns the client interceptors.
+func (c *VendorClient) Interceptors() []Interceptor {
+	return c.inters.Vendor
 }
 
 func (c *VendorClient) mutate(ctx context.Context, m *VendorMutation) (Value, error) {
@@ -1467,6 +1586,12 @@ func NewWarehouseClient(c config) *WarehouseClient {
 // A call to `Use(f, g, h)` equals to `warehouse.Hooks(f(g(h())))`.
 func (c *WarehouseClient) Use(hooks ...Hook) {
 	c.hooks.Warehouse = append(c.hooks.Warehouse, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `warehouse.Intercept(f(g(h())))`.
+func (c *WarehouseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Warehouse = append(c.inters.Warehouse, interceptors...)
 }
 
 // Create returns a builder for creating a Warehouse entity.
@@ -1521,6 +1646,8 @@ func (c *WarehouseClient) DeleteOneID(id uuid.UUID) *WarehouseDeleteOne {
 func (c *WarehouseClient) Query() *WarehouseQuery {
 	return &WarehouseQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeWarehouse},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1540,7 +1667,7 @@ func (c *WarehouseClient) GetX(ctx context.Context, id uuid.UUID) *Warehouse {
 
 // QueryProducts queries the products edge of a Warehouse.
 func (c *WarehouseClient) QueryProducts(w *Warehouse) *ProductQuery {
-	query := &ProductQuery{config: c.config}
+	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
@@ -1556,7 +1683,7 @@ func (c *WarehouseClient) QueryProducts(w *Warehouse) *ProductQuery {
 
 // QueryVendor queries the vendor edge of a Warehouse.
 func (c *WarehouseClient) QueryVendor(w *Warehouse) *VendorQuery {
-	query := &VendorQuery{config: c.config}
+	query := (&VendorClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
@@ -1573,6 +1700,11 @@ func (c *WarehouseClient) QueryVendor(w *Warehouse) *VendorQuery {
 // Hooks returns the client hooks.
 func (c *WarehouseClient) Hooks() []Hook {
 	return c.hooks.Warehouse
+}
+
+// Interceptors returns the client interceptors.
+func (c *WarehouseClient) Interceptors() []Interceptor {
+	return c.inters.Warehouse
 }
 
 func (c *WarehouseClient) mutate(ctx context.Context, m *WarehouseMutation) (Value, error) {
@@ -1604,6 +1736,12 @@ func NewWebsiteClient(c config) *WebsiteClient {
 // A call to `Use(f, g, h)` equals to `website.Hooks(f(g(h())))`.
 func (c *WebsiteClient) Use(hooks ...Hook) {
 	c.hooks.Website = append(c.hooks.Website, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `website.Intercept(f(g(h())))`.
+func (c *WebsiteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Website = append(c.inters.Website, interceptors...)
 }
 
 // Create returns a builder for creating a Website entity.
@@ -1658,6 +1796,8 @@ func (c *WebsiteClient) DeleteOneID(id uuid.UUID) *WebsiteDeleteOne {
 func (c *WebsiteClient) Query() *WebsiteQuery {
 	return &WebsiteQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeWebsite},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1677,7 +1817,7 @@ func (c *WebsiteClient) GetX(ctx context.Context, id uuid.UUID) *Website {
 
 // QueryCompany queries the company edge of a Website.
 func (c *WebsiteClient) QueryCompany(w *Website) *CompanyQuery {
-	query := &CompanyQuery{config: c.config}
+	query := (&CompanyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
@@ -1693,7 +1833,7 @@ func (c *WebsiteClient) QueryCompany(w *Website) *CompanyQuery {
 
 // QueryCountry queries the country edge of a Website.
 func (c *WebsiteClient) QueryCountry(w *Website) *CountryQuery {
-	query := &CountryQuery{config: c.config}
+	query := (&CountryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
@@ -1710,6 +1850,11 @@ func (c *WebsiteClient) QueryCountry(w *Website) *CountryQuery {
 // Hooks returns the client hooks.
 func (c *WebsiteClient) Hooks() []Hook {
 	return c.hooks.Website
+}
+
+// Interceptors returns the client interceptors.
+func (c *WebsiteClient) Interceptors() []Interceptor {
+	return c.inters.Website
 }
 
 func (c *WebsiteClient) mutate(ctx context.Context, m *WebsiteMutation) (Value, error) {

@@ -223,19 +223,19 @@ func (l *Location) assignValues(columns []string, values []any) error {
 
 // QueryCompany queries the "company" edge of the Location entity.
 func (l *Location) QueryCompany() *CompanyQuery {
-	return (&LocationClient{config: l.config}).QueryCompany(l)
+	return NewLocationClient(l.config).QueryCompany(l)
 }
 
 // QueryCountry queries the "country" edge of the Location entity.
 func (l *Location) QueryCountry() *CountryQuery {
-	return (&LocationClient{config: l.config}).QueryCountry(l)
+	return NewLocationClient(l.config).QueryCountry(l)
 }
 
 // Update returns a builder for updating this Location.
 // Note that you need to call Location.Unwrap() before calling this method if this Location
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (l *Location) Update() *LocationUpdateOne {
-	return (&LocationClient{config: l.config}).UpdateOne(l)
+	return NewLocationClient(l.config).UpdateOne(l)
 }
 
 // Unwrap unwraps the Location entity that was returned from a transaction after it was closed,

@@ -39,11 +39,9 @@ import (
 // CompanyQuery is the builder for querying Company entities.
 type CompanyQuery struct {
 	config
-	limit                  *int
-	offset                 *int
-	unique                 *bool
+	ctx                    *QueryContext
 	order                  []OrderFunc
-	fields                 []string
+	inters                 []Interceptor
 	predicates             []predicate.Company
 	withCountries          *CountryQuery
 	withPhones             *PhoneQuery
@@ -71,26 +69,26 @@ func (cq *CompanyQuery) Where(ps ...predicate.Company) *CompanyQuery {
 	return cq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (cq *CompanyQuery) Limit(limit int) *CompanyQuery {
-	cq.limit = &limit
+	cq.ctx.Limit = &limit
 	return cq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (cq *CompanyQuery) Offset(offset int) *CompanyQuery {
-	cq.offset = &offset
+	cq.ctx.Offset = &offset
 	return cq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (cq *CompanyQuery) Unique(unique bool) *CompanyQuery {
-	cq.unique = &unique
+	cq.ctx.Unique = &unique
 	return cq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (cq *CompanyQuery) Order(o ...OrderFunc) *CompanyQuery {
 	cq.order = append(cq.order, o...)
 	return cq
@@ -98,7 +96,7 @@ func (cq *CompanyQuery) Order(o ...OrderFunc) *CompanyQuery {
 
 // QueryCountries chains the current query on the "countries" edge.
 func (cq *CompanyQuery) QueryCountries() *CountryQuery {
-	query := &CountryQuery{config: cq.config}
+	query := (&CountryClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -120,7 +118,7 @@ func (cq *CompanyQuery) QueryCountries() *CountryQuery {
 
 // QueryPhones chains the current query on the "phones" edge.
 func (cq *CompanyQuery) QueryPhones() *PhoneQuery {
-	query := &PhoneQuery{config: cq.config}
+	query := (&PhoneClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -142,7 +140,7 @@ func (cq *CompanyQuery) QueryPhones() *PhoneQuery {
 
 // QueryEmails chains the current query on the "emails" edge.
 func (cq *CompanyQuery) QueryEmails() *EmailQuery {
-	query := &EmailQuery{config: cq.config}
+	query := (&EmailClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -164,7 +162,7 @@ func (cq *CompanyQuery) QueryEmails() *EmailQuery {
 
 // QueryWebsites chains the current query on the "websites" edge.
 func (cq *CompanyQuery) QueryWebsites() *WebsiteQuery {
-	query := &WebsiteQuery{config: cq.config}
+	query := (&WebsiteClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -186,7 +184,7 @@ func (cq *CompanyQuery) QueryWebsites() *WebsiteQuery {
 
 // QueryLocations chains the current query on the "locations" edge.
 func (cq *CompanyQuery) QueryLocations() *LocationQuery {
-	query := &LocationQuery{config: cq.config}
+	query := (&LocationClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -208,7 +206,7 @@ func (cq *CompanyQuery) QueryLocations() *LocationQuery {
 
 // QueryLogoImage chains the current query on the "logo_image" edge.
 func (cq *CompanyQuery) QueryLogoImage() *ImageQuery {
-	query := &ImageQuery{config: cq.config}
+	query := (&ImageClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -230,7 +228,7 @@ func (cq *CompanyQuery) QueryLogoImage() *ImageQuery {
 
 // QueryGalleryImages chains the current query on the "gallery_images" edge.
 func (cq *CompanyQuery) QueryGalleryImages() *ImageQuery {
-	query := &ImageQuery{config: cq.config}
+	query := (&ImageClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -253,7 +251,7 @@ func (cq *CompanyQuery) QueryGalleryImages() *ImageQuery {
 // First returns the first Company entity from the query.
 // Returns a *NotFoundError when no Company was found.
 func (cq *CompanyQuery) First(ctx context.Context) (*Company, error) {
-	nodes, err := cq.Limit(1).All(ctx)
+	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +274,7 @@ func (cq *CompanyQuery) FirstX(ctx context.Context) *Company {
 // Returns a *NotFoundError when no Company ID was found.
 func (cq *CompanyQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -299,7 +297,7 @@ func (cq *CompanyQuery) FirstIDX(ctx context.Context) uuid.UUID {
 // Returns a *NotSingularError when more than one Company entity is found.
 // Returns a *NotFoundError when no Company entities are found.
 func (cq *CompanyQuery) Only(ctx context.Context) (*Company, error) {
-	nodes, err := cq.Limit(2).All(ctx)
+	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +325,7 @@ func (cq *CompanyQuery) OnlyX(ctx context.Context) *Company {
 // Returns a *NotFoundError when no entities are found.
 func (cq *CompanyQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -352,10 +350,12 @@ func (cq *CompanyQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 
 // All executes the query and returns a list of Companies.
 func (cq *CompanyQuery) All(ctx context.Context) ([]*Company, error) {
+	ctx = setContextOp(ctx, cq.ctx, "All")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return cq.sqlAll(ctx)
+	qr := querierAll[[]*Company, *CompanyQuery]()
+	return withInterceptors[[]*Company](ctx, cq, qr, cq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -370,6 +370,7 @@ func (cq *CompanyQuery) AllX(ctx context.Context) []*Company {
 // IDs executes the query and returns a list of Company IDs.
 func (cq *CompanyQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	var ids []uuid.UUID
+	ctx = setContextOp(ctx, cq.ctx, "IDs")
 	if err := cq.Select(company.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -387,10 +388,11 @@ func (cq *CompanyQuery) IDsX(ctx context.Context) []uuid.UUID {
 
 // Count returns the count of the given query.
 func (cq *CompanyQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, cq.ctx, "Count")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return cq.sqlCount(ctx)
+	return withInterceptors[int](ctx, cq, querierCount[*CompanyQuery](), cq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -404,6 +406,7 @@ func (cq *CompanyQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *CompanyQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, cq.ctx, "Exist")
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -431,9 +434,9 @@ func (cq *CompanyQuery) Clone() *CompanyQuery {
 	}
 	return &CompanyQuery{
 		config:            cq.config,
-		limit:             cq.limit,
-		offset:            cq.offset,
+		ctx:               cq.ctx.Clone(),
 		order:             append([]OrderFunc{}, cq.order...),
+		inters:            append([]Interceptor{}, cq.inters...),
 		predicates:        append([]predicate.Company{}, cq.predicates...),
 		withCountries:     cq.withCountries.Clone(),
 		withPhones:        cq.withPhones.Clone(),
@@ -443,16 +446,15 @@ func (cq *CompanyQuery) Clone() *CompanyQuery {
 		withLogoImage:     cq.withLogoImage.Clone(),
 		withGalleryImages: cq.withGalleryImages.Clone(),
 		// clone intermediate query.
-		sql:    cq.sql.Clone(),
-		path:   cq.path,
-		unique: cq.unique,
+		sql:  cq.sql.Clone(),
+		path: cq.path,
 	}
 }
 
 // WithCountries tells the query-builder to eager-load the nodes that are connected to
 // the "countries" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithCountries(opts ...func(*CountryQuery)) *CompanyQuery {
-	query := &CountryQuery{config: cq.config}
+	query := (&CountryClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -463,7 +465,7 @@ func (cq *CompanyQuery) WithCountries(opts ...func(*CountryQuery)) *CompanyQuery
 // WithPhones tells the query-builder to eager-load the nodes that are connected to
 // the "phones" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithPhones(opts ...func(*PhoneQuery)) *CompanyQuery {
-	query := &PhoneQuery{config: cq.config}
+	query := (&PhoneClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -474,7 +476,7 @@ func (cq *CompanyQuery) WithPhones(opts ...func(*PhoneQuery)) *CompanyQuery {
 // WithEmails tells the query-builder to eager-load the nodes that are connected to
 // the "emails" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithEmails(opts ...func(*EmailQuery)) *CompanyQuery {
-	query := &EmailQuery{config: cq.config}
+	query := (&EmailClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -485,7 +487,7 @@ func (cq *CompanyQuery) WithEmails(opts ...func(*EmailQuery)) *CompanyQuery {
 // WithWebsites tells the query-builder to eager-load the nodes that are connected to
 // the "websites" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithWebsites(opts ...func(*WebsiteQuery)) *CompanyQuery {
-	query := &WebsiteQuery{config: cq.config}
+	query := (&WebsiteClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -496,7 +498,7 @@ func (cq *CompanyQuery) WithWebsites(opts ...func(*WebsiteQuery)) *CompanyQuery 
 // WithLocations tells the query-builder to eager-load the nodes that are connected to
 // the "locations" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithLocations(opts ...func(*LocationQuery)) *CompanyQuery {
-	query := &LocationQuery{config: cq.config}
+	query := (&LocationClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -507,7 +509,7 @@ func (cq *CompanyQuery) WithLocations(opts ...func(*LocationQuery)) *CompanyQuer
 // WithLogoImage tells the query-builder to eager-load the nodes that are connected to
 // the "logo_image" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithLogoImage(opts ...func(*ImageQuery)) *CompanyQuery {
-	query := &ImageQuery{config: cq.config}
+	query := (&ImageClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -518,7 +520,7 @@ func (cq *CompanyQuery) WithLogoImage(opts ...func(*ImageQuery)) *CompanyQuery {
 // WithGalleryImages tells the query-builder to eager-load the nodes that are connected to
 // the "gallery_images" edge. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithGalleryImages(opts ...func(*ImageQuery)) *CompanyQuery {
-	query := &ImageQuery{config: cq.config}
+	query := (&ImageClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -541,16 +543,11 @@ func (cq *CompanyQuery) WithGalleryImages(opts ...func(*ImageQuery)) *CompanyQue
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CompanyQuery) GroupBy(field string, fields ...string) *CompanyGroupBy {
-	grbuild := &CompanyGroupBy{config: cq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return cq.sqlQuery(ctx), nil
-	}
+	cq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &CompanyGroupBy{build: cq}
+	grbuild.flds = &cq.ctx.Fields
 	grbuild.label = company.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -567,11 +564,11 @@ func (cq *CompanyQuery) GroupBy(field string, fields ...string) *CompanyGroupBy 
 //		Select(company.FieldName).
 //		Scan(ctx, &v)
 func (cq *CompanyQuery) Select(fields ...string) *CompanySelect {
-	cq.fields = append(cq.fields, fields...)
-	selbuild := &CompanySelect{CompanyQuery: cq}
-	selbuild.label = company.Label
-	selbuild.flds, selbuild.scan = &cq.fields, selbuild.Scan
-	return selbuild
+	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
+	sbuild := &CompanySelect{CompanyQuery: cq}
+	sbuild.label = company.Label
+	sbuild.flds, sbuild.scan = &cq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a CompanySelect configured with the given aggregations.
@@ -580,7 +577,17 @@ func (cq *CompanyQuery) Aggregate(fns ...AggregateFunc) *CompanySelect {
 }
 
 func (cq *CompanyQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range cq.fields {
+	for _, inter := range cq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, cq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range cq.ctx.Fields {
 		if !company.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -975,9 +982,9 @@ func (cq *CompanyQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(cq.modifiers) > 0 {
 		_spec.Modifiers = cq.modifiers
 	}
-	_spec.Node.Columns = cq.fields
-	if len(cq.fields) > 0 {
-		_spec.Unique = cq.unique != nil && *cq.unique
+	_spec.Node.Columns = cq.ctx.Fields
+	if len(cq.ctx.Fields) > 0 {
+		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
 }
@@ -995,10 +1002,10 @@ func (cq *CompanyQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   cq.sql,
 		Unique: true,
 	}
-	if unique := cq.unique; unique != nil {
+	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := cq.fields; len(fields) > 0 {
+	if fields := cq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, company.FieldID)
 		for i := range fields {
@@ -1014,10 +1021,10 @@ func (cq *CompanyQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := cq.limit; limit != nil {
+	if limit := cq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cq.offset; offset != nil {
+	if offset := cq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := cq.order; len(ps) > 0 {
@@ -1033,7 +1040,7 @@ func (cq *CompanyQuery) querySpec() *sqlgraph.QuerySpec {
 func (cq *CompanyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cq.driver.Dialect())
 	t1 := builder.Table(company.Table)
-	columns := cq.fields
+	columns := cq.ctx.Fields
 	if len(columns) == 0 {
 		columns = company.Columns
 	}
@@ -1042,7 +1049,7 @@ func (cq *CompanyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = cq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cq.unique != nil && *cq.unique {
+	if cq.ctx.Unique != nil && *cq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range cq.predicates {
@@ -1051,12 +1058,12 @@ func (cq *CompanyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range cq.order {
 		p(selector)
 	}
-	if offset := cq.offset; offset != nil {
+	if offset := cq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cq.limit; limit != nil {
+	if limit := cq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -1065,7 +1072,7 @@ func (cq *CompanyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // WithNamedCountries tells the query-builder to eager-load the nodes that are connected to the "countries"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedCountries(name string, opts ...func(*CountryQuery)) *CompanyQuery {
-	query := &CountryQuery{config: cq.config}
+	query := (&CountryClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1079,7 +1086,7 @@ func (cq *CompanyQuery) WithNamedCountries(name string, opts ...func(*CountryQue
 // WithNamedPhones tells the query-builder to eager-load the nodes that are connected to the "phones"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedPhones(name string, opts ...func(*PhoneQuery)) *CompanyQuery {
-	query := &PhoneQuery{config: cq.config}
+	query := (&PhoneClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1093,7 +1100,7 @@ func (cq *CompanyQuery) WithNamedPhones(name string, opts ...func(*PhoneQuery)) 
 // WithNamedEmails tells the query-builder to eager-load the nodes that are connected to the "emails"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedEmails(name string, opts ...func(*EmailQuery)) *CompanyQuery {
-	query := &EmailQuery{config: cq.config}
+	query := (&EmailClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1107,7 +1114,7 @@ func (cq *CompanyQuery) WithNamedEmails(name string, opts ...func(*EmailQuery)) 
 // WithNamedWebsites tells the query-builder to eager-load the nodes that are connected to the "websites"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedWebsites(name string, opts ...func(*WebsiteQuery)) *CompanyQuery {
-	query := &WebsiteQuery{config: cq.config}
+	query := (&WebsiteClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1121,7 +1128,7 @@ func (cq *CompanyQuery) WithNamedWebsites(name string, opts ...func(*WebsiteQuer
 // WithNamedLocations tells the query-builder to eager-load the nodes that are connected to the "locations"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedLocations(name string, opts ...func(*LocationQuery)) *CompanyQuery {
-	query := &LocationQuery{config: cq.config}
+	query := (&LocationClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1135,7 +1142,7 @@ func (cq *CompanyQuery) WithNamedLocations(name string, opts ...func(*LocationQu
 // WithNamedGalleryImages tells the query-builder to eager-load the nodes that are connected to the "gallery_images"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (cq *CompanyQuery) WithNamedGalleryImages(name string, opts ...func(*ImageQuery)) *CompanyQuery {
-	query := &ImageQuery{config: cq.config}
+	query := (&ImageClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -1148,13 +1155,8 @@ func (cq *CompanyQuery) WithNamedGalleryImages(name string, opts ...func(*ImageQ
 
 // CompanyGroupBy is the group-by builder for Company entities.
 type CompanyGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *CompanyQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -1163,58 +1165,46 @@ func (cgb *CompanyGroupBy) Aggregate(fns ...AggregateFunc) *CompanyGroupBy {
 	return cgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (cgb *CompanyGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := cgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
+	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cgb.sql = query
-	return cgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*CompanyQuery, *CompanyGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
 }
 
-func (cgb *CompanyGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range cgb.fields {
-		if !company.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (cgb *CompanyGroupBy) sqlScan(ctx context.Context, root *CompanyQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(cgb.fns))
+	for _, fn := range cgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := cgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*cgb.flds)+len(cgb.fns))
+		for _, f := range *cgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*cgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (cgb *CompanyGroupBy) sqlQuery() *sql.Selector {
-	selector := cgb.sql.Select()
-	aggregation := make([]string, 0, len(cgb.fns))
-	for _, fn := range cgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(cgb.fields)+len(cgb.fns))
-		for _, f := range cgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(cgb.fields...)...)
-}
-
 // CompanySelect is the builder for selecting fields of Company entities.
 type CompanySelect struct {
 	*CompanyQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -1225,26 +1215,27 @@ func (cs *CompanySelect) Aggregate(fns ...AggregateFunc) *CompanySelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cs *CompanySelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cs.ctx, "Select")
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cs.sql = cs.CompanyQuery.sqlQuery(ctx)
-	return cs.sqlScan(ctx, v)
+	return scanWithInterceptors[*CompanyQuery, *CompanySelect](ctx, cs.CompanyQuery, cs, cs.inters, v)
 }
 
-func (cs *CompanySelect) sqlScan(ctx context.Context, v any) error {
+func (cs *CompanySelect) sqlScan(ctx context.Context, root *CompanyQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cs.fns))
 	for _, fn := range cs.fns {
-		aggregation = append(aggregation, fn(cs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*cs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		cs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		cs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := cs.sql.Query()
+	query, args := selector.Query()
 	if err := cs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

@@ -35,11 +35,9 @@ import (
 // VendorQuery is the builder for querying Vendor entities.
 type VendorQuery struct {
 	config
-	limit               *int
-	offset              *int
-	unique              *bool
+	ctx                 *QueryContext
 	order               []OrderFunc
-	fields              []string
+	inters              []Interceptor
 	predicates          []predicate.Vendor
 	withWarehouses      *WarehouseQuery
 	withProducts        *ProductQuery
@@ -58,26 +56,26 @@ func (vq *VendorQuery) Where(ps ...predicate.Vendor) *VendorQuery {
 	return vq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (vq *VendorQuery) Limit(limit int) *VendorQuery {
-	vq.limit = &limit
+	vq.ctx.Limit = &limit
 	return vq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (vq *VendorQuery) Offset(offset int) *VendorQuery {
-	vq.offset = &offset
+	vq.ctx.Offset = &offset
 	return vq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (vq *VendorQuery) Unique(unique bool) *VendorQuery {
-	vq.unique = &unique
+	vq.ctx.Unique = &unique
 	return vq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (vq *VendorQuery) Order(o ...OrderFunc) *VendorQuery {
 	vq.order = append(vq.order, o...)
 	return vq
@@ -85,7 +83,7 @@ func (vq *VendorQuery) Order(o ...OrderFunc) *VendorQuery {
 
 // QueryWarehouses chains the current query on the "warehouses" edge.
 func (vq *VendorQuery) QueryWarehouses() *WarehouseQuery {
-	query := &WarehouseQuery{config: vq.config}
+	query := (&WarehouseClient{config: vq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := vq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -107,7 +105,7 @@ func (vq *VendorQuery) QueryWarehouses() *WarehouseQuery {
 
 // QueryProducts chains the current query on the "products" edge.
 func (vq *VendorQuery) QueryProducts() *ProductQuery {
-	query := &ProductQuery{config: vq.config}
+	query := (&ProductClient{config: vq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := vq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -130,7 +128,7 @@ func (vq *VendorQuery) QueryProducts() *ProductQuery {
 // First returns the first Vendor entity from the query.
 // Returns a *NotFoundError when no Vendor was found.
 func (vq *VendorQuery) First(ctx context.Context) (*Vendor, error) {
-	nodes, err := vq.Limit(1).All(ctx)
+	nodes, err := vq.Limit(1).All(setContextOp(ctx, vq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +151,7 @@ func (vq *VendorQuery) FirstX(ctx context.Context) *Vendor {
 // Returns a *NotFoundError when no Vendor ID was found.
 func (vq *VendorQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = vq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = vq.Limit(1).IDs(setContextOp(ctx, vq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -176,7 +174,7 @@ func (vq *VendorQuery) FirstIDX(ctx context.Context) uuid.UUID {
 // Returns a *NotSingularError when more than one Vendor entity is found.
 // Returns a *NotFoundError when no Vendor entities are found.
 func (vq *VendorQuery) Only(ctx context.Context) (*Vendor, error) {
-	nodes, err := vq.Limit(2).All(ctx)
+	nodes, err := vq.Limit(2).All(setContextOp(ctx, vq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +202,7 @@ func (vq *VendorQuery) OnlyX(ctx context.Context) *Vendor {
 // Returns a *NotFoundError when no entities are found.
 func (vq *VendorQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = vq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = vq.Limit(2).IDs(setContextOp(ctx, vq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -229,10 +227,12 @@ func (vq *VendorQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 
 // All executes the query and returns a list of Vendors.
 func (vq *VendorQuery) All(ctx context.Context) ([]*Vendor, error) {
+	ctx = setContextOp(ctx, vq.ctx, "All")
 	if err := vq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return vq.sqlAll(ctx)
+	qr := querierAll[[]*Vendor, *VendorQuery]()
+	return withInterceptors[[]*Vendor](ctx, vq, qr, vq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -247,6 +247,7 @@ func (vq *VendorQuery) AllX(ctx context.Context) []*Vendor {
 // IDs executes the query and returns a list of Vendor IDs.
 func (vq *VendorQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	var ids []uuid.UUID
+	ctx = setContextOp(ctx, vq.ctx, "IDs")
 	if err := vq.Select(vendor.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -264,10 +265,11 @@ func (vq *VendorQuery) IDsX(ctx context.Context) []uuid.UUID {
 
 // Count returns the count of the given query.
 func (vq *VendorQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, vq.ctx, "Count")
 	if err := vq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return vq.sqlCount(ctx)
+	return withInterceptors[int](ctx, vq, querierCount[*VendorQuery](), vq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -281,6 +283,7 @@ func (vq *VendorQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (vq *VendorQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, vq.ctx, "Exist")
 	switch _, err := vq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -308,23 +311,22 @@ func (vq *VendorQuery) Clone() *VendorQuery {
 	}
 	return &VendorQuery{
 		config:         vq.config,
-		limit:          vq.limit,
-		offset:         vq.offset,
+		ctx:            vq.ctx.Clone(),
 		order:          append([]OrderFunc{}, vq.order...),
+		inters:         append([]Interceptor{}, vq.inters...),
 		predicates:     append([]predicate.Vendor{}, vq.predicates...),
 		withWarehouses: vq.withWarehouses.Clone(),
 		withProducts:   vq.withProducts.Clone(),
 		// clone intermediate query.
-		sql:    vq.sql.Clone(),
-		path:   vq.path,
-		unique: vq.unique,
+		sql:  vq.sql.Clone(),
+		path: vq.path,
 	}
 }
 
 // WithWarehouses tells the query-builder to eager-load the nodes that are connected to
 // the "warehouses" edge. The optional arguments are used to configure the query builder of the edge.
 func (vq *VendorQuery) WithWarehouses(opts ...func(*WarehouseQuery)) *VendorQuery {
-	query := &WarehouseQuery{config: vq.config}
+	query := (&WarehouseClient{config: vq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -335,7 +337,7 @@ func (vq *VendorQuery) WithWarehouses(opts ...func(*WarehouseQuery)) *VendorQuer
 // WithProducts tells the query-builder to eager-load the nodes that are connected to
 // the "products" edge. The optional arguments are used to configure the query builder of the edge.
 func (vq *VendorQuery) WithProducts(opts ...func(*ProductQuery)) *VendorQuery {
-	query := &ProductQuery{config: vq.config}
+	query := (&ProductClient{config: vq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -358,16 +360,11 @@ func (vq *VendorQuery) WithProducts(opts ...func(*ProductQuery)) *VendorQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (vq *VendorQuery) GroupBy(field string, fields ...string) *VendorGroupBy {
-	grbuild := &VendorGroupBy{config: vq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return vq.sqlQuery(ctx), nil
-	}
+	vq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &VendorGroupBy{build: vq}
+	grbuild.flds = &vq.ctx.Fields
 	grbuild.label = vendor.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -384,11 +381,11 @@ func (vq *VendorQuery) GroupBy(field string, fields ...string) *VendorGroupBy {
 //		Select(vendor.FieldName).
 //		Scan(ctx, &v)
 func (vq *VendorQuery) Select(fields ...string) *VendorSelect {
-	vq.fields = append(vq.fields, fields...)
-	selbuild := &VendorSelect{VendorQuery: vq}
-	selbuild.label = vendor.Label
-	selbuild.flds, selbuild.scan = &vq.fields, selbuild.Scan
-	return selbuild
+	vq.ctx.Fields = append(vq.ctx.Fields, fields...)
+	sbuild := &VendorSelect{VendorQuery: vq}
+	sbuild.label = vendor.Label
+	sbuild.flds, sbuild.scan = &vq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a VendorSelect configured with the given aggregations.
@@ -397,7 +394,17 @@ func (vq *VendorQuery) Aggregate(fns ...AggregateFunc) *VendorSelect {
 }
 
 func (vq *VendorQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range vq.fields {
+	for _, inter := range vq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, vq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range vq.ctx.Fields {
 		if !vendor.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -546,9 +553,9 @@ func (vq *VendorQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(vq.modifiers) > 0 {
 		_spec.Modifiers = vq.modifiers
 	}
-	_spec.Node.Columns = vq.fields
-	if len(vq.fields) > 0 {
-		_spec.Unique = vq.unique != nil && *vq.unique
+	_spec.Node.Columns = vq.ctx.Fields
+	if len(vq.ctx.Fields) > 0 {
+		_spec.Unique = vq.ctx.Unique != nil && *vq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, vq.driver, _spec)
 }
@@ -566,10 +573,10 @@ func (vq *VendorQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   vq.sql,
 		Unique: true,
 	}
-	if unique := vq.unique; unique != nil {
+	if unique := vq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := vq.fields; len(fields) > 0 {
+	if fields := vq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, vendor.FieldID)
 		for i := range fields {
@@ -585,10 +592,10 @@ func (vq *VendorQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := vq.limit; limit != nil {
+	if limit := vq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := vq.offset; offset != nil {
+	if offset := vq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := vq.order; len(ps) > 0 {
@@ -604,7 +611,7 @@ func (vq *VendorQuery) querySpec() *sqlgraph.QuerySpec {
 func (vq *VendorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(vq.driver.Dialect())
 	t1 := builder.Table(vendor.Table)
-	columns := vq.fields
+	columns := vq.ctx.Fields
 	if len(columns) == 0 {
 		columns = vendor.Columns
 	}
@@ -613,7 +620,7 @@ func (vq *VendorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = vq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if vq.unique != nil && *vq.unique {
+	if vq.ctx.Unique != nil && *vq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range vq.predicates {
@@ -622,12 +629,12 @@ func (vq *VendorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range vq.order {
 		p(selector)
 	}
-	if offset := vq.offset; offset != nil {
+	if offset := vq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := vq.limit; limit != nil {
+	if limit := vq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -636,7 +643,7 @@ func (vq *VendorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // WithNamedWarehouses tells the query-builder to eager-load the nodes that are connected to the "warehouses"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (vq *VendorQuery) WithNamedWarehouses(name string, opts ...func(*WarehouseQuery)) *VendorQuery {
-	query := &WarehouseQuery{config: vq.config}
+	query := (&WarehouseClient{config: vq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -650,7 +657,7 @@ func (vq *VendorQuery) WithNamedWarehouses(name string, opts ...func(*WarehouseQ
 // WithNamedProducts tells the query-builder to eager-load the nodes that are connected to the "products"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (vq *VendorQuery) WithNamedProducts(name string, opts ...func(*ProductQuery)) *VendorQuery {
-	query := &ProductQuery{config: vq.config}
+	query := (&ProductClient{config: vq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -663,13 +670,8 @@ func (vq *VendorQuery) WithNamedProducts(name string, opts ...func(*ProductQuery
 
 // VendorGroupBy is the group-by builder for Vendor entities.
 type VendorGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *VendorQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -678,58 +680,46 @@ func (vgb *VendorGroupBy) Aggregate(fns ...AggregateFunc) *VendorGroupBy {
 	return vgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (vgb *VendorGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := vgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, vgb.build.ctx, "GroupBy")
+	if err := vgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	vgb.sql = query
-	return vgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*VendorQuery, *VendorGroupBy](ctx, vgb.build, vgb, vgb.build.inters, v)
 }
 
-func (vgb *VendorGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range vgb.fields {
-		if !vendor.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (vgb *VendorGroupBy) sqlScan(ctx context.Context, root *VendorQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(vgb.fns))
+	for _, fn := range vgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := vgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*vgb.flds)+len(vgb.fns))
+		for _, f := range *vgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*vgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := vgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := vgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (vgb *VendorGroupBy) sqlQuery() *sql.Selector {
-	selector := vgb.sql.Select()
-	aggregation := make([]string, 0, len(vgb.fns))
-	for _, fn := range vgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(vgb.fields)+len(vgb.fns))
-		for _, f := range vgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(vgb.fields...)...)
-}
-
 // VendorSelect is the builder for selecting fields of Vendor entities.
 type VendorSelect struct {
 	*VendorQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -740,26 +730,27 @@ func (vs *VendorSelect) Aggregate(fns ...AggregateFunc) *VendorSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (vs *VendorSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, vs.ctx, "Select")
 	if err := vs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	vs.sql = vs.VendorQuery.sqlQuery(ctx)
-	return vs.sqlScan(ctx, v)
+	return scanWithInterceptors[*VendorQuery, *VendorSelect](ctx, vs.VendorQuery, vs, vs.inters, v)
 }
 
-func (vs *VendorSelect) sqlScan(ctx context.Context, v any) error {
+func (vs *VendorSelect) sqlScan(ctx context.Context, root *VendorQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(vs.fns))
 	for _, fn := range vs.fns {
-		aggregation = append(aggregation, fn(vs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*vs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		vs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		vs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := vs.sql.Query()
+	query, args := selector.Query()
 	if err := vs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

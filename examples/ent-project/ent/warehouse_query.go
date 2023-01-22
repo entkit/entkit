@@ -35,11 +35,9 @@ import (
 // WarehouseQuery is the builder for querying Warehouse entities.
 type WarehouseQuery struct {
 	config
-	limit             *int
-	offset            *int
-	unique            *bool
+	ctx               *QueryContext
 	order             []OrderFunc
-	fields            []string
+	inters            []Interceptor
 	predicates        []predicate.Warehouse
 	withProducts      *ProductQuery
 	withVendor        *VendorQuery
@@ -58,26 +56,26 @@ func (wq *WarehouseQuery) Where(ps ...predicate.Warehouse) *WarehouseQuery {
 	return wq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (wq *WarehouseQuery) Limit(limit int) *WarehouseQuery {
-	wq.limit = &limit
+	wq.ctx.Limit = &limit
 	return wq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (wq *WarehouseQuery) Offset(offset int) *WarehouseQuery {
-	wq.offset = &offset
+	wq.ctx.Offset = &offset
 	return wq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (wq *WarehouseQuery) Unique(unique bool) *WarehouseQuery {
-	wq.unique = &unique
+	wq.ctx.Unique = &unique
 	return wq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (wq *WarehouseQuery) Order(o ...OrderFunc) *WarehouseQuery {
 	wq.order = append(wq.order, o...)
 	return wq
@@ -85,7 +83,7 @@ func (wq *WarehouseQuery) Order(o ...OrderFunc) *WarehouseQuery {
 
 // QueryProducts chains the current query on the "products" edge.
 func (wq *WarehouseQuery) QueryProducts() *ProductQuery {
-	query := &ProductQuery{config: wq.config}
+	query := (&ProductClient{config: wq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := wq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -107,7 +105,7 @@ func (wq *WarehouseQuery) QueryProducts() *ProductQuery {
 
 // QueryVendor chains the current query on the "vendor" edge.
 func (wq *WarehouseQuery) QueryVendor() *VendorQuery {
-	query := &VendorQuery{config: wq.config}
+	query := (&VendorClient{config: wq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := wq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -130,7 +128,7 @@ func (wq *WarehouseQuery) QueryVendor() *VendorQuery {
 // First returns the first Warehouse entity from the query.
 // Returns a *NotFoundError when no Warehouse was found.
 func (wq *WarehouseQuery) First(ctx context.Context) (*Warehouse, error) {
-	nodes, err := wq.Limit(1).All(ctx)
+	nodes, err := wq.Limit(1).All(setContextOp(ctx, wq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +151,7 @@ func (wq *WarehouseQuery) FirstX(ctx context.Context) *Warehouse {
 // Returns a *NotFoundError when no Warehouse ID was found.
 func (wq *WarehouseQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = wq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = wq.Limit(1).IDs(setContextOp(ctx, wq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -176,7 +174,7 @@ func (wq *WarehouseQuery) FirstIDX(ctx context.Context) uuid.UUID {
 // Returns a *NotSingularError when more than one Warehouse entity is found.
 // Returns a *NotFoundError when no Warehouse entities are found.
 func (wq *WarehouseQuery) Only(ctx context.Context) (*Warehouse, error) {
-	nodes, err := wq.Limit(2).All(ctx)
+	nodes, err := wq.Limit(2).All(setContextOp(ctx, wq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +202,7 @@ func (wq *WarehouseQuery) OnlyX(ctx context.Context) *Warehouse {
 // Returns a *NotFoundError when no entities are found.
 func (wq *WarehouseQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = wq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = wq.Limit(2).IDs(setContextOp(ctx, wq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -229,10 +227,12 @@ func (wq *WarehouseQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 
 // All executes the query and returns a list of Warehouses.
 func (wq *WarehouseQuery) All(ctx context.Context) ([]*Warehouse, error) {
+	ctx = setContextOp(ctx, wq.ctx, "All")
 	if err := wq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return wq.sqlAll(ctx)
+	qr := querierAll[[]*Warehouse, *WarehouseQuery]()
+	return withInterceptors[[]*Warehouse](ctx, wq, qr, wq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -247,6 +247,7 @@ func (wq *WarehouseQuery) AllX(ctx context.Context) []*Warehouse {
 // IDs executes the query and returns a list of Warehouse IDs.
 func (wq *WarehouseQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	var ids []uuid.UUID
+	ctx = setContextOp(ctx, wq.ctx, "IDs")
 	if err := wq.Select(warehouse.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -264,10 +265,11 @@ func (wq *WarehouseQuery) IDsX(ctx context.Context) []uuid.UUID {
 
 // Count returns the count of the given query.
 func (wq *WarehouseQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, wq.ctx, "Count")
 	if err := wq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return wq.sqlCount(ctx)
+	return withInterceptors[int](ctx, wq, querierCount[*WarehouseQuery](), wq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -281,6 +283,7 @@ func (wq *WarehouseQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (wq *WarehouseQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, wq.ctx, "Exist")
 	switch _, err := wq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -308,23 +311,22 @@ func (wq *WarehouseQuery) Clone() *WarehouseQuery {
 	}
 	return &WarehouseQuery{
 		config:       wq.config,
-		limit:        wq.limit,
-		offset:       wq.offset,
+		ctx:          wq.ctx.Clone(),
 		order:        append([]OrderFunc{}, wq.order...),
+		inters:       append([]Interceptor{}, wq.inters...),
 		predicates:   append([]predicate.Warehouse{}, wq.predicates...),
 		withProducts: wq.withProducts.Clone(),
 		withVendor:   wq.withVendor.Clone(),
 		// clone intermediate query.
-		sql:    wq.sql.Clone(),
-		path:   wq.path,
-		unique: wq.unique,
+		sql:  wq.sql.Clone(),
+		path: wq.path,
 	}
 }
 
 // WithProducts tells the query-builder to eager-load the nodes that are connected to
 // the "products" edge. The optional arguments are used to configure the query builder of the edge.
 func (wq *WarehouseQuery) WithProducts(opts ...func(*ProductQuery)) *WarehouseQuery {
-	query := &ProductQuery{config: wq.config}
+	query := (&ProductClient{config: wq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -335,7 +337,7 @@ func (wq *WarehouseQuery) WithProducts(opts ...func(*ProductQuery)) *WarehouseQu
 // WithVendor tells the query-builder to eager-load the nodes that are connected to
 // the "vendor" edge. The optional arguments are used to configure the query builder of the edge.
 func (wq *WarehouseQuery) WithVendor(opts ...func(*VendorQuery)) *WarehouseQuery {
-	query := &VendorQuery{config: wq.config}
+	query := (&VendorClient{config: wq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -358,16 +360,11 @@ func (wq *WarehouseQuery) WithVendor(opts ...func(*VendorQuery)) *WarehouseQuery
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (wq *WarehouseQuery) GroupBy(field string, fields ...string) *WarehouseGroupBy {
-	grbuild := &WarehouseGroupBy{config: wq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := wq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return wq.sqlQuery(ctx), nil
-	}
+	wq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &WarehouseGroupBy{build: wq}
+	grbuild.flds = &wq.ctx.Fields
 	grbuild.label = warehouse.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -384,11 +381,11 @@ func (wq *WarehouseQuery) GroupBy(field string, fields ...string) *WarehouseGrou
 //		Select(warehouse.FieldName).
 //		Scan(ctx, &v)
 func (wq *WarehouseQuery) Select(fields ...string) *WarehouseSelect {
-	wq.fields = append(wq.fields, fields...)
-	selbuild := &WarehouseSelect{WarehouseQuery: wq}
-	selbuild.label = warehouse.Label
-	selbuild.flds, selbuild.scan = &wq.fields, selbuild.Scan
-	return selbuild
+	wq.ctx.Fields = append(wq.ctx.Fields, fields...)
+	sbuild := &WarehouseSelect{WarehouseQuery: wq}
+	sbuild.label = warehouse.Label
+	sbuild.flds, sbuild.scan = &wq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a WarehouseSelect configured with the given aggregations.
@@ -397,7 +394,17 @@ func (wq *WarehouseQuery) Aggregate(fns ...AggregateFunc) *WarehouseSelect {
 }
 
 func (wq *WarehouseQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range wq.fields {
+	for _, inter := range wq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, wq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range wq.ctx.Fields {
 		if !warehouse.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -521,6 +528,9 @@ func (wq *WarehouseQuery) loadVendor(ctx context.Context, query *VendorQuery, no
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(vendor.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -543,9 +553,9 @@ func (wq *WarehouseQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(wq.modifiers) > 0 {
 		_spec.Modifiers = wq.modifiers
 	}
-	_spec.Node.Columns = wq.fields
-	if len(wq.fields) > 0 {
-		_spec.Unique = wq.unique != nil && *wq.unique
+	_spec.Node.Columns = wq.ctx.Fields
+	if len(wq.ctx.Fields) > 0 {
+		_spec.Unique = wq.ctx.Unique != nil && *wq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, wq.driver, _spec)
 }
@@ -563,10 +573,10 @@ func (wq *WarehouseQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   wq.sql,
 		Unique: true,
 	}
-	if unique := wq.unique; unique != nil {
+	if unique := wq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := wq.fields; len(fields) > 0 {
+	if fields := wq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, warehouse.FieldID)
 		for i := range fields {
@@ -582,10 +592,10 @@ func (wq *WarehouseQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := wq.limit; limit != nil {
+	if limit := wq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := wq.offset; offset != nil {
+	if offset := wq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := wq.order; len(ps) > 0 {
@@ -601,7 +611,7 @@ func (wq *WarehouseQuery) querySpec() *sqlgraph.QuerySpec {
 func (wq *WarehouseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(wq.driver.Dialect())
 	t1 := builder.Table(warehouse.Table)
-	columns := wq.fields
+	columns := wq.ctx.Fields
 	if len(columns) == 0 {
 		columns = warehouse.Columns
 	}
@@ -610,7 +620,7 @@ func (wq *WarehouseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = wq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if wq.unique != nil && *wq.unique {
+	if wq.ctx.Unique != nil && *wq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range wq.predicates {
@@ -619,12 +629,12 @@ func (wq *WarehouseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range wq.order {
 		p(selector)
 	}
-	if offset := wq.offset; offset != nil {
+	if offset := wq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := wq.limit; limit != nil {
+	if limit := wq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -633,7 +643,7 @@ func (wq *WarehouseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // WithNamedProducts tells the query-builder to eager-load the nodes that are connected to the "products"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (wq *WarehouseQuery) WithNamedProducts(name string, opts ...func(*ProductQuery)) *WarehouseQuery {
-	query := &ProductQuery{config: wq.config}
+	query := (&ProductClient{config: wq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -646,13 +656,8 @@ func (wq *WarehouseQuery) WithNamedProducts(name string, opts ...func(*ProductQu
 
 // WarehouseGroupBy is the group-by builder for Warehouse entities.
 type WarehouseGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *WarehouseQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -661,58 +666,46 @@ func (wgb *WarehouseGroupBy) Aggregate(fns ...AggregateFunc) *WarehouseGroupBy {
 	return wgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (wgb *WarehouseGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := wgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, wgb.build.ctx, "GroupBy")
+	if err := wgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	wgb.sql = query
-	return wgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*WarehouseQuery, *WarehouseGroupBy](ctx, wgb.build, wgb, wgb.build.inters, v)
 }
 
-func (wgb *WarehouseGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range wgb.fields {
-		if !warehouse.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (wgb *WarehouseGroupBy) sqlScan(ctx context.Context, root *WarehouseQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(wgb.fns))
+	for _, fn := range wgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := wgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*wgb.flds)+len(wgb.fns))
+		for _, f := range *wgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*wgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := wgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (wgb *WarehouseGroupBy) sqlQuery() *sql.Selector {
-	selector := wgb.sql.Select()
-	aggregation := make([]string, 0, len(wgb.fns))
-	for _, fn := range wgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(wgb.fields)+len(wgb.fns))
-		for _, f := range wgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(wgb.fields...)...)
-}
-
 // WarehouseSelect is the builder for selecting fields of Warehouse entities.
 type WarehouseSelect struct {
 	*WarehouseQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -723,26 +716,27 @@ func (ws *WarehouseSelect) Aggregate(fns ...AggregateFunc) *WarehouseSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ws *WarehouseSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, ws.ctx, "Select")
 	if err := ws.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ws.sql = ws.WarehouseQuery.sqlQuery(ctx)
-	return ws.sqlScan(ctx, v)
+	return scanWithInterceptors[*WarehouseQuery, *WarehouseSelect](ctx, ws.WarehouseQuery, ws, ws.inters, v)
 }
 
-func (ws *WarehouseSelect) sqlScan(ctx context.Context, v any) error {
+func (ws *WarehouseSelect) sqlScan(ctx context.Context, root *WarehouseQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(ws.fns))
 	for _, fn := range ws.fns {
-		aggregation = append(aggregation, fn(ws.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*ws.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		ws.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		ws.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := ws.sql.Query()
+	query, args := selector.Query()
 	if err := ws.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

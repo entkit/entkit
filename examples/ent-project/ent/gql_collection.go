@@ -50,7 +50,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CountryQuery{config: c.config}
+				query = (&CountryClient{config: c.config}).Query()
 			)
 			args := newCountryPaginateArgs(fieldArgs(ctx, new(CountryWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -137,7 +137,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &PhoneQuery{config: c.config}
+				query = (&PhoneClient{config: c.config}).Query()
 			)
 			args := newPhonePaginateArgs(fieldArgs(ctx, new(PhoneWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -220,7 +220,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &EmailQuery{config: c.config}
+				query = (&EmailClient{config: c.config}).Query()
 			)
 			args := newEmailPaginateArgs(fieldArgs(ctx, new(EmailWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -303,7 +303,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &WebsiteQuery{config: c.config}
+				query = (&WebsiteClient{config: c.config}).Query()
 			)
 			args := newWebsitePaginateArgs(fieldArgs(ctx, new(WebsiteWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -386,7 +386,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &LocationQuery{config: c.config}
+				query = (&LocationClient{config: c.config}).Query()
 			)
 			args := newLocationPaginateArgs(fieldArgs(ctx, new(LocationWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -469,7 +469,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &ImageQuery{config: c.config}
+				query = (&ImageClient{config: c.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -479,7 +479,7 @@ func (c *CompanyQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &ImageQuery{config: c.config}
+				query = (&ImageClient{config: c.config}).Query()
 			)
 			args := newImagePaginateArgs(fieldArgs(ctx, new(ImageWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -634,7 +634,7 @@ func (c *CountryQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: c.config}
+				query = (&CompanyClient{config: c.config}).Query()
 			)
 			args := newCompanyPaginateArgs(fieldArgs(ctx, new(CompanyWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -721,7 +721,7 @@ func (c *CountryQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &PhoneQuery{config: c.config}
+				query = (&PhoneClient{config: c.config}).Query()
 			)
 			args := newPhonePaginateArgs(fieldArgs(ctx, new(PhoneWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -804,7 +804,7 @@ func (c *CountryQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &EmailQuery{config: c.config}
+				query = (&EmailClient{config: c.config}).Query()
 			)
 			args := newEmailPaginateArgs(fieldArgs(ctx, new(EmailWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -887,7 +887,7 @@ func (c *CountryQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &WebsiteQuery{config: c.config}
+				query = (&WebsiteClient{config: c.config}).Query()
 			)
 			args := newWebsitePaginateArgs(fieldArgs(ctx, new(WebsiteWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -970,7 +970,7 @@ func (c *CountryQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &LocationQuery{config: c.config}
+				query = (&LocationClient{config: c.config}).Query()
 			)
 			args := newLocationPaginateArgs(fieldArgs(ctx, new(LocationWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -1125,7 +1125,7 @@ func (e *EmailQuery) collectField(ctx context.Context, op *graphql.OperationCont
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: e.config}
+				query = (&CompanyClient{config: e.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1135,7 +1135,7 @@ func (e *EmailQuery) collectField(ctx context.Context, op *graphql.OperationCont
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CountryQuery{config: e.config}
+				query = (&CountryClient{config: e.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1217,7 +1217,7 @@ func (i *ImageQuery) collectField(ctx context.Context, op *graphql.OperationCont
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: i.config}
+				query = (&CompanyClient{config: i.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1227,7 +1227,7 @@ func (i *ImageQuery) collectField(ctx context.Context, op *graphql.OperationCont
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: i.config}
+				query = (&CompanyClient{config: i.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1309,7 +1309,7 @@ func (l *LocationQuery) collectField(ctx context.Context, op *graphql.OperationC
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: l.config}
+				query = (&CompanyClient{config: l.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1319,7 +1319,7 @@ func (l *LocationQuery) collectField(ctx context.Context, op *graphql.OperationC
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CountryQuery{config: l.config}
+				query = (&CountryClient{config: l.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1401,7 +1401,7 @@ func (ph *PhoneQuery) collectField(ctx context.Context, op *graphql.OperationCon
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: ph.config}
+				query = (&CompanyClient{config: ph.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1411,7 +1411,7 @@ func (ph *PhoneQuery) collectField(ctx context.Context, op *graphql.OperationCon
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CountryQuery{config: ph.config}
+				query = (&CountryClient{config: ph.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1493,7 +1493,7 @@ func (pr *ProductQuery) collectField(ctx context.Context, op *graphql.OperationC
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &WarehouseQuery{config: pr.config}
+				query = (&WarehouseClient{config: pr.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1503,7 +1503,7 @@ func (pr *ProductQuery) collectField(ctx context.Context, op *graphql.OperationC
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &VendorQuery{config: pr.config}
+				query = (&VendorClient{config: pr.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1585,7 +1585,7 @@ func (v *VendorQuery) collectField(ctx context.Context, op *graphql.OperationCon
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &WarehouseQuery{config: v.config}
+				query = (&WarehouseClient{config: v.config}).Query()
 			)
 			args := newWarehousePaginateArgs(fieldArgs(ctx, new(WarehouseWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -1668,7 +1668,7 @@ func (v *VendorQuery) collectField(ctx context.Context, op *graphql.OperationCon
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &ProductQuery{config: v.config}
+				query = (&ProductClient{config: v.config}).Query()
 			)
 			args := newProductPaginateArgs(fieldArgs(ctx, new(ProductWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -1823,7 +1823,7 @@ func (w *WarehouseQuery) collectField(ctx context.Context, op *graphql.Operation
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &ProductQuery{config: w.config}
+				query = (&ProductClient{config: w.config}).Query()
 			)
 			args := newProductPaginateArgs(fieldArgs(ctx, new(ProductWhereInput), path...))
 			if err := validateFirstLast(args.first, args.last); err != nil {
@@ -1906,7 +1906,7 @@ func (w *WarehouseQuery) collectField(ctx context.Context, op *graphql.Operation
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &VendorQuery{config: w.config}
+				query = (&VendorClient{config: w.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1988,7 +1988,7 @@ func (w *WebsiteQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CompanyQuery{config: w.config}
+				query = (&CompanyClient{config: w.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err
@@ -1998,7 +1998,7 @@ func (w *WebsiteQuery) collectField(ctx context.Context, op *graphql.OperationCo
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = &CountryQuery{config: w.config}
+				query = (&CountryClient{config: w.config}).Query()
 			)
 			if err := query.collectField(ctx, op, field, path, satisfies...); err != nil {
 				return err

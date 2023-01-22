@@ -82,7 +82,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
                 {{- range $f := $n.Fields}}
                 {{if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
                 <RA.Form.Item
-                    label="{{ $f.Name | label }}"
+                    label="{{ $f.Name | ER_label }}"
                     name="{{ camel $f.Name }}"
                     rules={[{required: {{ not $f.Optional }}}]}
                     {{- if eq $f.Type.String "time.Time"}}

@@ -34,11 +34,9 @@ import (
 // PhoneQuery is the builder for querying Phone entities.
 type PhoneQuery struct {
 	config
-	limit       *int
-	offset      *int
-	unique      *bool
+	ctx         *QueryContext
 	order       []OrderFunc
-	fields      []string
+	inters      []Interceptor
 	predicates  []predicate.Phone
 	withCompany *CompanyQuery
 	withCountry *CountryQuery
@@ -56,26 +54,26 @@ func (pq *PhoneQuery) Where(ps ...predicate.Phone) *PhoneQuery {
 	return pq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (pq *PhoneQuery) Limit(limit int) *PhoneQuery {
-	pq.limit = &limit
+	pq.ctx.Limit = &limit
 	return pq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (pq *PhoneQuery) Offset(offset int) *PhoneQuery {
-	pq.offset = &offset
+	pq.ctx.Offset = &offset
 	return pq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (pq *PhoneQuery) Unique(unique bool) *PhoneQuery {
-	pq.unique = &unique
+	pq.ctx.Unique = &unique
 	return pq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (pq *PhoneQuery) Order(o ...OrderFunc) *PhoneQuery {
 	pq.order = append(pq.order, o...)
 	return pq
@@ -83,7 +81,7 @@ func (pq *PhoneQuery) Order(o ...OrderFunc) *PhoneQuery {
 
 // QueryCompany chains the current query on the "company" edge.
 func (pq *PhoneQuery) QueryCompany() *CompanyQuery {
-	query := &CompanyQuery{config: pq.config}
+	query := (&CompanyClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -105,7 +103,7 @@ func (pq *PhoneQuery) QueryCompany() *CompanyQuery {
 
 // QueryCountry chains the current query on the "country" edge.
 func (pq *PhoneQuery) QueryCountry() *CountryQuery {
-	query := &CountryQuery{config: pq.config}
+	query := (&CountryClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -128,7 +126,7 @@ func (pq *PhoneQuery) QueryCountry() *CountryQuery {
 // First returns the first Phone entity from the query.
 // Returns a *NotFoundError when no Phone was found.
 func (pq *PhoneQuery) First(ctx context.Context) (*Phone, error) {
-	nodes, err := pq.Limit(1).All(ctx)
+	nodes, err := pq.Limit(1).All(setContextOp(ctx, pq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +149,7 @@ func (pq *PhoneQuery) FirstX(ctx context.Context) *Phone {
 // Returns a *NotFoundError when no Phone ID was found.
 func (pq *PhoneQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = pq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -174,7 +172,7 @@ func (pq *PhoneQuery) FirstIDX(ctx context.Context) uuid.UUID {
 // Returns a *NotSingularError when more than one Phone entity is found.
 // Returns a *NotFoundError when no Phone entities are found.
 func (pq *PhoneQuery) Only(ctx context.Context) (*Phone, error) {
-	nodes, err := pq.Limit(2).All(ctx)
+	nodes, err := pq.Limit(2).All(setContextOp(ctx, pq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +200,7 @@ func (pq *PhoneQuery) OnlyX(ctx context.Context) *Phone {
 // Returns a *NotFoundError when no entities are found.
 func (pq *PhoneQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = pq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -227,10 +225,12 @@ func (pq *PhoneQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 
 // All executes the query and returns a list of Phones.
 func (pq *PhoneQuery) All(ctx context.Context) ([]*Phone, error) {
+	ctx = setContextOp(ctx, pq.ctx, "All")
 	if err := pq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return pq.sqlAll(ctx)
+	qr := querierAll[[]*Phone, *PhoneQuery]()
+	return withInterceptors[[]*Phone](ctx, pq, qr, pq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -245,6 +245,7 @@ func (pq *PhoneQuery) AllX(ctx context.Context) []*Phone {
 // IDs executes the query and returns a list of Phone IDs.
 func (pq *PhoneQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	var ids []uuid.UUID
+	ctx = setContextOp(ctx, pq.ctx, "IDs")
 	if err := pq.Select(phone.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -262,10 +263,11 @@ func (pq *PhoneQuery) IDsX(ctx context.Context) []uuid.UUID {
 
 // Count returns the count of the given query.
 func (pq *PhoneQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, pq.ctx, "Count")
 	if err := pq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return pq.sqlCount(ctx)
+	return withInterceptors[int](ctx, pq, querierCount[*PhoneQuery](), pq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -279,6 +281,7 @@ func (pq *PhoneQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (pq *PhoneQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, pq.ctx, "Exist")
 	switch _, err := pq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -306,23 +309,22 @@ func (pq *PhoneQuery) Clone() *PhoneQuery {
 	}
 	return &PhoneQuery{
 		config:      pq.config,
-		limit:       pq.limit,
-		offset:      pq.offset,
+		ctx:         pq.ctx.Clone(),
 		order:       append([]OrderFunc{}, pq.order...),
+		inters:      append([]Interceptor{}, pq.inters...),
 		predicates:  append([]predicate.Phone{}, pq.predicates...),
 		withCompany: pq.withCompany.Clone(),
 		withCountry: pq.withCountry.Clone(),
 		// clone intermediate query.
-		sql:    pq.sql.Clone(),
-		path:   pq.path,
-		unique: pq.unique,
+		sql:  pq.sql.Clone(),
+		path: pq.path,
 	}
 }
 
 // WithCompany tells the query-builder to eager-load the nodes that are connected to
 // the "company" edge. The optional arguments are used to configure the query builder of the edge.
 func (pq *PhoneQuery) WithCompany(opts ...func(*CompanyQuery)) *PhoneQuery {
-	query := &CompanyQuery{config: pq.config}
+	query := (&CompanyClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -333,7 +335,7 @@ func (pq *PhoneQuery) WithCompany(opts ...func(*CompanyQuery)) *PhoneQuery {
 // WithCountry tells the query-builder to eager-load the nodes that are connected to
 // the "country" edge. The optional arguments are used to configure the query builder of the edge.
 func (pq *PhoneQuery) WithCountry(opts ...func(*CountryQuery)) *PhoneQuery {
-	query := &CountryQuery{config: pq.config}
+	query := (&CountryClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -356,16 +358,11 @@ func (pq *PhoneQuery) WithCountry(opts ...func(*CountryQuery)) *PhoneQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (pq *PhoneQuery) GroupBy(field string, fields ...string) *PhoneGroupBy {
-	grbuild := &PhoneGroupBy{config: pq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return pq.sqlQuery(ctx), nil
-	}
+	pq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &PhoneGroupBy{build: pq}
+	grbuild.flds = &pq.ctx.Fields
 	grbuild.label = phone.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -382,11 +379,11 @@ func (pq *PhoneQuery) GroupBy(field string, fields ...string) *PhoneGroupBy {
 //		Select(phone.FieldTitle).
 //		Scan(ctx, &v)
 func (pq *PhoneQuery) Select(fields ...string) *PhoneSelect {
-	pq.fields = append(pq.fields, fields...)
-	selbuild := &PhoneSelect{PhoneQuery: pq}
-	selbuild.label = phone.Label
-	selbuild.flds, selbuild.scan = &pq.fields, selbuild.Scan
-	return selbuild
+	pq.ctx.Fields = append(pq.ctx.Fields, fields...)
+	sbuild := &PhoneSelect{PhoneQuery: pq}
+	sbuild.label = phone.Label
+	sbuild.flds, sbuild.scan = &pq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a PhoneSelect configured with the given aggregations.
@@ -395,7 +392,17 @@ func (pq *PhoneQuery) Aggregate(fns ...AggregateFunc) *PhoneSelect {
 }
 
 func (pq *PhoneQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range pq.fields {
+	for _, inter := range pq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, pq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range pq.ctx.Fields {
 		if !phone.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -480,6 +487,9 @@ func (pq *PhoneQuery) loadCompany(ctx context.Context, query *CompanyQuery, node
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(company.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -509,6 +519,9 @@ func (pq *PhoneQuery) loadCountry(ctx context.Context, query *CountryQuery, node
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(country.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -531,9 +544,9 @@ func (pq *PhoneQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(pq.modifiers) > 0 {
 		_spec.Modifiers = pq.modifiers
 	}
-	_spec.Node.Columns = pq.fields
-	if len(pq.fields) > 0 {
-		_spec.Unique = pq.unique != nil && *pq.unique
+	_spec.Node.Columns = pq.ctx.Fields
+	if len(pq.ctx.Fields) > 0 {
+		_spec.Unique = pq.ctx.Unique != nil && *pq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, pq.driver, _spec)
 }
@@ -551,10 +564,10 @@ func (pq *PhoneQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   pq.sql,
 		Unique: true,
 	}
-	if unique := pq.unique; unique != nil {
+	if unique := pq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := pq.fields; len(fields) > 0 {
+	if fields := pq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, phone.FieldID)
 		for i := range fields {
@@ -570,10 +583,10 @@ func (pq *PhoneQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := pq.limit; limit != nil {
+	if limit := pq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := pq.offset; offset != nil {
+	if offset := pq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := pq.order; len(ps) > 0 {
@@ -589,7 +602,7 @@ func (pq *PhoneQuery) querySpec() *sqlgraph.QuerySpec {
 func (pq *PhoneQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(pq.driver.Dialect())
 	t1 := builder.Table(phone.Table)
-	columns := pq.fields
+	columns := pq.ctx.Fields
 	if len(columns) == 0 {
 		columns = phone.Columns
 	}
@@ -598,7 +611,7 @@ func (pq *PhoneQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = pq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if pq.unique != nil && *pq.unique {
+	if pq.ctx.Unique != nil && *pq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range pq.predicates {
@@ -607,12 +620,12 @@ func (pq *PhoneQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range pq.order {
 		p(selector)
 	}
-	if offset := pq.offset; offset != nil {
+	if offset := pq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := pq.limit; limit != nil {
+	if limit := pq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -620,13 +633,8 @@ func (pq *PhoneQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // PhoneGroupBy is the group-by builder for Phone entities.
 type PhoneGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *PhoneQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -635,58 +643,46 @@ func (pgb *PhoneGroupBy) Aggregate(fns ...AggregateFunc) *PhoneGroupBy {
 	return pgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (pgb *PhoneGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := pgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, pgb.build.ctx, "GroupBy")
+	if err := pgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	pgb.sql = query
-	return pgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*PhoneQuery, *PhoneGroupBy](ctx, pgb.build, pgb, pgb.build.inters, v)
 }
 
-func (pgb *PhoneGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range pgb.fields {
-		if !phone.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (pgb *PhoneGroupBy) sqlScan(ctx context.Context, root *PhoneQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(pgb.fns))
+	for _, fn := range pgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := pgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*pgb.flds)+len(pgb.fns))
+		for _, f := range *pgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*pgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := pgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := pgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (pgb *PhoneGroupBy) sqlQuery() *sql.Selector {
-	selector := pgb.sql.Select()
-	aggregation := make([]string, 0, len(pgb.fns))
-	for _, fn := range pgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(pgb.fields)+len(pgb.fns))
-		for _, f := range pgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(pgb.fields...)...)
-}
-
 // PhoneSelect is the builder for selecting fields of Phone entities.
 type PhoneSelect struct {
 	*PhoneQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -697,26 +693,27 @@ func (ps *PhoneSelect) Aggregate(fns ...AggregateFunc) *PhoneSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ps *PhoneSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, ps.ctx, "Select")
 	if err := ps.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ps.sql = ps.PhoneQuery.sqlQuery(ctx)
-	return ps.sqlScan(ctx, v)
+	return scanWithInterceptors[*PhoneQuery, *PhoneSelect](ctx, ps.PhoneQuery, ps, ps.inters, v)
 }
 
-func (ps *PhoneSelect) sqlScan(ctx context.Context, v any) error {
+func (ps *PhoneSelect) sqlScan(ctx context.Context, root *PhoneQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(ps.fns))
 	for _, fn := range ps.fns {
-		aggregation = append(aggregation, fn(ps.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*ps.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		ps.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		ps.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := ps.sql.Query()
+	query, args := selector.Query()
 	if err := ps.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

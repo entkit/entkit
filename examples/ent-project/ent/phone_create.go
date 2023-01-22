@@ -119,50 +119,8 @@ func (pc *PhoneCreate) Mutation() *PhoneMutation {
 
 // Save creates the Phone in the database.
 func (pc *PhoneCreate) Save(ctx context.Context) (*Phone, error) {
-	var (
-		err  error
-		node *Phone
-	)
 	pc.defaults()
-	if len(pc.hooks) == 0 {
-		if err = pc.check(); err != nil {
-			return nil, err
-		}
-		node, err = pc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*PhoneMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = pc.check(); err != nil {
-				return nil, err
-			}
-			pc.mutation = mutation
-			if node, err = pc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(pc.hooks) - 1; i >= 0; i-- {
-			if pc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = pc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, pc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Phone)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from PhoneMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Phone, PhoneMutation](ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -233,6 +191,9 @@ func (pc *PhoneCreate) check() error {
 }
 
 func (pc *PhoneCreate) sqlSave(ctx context.Context) (*Phone, error) {
+	if err := pc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := pc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, pc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -247,6 +208,8 @@ func (pc *PhoneCreate) sqlSave(ctx context.Context) (*Phone, error) {
 			return nil, err
 		}
 	}
+	pc.mutation.id = &_node.ID
+	pc.mutation.done = true
 	return _node, nil
 }
 

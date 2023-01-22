@@ -165,19 +165,19 @@ func (ph *Phone) assignValues(columns []string, values []any) error {
 
 // QueryCompany queries the "company" edge of the Phone entity.
 func (ph *Phone) QueryCompany() *CompanyQuery {
-	return (&PhoneClient{config: ph.config}).QueryCompany(ph)
+	return NewPhoneClient(ph.config).QueryCompany(ph)
 }
 
 // QueryCountry queries the "country" edge of the Phone entity.
 func (ph *Phone) QueryCountry() *CountryQuery {
-	return (&PhoneClient{config: ph.config}).QueryCountry(ph)
+	return NewPhoneClient(ph.config).QueryCountry(ph)
 }
 
 // Update returns a builder for updating this Phone.
 // Note that you need to call Phone.Unwrap() before calling this method if this Phone
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (ph *Phone) Update() *PhoneUpdateOne {
-	return (&PhoneClient{config: ph.config}).UpdateOne(ph)
+	return NewPhoneClient(ph.config).UpdateOne(ph)
 }
 
 // Unwrap unwraps the Phone entity that was returned from a transaction after it was closed,

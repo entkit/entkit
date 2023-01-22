@@ -16,7 +16,7 @@ export const Resources = [
         show: Show.{{ $n.Name }}Show,
         create: Create.{{ $n.Name }}Create,
         edit: Edit.{{ $n.Name }}Edit,
-        icon: <Icons.{{$n.Annotations.REFINE.Icon}}/>,
+        icon: <Icons.{{default "FileOutlined" $n.Annotations.REFINE.Icon}}/>,
     },
     {{- end}}
 ];

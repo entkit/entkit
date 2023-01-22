@@ -63,5 +63,5 @@ func main() {
 
 	r.Any("/query", gin.WrapH(srv))
 
-	panic(r.Run(":8081"))
+	panic(r.Run(":80"))
 }

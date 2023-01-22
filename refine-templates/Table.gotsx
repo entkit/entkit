@@ -3,6 +3,7 @@
 
 import React, {useState} from "react";
 import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
+import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
@@ -11,12 +12,10 @@ import * as FieldView from "./field-view";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
-export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError>}> = ( props ) => {
+export type {{$n.Name}}TableProps = RA.TableProps<Interfaces.I{{$n.Name}}> & { extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError> }
+export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, ...props} ) => {
 
-    const [cursors, setCursors] = useState<Cursors>({
-        first: 10,
-    })
-
+    const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
 
     {{- $allFields := prepend $n.Fields $n.ID }}
@@ -44,24 +43,33 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                 "{{ $n.ID.Name }}",
                 {{- range $f :=  $n.Fields}}
                 "{{ $f.Name | camel }}",
+                {{- end }}
+                {{- range $e :=  $n.Edges}}
+                {{- if $e.Unique }}
+                {{- $titleField := (ER_titleField $e.Type) }}
+                {"{{ $e.Name | camel }}": [ "{{$e.Type.ID.Name}}", "{{$titleField.Name}}" ]},
+                {{- end}}
                 {{- end}}
             ],
             cursors,
         },
         hasPagination: true,
-        ...props.extendTable,
+        ...extendTable,
     });
 
+
     const data = table.tableQueryResult.data as any
+    const { Link } = RefineReactRouter;
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="id">
+            <RA.Table {...table.tableProps} pagination={false} rowKey="{{$n.ID.Name}}" {...props}>
+                { /* region Fields */ }
                 {{- range $f := $allFields }}
                 {{- if not $f.Annotations.REFINE.HideOnList }}
                 <RA.Table.Column
                     dataIndex="{{ camel $f.Name }}"
-                    title="{{ $f.Name | label }}"
+                    title="{{ $f.Name | ER_label }}"
                     {{- if has $f $orderFields }}
                     sorter={
                         {}
@@ -97,6 +105,27 @@ export const {{$n.Name}}Table :React.FC<IResourceComponentsProps & {extendTable?
                 />
                 {{- end }}
                 {{- end }}
+                {/* endregion */}
+
+                { /* region Edges */ }
+                {{- range $e := $n.Edges }}
+                {{- if not $e.Annotations.REFINE.HideOnList }}
+                {{- if $e.Unique }}
+                {{- $titleField := (ER_titleField $e.Type) }}
+                <RA.Table.Column
+                    dataIndex="{{ camel $e.Name }}"
+                    title="{{ $e.Name | ER_label }}"
+                    render={
+                        (value)=>(<Link to={ "/{{$e.Type.Name}}/show/"+ value?.id}>
+                            { value?.{{$titleField.Name}} }
+                        </Link>)
+                    }
+                />
+                {{- end }}
+                {{- end }}
+                {{- end }}
+                {/* endregion Edges*/}
+
                 <RA.Table.Column<Interfaces.I{{ $n.Name }}>
                     title="Actions"
                     dataIndex="actions"

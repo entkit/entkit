@@ -195,44 +195,44 @@ func (c *Company) assignValues(columns []string, values []any) error {
 
 // QueryCountries queries the "countries" edge of the Company entity.
 func (c *Company) QueryCountries() *CountryQuery {
-	return (&CompanyClient{config: c.config}).QueryCountries(c)
+	return NewCompanyClient(c.config).QueryCountries(c)
 }
 
 // QueryPhones queries the "phones" edge of the Company entity.
 func (c *Company) QueryPhones() *PhoneQuery {
-	return (&CompanyClient{config: c.config}).QueryPhones(c)
+	return NewCompanyClient(c.config).QueryPhones(c)
 }
 
 // QueryEmails queries the "emails" edge of the Company entity.
 func (c *Company) QueryEmails() *EmailQuery {
-	return (&CompanyClient{config: c.config}).QueryEmails(c)
+	return NewCompanyClient(c.config).QueryEmails(c)
 }
 
 // QueryWebsites queries the "websites" edge of the Company entity.
 func (c *Company) QueryWebsites() *WebsiteQuery {
-	return (&CompanyClient{config: c.config}).QueryWebsites(c)
+	return NewCompanyClient(c.config).QueryWebsites(c)
 }
 
 // QueryLocations queries the "locations" edge of the Company entity.
 func (c *Company) QueryLocations() *LocationQuery {
-	return (&CompanyClient{config: c.config}).QueryLocations(c)
+	return NewCompanyClient(c.config).QueryLocations(c)
 }
 
 // QueryLogoImage queries the "logo_image" edge of the Company entity.
 func (c *Company) QueryLogoImage() *ImageQuery {
-	return (&CompanyClient{config: c.config}).QueryLogoImage(c)
+	return NewCompanyClient(c.config).QueryLogoImage(c)
 }
 
 // QueryGalleryImages queries the "gallery_images" edge of the Company entity.
 func (c *Company) QueryGalleryImages() *ImageQuery {
-	return (&CompanyClient{config: c.config}).QueryGalleryImages(c)
+	return NewCompanyClient(c.config).QueryGalleryImages(c)
 }
 
 // Update returns a builder for updating this Company.
 // Note that you need to call Company.Unwrap() before calling this method if this Company
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Company) Update() *CompanyUpdateOne {
-	return (&CompanyClient{config: c.config}).UpdateOne(c)
+	return NewCompanyClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Company entity that was returned from a transaction after it was closed,

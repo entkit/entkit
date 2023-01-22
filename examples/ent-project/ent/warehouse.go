@@ -172,19 +172,19 @@ func (w *Warehouse) assignValues(columns []string, values []any) error {
 
 // QueryProducts queries the "products" edge of the Warehouse entity.
 func (w *Warehouse) QueryProducts() *ProductQuery {
-	return (&WarehouseClient{config: w.config}).QueryProducts(w)
+	return NewWarehouseClient(w.config).QueryProducts(w)
 }
 
 // QueryVendor queries the "vendor" edge of the Warehouse entity.
 func (w *Warehouse) QueryVendor() *VendorQuery {
-	return (&WarehouseClient{config: w.config}).QueryVendor(w)
+	return NewWarehouseClient(w.config).QueryVendor(w)
 }
 
 // Update returns a builder for updating this Warehouse.
 // Note that you need to call Warehouse.Unwrap() before calling this method if this Warehouse
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (w *Warehouse) Update() *WarehouseUpdateOne {
-	return (&WarehouseClient{config: w.config}).UpdateOne(w)
+	return NewWarehouseClient(w.config).UpdateOne(w)
 }
 
 // Unwrap unwraps the Warehouse entity that was returned from a transaction after it was closed,

@@ -148,19 +148,19 @@ func (i *Image) assignValues(columns []string, values []any) error {
 
 // QueryGalleryCompany queries the "gallery_company" edge of the Image entity.
 func (i *Image) QueryGalleryCompany() *CompanyQuery {
-	return (&ImageClient{config: i.config}).QueryGalleryCompany(i)
+	return NewImageClient(i.config).QueryGalleryCompany(i)
 }
 
 // QueryLogoCompany queries the "logo_company" edge of the Image entity.
 func (i *Image) QueryLogoCompany() *CompanyQuery {
-	return (&ImageClient{config: i.config}).QueryLogoCompany(i)
+	return NewImageClient(i.config).QueryLogoCompany(i)
 }
 
 // Update returns a builder for updating this Image.
 // Note that you need to call Image.Unwrap() before calling this method if this Image
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (i *Image) Update() *ImageUpdateOne {
-	return (&ImageClient{config: i.config}).UpdateOne(i)
+	return NewImageClient(i.config).UpdateOne(i)
 }
 
 // Unwrap unwraps the Image entity that was returned from a transaction after it was closed,

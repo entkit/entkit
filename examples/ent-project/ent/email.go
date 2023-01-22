@@ -157,19 +157,19 @@ func (e *Email) assignValues(columns []string, values []any) error {
 
 // QueryCompany queries the "company" edge of the Email entity.
 func (e *Email) QueryCompany() *CompanyQuery {
-	return (&EmailClient{config: e.config}).QueryCompany(e)
+	return NewEmailClient(e.config).QueryCompany(e)
 }
 
 // QueryCountry queries the "country" edge of the Email entity.
 func (e *Email) QueryCountry() *CountryQuery {
-	return (&EmailClient{config: e.config}).QueryCountry(e)
+	return NewEmailClient(e.config).QueryCountry(e)
 }
 
 // Update returns a builder for updating this Email.
 // Note that you need to call Email.Unwrap() before calling this method if this Email
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (e *Email) Update() *EmailUpdateOne {
-	return (&EmailClient{config: e.config}).UpdateOne(e)
+	return NewEmailClient(e.config).UpdateOne(e)
 }
 
 // Unwrap unwraps the Email entity that was returned from a transaction after it was closed,

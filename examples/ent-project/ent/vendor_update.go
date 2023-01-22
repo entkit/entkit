@@ -135,40 +135,7 @@ func (vu *VendorUpdate) RemoveProducts(p ...*Product) *VendorUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (vu *VendorUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(vu.hooks) == 0 {
-		if err = vu.check(); err != nil {
-			return 0, err
-		}
-		affected, err = vu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*VendorMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = vu.check(); err != nil {
-				return 0, err
-			}
-			vu.mutation = mutation
-			affected, err = vu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(vu.hooks) - 1; i >= 0; i-- {
-			if vu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = vu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, vu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, VendorMutation](ctx, vu.sqlSave, vu.mutation, vu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -204,6 +171,9 @@ func (vu *VendorUpdate) check() error {
 }
 
 func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := vu.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   vendor.Table,
@@ -343,6 +313,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	vu.mutation.done = true
 	return n, nil
 }
 
@@ -452,46 +423,7 @@ func (vuo *VendorUpdateOne) Select(field string, fields ...string) *VendorUpdate
 
 // Save executes the query and returns the updated Vendor entity.
 func (vuo *VendorUpdateOne) Save(ctx context.Context) (*Vendor, error) {
-	var (
-		err  error
-		node *Vendor
-	)
-	if len(vuo.hooks) == 0 {
-		if err = vuo.check(); err != nil {
-			return nil, err
-		}
-		node, err = vuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*VendorMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = vuo.check(); err != nil {
-				return nil, err
-			}
-			vuo.mutation = mutation
-			node, err = vuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(vuo.hooks) - 1; i >= 0; i-- {
-			if vuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = vuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, vuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Vendor)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from VendorMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Vendor, VendorMutation](ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -527,6 +459,9 @@ func (vuo *VendorUpdateOne) check() error {
 }
 
 func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err error) {
+	if err := vuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   vendor.Table,
@@ -686,5 +621,6 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 		}
 		return nil, err
 	}
+	vuo.mutation.done = true
 	return _node, nil
 }

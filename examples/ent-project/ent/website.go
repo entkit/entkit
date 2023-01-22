@@ -157,19 +157,19 @@ func (w *Website) assignValues(columns []string, values []any) error {
 
 // QueryCompany queries the "company" edge of the Website entity.
 func (w *Website) QueryCompany() *CompanyQuery {
-	return (&WebsiteClient{config: w.config}).QueryCompany(w)
+	return NewWebsiteClient(w.config).QueryCompany(w)
 }
 
 // QueryCountry queries the "country" edge of the Website entity.
 func (w *Website) QueryCountry() *CountryQuery {
-	return (&WebsiteClient{config: w.config}).QueryCountry(w)
+	return NewWebsiteClient(w.config).QueryCountry(w)
 }
 
 // Update returns a builder for updating this Website.
 // Note that you need to call Website.Unwrap() before calling this method if this Website
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (w *Website) Update() *WebsiteUpdateOne {
-	return (&WebsiteClient{config: w.config}).UpdateOne(w)
+	return NewWebsiteClient(w.config).UpdateOne(w)
 }
 
 // Unwrap unwraps the Website entity that was returned from a transaction after it was closed,

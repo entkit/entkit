@@ -122,19 +122,19 @@ func (v *Vendor) assignValues(columns []string, values []any) error {
 
 // QueryWarehouses queries the "warehouses" edge of the Vendor entity.
 func (v *Vendor) QueryWarehouses() *WarehouseQuery {
-	return (&VendorClient{config: v.config}).QueryWarehouses(v)
+	return NewVendorClient(v.config).QueryWarehouses(v)
 }
 
 // QueryProducts queries the "products" edge of the Vendor entity.
 func (v *Vendor) QueryProducts() *ProductQuery {
-	return (&VendorClient{config: v.config}).QueryProducts(v)
+	return NewVendorClient(v.config).QueryProducts(v)
 }
 
 // Update returns a builder for updating this Vendor.
 // Note that you need to call Vendor.Unwrap() before calling this method if this Vendor
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (v *Vendor) Update() *VendorUpdateOne {
-	return (&VendorClient{config: v.config}).UpdateOne(v)
+	return NewVendorClient(v.config).UpdateOne(v)
 }
 
 // Unwrap unwraps the Vendor entity that was returned from a transaction after it was closed,

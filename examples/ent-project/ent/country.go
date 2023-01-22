@@ -158,34 +158,34 @@ func (c *Country) assignValues(columns []string, values []any) error {
 
 // QueryCompanies queries the "companies" edge of the Country entity.
 func (c *Country) QueryCompanies() *CompanyQuery {
-	return (&CountryClient{config: c.config}).QueryCompanies(c)
+	return NewCountryClient(c.config).QueryCompanies(c)
 }
 
 // QueryPhones queries the "phones" edge of the Country entity.
 func (c *Country) QueryPhones() *PhoneQuery {
-	return (&CountryClient{config: c.config}).QueryPhones(c)
+	return NewCountryClient(c.config).QueryPhones(c)
 }
 
 // QueryEmails queries the "emails" edge of the Country entity.
 func (c *Country) QueryEmails() *EmailQuery {
-	return (&CountryClient{config: c.config}).QueryEmails(c)
+	return NewCountryClient(c.config).QueryEmails(c)
 }
 
 // QueryWebsites queries the "websites" edge of the Country entity.
 func (c *Country) QueryWebsites() *WebsiteQuery {
-	return (&CountryClient{config: c.config}).QueryWebsites(c)
+	return NewCountryClient(c.config).QueryWebsites(c)
 }
 
 // QueryLocations queries the "locations" edge of the Country entity.
 func (c *Country) QueryLocations() *LocationQuery {
-	return (&CountryClient{config: c.config}).QueryLocations(c)
+	return NewCountryClient(c.config).QueryLocations(c)
 }
 
 // Update returns a builder for updating this Country.
 // Note that you need to call Country.Unwrap() before calling this method if this Country
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Country) Update() *CountryUpdateOne {
-	return (&CountryClient{config: c.config}).UpdateOne(c)
+	return NewCountryClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Country entity that was returned from a transaction after it was closed,

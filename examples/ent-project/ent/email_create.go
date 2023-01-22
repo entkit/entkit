@@ -113,50 +113,8 @@ func (ec *EmailCreate) Mutation() *EmailMutation {
 
 // Save creates the Email in the database.
 func (ec *EmailCreate) Save(ctx context.Context) (*Email, error) {
-	var (
-		err  error
-		node *Email
-	)
 	ec.defaults()
-	if len(ec.hooks) == 0 {
-		if err = ec.check(); err != nil {
-			return nil, err
-		}
-		node, err = ec.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*EmailMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = ec.check(); err != nil {
-				return nil, err
-			}
-			ec.mutation = mutation
-			if node, err = ec.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(ec.hooks) - 1; i >= 0; i-- {
-			if ec.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = ec.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, ec.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Email)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from EmailMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Email, EmailMutation](ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -219,6 +177,9 @@ func (ec *EmailCreate) check() error {
 }
 
 func (ec *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
+	if err := ec.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := ec.createSpec()
 	if err := sqlgraph.CreateNode(ctx, ec.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -233,6 +194,8 @@ func (ec *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
 			return nil, err
 		}
 	}
+	ec.mutation.id = &_node.ID
+	ec.mutation.done = true
 	return _node, nil
 }
 

@@ -2,11 +2,14 @@ import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as Tables from "./tables";
+import * as Lists from "./list";
 import * as Interfaces from "./interfaces";
 import * as FieldView from "./field-view";
 import * as Custom from "./custom";
 
-const { Link } = RefineReactRouter;export const CompanyShow = () => {
+const { Link } = RefineReactRouter;
+
+export const CompanyShow = () => {
     const { queryResult } = useShow<Interfaces.ICompany>({
         resource: "Company",
         metaData: {
@@ -113,62 +116,125 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "countries-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.GlobalOutlined/>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                    {
+                        label: <span>
+                            <RA.Icons.GlobalOutlined />
                             Countries
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.CountryTable key={ "countries-companiesSlice"} extendTable={ {permanentFilter: [{operator: "hasCompaniesWith" as any, field: "", value: {id: record?.id}}]} }></Tables.CountryTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "phones-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.PhoneOutlined/>
+                        </span>,
+                        key: "0",
+                        children: <Lists.CountryList
+                            key={ "countries-companiesSlice" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCompaniesWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.PhoneOutlined />
                             Phones
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.PhoneTable key={ "phones-companies"} extendTable={ {permanentFilter: [{operator: "hasCompanyWith" as any, field: "", value: {id: record?.id}}]} }></Tables.PhoneTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "emails-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.MailOutlined/>
+                        </span>,
+                        key: "1",
+                        children: <Lists.PhoneList
+                            key={ "phones-companies" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCompanyWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.MailOutlined />
                             Emails
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.EmailTable key={ "emails-companies"} extendTable={ {permanentFilter: [{operator: "hasCompanyWith" as any, field: "", value: {id: record?.id}}]} }></Tables.EmailTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "websites-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.LinkOutlined/>
+                        </span>,
+                        key: "2",
+                        children: <Lists.EmailList
+                            key={ "emails-companies" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCompanyWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.LinkOutlined />
                             Websites
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.WebsiteTable key={ "websites-companies"} extendTable={ {permanentFilter: [{operator: "hasCompanyWith" as any, field: "", value: {id: record?.id}}]} }></Tables.WebsiteTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "locations-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.PushpinOutlined/>
+                        </span>,
+                        key: "3",
+                        children: <Lists.WebsiteList
+                            key={ "websites-companies" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCompanyWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.PushpinOutlined />
                             Locations
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.LocationTable key={ "locations-companies"} extendTable={ {permanentFilter: [{operator: "hasCompanyWith" as any, field: "", value: {id: record?.id}}]} }></Tables.LocationTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "gallery_images-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.CameraOutlined/>
+                        </span>,
+                        key: "4",
+                        children: <Lists.LocationList
+                            key={ "locations-companies" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCompanyWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.CameraOutlined />
                             Gallery Images
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.ImageTable key={ "gallery_images-gallery_companies"} extendTable={ {permanentFilter: [{operator: "hasGalleryCompanyWith" as any, field: "", value: {id: record?.id}}]} }></Tables.ImageTable>
-                </RA.Col>
-            </RA.Row>
+                        </span>,
+                        key: "6",
+                        children: <Lists.ImageList
+                            key={ "gallery_images-gallery_companies" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasGalleryCompanyWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                ]}
+            />
         </RA.Show>
     );
 };export const CountryShow = () => {
@@ -255,53 +321,106 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "companies-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.ShopOutlined/>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                    {
+                        label: <span>
+                            <RA.Icons.ShopOutlined />
                             Companies
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.CompanyTable key={ "companies-countriesSlice"} extendTable={ {permanentFilter: [{operator: "hasCountriesWith" as any, field: "", value: {id: record?.id}}]} }></Tables.CompanyTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "phones-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.PhoneOutlined/>
+                        </span>,
+                        key: "0",
+                        children: <Lists.CompanyList
+                            key={ "companies-countriesSlice" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCountriesWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.PhoneOutlined />
                             Phones
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.PhoneTable key={ "phones-countries"} extendTable={ {permanentFilter: [{operator: "hasCountryWith" as any, field: "", value: {id: record?.id}}]} }></Tables.PhoneTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "emails-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.MailOutlined/>
+                        </span>,
+                        key: "1",
+                        children: <Lists.PhoneList
+                            key={ "phones-countries" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCountryWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.MailOutlined />
                             Emails
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.EmailTable key={ "emails-countries"} extendTable={ {permanentFilter: [{operator: "hasCountryWith" as any, field: "", value: {id: record?.id}}]} }></Tables.EmailTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "websites-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.LinkOutlined/>
+                        </span>,
+                        key: "2",
+                        children: <Lists.EmailList
+                            key={ "emails-countries" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCountryWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.LinkOutlined />
                             Websites
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.WebsiteTable key={ "websites-countries"} extendTable={ {permanentFilter: [{operator: "hasCountryWith" as any, field: "", value: {id: record?.id}}]} }></Tables.WebsiteTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "locations-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.PushpinOutlined/>
+                        </span>,
+                        key: "3",
+                        children: <Lists.WebsiteList
+                            key={ "websites-countries" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCountryWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.PushpinOutlined />
                             Locations
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.LocationTable key={ "locations-countries"} extendTable={ {permanentFilter: [{operator: "hasCountryWith" as any, field: "", value: {id: record?.id}}]} }></Tables.LocationTable>
-                </RA.Col>
-            </RA.Row>
+                        </span>,
+                        key: "4",
+                        children: <Lists.LocationList
+                            key={ "locations-countries" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasCountryWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                ]}
+            />
         </RA.Show>
     );
 };export const EmailShow = () => {
@@ -352,8 +471,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };export const ImageShow = () => {
@@ -401,8 +523,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };export const LocationShow = () => {
@@ -477,8 +602,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };export const PhoneShow = () => {
@@ -532,8 +660,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };export const ProductShow = () => {
@@ -599,8 +730,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };export const VendorShow = () => {
@@ -654,26 +788,49 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
             <RA.Descriptions>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "warehouses-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.OrderedListOutlined/>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                    {
+                        label: <span>
+                            <RA.Icons.OrderedListOutlined />
                             Warehouses
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.WarehouseTable key={ "warehouses-vendors"} extendTable={ {permanentFilter: [{operator: "hasVendorWith" as any, field: "", value: {id: record?.id}}]} }></Tables.WarehouseTable>
-                </RA.Col>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "products-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.FileOutlined/>
+                        </span>,
+                        key: "0",
+                        children: <Lists.WarehouseList
+                            key={ "warehouses-vendors" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasVendorWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                    {
+                        label: <span>
+                            <RA.Icons.FileOutlined />
                             Products
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.ProductTable key={ "products-vendors"} extendTable={ {permanentFilter: [{operator: "hasVendorWith" as any, field: "", value: {id: record?.id}}]} }></Tables.ProductTable>
-                </RA.Col>
-            </RA.Row>
+                        </span>,
+                        key: "1",
+                        children: <Lists.ProductList
+                            key={ "products-vendors" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasVendorWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                ]}
+            />
         </RA.Show>
     );
 };export const WarehouseShow = () => {
@@ -733,17 +890,30 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-                <RA.Col span={12}>
-                    <RA.Typography.Title key={ "products-label" } level={5}>
-                        <RA.Space size={8}>
-                            <RA.Icons.FileOutlined/>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                    {
+                        label: <span>
+                            <RA.Icons.FileOutlined />
                             Products
-                        </RA.Space>
-                    </RA.Typography.Title>
-                    <Tables.ProductTable key={ "products-warehouses"} extendTable={ {permanentFilter: [{operator: "hasWarehouseWith" as any, field: "", value: {id: record?.id}}]} }></Tables.ProductTable>
-                </RA.Col>
-            </RA.Row>
+                        </span>,
+                        key: "0",
+                        children: <Lists.ProductList
+                            key={ "products-warehouses" }
+                            breadcrumb={ false }
+                            tableProps={ {
+                                extendTable: {
+                                    permanentFilter: [
+                                        { operator: "hasWarehouseWith" as any, field: "", value: {id: record?.id} }
+                                    ]
+                                }
+                            }
+                            }
+                        />
+                    },
+                ]}
+            />
         </RA.Show>
     );
 };export const WebsiteShow = () => {
@@ -794,8 +964,11 @@ const { Link } = RefineReactRouter;export const CompanyShow = () => {
                 </RA.Descriptions.Item>
             </RA.Descriptions>
 
-            <RA.Row gutter={[16,32]}>
-            </RA.Row>
+            <RA.Tabs
+                defaultActiveKey="0"
+                items={[
+                ]}
+            />
         </RA.Show>
     );
 };

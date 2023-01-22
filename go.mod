@@ -3,8 +3,8 @@ module github.com/diazoxide/ent-refine
 go 1.19
 
 require (
-	entgo.io/contrib v0.3.5-0.20221216203125-e2b0072613c0
-	entgo.io/ent v0.11.5-0.20221212200803-3328201ba8a9
+	entgo.io/contrib v0.3.5-0.20230120172129-c4b887c04e5e
+	entgo.io/ent v0.11.6
 	github.com/99designs/gqlgen v0.17.5-0.20220428154617-9250f9ac1f90
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alecthomas/kong v0.7.0
@@ -20,7 +20,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.8.4-0.20221212165942-e53dd27a603d // indirect
+	ariga.io/atlas v0.9.1-0.20230119123307-a3ab6808892b // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect

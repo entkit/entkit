@@ -27,419 +27,277 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Warehouse(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Warehouse(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id uuid.UUID) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Warehouse(sql.FieldLTE(FieldID, id))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldName, v))
 }
 
 // LastUpdate applies equality check predicate on the "last_update" field. It's identical to LastUpdateEQ.
 func LastUpdate(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldLastUpdate, v))
 }
 
 // OriginalData applies equality check predicate on the "original_data" field. It's identical to OriginalDataEQ.
 func OriginalData(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldOriginalData, v))
 }
 
 // Enabled applies equality check predicate on the "enabled" field. It's identical to EnabledEQ.
 func Enabled(v bool) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEnabled), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldEnabled, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldName, v))
 }
 
 // NameNEQ applies the NEQ predicate on the "name" field.
 func NameNEQ(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldNEQ(FieldName, v))
 }
 
 // NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldName), v...))
-	})
+	return predicate.Warehouse(sql.FieldIn(FieldName, vs...))
 }
 
 // NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldName), v...))
-	})
+	return predicate.Warehouse(sql.FieldNotIn(FieldName, vs...))
 }
 
 // NameGT applies the GT predicate on the "name" field.
 func NameGT(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldGT(FieldName, v))
 }
 
 // NameGTE applies the GTE predicate on the "name" field.
 func NameGTE(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldGTE(FieldName, v))
 }
 
 // NameLT applies the LT predicate on the "name" field.
 func NameLT(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldLT(FieldName, v))
 }
 
 // NameLTE applies the LTE predicate on the "name" field.
 func NameLTE(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldLTE(FieldName, v))
 }
 
 // NameContains applies the Contains predicate on the "name" field.
 func NameContains(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldContains(FieldName, v))
 }
 
 // NameHasPrefix applies the HasPrefix predicate on the "name" field.
 func NameHasPrefix(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldHasPrefix(FieldName, v))
 }
 
 // NameHasSuffix applies the HasSuffix predicate on the "name" field.
 func NameHasSuffix(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldHasSuffix(FieldName, v))
 }
 
 // NameEqualFold applies the EqualFold predicate on the "name" field.
 func NameEqualFold(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldEqualFold(FieldName, v))
 }
 
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldName), v))
-	})
+	return predicate.Warehouse(sql.FieldContainsFold(FieldName, v))
 }
 
 // LastUpdateEQ applies the EQ predicate on the "last_update" field.
 func LastUpdateEQ(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldLastUpdate, v))
 }
 
 // LastUpdateNEQ applies the NEQ predicate on the "last_update" field.
 func LastUpdateNEQ(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldNEQ(FieldLastUpdate, v))
 }
 
 // LastUpdateIn applies the In predicate on the "last_update" field.
 func LastUpdateIn(vs ...time.Time) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldLastUpdate), v...))
-	})
+	return predicate.Warehouse(sql.FieldIn(FieldLastUpdate, vs...))
 }
 
 // LastUpdateNotIn applies the NotIn predicate on the "last_update" field.
 func LastUpdateNotIn(vs ...time.Time) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldLastUpdate), v...))
-	})
+	return predicate.Warehouse(sql.FieldNotIn(FieldLastUpdate, vs...))
 }
 
 // LastUpdateGT applies the GT predicate on the "last_update" field.
 func LastUpdateGT(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldGT(FieldLastUpdate, v))
 }
 
 // LastUpdateGTE applies the GTE predicate on the "last_update" field.
 func LastUpdateGTE(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldGTE(FieldLastUpdate, v))
 }
 
 // LastUpdateLT applies the LT predicate on the "last_update" field.
 func LastUpdateLT(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldLT(FieldLastUpdate, v))
 }
 
 // LastUpdateLTE applies the LTE predicate on the "last_update" field.
 func LastUpdateLTE(v time.Time) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLastUpdate), v))
-	})
+	return predicate.Warehouse(sql.FieldLTE(FieldLastUpdate, v))
 }
 
 // LastUpdateIsNil applies the IsNil predicate on the "last_update" field.
 func LastUpdateIsNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldLastUpdate)))
-	})
+	return predicate.Warehouse(sql.FieldIsNull(FieldLastUpdate))
 }
 
 // LastUpdateNotNil applies the NotNil predicate on the "last_update" field.
 func LastUpdateNotNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldLastUpdate)))
-	})
+	return predicate.Warehouse(sql.FieldNotNull(FieldLastUpdate))
 }
 
 // OriginalDataEQ applies the EQ predicate on the "original_data" field.
 func OriginalDataEQ(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldOriginalData, v))
 }
 
 // OriginalDataNEQ applies the NEQ predicate on the "original_data" field.
 func OriginalDataNEQ(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldNEQ(FieldOriginalData, v))
 }
 
 // OriginalDataIn applies the In predicate on the "original_data" field.
 func OriginalDataIn(vs ...string) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldOriginalData), v...))
-	})
+	return predicate.Warehouse(sql.FieldIn(FieldOriginalData, vs...))
 }
 
 // OriginalDataNotIn applies the NotIn predicate on the "original_data" field.
 func OriginalDataNotIn(vs ...string) predicate.Warehouse {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldOriginalData), v...))
-	})
+	return predicate.Warehouse(sql.FieldNotIn(FieldOriginalData, vs...))
 }
 
 // OriginalDataGT applies the GT predicate on the "original_data" field.
 func OriginalDataGT(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldGT(FieldOriginalData, v))
 }
 
 // OriginalDataGTE applies the GTE predicate on the "original_data" field.
 func OriginalDataGTE(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldGTE(FieldOriginalData, v))
 }
 
 // OriginalDataLT applies the LT predicate on the "original_data" field.
 func OriginalDataLT(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldLT(FieldOriginalData, v))
 }
 
 // OriginalDataLTE applies the LTE predicate on the "original_data" field.
 func OriginalDataLTE(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldLTE(FieldOriginalData, v))
 }
 
 // OriginalDataContains applies the Contains predicate on the "original_data" field.
 func OriginalDataContains(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldContains(FieldOriginalData, v))
 }
 
 // OriginalDataHasPrefix applies the HasPrefix predicate on the "original_data" field.
 func OriginalDataHasPrefix(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldHasPrefix(FieldOriginalData, v))
 }
 
 // OriginalDataHasSuffix applies the HasSuffix predicate on the "original_data" field.
 func OriginalDataHasSuffix(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldHasSuffix(FieldOriginalData, v))
 }
 
 // OriginalDataIsNil applies the IsNil predicate on the "original_data" field.
 func OriginalDataIsNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldOriginalData)))
-	})
+	return predicate.Warehouse(sql.FieldIsNull(FieldOriginalData))
 }
 
 // OriginalDataNotNil applies the NotNil predicate on the "original_data" field.
 func OriginalDataNotNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldOriginalData)))
-	})
+	return predicate.Warehouse(sql.FieldNotNull(FieldOriginalData))
 }
 
 // OriginalDataEqualFold applies the EqualFold predicate on the "original_data" field.
 func OriginalDataEqualFold(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldEqualFold(FieldOriginalData, v))
 }
 
 // OriginalDataContainsFold applies the ContainsFold predicate on the "original_data" field.
 func OriginalDataContainsFold(v string) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldOriginalData), v))
-	})
+	return predicate.Warehouse(sql.FieldContainsFold(FieldOriginalData, v))
 }
 
 // EnabledEQ applies the EQ predicate on the "enabled" field.
 func EnabledEQ(v bool) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEnabled), v))
-	})
+	return predicate.Warehouse(sql.FieldEQ(FieldEnabled, v))
 }
 
 // EnabledNEQ applies the NEQ predicate on the "enabled" field.
 func EnabledNEQ(v bool) predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldEnabled), v))
-	})
+	return predicate.Warehouse(sql.FieldNEQ(FieldEnabled, v))
 }
 
 // FiltersIsNil applies the IsNil predicate on the "filters" field.
 func FiltersIsNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldFilters)))
-	})
+	return predicate.Warehouse(sql.FieldIsNull(FieldFilters))
 }
 
 // FiltersNotNil applies the NotNil predicate on the "filters" field.
 func FiltersNotNil() predicate.Warehouse {
-	return predicate.Warehouse(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldFilters)))
-	})
+	return predicate.Warehouse(sql.FieldNotNull(FieldFilters))
 }
 
 // HasProducts applies the HasEdge predicate on the "products" edge.

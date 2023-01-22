@@ -38,6 +38,7 @@ import (
 	"github.com/google/uuid"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -687,6 +688,16 @@ func (m *CompanyMutation) ResetGalleryImages() {
 // Where appends a list predicates to the CompanyMutation builder.
 func (m *CompanyMutation) Where(ps ...predicate.Company) {
 	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CompanyMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CompanyMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Company, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
 }
 
 // Op returns the operation name.
@@ -1560,6 +1571,16 @@ func (m *CountryMutation) Where(ps ...predicate.Country) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the CountryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CountryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Country, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *CountryMutation) Op() Op {
 	return m.op
@@ -2195,6 +2216,16 @@ func (m *EmailMutation) Where(ps ...predicate.Email) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the EmailMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *EmailMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Email, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *EmailMutation) Op() Op {
 	return m.op
@@ -2712,6 +2743,16 @@ func (m *ImageMutation) ResetLogoCompany() {
 // Where appends a list predicates to the ImageMutation builder.
 func (m *ImageMutation) Where(ps ...predicate.Image) {
 	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ImageMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ImageMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Image, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
 }
 
 // Op returns the operation name.
@@ -3591,6 +3632,16 @@ func (m *LocationMutation) Where(ps ...predicate.Location) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the LocationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *LocationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Location, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *LocationMutation) Op() Op {
 	return m.op
@@ -4345,6 +4396,16 @@ func (m *PhoneMutation) ResetCountry() {
 // Where appends a list predicates to the PhoneMutation builder.
 func (m *PhoneMutation) Where(ps ...predicate.Phone) {
 	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PhoneMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PhoneMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Phone, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
 }
 
 // Op returns the operation name.
@@ -5131,6 +5192,16 @@ func (m *ProductMutation) Where(ps ...predicate.Product) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ProductMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProductMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Product, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ProductMutation) Op() Op {
 	return m.op
@@ -5780,6 +5851,16 @@ func (m *VendorMutation) ResetProducts() {
 // Where appends a list predicates to the VendorMutation builder.
 func (m *VendorMutation) Where(ps ...predicate.Vendor) {
 	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the VendorMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VendorMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Vendor, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
 }
 
 // Op returns the operation name.
@@ -6485,6 +6566,16 @@ func (m *WarehouseMutation) Where(ps ...predicate.Warehouse) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the WarehouseMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WarehouseMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Warehouse, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *WarehouseMutation) Op() Op {
 	return m.op
@@ -7104,6 +7195,16 @@ func (m *WebsiteMutation) ResetCountry() {
 // Where appends a list predicates to the WebsiteMutation builder.
 func (m *WebsiteMutation) Where(ps ...predicate.Website) {
 	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the WebsiteMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WebsiteMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Website, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
 }
 
 // Op returns the operation name.

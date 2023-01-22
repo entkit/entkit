@@ -115,7 +115,7 @@ export const {{ ER_fieldTSType $f }}ViewOnForm: React.FC = (props)=>{
             {{- range $v := $f.EnumValues }}
             {
                 value: "{{ $v }}",
-                label: "{{ label $v }}",
+                label: "{{ ER_label $v }}",
             },
             {{- end }}
         ]}
