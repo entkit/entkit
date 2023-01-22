@@ -12,7 +12,7 @@ import {SearchComponent} from "./ent-refine/search-component";
 import {Header} from "./components/header";
 import * as process from "process";
 
-const client = new GraphQLClient(process.env.ENTGQL_SERVER || "http://localhost:8081/query");
+const client = new GraphQLClient(process.env.REACT_APP_ENTGQL_SERVER || "http://localhost:8081/query");
 
 function App() {
     return (
