@@ -7,7 +7,7 @@ schema:
 exec:
   dir: ./
   filename: gql-generated.go
-  package: todo
+  package: ent_project
 
 resolver:
   # Tell gqlgen to generate resolvers next to the schema file.

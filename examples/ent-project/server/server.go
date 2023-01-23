@@ -2,43 +2,39 @@ package main
 
 import (
 	"context"
+	"entgo.io/contrib/entgql"
+	"fmt"
+	"github.com/diazoxide/ent-refine/examples"
 	example "github.com/diazoxide/ent-refine/examples/ent-project"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
-	"time"
-
-	"entgo.io/contrib/entgql"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	"io"
+	"io/fs"
+	"log"
+	"mime"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/debug"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/alecthomas/kong"
 	"go.uber.org/zap"
 
 	_ "github.com/diazoxide/ent-refine/examples/ent-project/ent/runtime"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func main() {
-	var cli struct {
-		Addr  string `name:"address" default:":8081" help:"Address to listen on."`
-		Debug bool   `name:"debug" help:"Enable debugging mode."`
+var refineFs fs.FS
+
+func init() {
+	var err error
+	refineFs, err = fs.Sub(examples.Refine, "refine-project/build")
+	if err != nil {
+		log.Fatal("failed to get ui fs", err)
 	}
-	kong.Parse(&cli)
-
-	log, _ := zap.NewDevelopment()
-	r := gin.New()
-
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-
+}
+func main() {
 	client, err := ent.Open(
 		"sqlite3",
 		"file:examples/example.db?mode=rwc&cache=shared&_fk=1",
@@ -53,15 +49,56 @@ func main() {
 		log.Fatal("running schema migration", zap.Error(err))
 	}
 
-	r.GET("/", gin.WrapF(playground.Handler("Example", "/query")))
+	// Up MUX server
+	mux := http.NewServeMux()
 
 	srv := handler.NewDefaultServer(example.NewSchema(client))
-
 	srv.Use(entgql.Transactioner{TxOpener: client})
-
 	srv.Use(&debug.Tracer{})
+	mux.HandleFunc("/playground", playground.Handler("Example", "/query"))
+	mux.Handle("/query", srv)
 
-	r.Any("/query", gin.WrapH(srv))
+	mux.HandleFunc("/", handleStatic)
+	log.Println("starting server...")
+	if err := http.ListenAndServe(":80", mux); err != nil {
+		log.Println("server failed:", err)
+	}
+}
 
-	panic(r.Run(":8081"))
+func handleStatic(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	path := filepath.Clean(r.URL.Path)
+	if path == "/" { // Add other paths that you route on the UI-side here
+		path = "index.html"
+	}
+	path = strings.TrimPrefix(path, "/")
+
+	file, err := refineFs.Open(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Println("file", path, "not found:", err)
+			http.NotFound(w, r)
+			return
+		}
+		log.Println("file", path, "cannot be read:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	contentType := mime.TypeByExtension(filepath.Ext(path))
+	w.Header().Set("Content-Type", contentType)
+	if strings.HasPrefix(path, "static/") {
+		w.Header().Set("Cache-Control", "public, max-age=31536000")
+	}
+	stat, err := file.Stat()
+	if err == nil && stat.Size() > 0 {
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", stat.Size()))
+	}
+
+	n, _ := io.Copy(w, file)
+	log.Println("file", path, "copied", n, "bytes")
 }

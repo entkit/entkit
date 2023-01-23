@@ -1,4 +1,4 @@
-package todo
+package ent_project
 
 import (
 	"github.com/99designs/gqlgen/graphql"

@@ -8,11 +8,9 @@ import routerProvider from "@pankod/refine-react-router-v6";
 import {GraphQLClient} from "graphql-request";
 import {Resources} from "./ent-refine/resources";
 import dataProvider from "./ent-refine/data-provider";
-import {SearchComponent} from "./ent-refine/search-component";
 import {Header} from "./components/header";
-import * as process from "process";
 
-const client = new GraphQLClient(process.env.REACT_APP_ENTGQL_SERVER || "http://localhost:8081/query");
+const client = new GraphQLClient(process.env.REACT_APP_GQL_URI || "http://localhost/query");
 
 function App() {
     return (

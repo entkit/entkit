@@ -54,7 +54,7 @@ func main() {
 		`,
 	}, entc.Extensions(
 		gqlEx,
-		EntRefine.New().AppPath(filepath.Join("..", "refine")),
+		EntRefine.New().AppPath(filepath.Join("..", "refine-project")),
 	))
 	if err != nil {
 		log.Fatalf("running ent codegen: %v", err)

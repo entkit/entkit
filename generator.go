@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/entc/gen"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 )
@@ -220,6 +221,11 @@ func (rg *RefineGen) updatePackageJson() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+
+	cmd := exec.Command("/bin/sh", "-c", "npm ls || npm ci ; npm run build")
+	cmd.Dir = rg.Extension.appPath
+	out, err := cmd.Output()
+	println(string(out))
 }
 
 func (rg *RefineGen) rendAndSave(tmpl *gen.Template, override bool) {
