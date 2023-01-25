@@ -56,9 +56,17 @@ func main() {
 	srv.Use(entgql.Transactioner{TxOpener: client})
 	srv.Use(&debug.Tracer{})
 	mux.HandleFunc("/playground", playground.Handler("Example", "/query"))
-	mux.Handle("/query", srv)
+	mux.HandleFunc("/query", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Access-Control-Allow-Origin", "*")
+		writer.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+		writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		srv.ServeHTTP(writer, request)
+	})
 
-	mux.HandleFunc("/", handleStatic)
+	if os.Getenv("SKIP_EMBED_SERVER") != "true" {
+		println("Embed Server...")
+		mux.HandleFunc("/", handleStatic)
+	}
 	log.Println("starting server...")
 	if err := http.ListenAndServe(":80", mux); err != nil {
 		log.Println("server failed:", err)

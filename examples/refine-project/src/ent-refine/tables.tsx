@@ -41,7 +41,67 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                 "name",
                 "logo",
                 "description",
+                {"countries": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "name"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"phones": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"emails": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"websites": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"locations": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
                 {"logoImage": [ "id", "title" ]},
+                {"galleryImages": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
             ],
             cursors,
         },
@@ -107,12 +167,54 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
 
                 { /* region Edges */ }
                 <RA.Table.Column
+                    dataIndex="countries"
+                    title="Countries"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="phones"
+                    title="Phones"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="emails"
+                    title="Emails"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="websites"
+                    title="Websites"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="locations"
+                    title="Locations"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
                     dataIndex="logoImage"
                     title="Logo Image"
                     render={
                         (value)=>(<Link to={ "/Image/show/"+ value?.id}>
                             { value?.title }
                         </Link>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="galleryImages"
+                    title="Gallery Images"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
                     }
                 />
                 {/* endregion Edges*/}
@@ -239,6 +341,56 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                 "id",
                 "name",
                 "code",
+                {"companies": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "name"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"phones": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"emails": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"websites": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"locations": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "title"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
             ],
             cursors,
         },
@@ -302,6 +454,41 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                 {/* endregion */}
 
                 { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="companies"
+                    title="Companies"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="phones"
+                    title="Phones"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="emails"
+                    title="Emails"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="websites"
+                    title="Websites"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="locations"
+                    title="Locations"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
                 {/* endregion Edges*/}
 
                 <RA.Table.Column<Interfaces.ICountry>
@@ -1874,6 +2061,26 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                 "id",
                 "name",
                 "schema",
+                {"warehouses": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "name"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
+                {"products": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "name"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
             ],
             cursors,
         },
@@ -1937,6 +2144,20 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                 {/* endregion */}
 
                 { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="warehouses"
+                    title="Warehouses"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="products"
+                    title="Products"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
                 {/* endregion Edges*/}
 
                 <RA.Table.Column<Interfaces.IVendor>
@@ -2076,6 +2297,16 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                 "originalData",
                 "enabled",
                 "filters",
+                {"products": [
+                    {
+                        edges: [
+                            {
+                                node: ["id", "name"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
                 {"vendor": [ "id", "name" ]},
             ],
             cursors,
@@ -2182,6 +2413,13 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                 {/* endregion */}
 
                 { /* region Edges */ }
+                <RA.Table.Column
+                    dataIndex="products"
+                    title="Products"
+                    render={
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                    }
+                />
                 <RA.Table.Column
                     dataIndex="vendor"
                     title="Vendor"

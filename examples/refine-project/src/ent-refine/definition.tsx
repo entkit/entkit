@@ -1,4 +1,4 @@
 // Metadata
 export const meta = {
-  "graphqlUri": "qweqwe"
+  "graphqlUri": "http://localhost/query"
 }

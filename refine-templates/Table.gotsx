@@ -45,9 +45,20 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                 "{{ $f.Name | camel }}",
                 {{- end }}
                 {{- range $e :=  $n.Edges}}
-                {{- if $e.Unique }}
                 {{- $titleField := (ER_titleField $e.Type) }}
+                {{- if $e.Unique }}
                 {"{{ $e.Name | camel }}": [ "{{$e.Type.ID.Name}}", "{{$titleField.Name}}" ]},
+                {{- else }}
+                {"{{ $e.Name | camel }}": [
+                    {
+                        edges: [
+                            {
+                                node: ["{{$e.Type.ID.Name}}", "{{$titleField.Name}}"]
+                            },
+                        ],
+                    },
+                    "totalCount",
+                ]},
                 {{- end}}
                 {{- end}}
             ],
@@ -110,18 +121,21 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                 { /* region Edges */ }
                 {{- range $e := $n.Edges }}
                 {{- if not $e.Annotations.REFINE.HideOnList }}
-                {{- if $e.Unique }}
                 {{- $titleField := (ER_titleField $e.Type) }}
                 <RA.Table.Column
                     dataIndex="{{ camel $e.Name }}"
                     title="{{ $e.Name | ER_label }}"
                     render={
+                        {{- if $e.Unique }}
                         (value)=>(<Link to={ "/{{$e.Type.Name}}/show/"+ value?.id}>
                             { value?.{{$titleField.Name}} }
                         </Link>)
+                        {{- else }}
+                        (value)=><span>{ value?.totalCount || "No" } Items</span>
+                        {{- end }}
                     }
                 />
-                {{- end }}
+
                 {{- end }}
                 {{- end }}
                 {/* endregion Edges*/}
