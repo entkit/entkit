@@ -4,7 +4,17 @@ Live demo here https://demo.entrefine.dev/
 
 Ent-Refine is a union of two powerful frameworks [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI)
 
-### Generate very flexible admin dashboard with Refine.js by ent definitions.
+## Main futures
+1. Generating CRUDs by Ent definitions
+2. Every view of CRUD is customizable
+3. Every field of every kind of list/form/show is customizable by annotations
+4. Custom actions for items
+5. Relational view, nested lists with edges
+6. Search component to find records by every attribute, with a custom operator
+7. Bulk actions on lists
+8. Using Graphql API only with custom Refine data-provider,
+9. Typescript types generating identically from Ent definitions
+10. Filters on columns with customizable operators
 
 ![main.png](docs%2Fimages%2Fmain.png)
 
