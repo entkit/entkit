@@ -97,7 +97,7 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 
 // saveGenerated Save generated file
 func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	resDir := path.Join(rg.Extension.appPath, rg.Extension.srcDirName, "ent-refine")
+	resDir := path.Join(rg.Extension.AppPath, rg.Extension.SrcDirName, "ent-refine")
 	p := filepath.Join(resDir, name)
 
 	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
@@ -139,36 +139,23 @@ func parseT(path string) *gen.Template {
 
 func (rg *RefineGen) Generate() {
 	var (
-		RefineCreateTemplate          = parseT("refine-templates/Create.gotsx")
-		RefineEditTemplate            = parseT("refine-templates/Edit.gotsx")
-		RefineTableTemplate           = parseT("refine-templates/Table.gotsx")
-		RefineListTemplate            = parseT("refine-templates/List.gotsx")
-		RefineResourcesTemplate       = parseT("refine-templates/Resources.gotsx")
-		RefineShowTemplate            = parseT("refine-templates/Show.gotsx")
-		RefineInterfacesTemplate      = parseT("refine-templates/Interfaces.gots")
-		RefineDataProviderTemplate    = parseT("refine-templates/DataProvider.gots")
-		RefineSearchComponentTemplate = parseT("refine-templates/SearchComponent.gotsx")
-		RefineSorterEnumsTemplate     = parseT("refine-templates/SorterEnums.gotsx")
-		RefineFieldViewsTemplate      = parseT("refine-templates/FieldViews.gotsx")
-		HelpersTemplate               = parseT("refine-templates/Helpers.gotsx")
-		CustomTemplate                = parseT("refine-templates/Custom.gotsx")
-
 		DynamicTemplates = []*gen.Template{
-			RefineCreateTemplate,
-			RefineEditTemplate,
-			RefineTableTemplate,
-			RefineListTemplate,
-			RefineResourcesTemplate,
-			RefineShowTemplate,
-			RefineInterfacesTemplate,
-			RefineDataProviderTemplate,
-			RefineSearchComponentTemplate,
-			RefineSorterEnumsTemplate,
-			RefineFieldViewsTemplate,
-			HelpersTemplate,
+			parseT("refine-templates/Definition.gots"),
+			parseT("refine-templates/Create.gotsx"),
+			parseT("refine-templates/Edit.gotsx"),
+			parseT("refine-templates/Table.gotsx"),
+			parseT("refine-templates/List.gotsx"),
+			parseT("refine-templates/Resources.gotsx"),
+			parseT("refine-templates/Show.gotsx"),
+			parseT("refine-templates/Interfaces.gots"),
+			parseT("refine-templates/DataProvider.gots"),
+			parseT("refine-templates/SearchComponent.gotsx"),
+			parseT("refine-templates/SorterEnums.gotsx"),
+			parseT("refine-templates/FieldViews.gotsx"),
+			parseT("refine-templates/Helpers.gotsx"),
 		}
 		StaticTemplates = []*gen.Template{
-			CustomTemplate,
+			parseT("refine-templates/Custom.gotsx"),
 		}
 	)
 	for _, t := range DynamicTemplates {
@@ -183,7 +170,7 @@ func (rg *RefineGen) Generate() {
 }
 
 func (rg *RefineGen) updatePackageJson() {
-	packageJsonPath := path.Join(rg.Extension.appPath, "package.json")
+	packageJsonPath := path.Join(rg.Extension.AppPath, "package.json")
 	dat, err := os.ReadFile(packageJsonPath)
 	if err != nil {
 		panic(err.Error())
@@ -223,7 +210,7 @@ func (rg *RefineGen) updatePackageJson() {
 	}
 
 	cmd := exec.Command("/bin/sh", "-c", "npm ls || npm ci ; npm run build")
-	cmd.Dir = rg.Extension.appPath
+	cmd.Dir = rg.Extension.AppPath
 	out, err := cmd.Output()
 	println(string(out))
 }

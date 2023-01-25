@@ -1,0 +1,5 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "definition.tsx" -}}
+// Metadata
+export const meta = {{ $.Extension.Meta | toPrettyJson}}
+{{- end -}}

@@ -24,27 +24,47 @@ var (
 	funcMap = template.FuncMap{}
 )
 
+type ExtensionOption = func(*Extension) error
+
 // Extension main struct
 type Extension struct {
 	entc.DefaultExtension
-	appPath    string
-	srcDirName string
+	AppPath    string         // AppPath JS Application path (packages.json directory path)
+	SrcDirName string         // SrcDirName JS Application source dir name
+	Meta       map[string]any // Meta to share with frontend application
 }
 
-// AppPath directory that contains package.json file
-func (ex *Extension) AppPath(dir string) *Extension {
-	ex.appPath = dir
-	return ex
+// WithAppPath define refine-project directory
+func WithAppPath(path string) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.AppPath = path
+		return nil
+	}
 }
 
-// SrcDirName directory to save generated TS files
-func (ex *Extension) SrcDirName(dir string) *Extension {
-	ex.srcDirName = dir
-	return ex
+// WithSrcDirName additional option to configure Refine repo code-source directory, default value is `src`
+func WithSrcDirName(name string) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.SrcDirName = name
+		return nil
+	}
 }
 
-// New Initialize extension
-func New() *Extension {
+// WithMeta add metadata to `{AppPath}/ent-refine.json`
+func WithMeta(meta map[string]any) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.Meta = meta
+		return nil
+	}
+}
+
+// NewExtension initialize extension
+func NewExtension(opts ...ExtensionOption) (*Extension, error) {
+	ex := &Extension{
+		SrcDirName: "src",
+		Meta:       map[string]any{},
+	}
+
 	if len(funcMap) == 0 {
 		for k, v := range _funcMap {
 			funcMap[k] = v
@@ -63,9 +83,12 @@ func New() *Extension {
 		}
 	}
 
-	return &Extension{
-		srcDirName: "src",
+	for _, opt := range opts {
+		if err := opt(ex); err != nil {
+			return nil, err
+		}
 	}
+	return ex, nil
 }
 
 // Annotations Define Ent annotations
@@ -76,7 +99,9 @@ func (ex *Extension) Annotations() []entc.Annotation {
 // Templates Define Ent templates
 func (ex *Extension) Templates() []*gen.Template {
 	return []*gen.Template{
-		gen.MustParse(gen.NewTemplate("greet").Funcs(funcMap).ParseFS(_templates, "templates/search_query_apply.tmpl")),
+		gen.MustParse(gen.NewTemplate("greet").
+			Funcs(funcMap).
+			ParseFS(_templates, "templates/search_query_apply.tmpl")),
 	}
 }
 

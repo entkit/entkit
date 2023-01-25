@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  example:
+    build:
+      context: "./"
+      args:
+        GRAPHQL_URI: "https://demo.entrefine.dev"
+    ports:
+      - "80:80"

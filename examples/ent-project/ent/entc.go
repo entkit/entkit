@@ -9,6 +9,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
@@ -34,6 +35,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)
 	}
+
+	graphqlUri := os.Getenv("GRAPHQL_URI")
+	if graphqlUri == "" {
+		graphqlUri = "http://localhost/query"
+	}
+	entRefine, err := EntRefine.NewExtension(
+		EntRefine.WithAppPath(filepath.Join("..", "refine-project")),
+		EntRefine.WithMeta(map[string]any{
+			"graphqlUri": graphqlUri,
+		}),
+	)
+	if err != nil {
+		log.Fatalf("creating ent-refine extension: %v", err)
+	}
+
 	err = entc.Generate("./ent/schema", &gen.Config{
 		Header: `
 			// Copyright 2019-present Facebook
@@ -54,7 +70,7 @@ func main() {
 		`,
 	}, entc.Extensions(
 		gqlEx,
-		EntRefine.New().AppPath(filepath.Join("..", "refine-project")),
+		entRefine,
 	))
 	if err != nil {
 		log.Fatalf("running ent codegen: %v", err)

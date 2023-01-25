@@ -72,10 +72,10 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := filepath.Clean(r.URL.Path)
-	if path == "/" { // Add other paths that you route on the UI-side here
+	path = strings.TrimPrefix(path, "/")
+	if !strings.HasPrefix(path, "static/") && path != "favicon.ico" && path != "asset-manifest.json" {
 		path = "index.html"
 	}
-	path = strings.TrimPrefix(path, "/")
 
 	file, err := refineFs.Open(path)
 	if err != nil {

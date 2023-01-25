@@ -9,8 +9,9 @@ import {GraphQLClient} from "graphql-request";
 import {Resources} from "./ent-refine/resources";
 import dataProvider from "./ent-refine/data-provider";
 import {Header} from "./components/header";
+import {meta} from "./ent-refine/definition";
 
-const client = new GraphQLClient(process.env.REACT_APP_GQL_URI || "http://localhost/query");
+const client = new GraphQLClient(meta.graphqlUri);
 
 function App() {
     return (

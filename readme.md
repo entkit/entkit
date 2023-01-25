@@ -40,7 +40,9 @@ func main() {
 			// GQL extension is mandatory
 			gqlEx,
 			// EntRefine configuration
-			EntRefine.New().AppPath(filepath.Join("..", "refine")),
+			EntRefine.NewExtension(
+				EntRefine.WithAppPath(filepath.Join("..", "refine"),
+			),
 		),
 	}
 	err = entc.Generate(schemaPath, config, opts...)
