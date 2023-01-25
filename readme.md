@@ -1,16 +1,20 @@
 # Ent-Refine "Everything is generated"
 
-## Generate very flexible admin dashboard with Refine.js by ent definitions.
+Live demo here https://demo.entrefine.dev/
+
+Ent-Refine is a union of two powerful frameworks [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI)
+
+### Generate very flexible admin dashboard with Refine.js by ent definitions.
 
 ![main.png](docs%2Fimages%2Fmain.png)
 
-## Smart search as a killer future
+### Smart search as a killer future
 ![search.gif](docs%2Fimages%2Fsearch.gif)
 
 
 > **Important:** platform is using a graphql as a data-provider interface **(GQL extension is mandatory)**
 
-## How to setup
+## How to set up?
 
 ### Add extension to your Ent framework `entc.go` file.
 
