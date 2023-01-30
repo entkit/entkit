@@ -1,6 +1,8 @@
 # Ent-Refine "Everything is generated"
 
-Live demo here https://demo.entrefine.dev/
+### Links
+- Live demo here https://demo.entrefine.dev/
+- Package https://pkg.go.dev/github.com/diazoxide/ent-refine
 
 Ent-Refine is a union of two powerful frameworks [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI)
 
@@ -20,7 +22,6 @@ Ent-Refine is a union of two powerful frameworks [Ent](https://entgo.io/)(ORM) a
 
 ### Smart search as a killer future
 ![search.gif](docs%2Fimages%2Fsearch.gif)
-
 
 > **Important:** platform is using a graphql as a data-provider interface **(GQL extension is mandatory)**
 
@@ -105,22 +106,30 @@ e.g. `EntRefine.FilterOperator("contains")`
 
 ## Supporting annotations
 
-* TitleField (field)
-* CodeField (field)
-* URLField (field)
-* RichTextField (field)
-* ImageField (field)
-* MainImageField (field)
-* HideOnList (field)
-* HideOnShow (field)
-* HideOnForm (field)
-* FilterOperator (field) `EntRefine.FilterOperator("contains")`
-* Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
-* [ListActions](#custom-list-actions-annotation) (entity)
-* [FieldView](#custom-field-views) (field)
-  * FieldViewOnList
-  * FieldViewOnShow
-  * FieldViewOnForm
+### For Fields
+* ImageField
+* MainImageField
+* TitleField
+* CodeField
+* URLField
+* RichTextField
+* HideOnList
+* HideOnShow
+* HideOnForm
+* FilterOperator `EntRefine.FilterOperator("contains")`
+* [FieldView](#custom-field-views)
+* [FieldViewOnList](#custom-field-views)
+* [FieldViewOnShow](#custom-field-views)
+* [FieldViewOnForm](#custom-field-views)
+
+### For Entities
+  * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
+  * [ListActions](#custom-list-actions-annotation) (entity)
+  * NoList
+  * NoShow
+  * NoCreate
+  * NoEdit
+
 ## Getting ready to use
 
 1. After configuration regenerate Ent.
@@ -164,6 +173,8 @@ e.g. `EntRefine.FilterOperator("contains")`
 
 Querying all fields with your defined operator (**FilterOperator Annotation**) included UUID
 
+### Example
+
 #### Root App
 
 ```tsx
@@ -178,7 +189,7 @@ function App() {
 }
 ```
 
-#### Your Header component
+#### Header component
 
 ```tsx
 import {SearchComponent} from "../../ent-refine/search-component";
@@ -203,7 +214,14 @@ export const Header: React.FC = () => {
 };
 ```
 
-# Custom List Actions Annotation
+# Customization
+
+## File `custom.tsx`
+
+To customize Ent-Refine components you can find `./ent-refine/custom.tsx` file on your refine root directory.
+
+
+## Custom List Actions Annotation
 
 Add entity annotation to your schema
 
@@ -221,7 +239,7 @@ EntRefine.ListActions(
 ```
 
 ### Implementation Example
-#### Example
+
 ```tsx
 // ./ent-refine/custom.tsx
 //...
@@ -243,10 +261,6 @@ export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
 //...
 ```
 
-## Custom.tsx
-
-To customize Ent-Refine components you can find `./ent-refine/custom.tsx` file on your refine root directory.  
-
 ## Custom field views
 
 On Ent-Refine every view of field is customizable for every type of layout.
@@ -259,7 +273,7 @@ On Ent-Refine every view of field is customizable for every type of layout.
 
 ### How to customize?
 
-1. First create new React Component on [Custom.tsx](#customtsx) (e.g. `MyCustomTitle`) with `ViewProps` type props.
+1. First create new React Component on [custom.tsx](#file-customtsx) (e.g. `MyCustomTitle`) with `ViewProps` type props.
    ```tsx
    import {ViewProps} from "./field-view";
    

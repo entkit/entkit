@@ -12,10 +12,18 @@ export const Resources = [
     {{- range $n := $.Graph.Nodes}}
     {
         name: "{{ $n.Name }}",
+        {{- if not $n.Annotations.REFINE.NoList }}
         list: Lists.{{ $n.Name }}List,
+        {{- end }}
+        {{- if not $n.Annotations.REFINE.NoShow }}
         show: Show.{{ $n.Name }}Show,
+        {{- end }}
+        {{- if not $n.Annotations.REFINE.NoCreate }}
         create: Create.{{ $n.Name }}Create,
+        {{- end }}
+        {{- if not $n.Annotations.REFINE.NoEdit }}
         edit: Edit.{{ $n.Name }}Edit,
+        {{- end }}
         icon: <Icons.{{default "FileOutlined" $n.Annotations.REFINE.Icon}}/>,
     },
     {{- end}}

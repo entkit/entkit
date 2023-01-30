@@ -98,7 +98,7 @@ func (Product) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("FileOutlined"),
-		EntRefine.ListActions(
+		EntRefine.ListItemActions(
 			EntRefine.ShowAction,
 			EntRefine.EditAction,
 			EntRefine.DeleteAction,

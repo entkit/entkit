@@ -60,7 +60,7 @@ func (Email) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("MailOutlined"),
-		EntRefine.ListActions(
+		EntRefine.ListItemActions(
 			EntRefine.ShowAction,
 			EntRefine.DeleteAction,
 			EntRefine.EditAction,

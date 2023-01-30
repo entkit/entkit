@@ -102,7 +102,7 @@ func (Location) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("PushpinOutlined"),
-		EntRefine.ListActions(
+		EntRefine.ListItemActions(
 			EntRefine.ShowAction,
 			EntRefine.DeleteAction,
 			EntRefine.EditAction,

@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
+	"text/template"
 )
 
 var (
@@ -132,17 +134,26 @@ func (rg *RefineGen) saveFile(path string, content []byte, override bool) error 
 }
 
 func parseT(path string) *gen.Template {
-	return gen.MustParse(gen.NewTemplate(path).
-		Funcs(funcMap).
-		ParseFS(_refineTemplates, path))
+
+	t := gen.NewTemplate(path).Funcs(funcMap)
+	var _funcMap template.FuncMap = map[string]interface{}{}
+	// copied from: https://github.com/helm/helm/blob/8648ccf5d35d682dcd5f7a9c2082f0aaf071e817/pkg/engine/engine.go#L147-L154
+	_funcMap["include"] = func(name string, data interface{}) (string, error) {
+		buf := bytes.NewBuffer(nil)
+		if err := t.ExecuteTemplate(buf, name, data); err != nil {
+			return "", err
+		}
+		return buf.String(), nil
+	}
+
+	return gen.MustParse(t.Funcs(_funcMap).ParseFS(_refineTemplates, path))
 }
 
 func (rg *RefineGen) Generate() {
 	var (
 		DynamicTemplates = []*gen.Template{
 			parseT("refine-templates/Definition.gots"),
-			parseT("refine-templates/Create.gotsx"),
-			parseT("refine-templates/Edit.gotsx"),
+			parseT("refine-templates/Form.gotsx"),
 			parseT("refine-templates/Table.gotsx"),
 			parseT("refine-templates/List.gotsx"),
 			parseT("refine-templates/Resources.gotsx"),
@@ -216,13 +227,19 @@ func (rg *RefineGen) updatePackageJson() {
 }
 
 func (rg *RefineGen) rendAndSave(tmpl *gen.Template, override bool) {
-	var b bytes.Buffer
 	rootName := path.Base(tmpl.Name())
-
 	for _, t := range tmpl.Templates() {
+		var b bytes.Buffer
+
 		if t.Name() == rootName {
 			continue
 		}
+
+		if strings.HasPrefix(t.Name(), "partial:") {
+			continue
+		}
+
+		t = t.Funcs(funcMap)
 
 		err := tmpl.ExecuteTemplate(&b, t.Name(), rg)
 		if err != nil {

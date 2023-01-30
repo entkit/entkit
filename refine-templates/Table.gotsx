@@ -145,7 +145,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            {{- range $a := $n.Annotations.REFINE.ListActions }}
+                            {{- range $a := $n.Annotations.REFINE.ListItemActions }}
                             <{{ $a.Name }}
                                 hideText={true}
                                 resource="{{$n.Name}}"

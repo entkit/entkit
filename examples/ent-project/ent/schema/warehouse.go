@@ -76,7 +76,7 @@ func (Warehouse) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("OrderedListOutlined"),
-		EntRefine.ListActions(
+		EntRefine.ListItemActions(
 			EntRefine.ShowAction,
 			EntRefine.DeleteAction,
 			EntRefine.EditAction,

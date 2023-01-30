@@ -1,0 +1,164 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "partial:imports" -}}
+import {useState} from "react";
+import * as RA from "@pankod/refine-antd";
+import * as Interfaces from "./interfaces";
+import {Cursors} from "./data-provider";
+import dayjs from "dayjs";
+import CodeEditor from '@uiw/react-textarea-code-editor';
+import * as FieldView from "./field-view";
+import * as Custom from "./custom";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+{{- end -}}
+
+{{- define "partial:selectProps" }}
+{{- range $ed := .EdgesWithID }}
+const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
+{{- $titleField := $ed.Type.ID }}
+{{- range $f:=$ed.Type.Fields }}
+{{- if $f.Annotations.REFINE.TitleField }}
+{{- $titleField = $f }}
+{{- end }}
+
+{{- end}}
+const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Name}}>({
+    resource: "{{ $ed.Type.Name }}",
+    optionLabel: "{{$titleField.Name}}",
+    optionValue: "id",
+    metaData:{
+        cursors: {{$ed.Name}}Cursors,
+        fields: ["{{ $.ID.Name }}", "{{$titleField.Name}}"]
+    },
+    onSearch: (value) => [
+        {
+            field: "{{$titleField.Name}}",
+            {{- $operator := "contains" }}
+            operator: "{{$operator}}",
+            value,
+        },
+    ],
+});
+{{- end}}
+{{- end -}}
+
+{{- define "partial:fieldInput" -}}
+<RA.Form.Item
+    name="{{ camel .Name }}"
+    label="{{ .Name | ER_label }}"
+    rules={[{required: {{ not .Optional }}}]}
+    {{- if .IsTime }}
+    getValueProps={(value) => ({
+        value: value ? dayjs(value) : "",
+    })}
+    {{- end }}
+>
+    {{- $viewName := ( print "FieldView." (ER_fieldTSType .) "ViewOnForm" ) }}
+    {{- if not (empty .Annotations.REFINE.FieldViewOnForm) }}
+    {{ $viewName = print "Custom." .Annotations.REFINE.FieldViewOnForm }}
+    {{- end}}
+     <{{$viewName}}/>
+</RA.Form.Item>
+{{- end -}}
+
+{{- define "partial:edgeInputs" -}}
+{{- range $e := .EdgesWithID }}
+{{- $gqlFieldName := print `{["` (singular $e.Name | camel) `IDs"]}` }}
+{{- $mode := `"multiple"` }}
+{{- if $e.Unique}}
+{{- $gqlFieldName = print `"` (pascal $e.Name | camel ) `ID"` }}
+{{- $mode = `undefined` }}
+{{- end}}
+<RA.Form.Item label="{{ $e.Name }}" name={{ $gqlFieldName }} rules={[{required: {{ not $e.Optional }}}]}>
+    <RA.Select {...{{$e.Name}}SelectProps} mode={ {{$mode}} }/>
+</RA.Form.Item>
+{{- end }}
+{{- end -}}
+
+{{- define "edit.tsx" -}}
+
+{{- template "partial:imports" . }}
+
+{{- range $n := $.Graph.Nodes}}
+
+export const {{$n.Name}}Edit: React.FC = () => {
+    const { formProps, saveButtonProps, queryResult } = RA.useForm<Interfaces.I{{$n.Name}}>(
+        {
+            redirect: false,
+            metaData: {
+                fields: [
+                    {{- range $f := $n.Fields}}
+                    "{{ camel $f.Name}}",
+                    {{- end }}
+                    {{- range $e := $n.EdgesWithID}}
+                    {{- if $e.Unique}}
+                    {
+                        "{{ camel $e.Name }}": [ "id" ]
+                    },
+                    {{- else }}
+                    {
+                        "{{ camel $e.Name }}": [
+                            {
+                                edges: [
+                                    {
+                                        node: [ "id" ],
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {{- end }}
+                    {{- end }}
+                ],
+            }
+        }
+    );
+
+    {{- (include "partial:selectProps" $n) | nindent 4 }}
+
+    return (
+        <RA.Edit saveButtonProps={saveButtonProps}>
+            <RA.Form {...formProps} layout="vertical">
+                {{- range $f := $n.Fields }}
+                {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
+                {{ (include "partial:fieldInput" $f) | nindent 16 }}
+                {{- end }}
+                {{- end }}
+
+                {{- (include "partial:edgeInputs" $n) | nindent 16 }}
+            </RA.Form>
+        </RA.Edit>
+    );
+};
+
+{{- end -}}
+{{- end -}}
+
+
+{{- define "create.tsx" -}}
+{{- template "partial:imports" .}}
+
+{{- range $n := $.Graph.Nodes -}}
+export const {{$n.Name}}Create: React.FC = () => {
+    const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.I{{$n.Name}}>();
+
+    {{- (include "partial:selectProps" $n) | nindent 4 }}
+
+    return (
+        <RA.Create saveButtonProps={saveButtonProps}>
+            <RA.Form {...formProps} layout="vertical">
+                {{- range $f := $n.Fields }}
+                {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
+                {{- (include "partial:fieldInput" $f) | nindent 16 }}
+                {{- end }}
+                {{- end }}
+
+                {{- (include "partial:edgeInputs" $n) | nindent 16 }}
+            </RA.Form>
+        </RA.Create>
+    );
+};
+
+{{- end -}}
+{{- end -}}
+

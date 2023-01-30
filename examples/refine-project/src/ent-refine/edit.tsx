@@ -3,11 +3,9 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
+import CodeEditor from '@uiw/react-textarea-code-editor';
 import * as FieldView from "./field-view";
 import * as Custom from "./custom";
-
-import CodeEditor from '@uiw/react-textarea-code-editor';
-
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -93,6 +91,7 @@ export const CompanyEdit: React.FC = () => {
             }
         }
     );
+    
     const [ countriesCursors, setCountriesCursors] = useState<Cursors>({})
     const { selectProps: countriesSelectProps } = RA.useSelect<Interfaces.ICompany>({
         resource: "Country",
@@ -218,28 +217,29 @@ export const CompanyEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Name"
                     name="name"
+                    label="Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Logo"
                     name="logo"
+                    label="Logo"
                     rules={[{required: false}]}
                 >
-                    <FieldView.ER_ImageViewOnForm/>
+                     <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_RichTextViewOnForm/>
+                     <FieldView.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
                     <RA.Select {...countriesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
@@ -255,7 +255,7 @@ export const CompanyEdit: React.FC = () => {
                 <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_image" name="logoImageID" rules={[{required: false}]}>
+                <RA.Form.Item label="logo_image" name="logoimageID" rules={[{required: false}]}>
                     <RA.Select {...logo_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
                 <RA.Form.Item label="gallery_images" name={["galleryImageIDs"]} rules={[{required: false}]}>
@@ -333,6 +333,7 @@ export const CountryEdit: React.FC = () => {
             }
         }
     );
+    
     const [ companiesCursors, setCompaniesCursors] = useState<Cursors>({})
     const { selectProps: companiesSelectProps } = RA.useSelect<Interfaces.ICountry>({
         resource: "Company",
@@ -424,20 +425,21 @@ export const CountryEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Name"
                     name="name"
+                    label="Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Code"
                     name="code"
+                    label="Code"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="companies" name={["companyIDs"]} rules={[{required: false}]}>
                     <RA.Select {...companiesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
@@ -477,6 +479,7 @@ export const EmailEdit: React.FC = () => {
             }
         }
     );
+    
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IEmail>({
         resource: "Company",
@@ -517,28 +520,29 @@ export const EmailEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
                     name="title"
+                    label="Title"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Address"
                     name="address"
+                    label="Address"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
@@ -568,6 +572,7 @@ export const ImageEdit: React.FC = () => {
             }
         }
     );
+    
     const [ gallery_companyCursors, setGalleryCompanyCursors] = useState<Cursors>({})
     const { selectProps: gallery_companySelectProps } = RA.useSelect<Interfaces.IImage>({
         resource: "Company",
@@ -608,24 +613,25 @@ export const ImageEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
                     name="title"
+                    label="Title"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Original Url"
                     name="originalURL"
+                    label="Original Url"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_ImageViewOnForm/>
+                     <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
-                <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
+                
+                <RA.Form.Item label="gallery_company" name="gallerycompanyID" rules={[{required: false}]}>
                     <RA.Select {...gallery_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_company" name="logoCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item label="logo_company" name="logocompanyID" rules={[{required: false}]}>
                     <RA.Select {...logo_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -660,6 +666,7 @@ export const LocationEdit: React.FC = () => {
             }
         }
     );
+    
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.ILocation>({
         resource: "Company",
@@ -700,92 +707,93 @@ export const LocationEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
                     name="title"
+                    label="Title"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Latitude"
                     name="latitude"
+                    label="Latitude"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Longitude"
                     name="longitude"
+                    label="Longitude"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Address"
                     name="address"
+                    label="Address"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Postcode"
                     name="postcode"
+                    label="Postcode"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Type"
                     name="type"
+                    label="Type"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="State"
                     name="state"
+                    label="State"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Suburb"
                     name="suburb"
+                    label="Suburb"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Street Type"
                     name="streetType"
+                    label="Street Type"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Street Name"
                     name="streetName"
+                    label="Street Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
@@ -817,6 +825,7 @@ export const PhoneEdit: React.FC = () => {
             }
         }
     );
+    
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IPhone>({
         resource: "Company",
@@ -857,36 +866,37 @@ export const PhoneEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
                     name="title"
+                    label="Title"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Number"
                     name="number"
+                    label="Number"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Type"
                     name="type"
+                    label="Type"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
@@ -922,6 +932,7 @@ export const ProductEdit: React.FC = () => {
             }
         }
     );
+    
     const [ warehouseCursors, setWarehouseCursors] = useState<Cursors>({})
     const { selectProps: warehouseSelectProps } = RA.useSelect<Interfaces.IProduct>({
         resource: "Warehouse",
@@ -962,74 +973,75 @@ export const ProductEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Name"
                     name="name"
+                    label="Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_RichTextViewOnForm/>
+                     <FieldView.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Image"
                     name="image"
+                    label="Image"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_ImageViewOnForm/>
+                     <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Url"
                     name="url"
+                    label="Url"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_URLViewOnForm/>
+                     <FieldView.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Last Sell"
                     name="lastSell"
+                    label="Last Sell"
                     rules={[{required: false}]}
                     getValueProps={(value) => ({
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                    <FieldView.ER_DateViewOnForm/>
+                     <FieldView.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Created At"
                     name="createdAt"
+                    label="Created At"
                     rules={[{required: false}]}
                     getValueProps={(value) => ({
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                    <FieldView.ER_DateViewOnForm/>
+                     <FieldView.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Status"
                     name="status"
+                    label="Status"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Build Status"
                     name="buildStatus"
+                    label="Build Status"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
                     <RA.Select {...warehouseSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
@@ -1075,6 +1087,7 @@ export const VendorEdit: React.FC = () => {
             }
         }
     );
+    
     const [ warehousesCursors, setWarehousesCursors] = useState<Cursors>({})
     const { selectProps: warehousesSelectProps } = RA.useSelect<Interfaces.IVendor>({
         resource: "Warehouse",
@@ -1115,20 +1128,21 @@ export const VendorEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Name"
                     name="name"
+                    label="Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Schema"
                     name="schema"
+                    label="Schema"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_CodeViewOnForm/>
+                     <FieldView.ER_CodeViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="warehouses" name={["warehouseIDs"]} rules={[{required: false}]}>
                     <RA.Select {...warehousesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
@@ -1169,6 +1183,7 @@ export const WarehouseEdit: React.FC = () => {
             }
         }
     );
+    
     const [ productsCursors, setProductsCursors] = useState<Cursors>({})
     const { selectProps: productsSelectProps } = RA.useSelect<Interfaces.IWarehouse>({
         resource: "Product",
@@ -1209,47 +1224,48 @@ export const WarehouseEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Name"
                     name="name"
+                    label="Name"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Last Update"
                     name="lastUpdate"
+                    label="Last Update"
                     rules={[{required: false}]}
                     getValueProps={(value) => ({
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                    <FieldView.ER_DateViewOnForm/>
+                     <FieldView.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Original Data"
                     name="originalData"
+                    label="Original Data"
                     rules={[{required: false}]}
                 >
-                    <FieldView.ER_CodeViewOnForm/>
+                     <FieldView.ER_CodeViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Enabled"
                     name="enabled"
+                    label="Enabled"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_BooleanViewOnForm/>
+                     <FieldView.ER_BooleanViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Filters"
                     name="filters"
+                    label="Filters"
                     rules={[{required: false}]}
                 >
-                    <FieldView.ER_StringListViewOnForm/>
+                     <FieldView.ER_StringListViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
                     <RA.Select {...productsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
@@ -1280,6 +1296,7 @@ export const WebsiteEdit: React.FC = () => {
             }
         }
     );
+    
     const [ companyCursors, setCompanyCursors] = useState<Cursors>({})
     const { selectProps: companySelectProps } = RA.useSelect<Interfaces.IWebsite>({
         resource: "Company",
@@ -1320,28 +1337,29 @@ export const WebsiteEdit: React.FC = () => {
             <RA.Form {...formProps} layout="vertical">
                 
                 <RA.Form.Item
-                    label="Title"
                     name="title"
+                    label="Title"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Description"
                     name="description"
+                    label="Description"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_StringViewOnForm/>
+                     <FieldView.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
-                    label="Url"
                     name="url"
+                    label="Url"
                     rules={[{required: true}]}
                 >
-                    <FieldView.ER_URLViewOnForm/>
+                     <FieldView.ER_URLViewOnForm/>
                 </RA.Form.Item>
+                
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>

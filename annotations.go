@@ -19,7 +19,6 @@ type Action struct {
 }
 
 var (
-
 	// EditAction standard edit action
 	EditAction = Action{
 		Name:  "RA.EditButton",
@@ -45,6 +44,10 @@ type RefineAnnotation struct {
 	CodeField       *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
 	URLField        bool              `json:"URLField,omitempty"`       // Mark field as url field
 	RichTextField   bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
+	NoList          bool              `json:"NoList,omitempty"`
+	NoShow          bool              `json:"NoShow,omitempty"`
+	NoCreate        bool              `json:"NoCreate,omitempty"`
+	NoEdit          bool              `json:"NoEdit,omitempty"`
 	HideOnList      bool              `json:"HideOnList,omitempty"`
 	HideOnShow      bool              `json:"HideOnShow,omitempty"`
 	HideOnForm      bool              `json:"HideOnForm,omitempty"`
@@ -54,7 +57,7 @@ type RefineAnnotation struct {
 	Description     *string           `json:"Description,omitempty"`
 	Prefix          *string           `json:"Prefix,omitempty"`
 	Suffix          *string           `json:"Suffix,omitempty"`
-	ListActions     []Action          `json:"ListActions,omitempty"`
+	ListItemActions []Action          `json:"ListItemActions,omitempty"`
 	ShowActions     []Action          `json:"ShowActions,omitempty"`
 	FieldView       *string           `json:"FieldView,omitempty"`
 	FieldViewOnShow *string           `json:"FieldViewOnShow,omitempty"`
@@ -116,6 +119,22 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.HideOnList = ant.HideOnList
 	}
 
+	if ant.NoList {
+		ra.NoList = ant.NoList
+	}
+
+	if ant.NoShow {
+		ra.NoShow = ant.NoShow
+	}
+
+	if ant.NoCreate {
+		ra.NoCreate = ant.NoCreate
+	}
+
+	if ant.NoEdit {
+		ra.NoEdit = ant.NoEdit
+	}
+
 	if ant.FilterOperator != nil {
 		ra.FilterOperator = ant.FilterOperator
 	}
@@ -152,8 +171,8 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.FieldViewOnShow = ant.FieldViewOnShow
 	}
 
-	if len(ant.ListActions) > 0 {
-		ra.ListActions = append(ra.ListActions, ant.ListActions...)
+	if len(ant.ListItemActions) > 0 {
+		ra.ListItemActions = append(ra.ListItemActions, ant.ListItemActions...)
 	}
 
 	if len(ant.ShowActions) > 0 {
@@ -168,10 +187,10 @@ func (ra RefineAnnotation) Name() string {
 	return "REFINE"
 }
 
-// ListActions actions/buttons on list items
-func ListActions(actions ...Action) RefineAnnotation {
+// ListItemActions actions/buttons on list items
+func ListItemActions(actions ...Action) RefineAnnotation {
 	return RefineAnnotation{
-		ListActions: actions,
+		ListItemActions: actions,
 	}
 }
 
@@ -206,6 +225,34 @@ func OnlyOnShow() RefineAnnotation {
 		HideOnList: true,
 		HideOnShow: false,
 		HideOnForm: true,
+	}
+}
+
+// NoList disable entity browse, also hide from navigation
+func NoList() RefineAnnotation {
+	return RefineAnnotation{
+		NoList: true,
+	}
+}
+
+// NoShow disable entity show page
+func NoShow() RefineAnnotation {
+	return RefineAnnotation{
+		NoShow: true,
+	}
+}
+
+// NoCreate disable entity creation form
+func NoCreate() RefineAnnotation {
+	return RefineAnnotation{
+		NoCreate: true,
+	}
+}
+
+// NoEdit disable entity edit form
+func NoEdit() RefineAnnotation {
+	return RefineAnnotation{
+		NoEdit: true,
 	}
 }
 
