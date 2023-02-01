@@ -101,6 +101,7 @@ type Company implements Node {
     where: LocationWhereInput
   ): LocationConnection!
   logoImage: Image
+  coverImage: Image
   galleryImages(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -229,6 +230,9 @@ input CompanyWhereInput {
   """logo_image edge predicates"""
   hasLogoImage: Boolean
   hasLogoImageWith: [ImageWhereInput!]
+  """cover_image edge predicates"""
+  hasCoverImage: Boolean
+  hasCoverImageWith: [ImageWhereInput!]
   """gallery_images edge predicates"""
   hasGalleryImages: Boolean
   hasGalleryImagesWith: [ImageWhereInput!]
@@ -436,6 +440,7 @@ input CreateCompanyInput {
   websiteIDs: [ID!]
   locationIDs: [ID!]
   logoImageID: ID
+  coverImageID: ID
   galleryImageIDs: [ID!]
 }
 """
@@ -471,6 +476,7 @@ input CreateImageInput {
   originalURL: String!
   galleryCompanyID: ID
   logoCompanyID: ID
+  coverCompanyID: ID
 }
 """
 CreateLocationInput is used for create Location object.
@@ -664,6 +670,7 @@ type Image implements Node {
   originalURL: String!
   galleryCompany: Company
   logoCompany: Company
+  coverCompany: Company
 }
 """A connection to a list of items."""
 type ImageConnection {
@@ -744,6 +751,9 @@ input ImageWhereInput {
   """logo_company edge predicates"""
   hasLogoCompany: Boolean
   hasLogoCompanyWith: [CompanyWhereInput!]
+  """cover_company edge predicates"""
+  hasCoverCompany: Boolean
+  hasCoverCompanyWith: [CompanyWhereInput!]
 }
 type Location implements Node {
   id: ID!
@@ -1162,7 +1172,7 @@ enum ProductOrderField {
   BUILD_STATUS
 }
 """ProductProcessStatus is enum for the field status"""
-enum ProductProcessStatus @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent/enums.ProcessStatus") {
+enum ProductProcessStatus @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/enums.ProcessStatus") {
   none
   done
   enqueued
@@ -1541,6 +1551,8 @@ input UpdateCompanyInput {
   clearLocations: Boolean
   logoImageID: ID
   clearLogoImage: Boolean
+  coverImageID: ID
+  clearCoverImage: Boolean
   addGalleryImageIDs: [ID!]
   removeGalleryImageIDs: [ID!]
   clearGalleryImages: Boolean
@@ -1592,6 +1604,8 @@ input UpdateImageInput {
   clearGalleryCompany: Boolean
   logoCompanyID: ID
   clearLogoCompany: Boolean
+  coverCompanyID: ID
+  clearCoverCompany: Boolean
 }
 """
 UpdateLocationInput is used for update Location object.

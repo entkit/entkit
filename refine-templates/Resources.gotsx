@@ -1,7 +1,7 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "resources.tsx" -}}
 import * as Lists from "./list";
-import * as Show from "./show";
+import * as MainShow from "./main-show";
 import * as Create from "./create";
 import * as Edit from "./edit";
 import {
@@ -16,7 +16,7 @@ export const Resources = [
         list: Lists.{{ $n.Name }}List,
         {{- end }}
         {{- if not $n.Annotations.REFINE.NoShow }}
-        show: Show.{{ $n.Name }}Show,
+        show: MainShow.{{ $n.Name }}MainShow,
         {{- end }}
         {{- if not $n.Annotations.REFINE.NoCreate }}
         create: Create.{{ $n.Name }}Create,

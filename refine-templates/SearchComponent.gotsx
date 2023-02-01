@@ -74,7 +74,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.{{ default "id" $titleField.Name }},
+                        String(item.{{ default "id" $titleField.Name }}),
                         {{- if not (empty $mainImageField) }}
                         `${item.{{camel $mainImageField.Name}}}`,
                         {{- else }}

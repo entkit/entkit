@@ -63,7 +63,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.name,
+                        String(item.name),
                         `${item.logo}`,
                         `/Company/show/${item.id}`,
                     ),
@@ -93,7 +93,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.name,
+                        String(item.name),
                         null,
                         `/Country/show/${item.id}`,
                     ),
@@ -123,7 +123,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        String(item.title),
                         null,
                         `/Email/show/${item.id}`,
                     ),
@@ -154,7 +154,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        String(item.title),
                         `${item.originalURL}`,
                         `/Image/show/${item.id}`,
                     ),
@@ -184,7 +184,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        String(item.title),
                         null,
                         `/Location/show/${item.id}`,
                     ),
@@ -214,7 +214,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        String(item.title),
                         null,
                         `/Phone/show/${item.id}`,
                     ),
@@ -245,7 +245,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.name,
+                        String(item.name),
                         `${item.image}`,
                         `/Product/show/${item.id}`,
                     ),
@@ -275,7 +275,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.name,
+                        String(item.name),
                         null,
                         `/Vendor/show/${item.id}`,
                     ),
@@ -305,7 +305,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.name,
+                        String(item.name),
                         null,
                         `/Warehouse/show/${item.id}`,
                     ),
@@ -335,7 +335,7 @@ export const SearchComponent: React.FC = () => {
             onSuccess: (data) => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
-                        item.title,
+                        String(item.title),
                         null,
                         `/Website/show/${item.id}`,
                     ),

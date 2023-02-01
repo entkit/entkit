@@ -13,11 +13,11 @@ export type ER_NumberList = ER_Number[]
 
 
 export enum ER_Enums_ProcessStatus{
-    none = "none",
-    done = "done",
-    enqueued = "enqueued",
-    in_progress = "in_progress",
-    failed = "failed",
+    "none" = "none",
+    "done" = "done",
+    "enqueued" = "enqueued",
+    "in_progress" = "in_progress",
+    "failed" = "failed",
 }
 
 
@@ -32,6 +32,7 @@ export interface ICompany {
     websites?: IWebsite[],
     locations?: ILocation[],
     logoImage?: IImage,
+    coverImage?: IImage,
     galleryImages?: IImage[],
 }
 export interface ICountry {
@@ -58,6 +59,7 @@ export interface IImage {
     originalURL: ER_Image, // string
     galleryCompany?: ICompany,
     logoCompany?: ICompany,
+    coverCompany?: ICompany,
 }
 export interface ILocation {
     id: ER_UUID, // uuid.UUID

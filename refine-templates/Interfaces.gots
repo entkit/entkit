@@ -23,7 +23,7 @@ export type ER_NumberList = ER_Number[]
 {{- $enums = append $enums $f.Type.String }}
 export enum {{ ER_fieldTSType $f }}{
     {{- range $v := $f.EnumValues }}
-    {{$v}} = "{{$v}}",
+    "{{ $v }}" = "{{ $v }}",
     {{- end}}
 }
 {{- end}}

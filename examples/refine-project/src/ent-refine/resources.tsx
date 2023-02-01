@@ -1,5 +1,5 @@
 import * as Lists from "./list";
-import * as Show from "./show";
+import * as MainShow from "./main-show";
 import * as Create from "./create";
 import * as Edit from "./edit";
 import {
@@ -10,7 +10,7 @@ export const Resources = [
     {
         name: "Company",
         list: Lists.CompanyList,
-        show: Show.CompanyShow,
+        show: MainShow.CompanyMainShow,
         create: Create.CompanyCreate,
         edit: Edit.CompanyEdit,
         icon: <Icons.ShopOutlined/>,
@@ -18,7 +18,7 @@ export const Resources = [
     {
         name: "Country",
         list: Lists.CountryList,
-        show: Show.CountryShow,
+        show: MainShow.CountryMainShow,
         create: Create.CountryCreate,
         edit: Edit.CountryEdit,
         icon: <Icons.GlobalOutlined/>,
@@ -26,7 +26,7 @@ export const Resources = [
     {
         name: "Email",
         list: Lists.EmailList,
-        show: Show.EmailShow,
+        show: MainShow.EmailMainShow,
         create: Create.EmailCreate,
         edit: Edit.EmailEdit,
         icon: <Icons.MailOutlined/>,
@@ -34,7 +34,7 @@ export const Resources = [
     {
         name: "Image",
         list: Lists.ImageList,
-        show: Show.ImageShow,
+        show: MainShow.ImageMainShow,
         create: Create.ImageCreate,
         edit: Edit.ImageEdit,
         icon: <Icons.CameraOutlined/>,
@@ -42,7 +42,7 @@ export const Resources = [
     {
         name: "Location",
         list: Lists.LocationList,
-        show: Show.LocationShow,
+        show: MainShow.LocationMainShow,
         create: Create.LocationCreate,
         edit: Edit.LocationEdit,
         icon: <Icons.PushpinOutlined/>,
@@ -50,7 +50,7 @@ export const Resources = [
     {
         name: "Phone",
         list: Lists.PhoneList,
-        show: Show.PhoneShow,
+        show: MainShow.PhoneMainShow,
         create: Create.PhoneCreate,
         edit: Edit.PhoneEdit,
         icon: <Icons.PhoneOutlined/>,
@@ -58,7 +58,7 @@ export const Resources = [
     {
         name: "Product",
         list: Lists.ProductList,
-        show: Show.ProductShow,
+        show: MainShow.ProductMainShow,
         create: Create.ProductCreate,
         edit: Edit.ProductEdit,
         icon: <Icons.FileOutlined/>,
@@ -66,7 +66,7 @@ export const Resources = [
     {
         name: "Vendor",
         list: Lists.VendorList,
-        show: Show.VendorShow,
+        show: MainShow.VendorMainShow,
         create: Create.VendorCreate,
         edit: Edit.VendorEdit,
         icon: <Icons.StarOutlined/>,
@@ -74,7 +74,7 @@ export const Resources = [
     {
         name: "Warehouse",
         list: Lists.WarehouseList,
-        show: Show.WarehouseShow,
+        show: MainShow.WarehouseMainShow,
         create: Create.WarehouseCreate,
         edit: Edit.WarehouseEdit,
         icon: <Icons.OrderedListOutlined/>,
@@ -82,7 +82,7 @@ export const Resources = [
     {
         name: "Website",
         list: Lists.WebsiteList,
-        show: Show.WebsiteShow,
+        show: MainShow.WebsiteMainShow,
         create: Create.WebsiteCreate,
         edit: Edit.WebsiteEdit,
         icon: <Icons.LinkOutlined/>,

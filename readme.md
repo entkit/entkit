@@ -1,33 +1,39 @@
 # Ent-Refine "Everything is generated"
 
-### Links
-- Live demo here https://demo.entrefine.dev/
-- Package https://pkg.go.dev/github.com/diazoxide/ent-refine
+Ent-Refine is a powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI). 
 
-Ent-Refine is a union of two powerful frameworks [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI)
+It simplifies the process of generating CRUDs from Ent definitions with customizable views, fields, actions and search features.
 
-## Main futures
-1. Generating CRUDs by Ent definitions
-2. Every view of CRUD is customizable
-3. Every field of every kind of list/form/show is customizable by annotations
+## Live Demo and Package Info
+Live demo: https://demo.entrefine.dev/
+Go.dev Package: https://pkg.go.dev/github.com/diazoxide/ent-refine
+
+## Features
+1. Generates CRUD operations based on Ent definitions
+2. Customizable views for each CRUD operation
+3. Customizable fields for lists, forms, and show views using annotations
 4. Custom actions for items
-5. Relational view, nested lists with edges
-6. Search component to find records by every attribute, with a custom operator
+5. Relational view with nested lists and edges
+6. Smart search component to find records by every attribute with a custom operator
 7. Bulk actions on lists
-8. Using Graphql API only with custom Refine data-provider,
-9. Typescript types generating identically from Ent definitions
-10. Filters on columns with customizable operators
+8. Uses only a Graphql API with a custom Refine data-provider
+9. Generates TypeScript types from Ent definitions
+10. Column filters with customizable operators
 
 ![main.png](docs%2Fimages%2Fmain.png)
 
-### Smart search as a killer future
+### Smart search
+Ent-Refine provides a smart search component to easily find records by any attribute with a custom operator.
 ![search.gif](docs%2Fimages%2Fsearch.gif)
 
-> **Important:** platform is using a graphql as a data-provider interface **(GQL extension is mandatory)**
+
+## Requirements
+The platform uses a Graphql API as the data-provider interface and therefore a GQL extension is mandatory.
 
 ## How to set up?
 
-### Add extension to your Ent framework `entc.go` file.
+### Extension registration on entc.go
+Add extension to your Ent framework `entc.go` file.
 
 #### Example
 
@@ -295,7 +301,7 @@ On Ent-Refine every view of field is customizable for every type of layout.
     ![custom-list-field.png](docs%2Fimages%2Fcustom-list-field.png)
  
 ## Example
-For more information please check example folder.
+Check out the documentation for more information and examples.
 
 Both frameworks (Ent and Refine) are configured as described in documentation. 
 

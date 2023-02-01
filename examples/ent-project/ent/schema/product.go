@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	EntRefine "github.com/diazoxide/ent-refine"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/enums"
+	"github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/enums"
 	"github.com/google/uuid"
 )
 

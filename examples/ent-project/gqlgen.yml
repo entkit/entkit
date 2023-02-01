@@ -22,7 +22,7 @@ autobind:
 models:
   ID:
     model:
-      - github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/uuidgql.UUID
+      - github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/id.UUID
   Map:
     model:
       - github.com/99designs/gqlgen/graphql.Map

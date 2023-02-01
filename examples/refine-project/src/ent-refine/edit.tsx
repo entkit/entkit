@@ -77,6 +77,9 @@ export const CompanyEdit: React.FC = () => {
                         "logoImage": [ "id" ]
                     },
                     {
+                        "coverImage": [ "id" ]
+                    },
+                    {
                         "galleryImages": [
                             {
                                 edges: [
@@ -194,6 +197,23 @@ export const CompanyEdit: React.FC = () => {
             },
         ],
     });
+    const [ cover_imageCursors, setCoverImageCursors] = useState<Cursors>({})
+    const { selectProps: cover_imageSelectProps } = RA.useSelect<Interfaces.ICompany>({
+        resource: "Image",
+        optionLabel: "title",
+        optionValue: "id",
+        metaData:{
+            cursors: cover_imageCursors,
+            fields: ["id", "title"]
+        },
+        onSearch: (value) => [
+            {
+                field: "title",
+                operator: "contains",
+                value,
+            },
+        ],
+    });
     const [ gallery_imagesCursors, setGalleryImagesCursors] = useState<Cursors>({})
     const { selectProps: gallery_imagesSelectProps } = RA.useSelect<Interfaces.ICompany>({
         resource: "Image",
@@ -255,8 +275,11 @@ export const CompanyEdit: React.FC = () => {
                 <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_image" name="logoimageID" rules={[{required: false}]}>
+                <RA.Form.Item label="logo_image" name="logoImageID" rules={[{required: false}]}>
                     <RA.Select {...logo_imageSelectProps} mode={ undefined }/>
+                </RA.Form.Item>
+                <RA.Form.Item label="cover_image" name="coverImageID" rules={[{required: false}]}>
+                    <RA.Select {...cover_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
                 <RA.Form.Item label="gallery_images" name={["galleryImageIDs"]} rules={[{required: false}]}>
                     <RA.Select {...gallery_imagesSelectProps} mode={ "multiple" }/>
@@ -568,6 +591,9 @@ export const ImageEdit: React.FC = () => {
                     {
                         "logoCompany": [ "id" ]
                     },
+                    {
+                        "coverCompany": [ "id" ]
+                    },
                 ],
             }
         }
@@ -607,6 +633,23 @@ export const ImageEdit: React.FC = () => {
             },
         ],
     });
+    const [ cover_companyCursors, setCoverCompanyCursors] = useState<Cursors>({})
+    const { selectProps: cover_companySelectProps } = RA.useSelect<Interfaces.IImage>({
+        resource: "Company",
+        optionLabel: "name",
+        optionValue: "id",
+        metaData:{
+            cursors: cover_companyCursors,
+            fields: ["id", "name"]
+        },
+        onSearch: (value) => [
+            {
+                field: "name",
+                operator: "contains",
+                value,
+            },
+        ],
+    });
 
     return (
         <RA.Edit saveButtonProps={saveButtonProps}>
@@ -628,11 +671,14 @@ export const ImageEdit: React.FC = () => {
                      <FieldView.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="gallery_company" name="gallerycompanyID" rules={[{required: false}]}>
+                <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
                     <RA.Select {...gallery_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_company" name="logocompanyID" rules={[{required: false}]}>
+                <RA.Form.Item label="logo_company" name="logoCompanyID" rules={[{required: false}]}>
                     <RA.Select {...logo_companySelectProps} mode={ undefined }/>
+                </RA.Form.Item>
+                <RA.Form.Item label="cover_company" name="coverCompanyID" rules={[{required: false}]}>
+                    <RA.Select {...cover_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
         </RA.Edit>

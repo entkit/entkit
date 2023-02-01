@@ -63,6 +63,8 @@ func (Company) Edges() []ent.Edge {
 			Annotations(entgql.RelayConnection()),
 		edge.To("logo_image", Image.Type).
 			Unique(),
+		edge.To("cover_image", Image.Type).
+			Unique(),
 		edge.To("gallery_images", Image.Type).
 			Annotations(entgql.RelayConnection()),
 	}

@@ -15,8 +15,8 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/enums"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/uuidgql"
+	"github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/enums"
+	"github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/id"
 	"github.com/google/uuid"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -50,6 +50,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Company struct {
 		Countries     func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CountryOrder, where *ent.CountryWhereInput) int
+		CoverImage    func(childComplexity int) int
 		Description   func(childComplexity int) int
 		Emails        func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.EmailOrder, where *ent.EmailWhereInput) int
 		GalleryImages func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ImageOrder, where *ent.ImageWhereInput) int
@@ -116,6 +117,7 @@ type ComplexityRoot struct {
 	}
 
 	Image struct {
+		CoverCompany   func(childComplexity int) int
 		GalleryCompany func(childComplexity int) int
 		ID             func(childComplexity int) int
 		LogoCompany    func(childComplexity int) int
@@ -398,6 +400,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Company.Countries(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.CountryOrder), args["where"].(*ent.CountryWhereInput)), true
+
+	case "Company.coverImage":
+		if e.complexity.Company.CoverImage == nil {
+			break
+		}
+
+		return e.complexity.Company.CoverImage(childComplexity), true
 
 	case "Company.description":
 		if e.complexity.Company.Description == nil {
@@ -721,6 +730,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailEdge.Node(childComplexity), true
+
+	case "Image.coverCompany":
+		if e.complexity.Image.CoverCompany == nil {
+			break
+		}
+
+		return e.complexity.Image.CoverCompany(childComplexity), true
 
 	case "Image.galleryCompany":
 		if e.complexity.Image.GalleryCompany == nil {
@@ -2117,6 +2133,7 @@ type Company implements Node {
     where: LocationWhereInput
   ): LocationConnection!
   logoImage: Image
+  coverImage: Image
   galleryImages(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -2245,6 +2262,9 @@ input CompanyWhereInput {
   """logo_image edge predicates"""
   hasLogoImage: Boolean
   hasLogoImageWith: [ImageWhereInput!]
+  """cover_image edge predicates"""
+  hasCoverImage: Boolean
+  hasCoverImageWith: [ImageWhereInput!]
   """gallery_images edge predicates"""
   hasGalleryImages: Boolean
   hasGalleryImagesWith: [ImageWhereInput!]
@@ -2452,6 +2472,7 @@ input CreateCompanyInput {
   websiteIDs: [ID!]
   locationIDs: [ID!]
   logoImageID: ID
+  coverImageID: ID
   galleryImageIDs: [ID!]
 }
 """
@@ -2487,6 +2508,7 @@ input CreateImageInput {
   originalURL: String!
   galleryCompanyID: ID
   logoCompanyID: ID
+  coverCompanyID: ID
 }
 """
 CreateLocationInput is used for create Location object.
@@ -2680,6 +2702,7 @@ type Image implements Node {
   originalURL: String!
   galleryCompany: Company
   logoCompany: Company
+  coverCompany: Company
 }
 """A connection to a list of items."""
 type ImageConnection {
@@ -2760,6 +2783,9 @@ input ImageWhereInput {
   """logo_company edge predicates"""
   hasLogoCompany: Boolean
   hasLogoCompanyWith: [CompanyWhereInput!]
+  """cover_company edge predicates"""
+  hasCoverCompany: Boolean
+  hasCoverCompanyWith: [CompanyWhereInput!]
 }
 type Location implements Node {
   id: ID!
@@ -3178,7 +3204,7 @@ enum ProductOrderField {
   BUILD_STATUS
 }
 """ProductProcessStatus is enum for the field status"""
-enum ProductProcessStatus @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent/enums.ProcessStatus") {
+enum ProductProcessStatus @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/enums.ProcessStatus") {
   none
   done
   enqueued
@@ -3557,6 +3583,8 @@ input UpdateCompanyInput {
   clearLocations: Boolean
   logoImageID: ID
   clearLogoImage: Boolean
+  coverImageID: ID
+  clearCoverImage: Boolean
   addGalleryImageIDs: [ID!]
   removeGalleryImageIDs: [ID!]
   clearGalleryImages: Boolean
@@ -3608,6 +3636,8 @@ input UpdateImageInput {
   clearGalleryCompany: Boolean
   logoCompanyID: ID
   clearLogoCompany: Boolean
+  coverCompanyID: ID
+  clearCoverCompany: Boolean
 }
 """
 UpdateLocationInput is used for update Location object.
@@ -6799,6 +6829,63 @@ func (ec *executionContext) fieldContext_Company_logoImage(ctx context.Context, 
 				return ec.fieldContext_Image_galleryCompany(ctx, field)
 			case "logoCompany":
 				return ec.fieldContext_Image_logoCompany(ctx, field)
+			case "coverCompany":
+				return ec.fieldContext_Image_coverCompany(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Company_coverImage(ctx context.Context, field graphql.CollectedField, obj *ent.Company) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Company_coverImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CoverImage(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Image)
+	fc.Result = res
+	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Company_coverImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Company",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Image_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Image_title(ctx, field)
+			case "originalURL":
+				return ec.fieldContext_Image_originalURL(ctx, field)
+			case "galleryCompany":
+				return ec.fieldContext_Image_galleryCompany(ctx, field)
+			case "logoCompany":
+				return ec.fieldContext_Image_logoCompany(ctx, field)
+			case "coverCompany":
+				return ec.fieldContext_Image_coverCompany(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
 		},
@@ -7070,6 +7157,8 @@ func (ec *executionContext) fieldContext_CompanyEdge_node(ctx context.Context, f
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -8050,6 +8139,8 @@ func (ec *executionContext) fieldContext_Email_company(ctx context.Context, fiel
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -8550,6 +8641,8 @@ func (ec *executionContext) fieldContext_Image_galleryCompany(ctx context.Contex
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -8615,6 +8708,75 @@ func (ec *executionContext) fieldContext_Image_logoCompany(ctx context.Context, 
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
+			case "galleryImages":
+				return ec.fieldContext_Company_galleryImages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Image_coverCompany(ctx context.Context, field graphql.CollectedField, obj *ent.Image) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Image_coverCompany(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CoverCompany(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Company)
+	fc.Result = res
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Image_coverCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Company_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Company_name(ctx, field)
+			case "logo":
+				return ec.fieldContext_Company_logo(ctx, field)
+			case "description":
+				return ec.fieldContext_Company_description(ctx, field)
+			case "countries":
+				return ec.fieldContext_Company_countries(ctx, field)
+			case "phones":
+				return ec.fieldContext_Company_phones(ctx, field)
+			case "emails":
+				return ec.fieldContext_Company_emails(ctx, field)
+			case "websites":
+				return ec.fieldContext_Company_websites(ctx, field)
+			case "locations":
+				return ec.fieldContext_Company_locations(ctx, field)
+			case "logoImage":
+				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -8815,6 +8977,8 @@ func (ec *executionContext) fieldContext_ImageEdge_node(ctx context.Context, fie
 				return ec.fieldContext_Image_galleryCompany(ctx, field)
 			case "logoCompany":
 				return ec.fieldContext_Image_logoCompany(ctx, field)
+			case "coverCompany":
+				return ec.fieldContext_Image_coverCompany(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
 		},
@@ -9450,6 +9614,8 @@ func (ec *executionContext) fieldContext_Location_company(ctx context.Context, f
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -10440,6 +10606,8 @@ func (ec *executionContext) fieldContext_Mutation_createCompany(ctx context.Cont
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -10519,6 +10687,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCompany(ctx context.Cont
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -11652,6 +11822,8 @@ func (ec *executionContext) fieldContext_Mutation_createImage(ctx context.Contex
 				return ec.fieldContext_Image_galleryCompany(ctx, field)
 			case "logoCompany":
 				return ec.fieldContext_Image_logoCompany(ctx, field)
+			case "coverCompany":
+				return ec.fieldContext_Image_coverCompany(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
 		},
@@ -11719,6 +11891,8 @@ func (ec *executionContext) fieldContext_Mutation_updateImage(ctx context.Contex
 				return ec.fieldContext_Image_galleryCompany(ctx, field)
 			case "logoCompany":
 				return ec.fieldContext_Image_logoCompany(ctx, field)
+			case "coverCompany":
+				return ec.fieldContext_Image_coverCompany(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
 		},
@@ -12238,6 +12412,8 @@ func (ec *executionContext) fieldContext_Phone_company(ctx context.Context, fiel
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -12882,7 +13058,7 @@ func (ec *executionContext) _Product_status(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(enums.ProcessStatus)
 	fc.Result = res
-	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, field.Selections, res)
+	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12926,7 +13102,7 @@ func (ec *executionContext) _Product_buildStatus(ctx context.Context, field grap
 	}
 	res := resTmp.(enums.ProcessStatus)
 	fc.Result = res
-	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, field.Selections, res)
+	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_buildStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15525,6 +15701,8 @@ func (ec *executionContext) fieldContext_Website_company(ctx context.Context, fi
 				return ec.fieldContext_Company_locations(ctx, field)
 			case "logoImage":
 				return ec.fieldContext_Company_logoImage(ctx, field)
+			case "coverImage":
+				return ec.fieldContext_Company_coverImage(ctx, field)
 			case "galleryImages":
 				return ec.fieldContext_Company_galleryImages(ctx, field)
 			}
@@ -18166,6 +18344,22 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
+		case "hasCoverImage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverImage"))
+			it.HasCoverImage, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCoverImageWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverImageWith"))
+			it.HasCoverImageWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "hasGalleryImages":
 			var err error
 
@@ -18695,6 +18889,14 @@ func (ec *executionContext) unmarshalInputCreateCompanyInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "coverImageID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coverImageID"))
+			it.CoverImageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "galleryImageIDs":
 			var err error
 
@@ -18873,6 +19075,14 @@ func (ec *executionContext) unmarshalInputCreateImageInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoCompanyID"))
 			it.LogoCompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "coverCompanyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coverCompanyID"))
+			it.CoverCompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19109,7 +19319,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19117,7 +19327,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20159,6 +20369,22 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLogoCompanyWith"))
 			it.HasLogoCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCoverCompany":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverCompany"))
+			it.HasCoverCompany, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCoverCompanyWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverCompanyWith"))
+			it.HasCoverCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22700,7 +22926,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22708,7 +22934,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.StatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22716,7 +22942,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.StatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22724,7 +22950,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.StatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22732,7 +22958,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22740,7 +22966,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusNEQ"))
-			it.BuildStatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22748,7 +22974,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusIn"))
-			it.BuildStatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.BuildStatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22756,7 +22982,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusNotIn"))
-			it.BuildStatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.BuildStatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22972,6 +23198,22 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLogoImage"))
 			it.ClearLogoImage, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "coverImageID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coverImageID"))
+			it.CoverImageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCoverImage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCoverImage"))
+			it.ClearCoverImage, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23284,6 +23526,22 @@ func (ec *executionContext) unmarshalInputUpdateImageInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "coverCompanyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coverCompanyID"))
+			it.CoverCompanyID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCoverCompany":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCoverCompany"))
+			it.ClearCoverCompany, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -23581,7 +23839,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23589,7 +23847,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25477,6 +25735,23 @@ func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
+		case "coverImage":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Company_coverImage(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "galleryImages":
 			field := field
 
@@ -26004,6 +26279,23 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 					}
 				}()
 				res = ec._Image_logoCompany(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "coverCompany":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Image_coverCompany(ctx, field, obj)
 				return res
 			}
 
@@ -28345,12 +28637,12 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v interface{}) (uuid.UUID, error) {
-	res, err := uuidgql.UnmarshalUUID(v)
+	res, err := id.UnmarshalUUID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, sel ast.SelectionSet, v uuid.UUID) graphql.Marshaler {
-	res := uuidgql.MarshalUUID(v)
+	res := id.MarshalUUID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28664,13 +28956,13 @@ func (ec *executionContext) marshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxid
 	return v
 }
 
-func (ec *executionContext) unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (enums.ProcessStatus, error) {
 	var res enums.ProcessStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v enums.ProcessStatus) graphql.Marshaler {
 	return v
 }
 
@@ -29590,7 +29882,7 @@ func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(
 	if v == nil {
 		return nil, nil
 	}
-	res, err := uuidgql.UnmarshalUUID(v)
+	res, err := id.UnmarshalUUID(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -29598,7 +29890,7 @@ func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ct
 	if v == nil {
 		return graphql.Null
 	}
-	res := uuidgql.MarshalUUID(*v)
+	res := id.MarshalUUID(*v)
 	return res
 }
 
@@ -29961,7 +30253,7 @@ func (ec *executionContext) unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx context.Context, v interface{}) ([]enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, v interface{}) ([]enums.ProcessStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29973,7 +30265,7 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdia
 	res := make([]enums.ProcessStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29981,7 +30273,7 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.ProcessStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -30008,7 +30300,7 @@ func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30028,7 +30320,7 @@ func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (*enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (*enums.ProcessStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30037,7 +30329,7 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdia
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v *enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentᚑrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v *enums.ProcessStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

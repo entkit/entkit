@@ -1,0 +1,26 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+
+{{- define "badge.tsx" -}}
+import RefineReactRouter from "@pankod/refine-react-router-v6";
+import * as RA  from "@pankod/refine-antd";
+import { BaseKey } from "@pankod/refine-core/dist/interfaces";
+import * as Show from "./show";
+
+const { Link } = RefineReactRouter;
+
+{{- range $n := $.Graph.Nodes }}
+
+export const {{ $n.Name }}Badge: React.FC<{id?: BaseKey, title?: string}> = ({id, title}) => {
+    return <RA.Popover
+        title={title}
+        overlayInnerStyle={ {width: "50vw", height: "40vh", maxHeight:"400px", maxWidth:"500px", overflow: "auto"} }
+        content={ <Show.{{$n.Name}}Show breadcrumb={false} title={title} id={id} withEdges={false} headerButtons={[]}/> }
+    >
+        <Link to={ "/{{ $n.Name }}/show/"+ id}>
+            { title }
+        </Link>
+    </RA.Popover>
+}
+
+{{- end }}
+{{- end -}}

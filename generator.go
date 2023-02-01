@@ -27,6 +27,7 @@ var (
 		"graphql-request":   "^4.3.0",
 		"graphql":           "^15.6.1",
 		"lodash":            "^4.17.21",
+		"reaflow":           "^5.1.2",
 	}
 
 	JsDevDependencies = map[string]string{
@@ -153,11 +154,13 @@ func (rg *RefineGen) Generate() {
 	var (
 		DynamicTemplates = []*gen.Template{
 			parseT("refine-templates/Definition.gots"),
+			parseT("refine-templates/Show.gotsx"),
+			parseT("refine-templates/MainShow.gotsx"),
+			parseT("refine-templates/Badge.gotsx"),
 			parseT("refine-templates/Form.gotsx"),
 			parseT("refine-templates/Table.gotsx"),
 			parseT("refine-templates/List.gotsx"),
 			parseT("refine-templates/Resources.gotsx"),
-			parseT("refine-templates/Show.gotsx"),
 			parseT("refine-templates/Interfaces.gots"),
 			parseT("refine-templates/DataProvider.gots"),
 			parseT("refine-templates/SearchComponent.gotsx"),
@@ -220,7 +223,7 @@ func (rg *RefineGen) updatePackageJson() {
 		log.Fatalln(err.Error())
 	}
 
-	cmd := exec.Command("/bin/sh", "-c", "npm ls || npm ci ; npm run build")
+	cmd := exec.Command("/bin/sh", "-c", "npm i; npm run build")
 	cmd.Dir = rg.Extension.AppPath
 	out, err := cmd.Output()
 	println(string(out))

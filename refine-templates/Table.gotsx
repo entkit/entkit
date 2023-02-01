@@ -9,6 +9,7 @@ import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 import * as FieldView from "./field-view";
+import * as Badge  from "./badge";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
@@ -127,9 +128,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     title="{{ $e.Name | ER_label }}"
                     render={
                         {{- if $e.Unique }}
-                        (value)=>(<Link to={ "/{{$e.Type.Name}}/show/"+ value?.id}>
-                            { value?.{{$titleField.Name}} }
-                        </Link>)
+                        (value)=>(<Badge.{{$e.Type.Name}}Badge id={ value?.id } title={ value?.{{$titleField.Name}} }/>)
                         {{- else }}
                         (value)=><span>{ value?.totalCount || "No" } Items</span>
                         {{- end }}

@@ -46,6 +46,9 @@ func (Image) Edges() []ent.Edge {
 		edge.From("logo_company", Company.Type).
 			Ref("logo_image").
 			Unique(),
+		edge.From("cover_company", Company.Type).
+			Ref("cover_image").
+			Unique(),
 	}
 }
 

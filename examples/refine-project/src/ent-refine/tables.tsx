@@ -6,6 +6,7 @@ import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 import * as FieldView from "./field-view";
+import * as Badge  from "./badge";
 
 
 export type CompanyTableProps = RA.TableProps<Interfaces.ICompany> & { extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError> }
@@ -92,6 +93,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     "totalCount",
                 ]},
                 {"logoImage": [ "id", "title" ]},
+                {"coverImage": [ "id", "title" ]},
                 {"galleryImages": [
                     {
                         edges: [
@@ -205,9 +207,14 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="logoImage"
                     title="Logo Image"
                     render={
-                        (value)=>(<Link to={ "/Image/show/"+ value?.id}>
-                            { value?.title }
-                        </Link>)
+                        (value)=>(<Badge.ImageBadge id={ value?.id } title={ value?.title }/>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="coverImage"
+                    title="Cover Image"
+                    render={
+                        (value)=>(<Badge.ImageBadge id={ value?.id } title={ value?.title }/>)
                     }
                 />
                 <RA.Table.Column
@@ -703,18 +710,14 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -843,6 +846,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                 "originalURL",
                 {"galleryCompany": [ "id", "name" ]},
                 {"logoCompany": [ "id", "name" ]},
+                {"coverCompany": [ "id", "name" ]},
             ],
             cursors,
         },
@@ -910,18 +914,21 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="galleryCompany"
                     title="Gallery Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="logoCompany"
                     title="Logo Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                    }
+                />
+                <RA.Table.Column
+                    dataIndex="coverCompany"
+                    title="Cover Company"
+                    render={
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1306,18 +1313,14 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1555,18 +1558,14 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1916,18 +1915,14 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="warehouse"
                     title="Warehouse"
                     render={
-                        (value)=>(<Link to={ "/Warehouse/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.WarehouseBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="vendor"
                     title="Vendor"
                     render={
-                        (value)=>(<Link to={ "/Vendor/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.VendorBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -2424,9 +2419,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="vendor"
                     title="Vendor"
                     render={
-                        (value)=>(<Link to={ "/Vendor/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.VendorBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}
@@ -2643,18 +2636,14 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Link to={ "/Company/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Link to={ "/Country/show/"+ value?.id}>
-                            { value?.name }
-                        </Link>)
+                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
                     }
                 />
                 {/* endregion Edges*/}

@@ -1,0 +1,13 @@
+{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- define "main-show.tsx" -}}
+
+import * as Show from "./show";
+
+{{ range $n := $.Graph.Nodes -}}
+export const {{$n.Name}}MainShow : React.FC = () => {
+    return <Show.{{$n.Name}}Show withEdges={true}/>
+};
+
+{{- end }}
+
+{{- end -}}
