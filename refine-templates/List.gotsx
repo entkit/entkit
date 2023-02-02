@@ -1,6 +1,6 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "list.tsx" -}}
-
+/* eslint no-use-before-define: 0 */
 import React, {useEffect, useState} from "react";
 import {IResourceComponentsProps, HttpError, useDeleteMany} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
@@ -43,4 +43,5 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
 };
 
 {{- end -}}
+/* eslint no-use-before-define: 2 */
 {{- end -}}

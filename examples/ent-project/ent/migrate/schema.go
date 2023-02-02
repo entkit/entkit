@@ -26,7 +26,6 @@ var (
 	CompaniesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Size: 128},
-		{Name: "logo", Type: field.TypeString, Nullable: true, Size: 128},
 		{Name: "description", Type: field.TypeString, Size: 512},
 	}
 	// CompaniesTable holds the schema information for the "companies" table.

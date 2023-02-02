@@ -1,15 +1,19 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "partial:imports" -}}
+/* eslint no-use-before-define: 0 */
 import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 import CodeEditor from '@uiw/react-textarea-code-editor';
-import * as FieldView from "./field-view";
+import * as View from "./view";
 import * as Custom from "./custom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+{{- end -}}
+{{- define "partial:footer" -}}
+/* eslint no-use-before-define: 2 */
 {{- end -}}
 
 {{- define "partial:selectProps" }}
@@ -53,9 +57,9 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Na
     })}
     {{- end }}
 >
-    {{- $viewName := ( print "FieldView." (ER_fieldTSType .) "ViewOnForm" ) }}
-    {{- if not (empty .Annotations.REFINE.FieldViewOnForm) }}
-    {{ $viewName = print "Custom." .Annotations.REFINE.FieldViewOnForm }}
+    {{- $viewName := ( print "View." (ER_fieldTSType .) "ViewOnForm" ) }}
+    {{- if not (empty .Annotations.REFINE.ViewOnForm) }}
+    {{ $viewName = print "Custom." .Annotations.REFINE.ViewOnForm }}
     {{- end}}
      <{{$viewName}}/>
 </RA.Form.Item>
@@ -132,6 +136,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
 };
 
 {{- end -}}
+{{ template "partial:footer" . }}
 {{- end -}}
 
 
@@ -160,5 +165,6 @@ export const {{$n.Name}}Create: React.FC = () => {
 };
 
 {{- end -}}
+{{ template "partial:footer" . }}
 {{- end -}}
 

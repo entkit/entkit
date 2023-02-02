@@ -1,6 +1,6 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "tables.tsx" -}}
-
+/* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
 import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
@@ -8,8 +8,7 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
-import * as FieldView from "./field-view";
-import * as Badge  from "./badge";
+import * as View from "./view";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
@@ -41,20 +40,30 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
         ],
         metaData: {
             fields: [
-                "{{ $n.ID.Name }}",
-                {{- range $f :=  $n.Fields}}
+                {{- range $f :=  $allFields}}
                 "{{ $f.Name | camel }}",
                 {{- end }}
                 {{- range $e :=  $n.Edges}}
+                {{- $edgeAllFields := prepend $e.Type.Fields $e.Type.ID }}
                 {{- $titleField := (ER_titleField $e.Type) }}
                 {{- if $e.Unique }}
-                {"{{ $e.Name | camel }}": [ "{{$e.Type.ID.Name}}", "{{$titleField.Name}}" ]},
+                {
+                    "{{ $e.Name | camel }}": [
+                        {{- range $f :=  $edgeAllFields}}
+                        "{{ $f.Name | camel }}",
+                        {{- end }}
+                    ]
+                },
                 {{- else }}
                 {"{{ $e.Name | camel }}": [
                     {
                         edges: [
                             {
-                                node: ["{{$e.Type.ID.Name}}", "{{$titleField.Name}}"]
+                                node: [
+                                    {{- range $f :=  $edgeAllFields}}
+                                    "{{ $f.Name | camel }}",
+                                    {{- end }}
+                                ]
                             },
                         ],
                     },
@@ -88,9 +97,9 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     }
                     {{- end }}
                     render={ (value)=> {
-                        {{- $viewName := ( print "FieldView." (ER_fieldTSType $f) "ViewOnList" ) }}
-                        {{- if not (empty $f.Annotations.REFINE.FieldViewOnList) }}
-                        {{ $viewName = print "Custom." $f.Annotations.REFINE.FieldViewOnList }}
+                        {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnList" ) }}
+                        {{- if not (empty $f.Annotations.REFINE.ViewOnList) }}
+                        {{ $viewName = print "Custom." $f.Annotations.REFINE.ViewOnList }}
                         {{- end}}
                         return <{{$viewName}} value={ value } />
                     } }
@@ -128,7 +137,11 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     title="{{ $e.Name | ER_label }}"
                     render={
                         {{- if $e.Unique }}
-                        (value)=>(<Badge.{{$e.Type.Name}}Badge id={ value?.id } title={ value?.{{$titleField.Name}} }/>)
+                        {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
+                        {{- if not (empty $e.Annotations.REFINE.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.REFINE.Badge }}
+                        {{- end}}
+                        (value)=>(<{{$viewName}} { ...value } />)
                         {{- else }}
                         (value)=><span>{ value?.totalCount || "No" } Items</span>
                         {{- end }}
@@ -218,4 +231,5 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
     );
 };
 {{- end -}}
+/* eslint no-use-before-define: 2 */
 {{- end -}}

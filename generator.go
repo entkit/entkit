@@ -156,7 +156,6 @@ func (rg *RefineGen) Generate() {
 			parseT("refine-templates/Definition.gots"),
 			parseT("refine-templates/Show.gotsx"),
 			parseT("refine-templates/MainShow.gotsx"),
-			parseT("refine-templates/Badge.gotsx"),
 			parseT("refine-templates/Form.gotsx"),
 			parseT("refine-templates/Table.gotsx"),
 			parseT("refine-templates/List.gotsx"),
@@ -165,7 +164,7 @@ func (rg *RefineGen) Generate() {
 			parseT("refine-templates/DataProvider.gots"),
 			parseT("refine-templates/SearchComponent.gotsx"),
 			parseT("refine-templates/SorterEnums.gotsx"),
-			parseT("refine-templates/FieldViews.gotsx"),
+			parseT("refine-templates/View.gotsx"),
 			parseT("refine-templates/Helpers.gotsx"),
 		}
 		StaticTemplates = []*gen.Template{

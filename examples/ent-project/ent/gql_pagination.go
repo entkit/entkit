@@ -473,16 +473,6 @@ var (
 			}
 		},
 	}
-	// CompanyOrderFieldLogo orders Company by logo.
-	CompanyOrderFieldLogo = &CompanyOrderField{
-		field: company.FieldLogo,
-		toCursor: func(c *Company) Cursor {
-			return Cursor{
-				ID:    c.ID,
-				Value: c.Logo,
-			}
-		},
-	}
 	// CompanyOrderFieldDescription orders Company by description.
 	CompanyOrderFieldDescription = &CompanyOrderField{
 		field: company.FieldDescription,
@@ -501,8 +491,6 @@ func (f CompanyOrderField) String() string {
 	switch f.field {
 	case company.FieldName:
 		str = "NAME"
-	case company.FieldLogo:
-		str = "LOGO"
 	case company.FieldDescription:
 		str = "DESCRIPTION"
 	}
@@ -523,8 +511,6 @@ func (f *CompanyOrderField) UnmarshalGQL(v interface{}) error {
 	switch str {
 	case "NAME":
 		*f = *CompanyOrderFieldName
-	case "LOGO":
-		*f = *CompanyOrderFieldLogo
 	case "DESCRIPTION":
 		*f = *CompanyOrderFieldDescription
 	default:

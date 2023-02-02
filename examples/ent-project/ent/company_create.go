@@ -46,20 +46,6 @@ func (cc *CompanyCreate) SetName(s string) *CompanyCreate {
 	return cc
 }
 
-// SetLogo sets the "logo" field.
-func (cc *CompanyCreate) SetLogo(s string) *CompanyCreate {
-	cc.mutation.SetLogo(s)
-	return cc
-}
-
-// SetNillableLogo sets the "logo" field if the given value is not nil.
-func (cc *CompanyCreate) SetNillableLogo(s *string) *CompanyCreate {
-	if s != nil {
-		cc.SetLogo(*s)
-	}
-	return cc
-}
-
 // SetDescription sets the "description" field.
 func (cc *CompanyCreate) SetDescription(s string) *CompanyCreate {
 	cc.mutation.SetDescription(s)
@@ -259,11 +245,6 @@ func (cc *CompanyCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
 		}
 	}
-	if v, ok := cc.mutation.Logo(); ok {
-		if err := company.LogoValidator(v); err != nil {
-			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Company.description"`)}
 	}
@@ -316,10 +297,6 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(company.FieldName, field.TypeString, value)
 		_node.Name = value
-	}
-	if value, ok := cc.mutation.Logo(); ok {
-		_spec.SetField(company.FieldLogo, field.TypeString, value)
-		_node.Logo = &value
 	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)

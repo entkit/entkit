@@ -69,7 +69,6 @@ type CompanyMutation struct {
 	typ                   string
 	id                    *uuid.UUID
 	name                  *string
-	logo                  *string
 	description           *string
 	clearedFields         map[string]struct{}
 	countries             map[uuid.UUID]struct{}
@@ -237,55 +236,6 @@ func (m *CompanyMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *CompanyMutation) ResetName() {
 	m.name = nil
-}
-
-// SetLogo sets the "logo" field.
-func (m *CompanyMutation) SetLogo(s string) {
-	m.logo = &s
-}
-
-// Logo returns the value of the "logo" field in the mutation.
-func (m *CompanyMutation) Logo() (r string, exists bool) {
-	v := m.logo
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLogo returns the old "logo" field's value of the Company entity.
-// If the Company object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CompanyMutation) OldLogo(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLogo is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLogo requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLogo: %w", err)
-	}
-	return oldValue.Logo, nil
-}
-
-// ClearLogo clears the value of the "logo" field.
-func (m *CompanyMutation) ClearLogo() {
-	m.logo = nil
-	m.clearedFields[company.FieldLogo] = struct{}{}
-}
-
-// LogoCleared returns if the "logo" field was cleared in this mutation.
-func (m *CompanyMutation) LogoCleared() bool {
-	_, ok := m.clearedFields[company.FieldLogo]
-	return ok
-}
-
-// ResetLogo resets all changes to the "logo" field.
-func (m *CompanyMutation) ResetLogo() {
-	m.logo = nil
-	delete(m.clearedFields, company.FieldLogo)
 }
 
 // SetDescription sets the "description" field.
@@ -760,12 +710,9 @@ func (m *CompanyMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CompanyMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, company.FieldName)
-	}
-	if m.logo != nil {
-		fields = append(fields, company.FieldLogo)
 	}
 	if m.description != nil {
 		fields = append(fields, company.FieldDescription)
@@ -780,8 +727,6 @@ func (m *CompanyMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case company.FieldName:
 		return m.Name()
-	case company.FieldLogo:
-		return m.Logo()
 	case company.FieldDescription:
 		return m.Description()
 	}
@@ -795,8 +740,6 @@ func (m *CompanyMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case company.FieldName:
 		return m.OldName(ctx)
-	case company.FieldLogo:
-		return m.OldLogo(ctx)
 	case company.FieldDescription:
 		return m.OldDescription(ctx)
 	}
@@ -814,13 +757,6 @@ func (m *CompanyMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
-		return nil
-	case company.FieldLogo:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLogo(v)
 		return nil
 	case company.FieldDescription:
 		v, ok := value.(string)
@@ -858,11 +794,7 @@ func (m *CompanyMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CompanyMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(company.FieldLogo) {
-		fields = append(fields, company.FieldLogo)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -875,11 +807,6 @@ func (m *CompanyMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CompanyMutation) ClearField(name string) error {
-	switch name {
-	case company.FieldLogo:
-		m.ClearLogo()
-		return nil
-	}
 	return fmt.Errorf("unknown Company nullable field %s", name)
 }
 
@@ -889,9 +816,6 @@ func (m *CompanyMutation) ResetField(name string) error {
 	switch name {
 	case company.FieldName:
 		m.ResetName()
-		return nil
-	case company.FieldLogo:
-		m.ResetLogo()
 		return nil
 	case company.FieldDescription:
 		m.ResetDescription()

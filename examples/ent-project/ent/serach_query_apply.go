@@ -42,7 +42,6 @@ func (cwi *CompanyWhereInput) ApplySearchQuery(q *string) *CompanyWhereInput {
 
 	var orPredicates []predicate.Company
 	orPredicates = append(orPredicates, company.NameContains(*q))
-	orPredicates = append(orPredicates, company.LogoEQ(*q))
 	orPredicates = append(orPredicates, company.DescriptionContains(*q))
 	// id uuid Field
 	u, err := uuid.Parse(*q)

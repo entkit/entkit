@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import * as Lists from "./list";
 import * as MainShow from "./main-show";
 import * as Create from "./create";
@@ -88,3 +89,4 @@ export const Resources = [
         icon: <Icons.LinkOutlined/>,
     },
 ];
+/* eslint no-use-before-define: 2 */

@@ -27,8 +27,6 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldLogo holds the string denoting the logo field in the database.
-	FieldLogo = "logo"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// EdgeCountries holds the string denoting the countries edge name in mutations.
@@ -109,7 +107,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
-	FieldLogo,
 	FieldDescription,
 }
 
@@ -132,8 +129,6 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// LogoValidator is a validator for the "logo" field. It is called by the builders before save.
-	LogoValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.

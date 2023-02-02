@@ -1,10 +1,11 @@
+/* eslint no-use-before-define: 0 */
 import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 import CodeEditor from '@uiw/react-textarea-code-editor';
-import * as FieldView from "./field-view";
+import * as View from "./view";
 import * as Custom from "./custom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = () => {
@@ -155,21 +156,14 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
-                </RA.Form.Item>
-                <RA.Form.Item
-                    name="logo"
-                    label="Logo"
-                    rules={[{required: false}]}
-                >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_RichTextViewOnForm/>
+                     <View.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
@@ -296,14 +290,14 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="code"
                     label="Code"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="companies" name={["companyIDs"]} rules={[{required: false}]}>
@@ -370,21 +364,21 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="address"
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -459,14 +453,14 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="originalURL"
                     label="Original Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
@@ -527,77 +521,77 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="latitude"
                     label="Latitude"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="longitude"
                     label="Longitude"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="address"
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="postcode"
                     label="Postcode"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="type"
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="state"
                     label="State"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="suburb"
                     label="Suburb"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="streetType"
                     label="Street Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="streetName"
                     label="Street Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -655,28 +649,28 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="number"
                     label="Number"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="type"
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -734,42 +728,42 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_RichTextViewOnForm/>
+                     <View.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="image"
                     label="Image"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="url"
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_URLViewOnForm/>
+                     <View.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="status"
                     label="Status"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="buildStatus"
                     label="Build Status"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
@@ -827,14 +821,14 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="schema"
                     label="Schema"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_CodeViewOnForm/>
+                     <View.ER_CodeViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="warehouses" name={["warehouseIDs"]} rules={[{required: false}]}>
@@ -892,28 +886,28 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="originalData"
                     label="Original Data"
                     rules={[{required: false}]}
                 >
-                     <FieldView.ER_CodeViewOnForm/>
+                     <View.ER_CodeViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="enabled"
                     label="Enabled"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_BooleanViewOnForm/>
+                     <View.ER_BooleanViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="filters"
                     label="Filters"
                     rules={[{required: false}]}
                 >
-                     <FieldView.ER_StringListViewOnForm/>
+                     <View.ER_StringListViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
@@ -971,21 +965,21 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="url"
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_URLViewOnForm/>
+                     <View.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -997,4 +991,4 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
             </RA.Form>
         </RA.Create>
     );
-};
+};/* eslint no-use-before-define: 2 */

@@ -1,6 +1,5 @@
-export const CompanySorterEnums = {
+/* eslint no-use-before-define: 0 */export const CompanySorterEnums = {
     "name": "NAME",
-    "logo": "LOGO",
     "description": "DESCRIPTION",
 }
 export const CountrySorterEnums = {
@@ -59,3 +58,5 @@ export const WebsiteSorterEnums = {
     "description": "DESCRIPTION",
     "url": "URL",
 }
+
+/* eslint no-use-before-define: 2 */

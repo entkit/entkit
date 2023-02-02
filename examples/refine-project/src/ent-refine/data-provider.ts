@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import {
     CrudFilters,
     CrudSorting,
@@ -475,3 +476,4 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 };
 
 export default dataProvider;
+/* eslint no-use-before-define: 2 */

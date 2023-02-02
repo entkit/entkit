@@ -41,12 +41,8 @@ func init() {
 	companyDescName := companyFields[1].Descriptor()
 	// company.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	company.NameValidator = companyDescName.Validators[0].(func(string) error)
-	// companyDescLogo is the schema descriptor for logo field.
-	companyDescLogo := companyFields[2].Descriptor()
-	// company.LogoValidator is a validator for the "logo" field. It is called by the builders before save.
-	company.LogoValidator = companyDescLogo.Validators[0].(func(string) error)
 	// companyDescDescription is the schema descriptor for description field.
-	companyDescDescription := companyFields[3].Descriptor()
+	companyDescDescription := companyFields[2].Descriptor()
 	// company.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	company.DescriptionValidator = companyDescDescription.Validators[0].(func(string) error)
 	// companyDescID is the schema descriptor for id field.

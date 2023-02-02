@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import { useState } from "react";
 import {BaseKey} from "@pankod/refine-core/dist/interfaces";
 import { useShow, useOne } from "@pankod/refine-core";
@@ -8,9 +9,8 @@ import {Canvas, Label, Node, Edge} from "reaflow";
 import * as Tables from "./tables";
 import * as Lists from "./list";
 import * as Interfaces from "./interfaces";
-import * as FieldView from "./field-view";
+import * as View from "./view";
 import * as Custom from "./custom";
-import * as Badge  from "./badge";
 
 const { Link } = RefineReactRouter;
 
@@ -28,14 +28,17 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
             fields: [
                 "id",
                 "name",
-                "logo",
                 "description",
                 {
                     "countries": [
                         {
                             edges: [
                                 {
-                                    node: [ "id", "name" ],
+                                    node: [
+                                        "id",
+                                        "name",
+                                        "code",
+                                    ],
                                 }
                             ]
                         }
@@ -46,7 +49,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "number",
+                                        "type",
+                                    ],
                                 }
                             ]
                         }
@@ -57,7 +66,12 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "address",
+                                    ],
                                 }
                             ]
                         }
@@ -68,7 +82,12 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "url",
+                                    ],
                                 }
                             ]
                         }
@@ -79,24 +98,49 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "latitude",
+                                        "longitude",
+                                        "address",
+                                        "postcode",
+                                        "type",
+                                        "state",
+                                        "suburb",
+                                        "streetType",
+                                        "streetName",
+                                    ],
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "logoImage": [ "id", "title" ]
+                    "logoImage": [
+                        "id",
+                        "title",
+                        "originalURL",
+                    ]
                 },
                 {
-                    "coverImage": [ "id", "title" ]
+                    "coverImage": [
+                        "id",
+                        "title",
+                        "originalURL",
+                    ]
                 },
                 {
                     "galleryImages": [
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "originalURL",
+                                    ],
                                 }
                             ]
                         }
@@ -271,23 +315,21 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
                 
                 <Custom.MyCustomTitle value={ record?.name } />
-                <RA.Typography.Title level={5}>Logo</RA.Typography.Title>
-                <FieldView.ER_ImageViewOnShow value={ record?.logo } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_RichTextViewOnShow value={ record?.description } />
+                <View.ER_RichTextViewOnShow value={ record?.description } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Logo Image">
-                            <Badge.ImageBadge id={ record?.logoImage?.id } title={ record?.logoImage?.title }/>
+                            <View.ImageBadge { ...record?.logoImage } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Cover Image">
-                            <Badge.ImageBadge id={ record?.coverImage?.id } title={ record?.coverImage?.title }/>
+                            <View.ImageBadge { ...record?.coverImage } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -450,7 +492,11 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "name" ],
+                                    node: [
+                                        "id",
+                                        "name",
+                                        "description",
+                                    ],
                                 }
                             ]
                         }
@@ -461,7 +507,13 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "number",
+                                        "type",
+                                    ],
                                 }
                             ]
                         }
@@ -472,7 +524,12 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "address",
+                                    ],
                                 }
                             ]
                         }
@@ -483,7 +540,12 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "url",
+                                    ],
                                 }
                             ]
                         }
@@ -494,7 +556,20 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                         {
                             edges: [
                                 {
-                                    node: [ "id", "title" ],
+                                    node: [
+                                        "id",
+                                        "title",
+                                        "description",
+                                        "latitude",
+                                        "longitude",
+                                        "address",
+                                        "postcode",
+                                        "type",
+                                        "state",
+                                        "suburb",
+                                        "streetType",
+                                        "streetName",
+                                    ],
                                 }
                             ]
                         }
@@ -626,11 +701,11 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.name } />
+                <View.ER_StringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Code</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.code } />
+                <View.ER_StringViewOnShow value={ record?.code } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -774,10 +849,18 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
                 "description",
                 "address",
                 {
-                    "company": [ "id", "name" ]
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "country": [ "id", "name" ]
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
                 },
             ],
         },
@@ -846,22 +929,22 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.title } />
+                <View.ER_StringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.description } />
+                <View.ER_StringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Address</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.address } />
+                <View.ER_StringViewOnShow value={ record?.address } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Company">
-                            <Badge.CompanyBadge id={ record?.company?.id } title={ record?.company?.name }/>
+                            <View.CompanyBadge { ...record?.company } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Country">
-                            <Badge.CountryBadge id={ record?.country?.id } title={ record?.country?.name }/>
+                            <View.CountryBadge { ...record?.country } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -906,13 +989,25 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
                 "title",
                 "originalURL",
                 {
-                    "galleryCompany": [ "id", "name" ]
+                    "galleryCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "logoCompany": [ "id", "name" ]
+                    "logoCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "coverCompany": [ "id", "name" ]
+                    "coverCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
             ],
         },
@@ -994,23 +1089,23 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.title } />
+                <View.ER_StringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Original Url</RA.Typography.Title>
-                <FieldView.ER_ImageViewOnShow value={ record?.originalURL } />
+                <View.ER_ImageViewOnShow value={ record?.originalURL } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Gallery Company">
-                            <Badge.CompanyBadge id={ record?.galleryCompany?.id } title={ record?.galleryCompany?.name }/>
+                            <View.CompanyBadge { ...record?.galleryCompany } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Logo Company">
-                            <Badge.CompanyBadge id={ record?.logoCompany?.id } title={ record?.logoCompany?.name }/>
+                            <View.CompanyBadge { ...record?.logoCompany } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Cover Company">
-                            <Badge.CompanyBadge id={ record?.coverCompany?.id } title={ record?.coverCompany?.name }/>
+                            <View.CompanyBadge { ...record?.coverCompany } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1064,10 +1159,18 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
                 "streetType",
                 "streetName",
                 {
-                    "company": [ "id", "name" ]
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "country": [ "id", "name" ]
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
                 },
             ],
         },
@@ -1136,38 +1239,38 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.title } />
+                <View.ER_StringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.description } />
+                <View.ER_StringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Latitude</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.latitude } />
+                <View.ER_StringViewOnShow value={ record?.latitude } />
                 <RA.Typography.Title level={5}>Longitude</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.longitude } />
+                <View.ER_StringViewOnShow value={ record?.longitude } />
                 <RA.Typography.Title level={5}>Address</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.address } />
+                <View.ER_StringViewOnShow value={ record?.address } />
                 <RA.Typography.Title level={5}>Postcode</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.postcode } />
+                <View.ER_StringViewOnShow value={ record?.postcode } />
                 <RA.Typography.Title level={5}>Type</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.type } />
+                <View.ER_StringViewOnShow value={ record?.type } />
                 <RA.Typography.Title level={5}>State</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.state } />
+                <View.ER_StringViewOnShow value={ record?.state } />
                 <RA.Typography.Title level={5}>Suburb</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.suburb } />
+                <View.ER_StringViewOnShow value={ record?.suburb } />
                 <RA.Typography.Title level={5}>Street Type</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.streetType } />
+                <View.ER_StringViewOnShow value={ record?.streetType } />
                 <RA.Typography.Title level={5}>Street Name</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.streetName } />
+                <View.ER_StringViewOnShow value={ record?.streetName } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Company">
-                            <Badge.CompanyBadge id={ record?.company?.id } title={ record?.company?.name }/>
+                            <View.CompanyBadge { ...record?.company } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Country">
-                            <Badge.CountryBadge id={ record?.country?.id } title={ record?.country?.name }/>
+                            <View.CountryBadge { ...record?.country } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1214,10 +1317,18 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
                 "number",
                 "type",
                 {
-                    "company": [ "id", "name" ]
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "country": [ "id", "name" ]
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
                 },
             ],
         },
@@ -1286,24 +1397,24 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.title } />
+                <View.ER_StringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.description } />
+                <View.ER_StringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Number</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.number } />
+                <View.ER_StringViewOnShow value={ record?.number } />
                 <RA.Typography.Title level={5}>Type</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.type } />
+                <View.ER_StringViewOnShow value={ record?.type } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Company">
-                            <Badge.CompanyBadge id={ record?.company?.id } title={ record?.company?.name }/>
+                            <View.CompanyBadge { ...record?.company } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Country">
-                            <Badge.CountryBadge id={ record?.country?.id } title={ record?.country?.name }/>
+                            <View.CountryBadge { ...record?.country } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1354,10 +1465,21 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
                 "status",
                 "buildStatus",
                 {
-                    "warehouse": [ "id", "name" ]
+                    "warehouse": [
+                        "id",
+                        "name",
+                        "lastUpdate",
+                        "originalData",
+                        "enabled",
+                        "filters",
+                    ]
                 },
                 {
-                    "vendor": [ "id", "name" ]
+                    "vendor": [
+                        "id",
+                        "name",
+                        "schema",
+                    ]
                 },
             ],
         },
@@ -1426,32 +1548,32 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.name } />
+                <View.ER_StringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_RichTextViewOnShow value={ record?.description } />
+                <View.ER_RichTextViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Image</RA.Typography.Title>
-                <FieldView.ER_ImageViewOnShow value={ record?.image } />
+                <View.ER_ImageViewOnShow value={ record?.image } />
                 <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-                <FieldView.ER_URLViewOnShow value={ record?.url } />
+                <View.ER_URLViewOnShow value={ record?.url } />
                 <RA.Typography.Title level={5}>Last Sell</RA.Typography.Title>
-                <FieldView.ER_DateViewOnShow value={ record?.lastSell } />
+                <View.ER_DateViewOnShow value={ record?.lastSell } />
                 <RA.Typography.Title level={5}>Created At</RA.Typography.Title>
-                <FieldView.ER_DateViewOnShow value={ record?.createdAt } />
+                <View.ER_DateViewOnShow value={ record?.createdAt } />
                 <RA.Typography.Title level={5}>Status</RA.Typography.Title>
-                <FieldView.ER_Enums_ProcessStatusViewOnShow value={ record?.status } />
+                <View.ER_Enums_ProcessStatusViewOnShow value={ record?.status } />
                 <RA.Typography.Title level={5}>Build Status</RA.Typography.Title>
-                <FieldView.ER_Enums_ProcessStatusViewOnShow value={ record?.buildStatus } />
+                <View.ER_Enums_ProcessStatusViewOnShow value={ record?.buildStatus } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Warehouse">
-                            <Badge.WarehouseBadge id={ record?.warehouse?.id } title={ record?.warehouse?.name }/>
+                            <View.WarehouseBadge { ...record?.warehouse } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Vendor">
-                            <Badge.VendorBadge id={ record?.vendor?.id } title={ record?.vendor?.name }/>
+                            <View.VendorBadge { ...record?.vendor } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1500,7 +1622,14 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                         {
                             edges: [
                                 {
-                                    node: [ "id", "name" ],
+                                    node: [
+                                        "id",
+                                        "name",
+                                        "lastUpdate",
+                                        "originalData",
+                                        "enabled",
+                                        "filters",
+                                    ],
                                 }
                             ]
                         }
@@ -1511,7 +1640,17 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                         {
                             edges: [
                                 {
-                                    node: [ "id", "name" ],
+                                    node: [
+                                        "id",
+                                        "name",
+                                        "description",
+                                        "image",
+                                        "url",
+                                        "lastSell",
+                                        "createdAt",
+                                        "status",
+                                        "buildStatus",
+                                    ],
                                 }
                             ]
                         }
@@ -1592,11 +1731,11 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.name } />
+                <View.ER_StringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Schema</RA.Typography.Title>
-                <FieldView.ER_CodeViewOnShow value={ record?.schema } />
+                <View.ER_CodeViewOnShow value={ record?.schema } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1689,14 +1828,28 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                         {
                             edges: [
                                 {
-                                    node: [ "id", "name" ],
+                                    node: [
+                                        "id",
+                                        "name",
+                                        "description",
+                                        "image",
+                                        "url",
+                                        "lastSell",
+                                        "createdAt",
+                                        "status",
+                                        "buildStatus",
+                                    ],
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "vendor": [ "id", "name" ]
+                    "vendor": [
+                        "id",
+                        "name",
+                        "schema",
+                    ]
                 },
             ],
         },
@@ -1769,23 +1922,23 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.name } />
+                <View.ER_StringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Last Update</RA.Typography.Title>
-                <FieldView.ER_DateViewOnShow value={ record?.lastUpdate } />
+                <View.ER_DateViewOnShow value={ record?.lastUpdate } />
                 <RA.Typography.Title level={5}>Original Data</RA.Typography.Title>
-                <FieldView.ER_CodeViewOnShow value={ record?.originalData } />
+                <View.ER_CodeViewOnShow value={ record?.originalData } />
                 <RA.Typography.Title level={5}>Enabled</RA.Typography.Title>
-                <FieldView.ER_BooleanViewOnShow value={ record?.enabled } />
+                <View.ER_BooleanViewOnShow value={ record?.enabled } />
                 <RA.Typography.Title level={5}>Filters</RA.Typography.Title>
-                <FieldView.ER_StringListViewOnShow value={ record?.filters } />
+                <View.ER_StringListViewOnShow value={ record?.filters } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Vendor">
-                            <Badge.VendorBadge id={ record?.vendor?.id } title={ record?.vendor?.name }/>
+                            <View.VendorBadge { ...record?.vendor } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1850,10 +2003,18 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
                 "description",
                 "url",
                 {
-                    "company": [ "id", "name" ]
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
                 },
                 {
-                    "country": [ "id", "name" ]
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
                 },
             ],
         },
@@ -1922,22 +2083,22 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
         >
             {!idTreeView ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <FieldView.ER_UUIDViewOnShow value={ record?.id } />
+                <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.title } />
+                <View.ER_StringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <FieldView.ER_StringViewOnShow value={ record?.description } />
+                <View.ER_StringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-                <FieldView.ER_URLViewOnShow value={ record?.url } />
+                <View.ER_URLViewOnShow value={ record?.url } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
                     <RA.Descriptions>
                         <RA.Descriptions.Item label="Company">
-                            <Badge.CompanyBadge id={ record?.company?.id } title={ record?.company?.name }/>
+                            <View.CompanyBadge { ...record?.company } />
                         </RA.Descriptions.Item>
                         <RA.Descriptions.Item label="Country">
-                            <Badge.CountryBadge id={ record?.country?.id } title={ record?.country?.name }/>
+                            <View.CountryBadge { ...record?.country } />
                         </RA.Descriptions.Item>
                     </RA.Descriptions>
                     <RA.Tabs
@@ -1966,4 +2127,4 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
 
         </RA.Show>
     );
-};
+};/* eslint no-use-before-define: 2 */

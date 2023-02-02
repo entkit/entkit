@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import * as Show from "./show";
 
 export const CompanyMainShow : React.FC = () => {
@@ -21,3 +22,4 @@ export const CompanyMainShow : React.FC = () => {
 };export const WebsiteMainShow : React.FC = () => {
     return <Show.WebsiteShow withEdges={true}/>
 };
+/* eslint no-use-before-define: 2 */

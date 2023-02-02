@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
 import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
@@ -5,8 +6,7 @@ import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
-import * as FieldView from "./field-view";
-import * as Badge  from "./badge";
+import * as View from "./view";
 
 
 export type CompanyTableProps = RA.TableProps<Interfaces.ICompany> & { extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError> }
@@ -31,22 +31,21 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                 field: "name",
                 value: null,
                 operator: "contains",
-            },{
-                field: "logo",
-                value: null,
-                operator: "eq",
             },],
         metaData: {
             fields: [
                 "id",
                 "name",
-                "logo",
                 "description",
                 {"countries": [
                     {
                         edges: [
                             {
-                                node: ["id", "name"]
+                                node: [
+                                    "id",
+                                    "name",
+                                    "code",
+                                ]
                             },
                         ],
                     },
@@ -56,7 +55,13 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "number",
+                                    "type",
+                                ]
                             },
                         ],
                     },
@@ -66,7 +71,12 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "address",
+                                ]
                             },
                         ],
                     },
@@ -76,7 +86,12 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "url",
+                                ]
                             },
                         ],
                     },
@@ -86,19 +101,48 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "latitude",
+                                    "longitude",
+                                    "address",
+                                    "postcode",
+                                    "type",
+                                    "state",
+                                    "suburb",
+                                    "streetType",
+                                    "streetName",
+                                ]
                             },
                         ],
                     },
                     "totalCount",
                 ]},
-                {"logoImage": [ "id", "title" ]},
-                {"coverImage": [ "id", "title" ]},
+                {
+                    "logoImage": [
+                        "id",
+                        "title",
+                        "originalURL",
+                    ]
+                },
+                {
+                    "coverImage": [
+                        "id",
+                        "title",
+                        "originalURL",
+                    ]
+                },
                 {"galleryImages": [
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "originalURL",
+                                ]
                             },
                         ],
                     },
@@ -123,7 +167,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -148,22 +192,6 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                         </RA.FilterDropdown>
                     )}
                     defaultSortOrder={RA.getDefaultSortOrder("name", table.sorter)}
-                />
-                <RA.Table.Column
-                    dataIndex="logo"
-                    title="Logo"
-                    sorter={
-                        {}
-                    }
-                    render={ (value)=> {
-                        return <FieldView.ER_ImageViewOnList value={ value } />
-                    } }
-                    filterDropdown={(props) => (
-                        <RA.FilterDropdown {...props}>
-                            <RA.Input />
-                        </RA.FilterDropdown>
-                    )}
-                    defaultSortOrder={RA.getDefaultSortOrder("logo", table.sorter)}
                 />
                 {/* endregion */}
 
@@ -207,14 +235,14 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="logoImage"
                     title="Logo Image"
                     render={
-                        (value)=>(<Badge.ImageBadge id={ value?.id } title={ value?.title }/>)
+                        (value)=>(<View.ImageBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="coverImage"
                     title="Cover Image"
                     render={
-                        (value)=>(<Badge.ImageBadge id={ value?.id } title={ value?.title }/>)
+                        (value)=>(<View.ImageBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
@@ -352,7 +380,11 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "name"]
+                                node: [
+                                    "id",
+                                    "name",
+                                    "description",
+                                ]
                             },
                         ],
                     },
@@ -362,7 +394,13 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "number",
+                                    "type",
+                                ]
                             },
                         ],
                     },
@@ -372,7 +410,12 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "address",
+                                ]
                             },
                         ],
                     },
@@ -382,7 +425,12 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "url",
+                                ]
                             },
                         ],
                     },
@@ -392,7 +440,20 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     {
                         edges: [
                             {
-                                node: ["id", "title"]
+                                node: [
+                                    "id",
+                                    "title",
+                                    "description",
+                                    "latitude",
+                                    "longitude",
+                                    "address",
+                                    "postcode",
+                                    "type",
+                                    "state",
+                                    "suburb",
+                                    "streetType",
+                                    "streetName",
+                                ]
                             },
                         ],
                     },
@@ -417,7 +478,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -433,7 +494,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -449,7 +510,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -625,8 +686,20 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                 "title",
                 "description",
                 "address",
-                {"company": [ "id", "name" ]},
-                {"country": [ "id", "name" ]},
+                {
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
+                },
             ],
             cursors,
         },
@@ -646,7 +719,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -662,7 +735,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -678,7 +751,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -694,7 +767,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -710,14 +783,14 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CountryBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -844,9 +917,27 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                 "id",
                 "title",
                 "originalURL",
-                {"galleryCompany": [ "id", "name" ]},
-                {"logoCompany": [ "id", "name" ]},
-                {"coverCompany": [ "id", "name" ]},
+                {
+                    "galleryCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "logoCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "coverCompany": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
             ],
             cursors,
         },
@@ -866,7 +957,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -882,7 +973,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -898,7 +989,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_ImageViewOnList value={ value } />
+                        return <View.ER_ImageViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -914,21 +1005,21 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="galleryCompany"
                     title="Gallery Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="logoCompany"
                     title="Logo Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="coverCompany"
                     title="Cover Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1100,8 +1191,20 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                 "suburb",
                 "streetType",
                 "streetName",
-                {"company": [ "id", "name" ]},
-                {"country": [ "id", "name" ]},
+                {
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
+                },
             ],
             cursors,
         },
@@ -1121,7 +1224,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1137,7 +1240,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1153,7 +1256,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1169,7 +1272,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1185,7 +1288,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1201,7 +1304,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1217,7 +1320,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1233,7 +1336,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1249,7 +1352,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1265,7 +1368,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1281,7 +1384,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1297,7 +1400,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1313,14 +1416,14 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CountryBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1457,8 +1560,20 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                 "description",
                 "number",
                 "type",
-                {"company": [ "id", "name" ]},
-                {"country": [ "id", "name" ]},
+                {
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
+                },
             ],
             cursors,
         },
@@ -1478,7 +1593,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1494,7 +1609,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1510,7 +1625,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1526,7 +1641,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1542,7 +1657,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1558,14 +1673,14 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CountryBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -1718,8 +1833,23 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                 "createdAt",
                 "status",
                 "buildStatus",
-                {"warehouse": [ "id", "name" ]},
-                {"vendor": [ "id", "name" ]},
+                {
+                    "warehouse": [
+                        "id",
+                        "name",
+                        "lastUpdate",
+                        "originalData",
+                        "enabled",
+                        "filters",
+                    ]
+                },
+                {
+                    "vendor": [
+                        "id",
+                        "name",
+                        "schema",
+                    ]
+                },
             ],
             cursors,
         },
@@ -1739,7 +1869,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1755,7 +1885,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1771,7 +1901,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_ImageViewOnList value={ value } />
+                        return <View.ER_ImageViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1787,7 +1917,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_URLViewOnList value={ value } />
+                        return <View.ER_URLViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1803,7 +1933,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_DateViewOnList value={ value } />
+                        return <View.ER_DateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1819,7 +1949,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_DateViewOnList value={ value } />
+                        return <View.ER_DateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1835,7 +1965,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_Enums_ProcessStatusViewOnList value={ value } />
+                        return <View.ER_Enums_ProcessStatusViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1875,7 +2005,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_Enums_ProcessStatusViewOnList value={ value } />
+                        return <View.ER_Enums_ProcessStatusViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1915,14 +2045,14 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="warehouse"
                     title="Warehouse"
                     render={
-                        (value)=>(<Badge.WarehouseBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.WarehouseBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="vendor"
                     title="Vendor"
                     render={
-                        (value)=>(<Badge.VendorBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.VendorBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -2060,7 +2190,14 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     {
                         edges: [
                             {
-                                node: ["id", "name"]
+                                node: [
+                                    "id",
+                                    "name",
+                                    "lastUpdate",
+                                    "originalData",
+                                    "enabled",
+                                    "filters",
+                                ]
                             },
                         ],
                     },
@@ -2070,7 +2207,17 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     {
                         edges: [
                             {
-                                node: ["id", "name"]
+                                node: [
+                                    "id",
+                                    "name",
+                                    "description",
+                                    "image",
+                                    "url",
+                                    "lastSell",
+                                    "createdAt",
+                                    "status",
+                                    "buildStatus",
+                                ]
                             },
                         ],
                     },
@@ -2095,7 +2242,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2111,7 +2258,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2127,7 +2274,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_CodeViewOnList value={ value } />
+                        return <View.ER_CodeViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2296,13 +2443,29 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     {
                         edges: [
                             {
-                                node: ["id", "name"]
+                                node: [
+                                    "id",
+                                    "name",
+                                    "description",
+                                    "image",
+                                    "url",
+                                    "lastSell",
+                                    "createdAt",
+                                    "status",
+                                    "buildStatus",
+                                ]
                             },
                         ],
                     },
                     "totalCount",
                 ]},
-                {"vendor": [ "id", "name" ]},
+                {
+                    "vendor": [
+                        "id",
+                        "name",
+                        "schema",
+                    ]
+                },
             ],
             cursors,
         },
@@ -2322,7 +2485,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2338,7 +2501,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2354,7 +2517,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_DateViewOnList value={ value } />
+                        return <View.ER_DateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2367,7 +2530,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="originalData"
                     title="Original Data"
                     render={ (value)=> {
-                        return <FieldView.ER_CodeViewOnList value={ value } />
+                        return <View.ER_CodeViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2383,7 +2546,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_BooleanViewOnList value={ value } />
+                        return <View.ER_BooleanViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2396,7 +2559,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="filters"
                     title="Filters"
                     render={ (value)=> {
-                        return <FieldView.ER_StringListViewOnList value={ value } />
+                        return <View.ER_StringListViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2419,7 +2582,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="vendor"
                     title="Vendor"
                     render={
-                        (value)=>(<Badge.VendorBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.VendorBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -2551,8 +2714,20 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                 "title",
                 "description",
                 "url",
-                {"company": [ "id", "name" ]},
-                {"country": [ "id", "name" ]},
+                {
+                    "company": [
+                        "id",
+                        "name",
+                        "description",
+                    ]
+                },
+                {
+                    "country": [
+                        "id",
+                        "name",
+                        "code",
+                    ]
+                },
             ],
             cursors,
         },
@@ -2572,7 +2747,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <FieldView.ER_UUIDViewOnList value={ value } />
+                        return <View.ER_UUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2588,7 +2763,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2604,7 +2779,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_StringViewOnList value={ value } />
+                        return <View.ER_StringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2620,7 +2795,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <FieldView.ER_URLViewOnList value={ value } />
+                        return <View.ER_URLViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2636,14 +2811,14 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="company"
                     title="Company"
                     render={
-                        (value)=>(<Badge.CompanyBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CompanyBadge { ...value } />)
                     }
                 />
                 <RA.Table.Column
                     dataIndex="country"
                     title="Country"
                     render={
-                        (value)=>(<Badge.CountryBadge id={ value?.id } title={ value?.name }/>)
+                        (value)=>(<View.CountryBadge { ...value } />)
                     }
                 />
                 {/* endregion Edges*/}
@@ -2737,4 +2912,4 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
             </RA.Space>
         </>
     );
-};
+};/* eslint no-use-before-define: 2 */

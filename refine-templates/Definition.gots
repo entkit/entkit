@@ -1,5 +1,7 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "definition.tsx" -}}
+/* eslint no-use-before-define: 0 */
 // Metadata
 export const meta = {{ $.Extension.Meta | toPrettyJson}}
+/* eslint no-use-before-define: 2 */
 {{- end -}}

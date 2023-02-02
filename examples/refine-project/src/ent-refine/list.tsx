@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 import React, {useEffect, useState} from "react";
 import {IResourceComponentsProps, HttpError, useDeleteMany} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
@@ -332,4 +333,4 @@ export const WebsiteList :React.FC<WebsiteListProps> = ({tableProps, ...props} )
     )}>
         <Tables.WebsiteTable {...tableProps} rowSelection={rowSelection}/>
     </RA.List>
-};
+};/* eslint no-use-before-define: 2 */

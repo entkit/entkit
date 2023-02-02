@@ -1,8 +1,7 @@
+/* eslint no-use-before-define: 0 */
 import {useState, useEffect} from "react";
 import * as RA from "@pankod/refine-antd";
-import {
-    useList,
-} from "@pankod/refine-core";
+import { useList } from "@pankod/refine-core";
 import * as Interfaces from "./interfaces"
 import debounce from "lodash/debounce";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
@@ -54,7 +53,6 @@ export const SearchComponent: React.FC = () => {
             fields: [
                 "id",
                 "name",
-                "logo",
             ],
             searchQuery: value,
         },
@@ -64,7 +62,7 @@ export const SearchComponent: React.FC = () => {
                 const storeOptionGroup = data.data.map((item) =>
                     renderItem(
                         String(item.name),
-                        `${item.logo}`,
+                        null,
                         `/Company/show/${item.id}`,
                     ),
                 );
@@ -393,3 +391,5 @@ export const SearchComponent: React.FC = () => {
         </RA.AutoComplete>
     )
 }
+
+/* eslint no-use-before-define: 2 */

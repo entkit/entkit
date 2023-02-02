@@ -26,7 +26,6 @@ import (
 // CreateCompanyInput represents a mutation input for creating companies.
 type CreateCompanyInput struct {
 	Name            string
-	Logo            *string
 	Description     string
 	CountryIDs      []uuid.UUID
 	PhoneIDs        []uuid.UUID
@@ -41,9 +40,6 @@ type CreateCompanyInput struct {
 // Mutate applies the CreateCompanyInput on the CompanyMutation builder.
 func (i *CreateCompanyInput) Mutate(m *CompanyMutation) {
 	m.SetName(i.Name)
-	if v := i.Logo; v != nil {
-		m.SetLogo(*v)
-	}
 	m.SetDescription(i.Description)
 	if v := i.CountryIDs; len(v) > 0 {
 		m.AddCountryIDs(v...)
@@ -80,8 +76,6 @@ func (c *CompanyCreate) SetInput(i CreateCompanyInput) *CompanyCreate {
 // UpdateCompanyInput represents a mutation input for updating companies.
 type UpdateCompanyInput struct {
 	Name                  *string
-	ClearLogo             bool
-	Logo                  *string
 	Description           *string
 	ClearCountries        bool
 	AddCountryIDs         []uuid.UUID
@@ -111,12 +105,6 @@ type UpdateCompanyInput struct {
 func (i *UpdateCompanyInput) Mutate(m *CompanyMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if i.ClearLogo {
-		m.ClearLogo()
-	}
-	if v := i.Logo; v != nil {
-		m.SetLogo(*v)
 	}
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)

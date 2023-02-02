@@ -54,26 +54,6 @@ func (cu *CompanyUpdate) SetName(s string) *CompanyUpdate {
 	return cu
 }
 
-// SetLogo sets the "logo" field.
-func (cu *CompanyUpdate) SetLogo(s string) *CompanyUpdate {
-	cu.mutation.SetLogo(s)
-	return cu
-}
-
-// SetNillableLogo sets the "logo" field if the given value is not nil.
-func (cu *CompanyUpdate) SetNillableLogo(s *string) *CompanyUpdate {
-	if s != nil {
-		cu.SetLogo(*s)
-	}
-	return cu
-}
-
-// ClearLogo clears the value of the "logo" field.
-func (cu *CompanyUpdate) ClearLogo() *CompanyUpdate {
-	cu.mutation.ClearLogo()
-	return cu
-}
-
 // SetDescription sets the "description" field.
 func (cu *CompanyUpdate) SetDescription(s string) *CompanyUpdate {
 	cu.mutation.SetDescription(s)
@@ -385,11 +365,6 @@ func (cu *CompanyUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Logo(); ok {
-		if err := company.LogoValidator(v); err != nil {
-			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
-		}
-	}
 	if v, ok := cu.mutation.Description(); ok {
 		if err := company.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Company.description": %w`, err)}
@@ -421,12 +396,6 @@ func (cu *CompanyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(company.FieldName, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.Logo(); ok {
-		_spec.SetField(company.FieldLogo, field.TypeString, value)
-	}
-	if cu.mutation.LogoCleared() {
-		_spec.ClearField(company.FieldLogo, field.TypeString)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)
@@ -851,26 +820,6 @@ func (cuo *CompanyUpdateOne) SetName(s string) *CompanyUpdateOne {
 	return cuo
 }
 
-// SetLogo sets the "logo" field.
-func (cuo *CompanyUpdateOne) SetLogo(s string) *CompanyUpdateOne {
-	cuo.mutation.SetLogo(s)
-	return cuo
-}
-
-// SetNillableLogo sets the "logo" field if the given value is not nil.
-func (cuo *CompanyUpdateOne) SetNillableLogo(s *string) *CompanyUpdateOne {
-	if s != nil {
-		cuo.SetLogo(*s)
-	}
-	return cuo
-}
-
-// ClearLogo clears the value of the "logo" field.
-func (cuo *CompanyUpdateOne) ClearLogo() *CompanyUpdateOne {
-	cuo.mutation.ClearLogo()
-	return cuo
-}
-
 // SetDescription sets the "description" field.
 func (cuo *CompanyUpdateOne) SetDescription(s string) *CompanyUpdateOne {
 	cuo.mutation.SetDescription(s)
@@ -1189,11 +1138,6 @@ func (cuo *CompanyUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Company.name": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Logo(); ok {
-		if err := company.LogoValidator(v); err != nil {
-			return &ValidationError{Name: "logo", err: fmt.Errorf(`ent: validator failed for field "Company.logo": %w`, err)}
-		}
-	}
 	if v, ok := cuo.mutation.Description(); ok {
 		if err := company.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Company.description": %w`, err)}
@@ -1242,12 +1186,6 @@ func (cuo *CompanyUpdateOne) sqlSave(ctx context.Context) (_node *Company, err e
 	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(company.FieldName, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.Logo(); ok {
-		_spec.SetField(company.FieldLogo, field.TypeString, value)
-	}
-	if cuo.mutation.LogoCleared() {
-		_spec.ClearField(company.FieldLogo, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(company.FieldDescription, field.TypeString, value)

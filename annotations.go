@@ -59,10 +59,12 @@ type RefineAnnotation struct {
 	Suffix          *string           `json:"Suffix,omitempty"`
 	ListItemActions []Action          `json:"ListItemActions,omitempty"`
 	ShowActions     []Action          `json:"ShowActions,omitempty"`
-	FieldView       *string           `json:"FieldView,omitempty"`
-	FieldViewOnShow *string           `json:"FieldViewOnShow,omitempty"`
-	FieldViewOnList *string           `json:"FieldViewOnList,omitempty"`
-	FieldViewOnForm *string           `json:"FieldViewOnForm,omitempty"`
+
+	View       *string `json:"View,omitempty"`
+	ViewOnShow *string `json:"ViewOnShow,omitempty"`
+	ViewOnList *string `json:"ViewOnList,omitempty"`
+	ViewOnForm *string `json:"ViewOnForm,omitempty"`
+	Badge      *string `json:"Badge,omitempty"`
 }
 
 // Merge implements the schema.Merger interface.
@@ -159,16 +161,20 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.Suffix = ant.Suffix
 	}
 
-	if ant.FieldView != nil {
-		ra.FieldView = ant.FieldView
+	if ant.View != nil {
+		ra.View = ant.View
 	}
 
-	if ant.FieldViewOnList != nil {
-		ra.FieldViewOnList = ant.FieldViewOnList
+	if ant.ViewOnList != nil {
+		ra.ViewOnList = ant.ViewOnList
 	}
 
-	if ant.FieldViewOnShow != nil {
-		ra.FieldViewOnShow = ant.FieldViewOnShow
+	if ant.ViewOnShow != nil {
+		ra.ViewOnShow = ant.ViewOnShow
+	}
+
+	if ant.Badge != nil {
+		ra.Badge = ant.Badge
 	}
 
 	if len(ant.ListItemActions) > 0 {
@@ -358,33 +364,40 @@ func Suffix(suffix string) RefineAnnotation {
 	}
 }
 
-// FieldView define field views on list and show
-func FieldView(name string) RefineAnnotation {
+// View define field views on list and show
+func View(name string) RefineAnnotation {
 	return RefineAnnotation{
-		FieldView:       &name,
-		FieldViewOnList: &name,
-		FieldViewOnShow: &name,
+		View:       &name,
+		ViewOnList: &name,
+		ViewOnShow: &name,
 	}
 }
 
-// FieldViewOnList define field view on list
-func FieldViewOnList(name string) RefineAnnotation {
+// ViewOnList define field view on list
+func ViewOnList(name string) RefineAnnotation {
 	return RefineAnnotation{
-		FieldViewOnList: &name,
+		ViewOnList: &name,
 	}
 }
 
-// FieldViewOnShow define field view on show page
-func FieldViewOnShow(name string) RefineAnnotation {
+// ViewOnShow define field view on show page
+func ViewOnShow(name string) RefineAnnotation {
 	return RefineAnnotation{
-		FieldViewOnShow: &name,
+		ViewOnShow: &name,
 	}
 }
 
-// FieldViewOnForm define field view on form
-func FieldViewOnForm(name string) RefineAnnotation {
+// ViewOnForm define field view on form
+func ViewOnForm(name string) RefineAnnotation {
 	return RefineAnnotation{
-		FieldViewOnForm: &name,
+		ViewOnForm: &name,
+	}
+}
+
+// Badge define entity badge view
+func Badge(name string) RefineAnnotation {
+	return RefineAnnotation{
+		Badge: &name,
 	}
 }
 

@@ -33,8 +33,6 @@ type Company struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Logo holds the value of the "logo" field.
-	Logo *string `json:"logo,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -159,7 +157,7 @@ func (*Company) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case company.FieldName, company.FieldLogo, company.FieldDescription:
+		case company.FieldName, company.FieldDescription:
 			values[i] = new(sql.NullString)
 		case company.FieldID:
 			values[i] = new(uuid.UUID)
@@ -189,13 +187,6 @@ func (c *Company) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				c.Name = value.String
-			}
-		case company.FieldLogo:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field logo", values[i])
-			} else if value.Valid {
-				c.Logo = new(string)
-				*c.Logo = value.String
 			}
 		case company.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -273,11 +264,6 @@ func (c *Company) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
-	builder.WriteString(", ")
-	if v := c.Logo; v != nil {
-		builder.WriteString("logo=")
-		builder.WriteString(*v)
-	}
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)

@@ -1,6 +1,6 @@
 // Write your custom components here
 
-import {ViewProps} from "./field-view";
+import {ViewProps} from "./view";
 import * as RA from "@pankod/refine-antd";
 import {useNotification} from "@pankod/refine-core";
 import {ButtonProps} from "@pankod/refine-antd";

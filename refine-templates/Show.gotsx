@@ -1,6 +1,6 @@
-import {useState} from "react";
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "show.tsx" -}}
+/* eslint no-use-before-define: 0 */
 import { useState } from "react";
 import {BaseKey} from "@pankod/refine-core/dist/interfaces";
 import { useShow, useOne } from "@pankod/refine-core";
@@ -11,14 +11,14 @@ import {Canvas, Label, Node, Edge} from "reaflow";
 import * as Tables from "./tables";
 import * as Lists from "./list";
 import * as Interfaces from "./interfaces";
-import * as FieldView from "./field-view";
+import * as View from "./view";
 import * as Custom from "./custom";
-import * as Badge  from "./badge";
 
 const { Link } = RefineReactRouter;
 
 {{ range $n := $.Graph.Nodes -}}
 {{- $titleField := (ER_titleField $n) }}
+{{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}ShowProps = {
     id?: BaseKey,
@@ -30,15 +30,19 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
         id,
         metaData: {
             fields: [
-                "{{ $n.ID.Name }}",
-                {{- range $f :=  $n.Fields }}
+                {{- range $f :=  $allFields }}
                 "{{ $f.Name | camel }}",
                 {{- end -}}
 
                 {{- range $e := $n.EdgesWithID }}
+                {{- $edgeAllFields := prepend $e.Type.Fields $e.Type.ID }}
                 {{- if $e.Unique }}
                 {
-                    "{{ camel $e.Name }}": [ "id", "{{ (ER_titleField $e.Type).Name }}" ]
+                    "{{ camel $e.Name }}": [
+                        {{- range $f :=  $edgeAllFields}}
+                        "{{ $f.Name | camel }}",
+                        {{- end }}
+                    ]
                 },
                 {{- else }}
                 {
@@ -46,7 +50,11 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                         {
                             edges: [
                                 {
-                                    node: [ "id", "{{ (ER_titleField $e.Type).Name }}" ],
+                                    node: [
+                                        {{- range $f :=  $edgeAllFields}}
+                                        "{{ $f.Name | camel }}",
+                                        {{- end }}
+                                    ],
                                 }
                             ]
                         }
@@ -137,9 +145,9 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
             {!idTreeView ? <>
                 {{- range $f := $allFields}}
                 <RA.Typography.Title level={5}>{{ $f.Name | ER_label }}</RA.Typography.Title>
-                {{- $viewName := ( print "FieldView." (ER_fieldTSType $f) "ViewOnShow" ) }}
-                {{- if not (empty $f.Annotations.REFINE.FieldViewOnShow) }}
-                {{ $viewName = print "Custom." $f.Annotations.REFINE.FieldViewOnShow }}
+                {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
+                {{- if not (empty $f.Annotations.REFINE.ViewOnShow) }}
+                {{ $viewName = print "Custom." $f.Annotations.REFINE.ViewOnShow }}
                 {{- end}}
                 <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
                 {{- end }}
@@ -149,9 +157,13 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                     <RA.Descriptions>
                         {{- range $e := $n.EdgesWithID }}
                         {{- $titleField := (ER_titleField $e.Type) }}
+                        {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
+                        {{- if not (empty $e.Annotations.REFINE.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.REFINE.Badge }}
+                        {{- end}}
                         {{- if $e.Unique }}
                         <RA.Descriptions.Item label="{{ $e.Name | ER_label }}">
-                            <Badge.{{$e.Type.Name}}Badge id={ record?.{{ camel $e.Name }}?.id } title={ record?.{{ camel $e.Name }}?.{{camel $titleField.Name}} }/>
+                            <{{$viewName}} { ...record?.{{ camel $e.Name }} } />
                         </RA.Descriptions.Item>
                         {{- end}}
                         {{- end}}
@@ -212,4 +224,6 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
 };
 
 {{- end -}}
+
+/* eslint no-use-before-define: 2 */
 {{- end -}}

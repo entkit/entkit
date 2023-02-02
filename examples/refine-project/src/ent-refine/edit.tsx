@@ -1,10 +1,11 @@
+/* eslint no-use-before-define: 0 */
 import {useState} from "react";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 import CodeEditor from '@uiw/react-textarea-code-editor';
-import * as FieldView from "./field-view";
+import * as View from "./view";
 import * as Custom from "./custom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -16,7 +17,6 @@ export const CompanyEdit: React.FC = () => {
             metaData: {
                 fields: [
                     "name",
-                    "logo",
                     "description",
                     {
                         "countries": [
@@ -241,15 +241,7 @@ export const CompanyEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
-                </RA.Form.Item>
-                
-                <RA.Form.Item
-                    name="logo"
-                    label="Logo"
-                    rules={[{required: false}]}
-                >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -257,7 +249,7 @@ export const CompanyEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_RichTextViewOnForm/>
+                     <View.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
@@ -452,7 +444,7 @@ export const CountryEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -460,7 +452,7 @@ export const CountryEdit: React.FC = () => {
                     label="Code"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="companies" name={["companyIDs"]} rules={[{required: false}]}>
@@ -547,7 +539,7 @@ export const EmailEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -555,7 +547,7 @@ export const EmailEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -563,7 +555,7 @@ export const EmailEdit: React.FC = () => {
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -660,7 +652,7 @@ export const ImageEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -668,7 +660,7 @@ export const ImageEdit: React.FC = () => {
                     label="Original Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
@@ -757,7 +749,7 @@ export const LocationEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -765,7 +757,7 @@ export const LocationEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -773,7 +765,7 @@ export const LocationEdit: React.FC = () => {
                     label="Latitude"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -781,7 +773,7 @@ export const LocationEdit: React.FC = () => {
                     label="Longitude"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -789,7 +781,7 @@ export const LocationEdit: React.FC = () => {
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -797,7 +789,7 @@ export const LocationEdit: React.FC = () => {
                     label="Postcode"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -805,7 +797,7 @@ export const LocationEdit: React.FC = () => {
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -813,7 +805,7 @@ export const LocationEdit: React.FC = () => {
                     label="State"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -821,7 +813,7 @@ export const LocationEdit: React.FC = () => {
                     label="Suburb"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -829,7 +821,7 @@ export const LocationEdit: React.FC = () => {
                     label="Street Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -837,7 +829,7 @@ export const LocationEdit: React.FC = () => {
                     label="Street Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -916,7 +908,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -924,7 +916,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -932,7 +924,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Number"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -940,7 +932,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -1023,7 +1015,7 @@ export const ProductEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1031,7 +1023,7 @@ export const ProductEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_RichTextViewOnForm/>
+                     <View.ER_RichTextViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1039,7 +1031,7 @@ export const ProductEdit: React.FC = () => {
                     label="Image"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_ImageViewOnForm/>
+                     <View.ER_ImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1047,7 +1039,7 @@ export const ProductEdit: React.FC = () => {
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_URLViewOnForm/>
+                     <View.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1058,7 +1050,7 @@ export const ProductEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <FieldView.ER_DateViewOnForm/>
+                     <View.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1069,7 +1061,7 @@ export const ProductEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <FieldView.ER_DateViewOnForm/>
+                     <View.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1077,7 +1069,7 @@ export const ProductEdit: React.FC = () => {
                     label="Status"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1085,7 +1077,7 @@ export const ProductEdit: React.FC = () => {
                     label="Build Status"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.ER_Enums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
@@ -1178,7 +1170,7 @@ export const VendorEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1186,7 +1178,7 @@ export const VendorEdit: React.FC = () => {
                     label="Schema"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_CodeViewOnForm/>
+                     <View.ER_CodeViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="warehouses" name={["warehouseIDs"]} rules={[{required: false}]}>
@@ -1274,7 +1266,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1285,7 +1277,7 @@ export const WarehouseEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <FieldView.ER_DateViewOnForm/>
+                     <View.ER_DateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1293,7 +1285,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Original Data"
                     rules={[{required: false}]}
                 >
-                     <FieldView.ER_CodeViewOnForm/>
+                     <View.ER_CodeViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1301,7 +1293,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Enabled"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_BooleanViewOnForm/>
+                     <View.ER_BooleanViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1309,7 +1301,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Filters"
                     rules={[{required: false}]}
                 >
-                     <FieldView.ER_StringListViewOnForm/>
+                     <View.ER_StringListViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
@@ -1387,7 +1379,7 @@ export const WebsiteEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1395,7 +1387,7 @@ export const WebsiteEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_StringViewOnForm/>
+                     <View.ER_StringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1403,7 +1395,7 @@ export const WebsiteEdit: React.FC = () => {
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <FieldView.ER_URLViewOnForm/>
+                     <View.ER_URLViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
@@ -1415,4 +1407,4 @@ export const WebsiteEdit: React.FC = () => {
             </RA.Form>
         </RA.Edit>
     );
-};
+};/* eslint no-use-before-define: 2 */

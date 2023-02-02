@@ -68,23 +68,6 @@ type CompanyWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "logo" field predicates.
-	Logo             *string  `json:"logo,omitempty"`
-	LogoNEQ          *string  `json:"logoNEQ,omitempty"`
-	LogoIn           []string `json:"logoIn,omitempty"`
-	LogoNotIn        []string `json:"logoNotIn,omitempty"`
-	LogoGT           *string  `json:"logoGT,omitempty"`
-	LogoGTE          *string  `json:"logoGTE,omitempty"`
-	LogoLT           *string  `json:"logoLT,omitempty"`
-	LogoLTE          *string  `json:"logoLTE,omitempty"`
-	LogoContains     *string  `json:"logoContains,omitempty"`
-	LogoHasPrefix    *string  `json:"logoHasPrefix,omitempty"`
-	LogoHasSuffix    *string  `json:"logoHasSuffix,omitempty"`
-	LogoIsNil        bool     `json:"logoIsNil,omitempty"`
-	LogoNotNil       bool     `json:"logoNotNil,omitempty"`
-	LogoEqualFold    *string  `json:"logoEqualFold,omitempty"`
-	LogoContainsFold *string  `json:"logoContainsFold,omitempty"`
-
 	// "description" field predicates.
 	Description             *string  `json:"description,omitempty"`
 	DescriptionNEQ          *string  `json:"descriptionNEQ,omitempty"`
@@ -266,51 +249,6 @@ func (i *CompanyWhereInput) P() (predicate.Company, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, company.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Logo != nil {
-		predicates = append(predicates, company.LogoEQ(*i.Logo))
-	}
-	if i.LogoNEQ != nil {
-		predicates = append(predicates, company.LogoNEQ(*i.LogoNEQ))
-	}
-	if len(i.LogoIn) > 0 {
-		predicates = append(predicates, company.LogoIn(i.LogoIn...))
-	}
-	if len(i.LogoNotIn) > 0 {
-		predicates = append(predicates, company.LogoNotIn(i.LogoNotIn...))
-	}
-	if i.LogoGT != nil {
-		predicates = append(predicates, company.LogoGT(*i.LogoGT))
-	}
-	if i.LogoGTE != nil {
-		predicates = append(predicates, company.LogoGTE(*i.LogoGTE))
-	}
-	if i.LogoLT != nil {
-		predicates = append(predicates, company.LogoLT(*i.LogoLT))
-	}
-	if i.LogoLTE != nil {
-		predicates = append(predicates, company.LogoLTE(*i.LogoLTE))
-	}
-	if i.LogoContains != nil {
-		predicates = append(predicates, company.LogoContains(*i.LogoContains))
-	}
-	if i.LogoHasPrefix != nil {
-		predicates = append(predicates, company.LogoHasPrefix(*i.LogoHasPrefix))
-	}
-	if i.LogoHasSuffix != nil {
-		predicates = append(predicates, company.LogoHasSuffix(*i.LogoHasSuffix))
-	}
-	if i.LogoIsNil {
-		predicates = append(predicates, company.LogoIsNil())
-	}
-	if i.LogoNotNil {
-		predicates = append(predicates, company.LogoNotNil())
-	}
-	if i.LogoEqualFold != nil {
-		predicates = append(predicates, company.LogoEqualFold(*i.LogoEqualFold))
-	}
-	if i.LogoContainsFold != nil {
-		predicates = append(predicates, company.LogoContainsFold(*i.LogoContainsFold))
 	}
 	if i.Description != nil {
 		predicates = append(predicates, company.DescriptionEQ(*i.Description))

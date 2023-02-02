@@ -6,6 +6,7 @@ It simplifies the process of generating CRUDs from Ent definitions with customiz
 
 ## Live Demo and Package Info
 Live demo: https://demo.entrefine.dev/
+
 Go.dev Package: https://pkg.go.dev/github.com/diazoxide/ent-refine
 
 ## Features
@@ -123,10 +124,10 @@ e.g. `EntRefine.FilterOperator("contains")`
 * HideOnShow
 * HideOnForm
 * FilterOperator `EntRefine.FilterOperator("contains")`
-* [FieldView](#custom-field-views)
-* [FieldViewOnList](#custom-field-views)
-* [FieldViewOnShow](#custom-field-views)
-* [FieldViewOnForm](#custom-field-views)
+* [View](#custom-views)
+* [ViewOnList](#custom-views)
+* [ViewOnShow](#custom-views)
+* [ViewOnForm](#custom-views)
 
 ### For Entities
   * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
@@ -135,6 +136,11 @@ e.g. `EntRefine.FilterOperator("contains")`
   * NoShow
   * NoCreate
   * NoEdit
+  * [View](#custom-views)
+  * [ViewOnList](#custom-views)
+  * [ViewOnShow](#custom-views)
+  * [ViewOnForm](#custom-views)
+  * [Badge](#badge-view)
 
 ## Getting ready to use
 
@@ -267,32 +273,32 @@ export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
 //...
 ```
 
-## Custom field views
+## Custom views
 
 On Ent-Refine every view of field is customizable for every type of layout.
 
 ### Special annotations
-1. FieldView - *Forcing list and show views*
-2. FieldViewOnList
-3. FieldViewOnShow
-4. FieldViewOnForm
+1. View - *Forcing list and show views*
+2. ViewOnList
+3. ViewOnShow
+4. ViewOnForm
 
 ### How to customize?
 
 1. First create new React Component on [custom.tsx](#file-customtsx) (e.g. `MyCustomTitle`) with `ViewProps` type props.
    ```tsx
-   import {ViewProps} from "./field-view";
+   import {ViewProps} from "./view";
    
    export const MyCustomTitle: React.FC<ViewProps<string>> = ({value}) => {
       return <RA.Typography.Text copyable={true} style={ {color: "red"} }>{ value }</RA.Typography.Text>
    }
    ```
-2. Define type of field on schema by `EntRefine.FieldView` annotation
+2. Define type of field on schema by `EntRefine.View` annotation
    ```go
    field.String("title").
         Annotations(
             ...
-            EntRefine.FieldView("MyCustomTitle"),
+            EntRefine.View("MyCustomTitle"),
             ...
         ),
    ```
@@ -300,6 +306,17 @@ On Ent-Refine every view of field is customizable for every type of layout.
 3. Regenerate and check
     ![custom-list-field.png](docs%2Fimages%2Fcustom-list-field.png)
  
+## Custom Badge view
+
+### What is a badge?
+Badge is a public view of entity on other items edge views.
+e.g. 
+![img.png](docs/images/badge-view.png)
+
+### Badge customization
+First you need to create new React component like [Custom Views](#custom-views). 
+Then use `Badge` annotation to connect it with entity. 
+
 ## Example
 Check out the documentation for more information and examples.
 

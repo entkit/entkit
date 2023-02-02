@@ -1,3 +1,4 @@
+/* eslint no-use-before-define: 0 */
 // Custom types
 export type ER_String = string
 export type ER_Number = number
@@ -24,7 +25,6 @@ export enum ER_Enums_ProcessStatus{
 export interface ICompany {
     id: ER_UUID, // uuid.UUID
     name: ER_String, // string
-    logo: ER_Image, // string
     description: ER_RichText, // string
     countries?: ICountry[],
     phones?: IPhone[],
@@ -123,4 +123,4 @@ export interface IWebsite {
     url: ER_URL, // string
     company?: ICompany,
     country?: ICountry,
-}
+}/* eslint no-use-before-define: 2 */

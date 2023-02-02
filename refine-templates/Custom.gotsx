@@ -1,4 +1,6 @@
 {{- define "custom.tsx" -}}
+/* eslint no-use-before-define: 0 */
 // Write your custom components here
 export {}
+/* eslint no-use-before-define: 2 */
 {{- end -}}

@@ -27,16 +27,8 @@ func (Company) Fields() []ent.Field {
 			Annotations(
 				EntRefine.TitleField(),
 				EntRefine.FilterOperator(gen.Contains),
-				EntRefine.FieldView("MyCustomTitle"),
+				EntRefine.View("MyCustomTitle"),
 				entgql.OrderField("NAME"),
-			),
-		field.String("logo").
-			MaxLen(128).
-			Nillable().
-			Optional().
-			Annotations(
-				entgql.OrderField("LOGO"),
-				EntRefine.MainImageField(),
 			),
 		field.String("description").
 			MaxLen(512).

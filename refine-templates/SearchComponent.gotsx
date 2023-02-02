@@ -1,10 +1,9 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "search-component.tsx" -}}
+/* eslint no-use-before-define: 0 */
 import {useState, useEffect} from "react";
 import * as RA from "@pankod/refine-antd";
-import {
-    useList,
-} from "@pankod/refine-core";
+import { useList } from "@pankod/refine-core";
 import * as Interfaces from "./interfaces"
 import debounce from "lodash/debounce";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
@@ -131,4 +130,5 @@ export const SearchComponent: React.FC = () => {
     )
 }
 
+/* eslint no-use-before-define: 2 */
 {{- end -}}
