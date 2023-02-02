@@ -37,11 +37,8 @@ export const Header: React.FC = () => {
                     justifyContent: screens.sm ? "space-between" : "end",
                 }}
             >
-                <Col xs={0} sm={12}>
+                <Col sm={12} xs={36}>
                     <SearchComponent/>
-                </Col>
-                <Col>
-
                 </Col>
             </Row>
         </AntdHeader>
