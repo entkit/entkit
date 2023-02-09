@@ -13,7 +13,7 @@ RUN apk add --no-cache nodejs npm
 # Build
 RUN ls -la
 RUN go mod tidy
-RUN cd examples/ent-project; go generate
+#RUN cd examples/ent-project; go generate
 RUN go build ./examples/ent-project/server/server.go
 
 # Run binary

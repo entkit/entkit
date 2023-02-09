@@ -626,7 +626,7 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -834,7 +834,7 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -970,7 +970,7 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1100,7 +1100,7 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1238,7 +1238,7 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1369,7 +1369,7 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1532,7 +1532,7 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1703,7 +1703,7 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
@@ -1844,7 +1844,7 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
