@@ -59,130 +59,136 @@ type RefineAnnotation struct {
 	Suffix          *string           `json:"Suffix,omitempty"`
 	ListItemActions []Action          `json:"ListItemActions,omitempty"`
 	ShowActions     []Action          `json:"ShowActions,omitempty"`
+	View            *string           `json:"View,omitempty"`
 
-	View       *string `json:"View,omitempty"`
 	ViewOnShow *string `json:"ViewOnShow,omitempty"`
 	ViewOnList *string `json:"ViewOnList,omitempty"`
 	ViewOnForm *string `json:"ViewOnForm,omitempty"`
 	Badge      *string `json:"Badge,omitempty"`
+
+	EdgesDiagram *string `json:"EdgesDiagram,omitempty"`
 }
 
 // Merge implements the schema.Merger interface.
 func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
-	var ant RefineAnnotation
+	var annotation RefineAnnotation
 	switch other := other.(type) {
 	case RefineAnnotation:
-		ant = other
+		annotation = other
 	case *RefineAnnotation:
 		if other != nil {
-			ant = *other
+			annotation = *other
 		}
 	default:
 		return ra
 	}
 
-	if ant.TitleField {
-		ra.TitleField = ant.TitleField
+	if annotation.TitleField {
+		ra.TitleField = annotation.TitleField
 	}
 
-	if ant.CodeField != nil {
-		ra.CodeField = ant.CodeField
+	if annotation.CodeField != nil {
+		ra.CodeField = annotation.CodeField
 	}
 
-	if ant.TitleField {
-		ra.TitleField = ant.TitleField
+	if annotation.TitleField {
+		ra.TitleField = annotation.TitleField
 	}
 
-	if ant.URLField {
-		ra.URLField = ant.URLField
+	if annotation.URLField {
+		ra.URLField = annotation.URLField
 	}
 
-	if ant.ImageField {
-		ra.ImageField = ant.ImageField
+	if annotation.ImageField {
+		ra.ImageField = annotation.ImageField
 	}
 
-	if ant.MainImageField {
-		ra.MainImageField = ant.MainImageField
+	if annotation.MainImageField {
+		ra.MainImageField = annotation.MainImageField
 	}
 
-	if ant.RichTextField {
-		ra.RichTextField = ant.RichTextField
+	if annotation.RichTextField {
+		ra.RichTextField = annotation.RichTextField
 	}
 
-	if ant.HideOnShow {
-		ra.HideOnList = ant.HideOnList
+	if annotation.HideOnShow {
+		ra.HideOnList = annotation.HideOnList
 	}
 
-	if ant.HideOnForm {
-		ra.HideOnForm = ant.HideOnForm
+	if annotation.HideOnForm {
+		ra.HideOnForm = annotation.HideOnForm
 	}
 
-	if ant.HideOnList {
-		ra.HideOnList = ant.HideOnList
+	if annotation.HideOnList {
+		ra.HideOnList = annotation.HideOnList
 	}
 
-	if ant.NoList {
-		ra.NoList = ant.NoList
+	if annotation.NoList {
+		ra.NoList = annotation.NoList
 	}
 
-	if ant.NoShow {
-		ra.NoShow = ant.NoShow
+	if annotation.NoShow {
+		ra.NoShow = annotation.NoShow
 	}
 
-	if ant.NoCreate {
-		ra.NoCreate = ant.NoCreate
+	if annotation.NoCreate {
+		ra.NoCreate = annotation.NoCreate
 	}
 
-	if ant.NoEdit {
-		ra.NoEdit = ant.NoEdit
+	if annotation.NoEdit {
+		ra.NoEdit = annotation.NoEdit
 	}
 
-	if ant.FilterOperator != nil {
-		ra.FilterOperator = ant.FilterOperator
+	if annotation.FilterOperator != nil {
+		ra.FilterOperator = annotation.FilterOperator
 	}
 
-	if ant.Label != nil {
-		ra.Label = ant.Label
+	if annotation.Label != nil {
+		ra.Label = annotation.Label
 	}
 
-	if ant.Description != nil {
-		ra.Description = ant.Description
+	if annotation.Description != nil {
+		ra.Description = annotation.Description
 	}
 
-	if ant.Icon != nil {
-		ra.Icon = ant.Icon
+	if annotation.Icon != nil {
+		ra.Icon = annotation.Icon
 	}
 
-	if ant.Prefix != nil {
-		ra.Prefix = ant.Prefix
+	if annotation.Prefix != nil {
+		ra.Prefix = annotation.Prefix
 	}
 
-	if ant.Suffix != nil {
-		ra.Suffix = ant.Suffix
+	if annotation.Suffix != nil {
+		ra.Suffix = annotation.Suffix
 	}
 
-	if ant.View != nil {
-		ra.View = ant.View
+	if annotation.View != nil {
+		ra.View = annotation.View
 	}
 
-	if ant.ViewOnList != nil {
-		ra.ViewOnList = ant.ViewOnList
+	if annotation.ViewOnList != nil {
+		ra.ViewOnList = annotation.ViewOnList
 	}
 
-	if ant.ViewOnShow != nil {
-		ra.ViewOnShow = ant.ViewOnShow
+	if annotation.ViewOnShow != nil {
+		ra.ViewOnShow = annotation.ViewOnShow
 	}
 
-	if ant.Badge != nil {
-		ra.Badge = ant.Badge
+	if annotation.Badge != nil {
+		ra.Badge = annotation.Badge
 	}
 
-	if len(ant.ListItemActions) > 0 {
-		ra.ListItemActions = append(ra.ListItemActions, ant.ListItemActions...)
+	if len(annotation.ListItemActions) > 0 {
+		ra.ListItemActions = append(ra.ListItemActions, annotation.ListItemActions...)
 	}
 
-	if len(ant.ShowActions) > 0 {
-		ra.ShowActions = append(ra.ShowActions, ant.ShowActions...)
+	if len(annotation.ShowActions) > 0 {
+		ra.ShowActions = append(ra.ShowActions, annotation.ShowActions...)
+	}
+
+	if annotation.EdgesDiagram != nil {
+		ra.EdgesDiagram = annotation.EdgesDiagram
 	}
 
 	return ra

@@ -45,6 +45,13 @@ func main() {
 		EntRefine.WithMeta(map[string]any{
 			"graphqlUri": graphqlUri,
 		}),
+		EntRefine.WithGoJs(
+			EntRefine.GoJSOptions{
+				Enabled:    true,
+				LicenseKey: "xxxxx-xxxxxx-xxxxx-xxxxx",
+			},
+		),
+		EntRefine.WithDefaultEdgesDiagram('Diagram.GoJS'),
 	)
 	if err != nil {
 		log.Fatalf("creating ent-refine extension: %v", err)

@@ -16,23 +16,41 @@ import (
 	"text/template"
 )
 
+type JSDeps struct {
+	Deps    map[string]string
+	DevDeps map[string]string
+}
+
 var (
 	//go:embed refine-templates/*
 	_refineTemplates embed.FS
 
-	JsDependencies = map[string]string{
-		"pluralize":         "^8.0.0",
-		"camelcase":         "^6.2.0",
-		"gql-query-builder": "^3.5.5",
-		"graphql-request":   "^4.3.0",
-		"graphql":           "^15.6.1",
-		"lodash":            "^4.17.21",
-		"reaflow":           "^5.1.2",
+	Dependencies = JSDeps{
+		Deps: map[string]string{
+			"pluralize":         "^8.0.0",
+			"camelcase":         "^6.2.0",
+			"gql-query-builder": "^3.5.5",
+			"graphql-request":   "^4.3.0",
+			"graphql":           "^15.6.1",
+			"lodash":            "^4.17.21",
+		},
+		DevDeps: map[string]string{
+			"@types/pluralize": "^0.0.29",
+			"@types/lodash":    "^4.14.171",
+		},
 	}
 
-	JsDevDependencies = map[string]string{
-		"@types/pluralize": "^0.0.29",
-		"@types/lodash":    "^4.14.171",
+	ForceGraph2DDependencies = JSDeps{
+		Deps: map[string]string{
+			"react-force-graph-2d": "^1.23.17",
+		},
+	}
+
+	GoJSDependencies = JSDeps{
+		Deps: map[string]string{
+			"gojs":       "^2.3.1",
+			"gojs-react": "^1.1.1",
+		},
 	}
 )
 
@@ -96,6 +114,29 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 		},
 	}
 	return rg
+}
+
+func (rg *RefineGen) GetJSDependencies() JSDeps {
+	combined := Dependencies
+
+	if rg.Extension.GoJs.Enabled {
+		for k, v := range GoJSDependencies.Deps {
+			combined.Deps[k] = v
+		}
+		for k, v := range GoJSDependencies.DevDeps {
+			combined.DevDeps[k] = v
+		}
+	}
+
+	if rg.Extension.ForceGraph2D.Enabled {
+		for k, v := range ForceGraph2DDependencies.Deps {
+			combined.Deps[k] = v
+		}
+		for k, v := range ForceGraph2DDependencies.DevDeps {
+			combined.DevDeps[k] = v
+		}
+	}
+	return combined
 }
 
 // saveGenerated Save generated file
@@ -166,6 +207,7 @@ func (rg *RefineGen) Generate() {
 			parseT("refine-templates/SorterEnums.gotsx"),
 			parseT("refine-templates/View.gotsx"),
 			parseT("refine-templates/Helpers.gotsx"),
+			parseT("refine-templates/Diagram.gotsx"),
 		}
 		StaticTemplates = []*gen.Template{
 			parseT("refine-templates/Custom.gotsx"),
@@ -200,7 +242,10 @@ func (rg *RefineGen) updatePackageJson() {
 	if !ok {
 		log.Fatalln("Something bad happened. Check your package.json `dependencies`", deps)
 	}
-	for name, ver := range JsDependencies {
+
+	_deps := rg.GetJSDependencies()
+
+	for name, ver := range _deps.Deps {
 		v[name] = ver
 	}
 	p["dependencies"] = v
@@ -210,7 +255,7 @@ func (rg *RefineGen) updatePackageJson() {
 	if !ok {
 		log.Fatalln("Something bad happened. Check your package.json `devDependencies`", devDeps)
 	}
-	for name, ver := range JsDevDependencies {
+	for name, ver := range _deps.DevDeps {
 		v[name] = ver
 	}
 	p["devDependencies"] = v

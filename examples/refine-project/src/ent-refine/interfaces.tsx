@@ -11,6 +11,7 @@ export type ER_URL = string
 export type ER_RichText = string
 export type ER_StringList = ER_String[]
 export type ER_NumberList = ER_Number[]
+export type ER_ID = ER_UUID | ER_Number
 
 
 export enum ER_Enums_ProcessStatus{

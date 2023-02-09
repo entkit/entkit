@@ -18,6 +18,7 @@ var (
 		"ER_label":          common.ToLabel,
 		"ER_fieldTSType":    common.FieldTSType,
 		"ER_tsType":         common.TSType,
+		"ER_resourceAlias":  common.ResourceAlias,
 		"ER_titleField":     titleField,
 		"ER_mainImageField": mainImageField,
 	}
@@ -32,6 +33,19 @@ type Extension struct {
 	AppPath    string         // AppPath JS Application path (packages.json directory path)
 	SrcDirName string         // SrcDirName JS Application source dir name
 	Meta       map[string]any // Meta to share with frontend application
+
+	GoJs                GoJSOptions
+	ForceGraph2D        ForceGraph2DOptions
+	DefaultEdgesDiagram string
+}
+
+type GoJSOptions struct {
+	Enabled    bool   `json:"Enabled,omitempty"`
+	LicenseKey string `json:"LicenseKey,omitempty"`
+}
+
+type ForceGraph2DOptions struct {
+	Enabled bool `json:"Enabled,omitempty"`
 }
 
 // WithAppPath define refine-project directory
@@ -50,6 +64,30 @@ func WithSrcDirName(name string) ExtensionOption {
 	}
 }
 
+// WithDefaultEdgesDiagram set default edges graph/diagram view component name
+func WithDefaultEdgesDiagram(name string) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.DefaultEdgesDiagram = name
+		return nil
+	}
+}
+
+// WithGoJs use gojs for edges diagrams
+func WithGoJs(options GoJSOptions) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.GoJs = options
+		return nil
+	}
+}
+
+// WithForceGraph2D use react-force-graph-2d for edges diagrams
+func WithForceGraph2D(options ForceGraph2DOptions) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.ForceGraph2D = options
+		return nil
+	}
+}
+
 // WithMeta add metadata to `{AppPath}/ent-refine.json`
 func WithMeta(meta map[string]any) ExtensionOption {
 	return func(ex *Extension) (err error) {
@@ -63,6 +101,12 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	ex := &Extension{
 		SrcDirName: "src",
 		Meta:       map[string]any{},
+
+		DefaultEdgesDiagram: "Diagram.GoJS",
+		GoJs: GoJSOptions{
+			Enabled:    true,
+			LicenseKey: "test",
+		},
 	}
 
 	if len(funcMap) == 0 {

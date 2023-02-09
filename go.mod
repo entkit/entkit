@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/stoewer/go-strcase v1.2.0
 	github.com/vektah/gqlparser/v2 v2.4.3-0.20220508162109-d3d9eb001575
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.9
 	go.uber.org/zap v1.24.0

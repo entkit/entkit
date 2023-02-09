@@ -2,14 +2,14 @@
 {{- define "show.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import { useState } from "react";
-import {BaseKey} from "@pankod/refine-core/dist/interfaces";
 import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-import {Canvas, Label, Node, Edge} from "reaflow";
+import {GraphData, NodeObject, LinkObject} from "react-force-graph-2d";
 
 import * as Tables from "./tables";
 import * as Lists from "./list";
+import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
@@ -21,7 +21,7 @@ const { Link } = RefineReactRouter;
 {{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}ShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges, ...showProps}) => {
@@ -69,66 +69,54 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.{{$n.ID.Name}},
-            text: record.{{$n.ID.Name}},
-            data: {
-                title: record.{{$titleField.Name}}
-            }
-        },
-        {{- range $e := $n.EdgesWithID }}
-        {{- $titleField := (ER_titleField $e.Type) }}
-        {{- if $e.Unique }}
-        record.{{ camel $e.Name }} ? {
-            id: record.{{ camel $e.Name }}.id || "n/a",
-            text: record.{{ camel $e.Name }}.id ||"n/a",
-            data: {
-                title: record.{{ camel $e.Name }}.{{$titleField.Name}}
-            }
-        } : undefined,
-        {{- else }}
-        ...(record.{{ camel $e.Name }} || []).map((i)=>{
-            return {
-                id: i.{{$e.Type.ID.Name}},
-                text: i.{{$e.Type.ID.Name}},
-                data: {
-                    title: i.{{$titleField.Name}}
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.{{$n.ID.Name}},
+                label: record.{{$n.ID.Name}},
+                {{/*color: "#dddddd"*/}}
+            },
+            {{- range $e := $n.EdgesWithID }}
+            {{- $titleField := (ER_titleField $e.Type) }}
+            {{- if $e.Unique }}
+            record.{{ camel $e.Name }} ? {
+                id: record.{{ camel $e.Name }}.id || "n/a",
+                label: record.{{ camel $e.Name }}.id ||"n/a",
+            } : undefined,
+            {{- else }}
+            ...(record.{{ camel $e.Name }} || []).map((i)=>{
+                return {
+                    id: i.{{$e.Type.ID.Name}},
+                    label: i.{{$e.Type.ID.Name}},
                 }
-            }
-        }),
-        {{- end }}
-        {{- end }}
-    ]
-    const edges: Array<edgeType|undefined> = [
-        {{- range $e := $n.EdgesWithID }}
-        {{- if $e.Unique }}
-        record.{{ camel $e.Name }} ? {
-            id: record.{{$n.ID.Name}}+"-"+(record.{{ camel $e.Name }}?.id || "n/a"),
-            from: record.{{$n.ID.Name}},
-            to: record.{{ camel $e.Name }}?.id || "n/a",
-            text: "{{ ER_label $e.Name }}"
-        } : undefined,
-        {{- else }}
-        ...(record.{{ camel $e.Name }} || []).map((i)=>{
-           return {
-               id: record.{{$n.ID.Name}}+"-"+i.{{$e.Type.ID.Name}},
-               from: record.{{$n.ID.Name}},
-               to: i.{{$e.Type.ID.Name}},
-               text: "{{ER_label $e.Name }}"
-           }
-        }),
-        {{- end }}
-        {{- end }}
-    ]
+            }),
+            {{- end }}
+            {{- end }}
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            {{- range $e := $n.EdgesWithID }}
+            {{- if $e.Unique }}
+            record.{{ camel $e.Name }} ? {
+                source: record.{{$n.ID.Name}},
+                target: record.{{ camel $e.Name }}?.id || "n/a",
+                label: "{{ ER_label $e.Name }}"
+            } : undefined,
+            {{- else }}
+            ...(record.{{ camel $e.Name }} || []).map((i)=>{
+                return {
+                    source: record.{{$n.ID.Name}},
+                    target: i.{{$e.Type.ID.Name}},
+                    label: "{{ER_label $e.Name }}"
+                }
+            }),
+            {{- end }}
+            {{- end }}
+        ]
 
 
     {{ $allFields := prepend $n.Fields $n.ID}}
@@ -137,12 +125,12 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 {{- range $f := $allFields}}
                 <RA.Typography.Title level={5}>{{ $f.Name | ER_label }}</RA.Typography.Title>
                 {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
@@ -204,25 +192,17 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.REFINE.EdgesDiagram }}
+                <{{$diagramView}}
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
-
+    )
+}
 {{- end -}}
 
 /* eslint no-use-before-define: 2 */

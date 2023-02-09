@@ -20,6 +20,7 @@ Go.dev Package: https://pkg.go.dev/github.com/diazoxide/ent-refine
 8. Uses only a Graphql API with a custom Refine data-provider
 9. Generates TypeScript types from Ent definitions
 10. Column filters with customizable operators
+11. [Edges diagram graph view](#edges-diagram-graph-view) (with [gojs](https://github.com/NorthwoodsSoftware/GoJS) or [react-force-graph](https://github.com/vasturiano/react-force-graph))
 
 ![main.png](docs%2Fimages%2Fmain.png)
 
@@ -271,6 +272,61 @@ export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
         }></Button>
 }
 //...
+```
+
+## Edges diagram graph view
+The Edge Graph Diagram is an effective tool for visualizing 
+the relationships between your entities. It presents an 
+interactive representation of the edges, displaying record 
+IDs and their connections to the main record, making it 
+easier to understand and analyze complex data.
+
+![edges-diagram.png](docs%2Fimages%2Fedges-diagram.png)
+
+### How to enable
+
+> **Important!**
+> By default, the Edge Graph Diagram utilizes GoJS technology. 
+Both GoJS and react-force-graph-2d are available options, 
+allowing you to select the best solution for your needs. 
+However, it's important to note that GoJS is a proprietary 
+library and requires a license key purchased from the GoJS 
+official website for commercial use. On the other hand, 
+react-force-graph-2d is an open-source option.
+
+### How to switch GoJS to react-force-graph-2d
+
+Customize ent-refine extension configs on **entc.go** file
+
+e.g.
+```go
+entRefine, err := EntRefine.NewExtension(
+    ...
+    EntRefine.WithForceGraph2D(
+        EntRefine.ForceGraph2DOptions{
+            Enabled: true,
+        },
+    ),
+    EntRefine.WithDefaultEdgesDiagram('Diagram.ForceGraph2D'),
+    ...
+)
+```
+
+### GoJS license and configuration
+
+e.g.
+```go
+entRefine, err := EntRefine.NewExtension(
+    ...
+    EntRefine.WithGoJs(
+        EntRefine.GoJSOptions{
+            Enabled: true,
+            LicenseKey: "xxxxx-xxxxxx-xxxxx-xxxxx",
+        },
+    ),
+    EntRefine.WithDefaultEdgesDiagram('Diagram.GoJS'),
+    ...
+)
 ```
 
 ## Custom views

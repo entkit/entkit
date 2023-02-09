@@ -2,6 +2,7 @@ package common
 
 import (
 	"entgo.io/ent/entc/gen"
+	"github.com/stoewer/go-strcase"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
@@ -83,4 +84,8 @@ func FieldTSType(field gen.Field) string {
 	}
 
 	return TSType(field.Type.String())
+}
+
+func ResourceAlias(node gen.Type) string {
+	return strcase.SnakeCase(node.Name)
 }

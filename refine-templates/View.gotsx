@@ -3,7 +3,6 @@
 import React from "react";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-import { BaseKey } from "@pankod/refine-core/dist/interfaces";
 import * as Show from "./show";
 import * as Type  from "./interfaces";
 import ReactQuill from 'react-quill';

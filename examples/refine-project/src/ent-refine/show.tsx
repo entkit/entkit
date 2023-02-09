@@ -1,13 +1,13 @@
 /* eslint no-use-before-define: 0 */
 import { useState } from "react";
-import {BaseKey} from "@pankod/refine-core/dist/interfaces";
 import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-import {Canvas, Label, Node, Edge} from "reaflow";
+import {GraphData, NodeObject, LinkObject} from "react-force-graph-2d";
 
 import * as Tables from "./tables";
 import * as Lists from "./list";
+import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
@@ -17,7 +17,7 @@ const { Link } = RefineReactRouter;
 
 
 export type CompanyShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...showProps}) => {
@@ -153,153 +153,117 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.name
-            }
-        },
-        ...(record.countries || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.name
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            ...(record.countries || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.phones || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.phones || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.emails || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.emails || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.websites || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.websites || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.locations || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.locations || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        record.logoImage ? {
-            id: record.logoImage.id || "n/a",
-            text: record.logoImage.id ||"n/a",
-            data: {
-                title: record.logoImage.title
-            }
-        } : undefined,
-        record.coverImage ? {
-            id: record.coverImage.id || "n/a",
-            text: record.coverImage.id ||"n/a",
-            data: {
-                title: record.coverImage.title
-            }
-        } : undefined,
-        ...(record.galleryImages || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            record.logoImage ? {
+                id: record.logoImage.id || "n/a",
+                label: record.logoImage.id ||"n/a",
+            } : undefined,
+            record.coverImage ? {
+                id: record.coverImage.id || "n/a",
+                label: record.coverImage.id ||"n/a",
+            } : undefined,
+            ...(record.galleryImages || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-    ]
-    const edges: Array<edgeType|undefined> = [
-        ...(record.countries || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Countries"
-           }
-        }),
-        ...(record.phones || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Phones"
-           }
-        }),
-        ...(record.emails || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Emails"
-           }
-        }),
-        ...(record.websites || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Websites"
-           }
-        }),
-        ...(record.locations || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Locations"
-           }
-        }),
-        record.logoImage ? {
-            id: record.id+"-"+(record.logoImage?.id || "n/a"),
-            from: record.id,
-            to: record.logoImage?.id || "n/a",
-            text: "Logo Image"
-        } : undefined,
-        record.coverImage ? {
-            id: record.id+"-"+(record.coverImage?.id || "n/a"),
-            from: record.id,
-            to: record.coverImage?.id || "n/a",
-            text: "Cover Image"
-        } : undefined,
-        ...(record.galleryImages || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Gallery Images"
-           }
-        }),
-    ]
+            }),
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            ...(record.countries || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Countries"
+                }
+            }),
+            ...(record.phones || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Phones"
+                }
+            }),
+            ...(record.emails || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Emails"
+                }
+            }),
+            ...(record.websites || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Websites"
+                }
+            }),
+            ...(record.locations || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Locations"
+                }
+            }),
+            record.logoImage ? {
+                source: record.id,
+                target: record.logoImage?.id || "n/a",
+                label: "Logo Image"
+            } : undefined,
+            record.coverImage ? {
+                source: record.id,
+                target: record.coverImage?.id || "n/a",
+                label: "Cover Image"
+            } : undefined,
+            ...(record.galleryImages || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Gallery Images"
+                }
+            }),
+        ]
 
 
     
@@ -308,12 +272,12 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
@@ -455,27 +419,19 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type CountryShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...showProps}) => {
@@ -582,110 +538,86 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.name
-            }
-        },
-        ...(record.companies || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.name
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            ...(record.companies || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.phones || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.phones || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.emails || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.emails || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.websites || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.websites || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.locations || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.title
+            }),
+            ...(record.locations || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-    ]
-    const edges: Array<edgeType|undefined> = [
-        ...(record.companies || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Companies"
-           }
-        }),
-        ...(record.phones || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Phones"
-           }
-        }),
-        ...(record.emails || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Emails"
-           }
-        }),
-        ...(record.websites || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Websites"
-           }
-        }),
-        ...(record.locations || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Locations"
-           }
-        }),
-    ]
+            }),
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            ...(record.companies || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Companies"
+                }
+            }),
+            ...(record.phones || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Phones"
+                }
+            }),
+            ...(record.emails || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Emails"
+                }
+            }),
+            ...(record.websites || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Websites"
+                }
+            }),
+            ...(record.locations || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Locations"
+                }
+            }),
+        ]
 
 
     
@@ -694,12 +626,12 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
@@ -815,27 +747,19 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type EmailShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProps}) => {
@@ -869,51 +793,39 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.title
-            }
-        },
-        record.company ? {
-            id: record.company.id || "n/a",
-            text: record.company.id ||"n/a",
-            data: {
-                title: record.company.name
-            }
-        } : undefined,
-        record.country ? {
-            id: record.country.id || "n/a",
-            text: record.country.id ||"n/a",
-            data: {
-                title: record.country.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.company ? {
-            id: record.id+"-"+(record.company?.id || "n/a"),
-            from: record.id,
-            to: record.company?.id || "n/a",
-            text: "Company"
-        } : undefined,
-        record.country ? {
-            id: record.id+"-"+(record.country?.id || "n/a"),
-            from: record.id,
-            to: record.country?.id || "n/a",
-            text: "Country"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.company ? {
+                id: record.company.id || "n/a",
+                label: record.company.id ||"n/a",
+            } : undefined,
+            record.country ? {
+                id: record.country.id || "n/a",
+                label: record.country.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.company ? {
+                source: record.id,
+                target: record.company?.id || "n/a",
+                label: "Company"
+            } : undefined,
+            record.country ? {
+                source: record.id,
+                target: record.country?.id || "n/a",
+                label: "Country"
+            } : undefined,
+        ]
 
 
     
@@ -922,12 +834,12 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
@@ -956,27 +868,19 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type ImageShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1016,64 +920,48 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.title
-            }
-        },
-        record.galleryCompany ? {
-            id: record.galleryCompany.id || "n/a",
-            text: record.galleryCompany.id ||"n/a",
-            data: {
-                title: record.galleryCompany.name
-            }
-        } : undefined,
-        record.logoCompany ? {
-            id: record.logoCompany.id || "n/a",
-            text: record.logoCompany.id ||"n/a",
-            data: {
-                title: record.logoCompany.name
-            }
-        } : undefined,
-        record.coverCompany ? {
-            id: record.coverCompany.id || "n/a",
-            text: record.coverCompany.id ||"n/a",
-            data: {
-                title: record.coverCompany.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.galleryCompany ? {
-            id: record.id+"-"+(record.galleryCompany?.id || "n/a"),
-            from: record.id,
-            to: record.galleryCompany?.id || "n/a",
-            text: "Gallery Company"
-        } : undefined,
-        record.logoCompany ? {
-            id: record.id+"-"+(record.logoCompany?.id || "n/a"),
-            from: record.id,
-            to: record.logoCompany?.id || "n/a",
-            text: "Logo Company"
-        } : undefined,
-        record.coverCompany ? {
-            id: record.id+"-"+(record.coverCompany?.id || "n/a"),
-            from: record.id,
-            to: record.coverCompany?.id || "n/a",
-            text: "Cover Company"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.galleryCompany ? {
+                id: record.galleryCompany.id || "n/a",
+                label: record.galleryCompany.id ||"n/a",
+            } : undefined,
+            record.logoCompany ? {
+                id: record.logoCompany.id || "n/a",
+                label: record.logoCompany.id ||"n/a",
+            } : undefined,
+            record.coverCompany ? {
+                id: record.coverCompany.id || "n/a",
+                label: record.coverCompany.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.galleryCompany ? {
+                source: record.id,
+                target: record.galleryCompany?.id || "n/a",
+                label: "Gallery Company"
+            } : undefined,
+            record.logoCompany ? {
+                source: record.id,
+                target: record.logoCompany?.id || "n/a",
+                label: "Logo Company"
+            } : undefined,
+            record.coverCompany ? {
+                source: record.id,
+                target: record.coverCompany?.id || "n/a",
+                label: "Cover Company"
+            } : undefined,
+        ]
 
 
     
@@ -1082,12 +970,12 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
@@ -1117,27 +1005,19 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type LocationShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1179,51 +1059,39 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.title
-            }
-        },
-        record.company ? {
-            id: record.company.id || "n/a",
-            text: record.company.id ||"n/a",
-            data: {
-                title: record.company.name
-            }
-        } : undefined,
-        record.country ? {
-            id: record.country.id || "n/a",
-            text: record.country.id ||"n/a",
-            data: {
-                title: record.country.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.company ? {
-            id: record.id+"-"+(record.company?.id || "n/a"),
-            from: record.id,
-            to: record.company?.id || "n/a",
-            text: "Company"
-        } : undefined,
-        record.country ? {
-            id: record.id+"-"+(record.country?.id || "n/a"),
-            from: record.id,
-            to: record.country?.id || "n/a",
-            text: "Country"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.company ? {
+                id: record.company.id || "n/a",
+                label: record.company.id ||"n/a",
+            } : undefined,
+            record.country ? {
+                id: record.country.id || "n/a",
+                label: record.country.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.company ? {
+                source: record.id,
+                target: record.company?.id || "n/a",
+                label: "Company"
+            } : undefined,
+            record.country ? {
+                source: record.id,
+                target: record.country?.id || "n/a",
+                label: "Country"
+            } : undefined,
+        ]
 
 
     
@@ -1232,12 +1100,12 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
@@ -1282,27 +1150,19 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type PhoneShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1337,51 +1197,39 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.title
-            }
-        },
-        record.company ? {
-            id: record.company.id || "n/a",
-            text: record.company.id ||"n/a",
-            data: {
-                title: record.company.name
-            }
-        } : undefined,
-        record.country ? {
-            id: record.country.id || "n/a",
-            text: record.country.id ||"n/a",
-            data: {
-                title: record.country.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.company ? {
-            id: record.id+"-"+(record.company?.id || "n/a"),
-            from: record.id,
-            to: record.company?.id || "n/a",
-            text: "Company"
-        } : undefined,
-        record.country ? {
-            id: record.id+"-"+(record.country?.id || "n/a"),
-            from: record.id,
-            to: record.country?.id || "n/a",
-            text: "Country"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.company ? {
+                id: record.company.id || "n/a",
+                label: record.company.id ||"n/a",
+            } : undefined,
+            record.country ? {
+                id: record.country.id || "n/a",
+                label: record.country.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.company ? {
+                source: record.id,
+                target: record.company?.id || "n/a",
+                label: "Company"
+            } : undefined,
+            record.country ? {
+                source: record.id,
+                target: record.country?.id || "n/a",
+                label: "Country"
+            } : undefined,
+        ]
 
 
     
@@ -1390,12 +1238,12 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
@@ -1426,27 +1274,19 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type ProductShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1488,51 +1328,39 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.name
-            }
-        },
-        record.warehouse ? {
-            id: record.warehouse.id || "n/a",
-            text: record.warehouse.id ||"n/a",
-            data: {
-                title: record.warehouse.name
-            }
-        } : undefined,
-        record.vendor ? {
-            id: record.vendor.id || "n/a",
-            text: record.vendor.id ||"n/a",
-            data: {
-                title: record.vendor.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.warehouse ? {
-            id: record.id+"-"+(record.warehouse?.id || "n/a"),
-            from: record.id,
-            to: record.warehouse?.id || "n/a",
-            text: "Warehouse"
-        } : undefined,
-        record.vendor ? {
-            id: record.id+"-"+(record.vendor?.id || "n/a"),
-            from: record.id,
-            to: record.vendor?.id || "n/a",
-            text: "Vendor"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.warehouse ? {
+                id: record.warehouse.id || "n/a",
+                label: record.warehouse.id ||"n/a",
+            } : undefined,
+            record.vendor ? {
+                id: record.vendor.id || "n/a",
+                label: record.vendor.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.warehouse ? {
+                source: record.id,
+                target: record.warehouse?.id || "n/a",
+                label: "Warehouse"
+            } : undefined,
+            record.vendor ? {
+                source: record.id,
+                target: record.vendor?.id || "n/a",
+                label: "Vendor"
+            } : undefined,
+        ]
 
 
     
@@ -1541,12 +1369,12 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
@@ -1585,27 +1413,19 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type VendorShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1663,59 +1483,47 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.name
-            }
-        },
-        ...(record.warehouses || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.name
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            ...(record.warehouses || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        ...(record.products || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.name
+            }),
+            ...(record.products || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-    ]
-    const edges: Array<edgeType|undefined> = [
-        ...(record.warehouses || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Warehouses"
-           }
-        }),
-        ...(record.products || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Products"
-           }
-        }),
-    ]
+            }),
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            ...(record.warehouses || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Warehouses"
+                }
+            }),
+            ...(record.products || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Products"
+                }
+            }),
+        ]
 
 
     
@@ -1724,12 +1532,12 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
@@ -1788,27 +1596,19 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type WarehouseShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1858,55 +1658,43 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.name
-            }
-        },
-        ...(record.products || []).map((i)=>{
-            return {
-                id: i.id,
-                text: i.id,
-                data: {
-                    title: i.name
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            ...(record.products || []).map((i)=>{
+                return {
+                    id: i.id,
+                    label: i.id,
                 }
-            }
-        }),
-        record.vendor ? {
-            id: record.vendor.id || "n/a",
-            text: record.vendor.id ||"n/a",
-            data: {
-                title: record.vendor.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        ...(record.products || []).map((i)=>{
-           return {
-               id: record.id+"-"+i.id,
-               from: record.id,
-               to: i.id,
-               text: "Products"
-           }
-        }),
-        record.vendor ? {
-            id: record.id+"-"+(record.vendor?.id || "n/a"),
-            from: record.id,
-            to: record.vendor?.id || "n/a",
-            text: "Vendor"
-        } : undefined,
-    ]
+            }),
+            record.vendor ? {
+                id: record.vendor.id || "n/a",
+                label: record.vendor.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            ...(record.products || []).map((i)=>{
+                return {
+                    source: record.id,
+                    target: i.id,
+                    label: "Products"
+                }
+            }),
+            record.vendor ? {
+                source: record.id,
+                target: record.vendor?.id || "n/a",
+                label: "Vendor"
+            } : undefined,
+        ]
 
 
     
@@ -1915,12 +1703,12 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
@@ -1969,27 +1757,19 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};
+    )
+}
 
 export type WebsiteShowProps = {
-    id?: BaseKey,
+    id?: Interfaces.ER_ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...showProps}) => {
@@ -2023,51 +1803,39 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [idTreeView, setIdTreeView] = useState(false)
+    const [edgesDiagram, setedgesDiagram] = useState(false)
 
     if(!record){
         return <></>
     }
 
-    type nodeType = {id: string; text: string, data: Record<string, any>}
-    type edgeType = {id: string, from: string, to: string, text: string}
-    const nodes: Array<nodeType|undefined> = [
-        {
-            id: record.id,
-            text: record.id,
-            data: {
-                title: record.title
-            }
-        },
-        record.company ? {
-            id: record.company.id || "n/a",
-            text: record.company.id ||"n/a",
-            data: {
-                title: record.company.name
-            }
-        } : undefined,
-        record.country ? {
-            id: record.country.id || "n/a",
-            text: record.country.id ||"n/a",
-            data: {
-                title: record.country.name
-            }
-        } : undefined,
-    ]
-    const edges: Array<edgeType|undefined> = [
-        record.company ? {
-            id: record.id+"-"+(record.company?.id || "n/a"),
-            from: record.id,
-            to: record.company?.id || "n/a",
-            text: "Company"
-        } : undefined,
-        record.country ? {
-            id: record.id+"-"+(record.country?.id || "n/a"),
-            from: record.id,
-            to: record.country?.id || "n/a",
-            text: "Country"
-        } : undefined,
-    ]
+    const nodes: Array<Diagram.Node|undefined> =  [
+            {
+                id: record.id,
+                label: record.id,
+                
+            },
+            record.company ? {
+                id: record.company.id || "n/a",
+                label: record.company.id ||"n/a",
+            } : undefined,
+            record.country ? {
+                id: record.country.id || "n/a",
+                label: record.country.id ||"n/a",
+            } : undefined,
+        ];
+    const links:Array<Diagram.Link|undefined> = [
+            record.company ? {
+                source: record.id,
+                target: record.company?.id || "n/a",
+                label: "Company"
+            } : undefined,
+            record.country ? {
+                source: record.id,
+                target: record.country?.id || "n/a",
+                label: "Country"
+            } : undefined,
+        ]
 
 
     
@@ -2076,12 +1844,12 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setIdTreeView(!idTreeView) } }>ID tree</RA.Button>
+                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>ID tree</RA.Button>
                      </>
                  )}
                  {...showProps}
         >
-            {!idTreeView ? <>
+            {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
                 <View.ER_UUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
@@ -2110,21 +1878,13 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
                 </> : null }
             </> : null }
 
-            {idTreeView ? <Canvas
-                height={600}
-                pannable={true}
-                nodes={nodes.filter((n): n is nodeType => typeof n !== "undefined")}
-                edges={edges.filter((e): e is edgeType => typeof e !== "undefined")}
-
-                node={<Node
-                    style={ { stroke: '#000000', fill: '#001628', strokeWidth: 1 } }
-                    label={ <Label style={ { fill: '#ffffff' } } /> }
-                >{event => (
-                    <span>{event.node.data.title}</span>
-                )}</Node>}
-                edge={<Edge label={<Label style={ { fill: 'black' } } />}></Edge>}
-            /> : null}
+            { edgesDiagram ?
+                <Diagram.GoJS
+                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+                />
+            : null }
 
         </RA.Show>
-    );
-};/* eslint no-use-before-define: 2 */
+    )
+}/* eslint no-use-before-define: 2 */
