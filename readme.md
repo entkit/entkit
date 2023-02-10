@@ -1,4 +1,13 @@
-# Ent-Refine "Everything is generated"
+# Ent-Refine
+
+![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/ent-refine)
+[![GitHub issues](https://img.shields.io/github/issues/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine/issues)
+[![GitHub stars](https://img.shields.io/github/stars/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine/stargazers)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/diazoxide/ent-refine)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/diazoxide/ent-refine)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/diazoxide/ent-refine)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/ent-refine)
+[![GitHub license](https://img.shields.io/github/license/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine)
 
 Ent-Refine is a powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI). 
 
