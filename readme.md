@@ -10,7 +10,7 @@ Ent-Refine is a powerful tool that combines the power of two frameworks, [Ent](h
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/ent-refine)
 [![GitHub license](https://img.shields.io/github/license/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine)
 
-![logo.png](docs%2Fimages%2Flogo.png)
+![cover.png](docs%2Fimages%2Fcover.svg)
 
 It simplifies the process of generating CRUDs from Ent definitions with customizable views, fields, actions and search features.
 
@@ -389,7 +389,7 @@ Check out the documentation for more information and examples.
 Both frameworks (Ent and Refine) are configured as described in documentation. 
 
 ## Contacts
-
+![logo.svg](docs%2Fimages%2Flogo.svg)
 **Linkedin**:  https://www.linkedin.com/in/aaron-yor/
 
 **Discord**:   aaron․yordanyan#7556
