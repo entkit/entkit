@@ -5,9 +5,7 @@ import { useState } from "react";
 import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-import {GraphData, NodeObject, LinkObject} from "react-force-graph-2d";
 
-import * as Tables from "./tables";
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
