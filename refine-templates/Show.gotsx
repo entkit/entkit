@@ -5,16 +5,13 @@ import { useState } from "react";
 import { useShow, useOne } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
-
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
 
-const { Link } = RefineReactRouter;
-
-{{ range $n := $.Graph.Nodes -}}
+{{- range $n := $.Graph.Nodes -}}
 {{- $titleField := (ER_titleField $n) }}
 {{- $allFields := prepend $n.Fields $n.ID }}
 
