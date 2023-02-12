@@ -115,6 +115,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
             for (const property in data) {
                 if (data?.[property]?.["edges"]){
                     data[pluralize.singular(property)+"IDs"] = data[property]["edges"].map((e:any)=>e.node["id"])
+                    data["_"+property] = data[property]
                     data[property] = data[property]["edges"].map((e:any)=>e.node)
                     //delete data[property]
                 } else if (data?.[property]?.["id"]){

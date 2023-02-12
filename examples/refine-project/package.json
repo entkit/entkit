@@ -6,7 +6,7 @@
       "last 1 safari version"
     ],
     "production": [
-      ">0.2%",
+      "\u003e0.2%",
       "not dead",
       "not op_mini all"
     ]

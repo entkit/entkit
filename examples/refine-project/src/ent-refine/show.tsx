@@ -1,23 +1,15 @@
 /* eslint no-use-before-define: 0 */
-import { useState } from "react";
-import { useShow, useOne } from "@pankod/refine-core";
+import React, { useState } from "react";
+import { useShow } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
-import RefineReactRouter from "@pankod/refine-react-router-v6";
-import {GraphData, NodeObject, LinkObject} from "react-force-graph-2d";
-
-import * as Tables from "./tables";
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
 
-const { Link } = RefineReactRouter;
-
-
-
 export type CompanyShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...showProps}) => {
@@ -30,7 +22,8 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                 "name",
                 "description",
                 {
-                    "countries": [
+                    operation: "countries",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -38,14 +31,19 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "id",
                                         "name",
                                         "code",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "phones": [
+                    operation: "phones",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -55,14 +53,19 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "description",
                                         "number",
                                         "type",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "emails": [
+                    operation: "emails",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -71,14 +74,19 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "title",
                                         "description",
                                         "address",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "websites": [
+                    operation: "websites",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -87,14 +95,19 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "title",
                                         "description",
                                         "url",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "locations": [
+                    operation: "locations",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -111,11 +124,15 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "suburb",
                                         "streetType",
                                         "streetName",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
                     "logoImage": [
@@ -132,7 +149,8 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     ]
                 },
                 {
-                    "galleryImages": [
+                    operation: "galleryImages",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -140,11 +158,15 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                                         "id",
                                         "title",
                                         "originalURL",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
             ],
         },
@@ -171,30 +193,60 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: i.id,
                 }
             }),
+            Number(record._countries?.totalCount) > Number(record.countries?.length)
+                ? {
+                    id: "Country_more",
+                    label: `More ${Number(record._countries?.totalCount) - Number(record.countries?.length)}`
+                }
+                : undefined,
             ...(record.phones || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._phones?.totalCount) > Number(record.phones?.length)
+                ? {
+                    id: "Phone_more",
+                    label: `More ${Number(record._phones?.totalCount) - Number(record.phones?.length)}`
+                }
+                : undefined,
             ...(record.emails || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._emails?.totalCount) > Number(record.emails?.length)
+                ? {
+                    id: "Email_more",
+                    label: `More ${Number(record._emails?.totalCount) - Number(record.emails?.length)}`
+                }
+                : undefined,
             ...(record.websites || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._websites?.totalCount) > Number(record.websites?.length)
+                ? {
+                    id: "Website_more",
+                    label: `More ${Number(record._websites?.totalCount) - Number(record.websites?.length)}`
+                }
+                : undefined,
             ...(record.locations || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._locations?.totalCount) > Number(record.locations?.length)
+                ? {
+                    id: "Location_more",
+                    label: `More ${Number(record._locations?.totalCount) - Number(record.locations?.length)}`
+                }
+                : undefined,
             record.logoImage ? {
                 id: record.logoImage.id || "n/a",
                 label: record.logoImage.id ||"n/a",
@@ -209,6 +261,12 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: i.id,
                 }
             }),
+            Number(record._galleryImages?.totalCount) > Number(record.galleryImages?.length)
+                ? {
+                    id: "Image_more",
+                    label: `More ${Number(record._galleryImages?.totalCount) - Number(record.galleryImages?.length)}`
+                }
+                : undefined,
         ];
     const links:Array<Diagram.Link|undefined> = [
             ...(record.countries || []).map((i)=>{
@@ -218,6 +276,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Countries"
                 }
             }),
+            Number(record._countries?.totalCount) > Number(record.countries?.length)
+            ? {
+                source: record.id,
+                target: "Country_more",
+                label: "Countries"
+            }
+            : undefined,
             ...(record.phones || []).map((i)=>{
                 return {
                     source: record.id,
@@ -225,6 +290,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Phones"
                 }
             }),
+            Number(record._phones?.totalCount) > Number(record.phones?.length)
+            ? {
+                source: record.id,
+                target: "Phone_more",
+                label: "Phones"
+            }
+            : undefined,
             ...(record.emails || []).map((i)=>{
                 return {
                     source: record.id,
@@ -232,6 +304,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Emails"
                 }
             }),
+            Number(record._emails?.totalCount) > Number(record.emails?.length)
+            ? {
+                source: record.id,
+                target: "Email_more",
+                label: "Emails"
+            }
+            : undefined,
             ...(record.websites || []).map((i)=>{
                 return {
                     source: record.id,
@@ -239,6 +318,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Websites"
                 }
             }),
+            Number(record._websites?.totalCount) > Number(record.websites?.length)
+            ? {
+                source: record.id,
+                target: "Website_more",
+                label: "Websites"
+            }
+            : undefined,
             ...(record.locations || []).map((i)=>{
                 return {
                     source: record.id,
@@ -246,6 +332,13 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Locations"
                 }
             }),
+            Number(record._locations?.totalCount) > Number(record.locations?.length)
+            ? {
+                source: record.id,
+                target: "Location_more",
+                label: "Locations"
+            }
+            : undefined,
             record.logoImage ? {
                 source: record.id,
                 target: record.logoImage?.id || "n/a",
@@ -263,10 +356,15 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                     label: "Gallery Images"
                 }
             }),
+            Number(record._galleryImages?.totalCount) > Number(record.galleryImages?.length)
+            ? {
+                source: record.id,
+                target: "Image_more",
+                label: "Gallery Images"
+            }
+            : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -279,12 +377,12 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
                 
                 <Custom.MyCustomTitle value={ record?.name } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_RichTextViewOnShow value={ record?.description } />
+                <View.EntRichTextViewOnShow value={ record?.description } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -431,7 +529,7 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
 }
 
 export type CountryShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...showProps}) => {
@@ -444,7 +542,8 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                 "name",
                 "code",
                 {
-                    "companies": [
+                    operation: "companies",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -452,14 +551,19 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                                         "id",
                                         "name",
                                         "description",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "phones": [
+                    operation: "phones",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -469,14 +573,19 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                                         "description",
                                         "number",
                                         "type",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "emails": [
+                    operation: "emails",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -485,14 +594,19 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                                         "title",
                                         "description",
                                         "address",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "websites": [
+                    operation: "websites",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -501,14 +615,19 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                                         "title",
                                         "description",
                                         "url",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "locations": [
+                    operation: "locations",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -525,11 +644,15 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                                         "suburb",
                                         "streetType",
                                         "streetName",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
             ],
         },
@@ -556,30 +679,60 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: i.id,
                 }
             }),
+            Number(record._companies?.totalCount) > Number(record.companies?.length)
+                ? {
+                    id: "Company_more",
+                    label: `More ${Number(record._companies?.totalCount) - Number(record.companies?.length)}`
+                }
+                : undefined,
             ...(record.phones || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._phones?.totalCount) > Number(record.phones?.length)
+                ? {
+                    id: "Phone_more",
+                    label: `More ${Number(record._phones?.totalCount) - Number(record.phones?.length)}`
+                }
+                : undefined,
             ...(record.emails || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._emails?.totalCount) > Number(record.emails?.length)
+                ? {
+                    id: "Email_more",
+                    label: `More ${Number(record._emails?.totalCount) - Number(record.emails?.length)}`
+                }
+                : undefined,
             ...(record.websites || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._websites?.totalCount) > Number(record.websites?.length)
+                ? {
+                    id: "Website_more",
+                    label: `More ${Number(record._websites?.totalCount) - Number(record.websites?.length)}`
+                }
+                : undefined,
             ...(record.locations || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._locations?.totalCount) > Number(record.locations?.length)
+                ? {
+                    id: "Location_more",
+                    label: `More ${Number(record._locations?.totalCount) - Number(record.locations?.length)}`
+                }
+                : undefined,
         ];
     const links:Array<Diagram.Link|undefined> = [
             ...(record.companies || []).map((i)=>{
@@ -589,6 +742,13 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: "Companies"
                 }
             }),
+            Number(record._companies?.totalCount) > Number(record.companies?.length)
+            ? {
+                source: record.id,
+                target: "Company_more",
+                label: "Companies"
+            }
+            : undefined,
             ...(record.phones || []).map((i)=>{
                 return {
                     source: record.id,
@@ -596,6 +756,13 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: "Phones"
                 }
             }),
+            Number(record._phones?.totalCount) > Number(record.phones?.length)
+            ? {
+                source: record.id,
+                target: "Phone_more",
+                label: "Phones"
+            }
+            : undefined,
             ...(record.emails || []).map((i)=>{
                 return {
                     source: record.id,
@@ -603,6 +770,13 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: "Emails"
                 }
             }),
+            Number(record._emails?.totalCount) > Number(record.emails?.length)
+            ? {
+                source: record.id,
+                target: "Email_more",
+                label: "Emails"
+            }
+            : undefined,
             ...(record.websites || []).map((i)=>{
                 return {
                     source: record.id,
@@ -610,6 +784,13 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: "Websites"
                 }
             }),
+            Number(record._websites?.totalCount) > Number(record.websites?.length)
+            ? {
+                source: record.id,
+                target: "Website_more",
+                label: "Websites"
+            }
+            : undefined,
             ...(record.locations || []).map((i)=>{
                 return {
                     source: record.id,
@@ -617,10 +798,15 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                     label: "Locations"
                 }
             }),
+            Number(record._locations?.totalCount) > Number(record.locations?.length)
+            ? {
+                source: record.id,
+                target: "Location_more",
+                label: "Locations"
+            }
+            : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -633,11 +819,11 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.name } />
+                <View.EntStringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Code</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.code } />
+                <View.EntStringViewOnShow value={ record?.code } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -759,7 +945,7 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
 }
 
 export type EmailShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProps}) => {
@@ -827,8 +1013,6 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -841,13 +1025,13 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.title } />
+                <View.EntStringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.description } />
+                <View.EntStringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Address</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.address } />
+                <View.EntStringViewOnShow value={ record?.address } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -880,7 +1064,7 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
 }
 
 export type ImageShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProps}) => {
@@ -963,8 +1147,6 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -977,11 +1159,11 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.title } />
+                <View.EntStringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Original Url</RA.Typography.Title>
-                <View.ER_ImageViewOnShow value={ record?.originalURL } />
+                <View.EntImageViewOnShow value={ record?.originalURL } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1017,7 +1199,7 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
 }
 
 export type LocationShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1093,8 +1275,6 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1107,29 +1287,29 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.title } />
+                <View.EntStringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.description } />
+                <View.EntStringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Latitude</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.latitude } />
+                <View.EntStringViewOnShow value={ record?.latitude } />
                 <RA.Typography.Title level={5}>Longitude</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.longitude } />
+                <View.EntStringViewOnShow value={ record?.longitude } />
                 <RA.Typography.Title level={5}>Address</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.address } />
+                <View.EntStringViewOnShow value={ record?.address } />
                 <RA.Typography.Title level={5}>Postcode</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.postcode } />
+                <View.EntStringViewOnShow value={ record?.postcode } />
                 <RA.Typography.Title level={5}>Type</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.type } />
+                <View.EntStringViewOnShow value={ record?.type } />
                 <RA.Typography.Title level={5}>State</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.state } />
+                <View.EntStringViewOnShow value={ record?.state } />
                 <RA.Typography.Title level={5}>Suburb</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.suburb } />
+                <View.EntStringViewOnShow value={ record?.suburb } />
                 <RA.Typography.Title level={5}>Street Type</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.streetType } />
+                <View.EntStringViewOnShow value={ record?.streetType } />
                 <RA.Typography.Title level={5}>Street Name</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.streetName } />
+                <View.EntStringViewOnShow value={ record?.streetName } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1162,7 +1342,7 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
 }
 
 export type PhoneShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1231,8 +1411,6 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1245,15 +1423,15 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.title } />
+                <View.EntStringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.description } />
+                <View.EntStringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Number</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.number } />
+                <View.EntStringViewOnShow value={ record?.number } />
                 <RA.Typography.Title level={5}>Type</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.type } />
+                <View.EntStringViewOnShow value={ record?.type } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1286,7 +1464,7 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
 }
 
 export type ProductShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1362,8 +1540,6 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1376,23 +1552,23 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.name } />
+                <View.EntStringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_RichTextViewOnShow value={ record?.description } />
+                <View.EntRichTextViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Image</RA.Typography.Title>
-                <View.ER_ImageViewOnShow value={ record?.image } />
+                <View.EntImageViewOnShow value={ record?.image } />
                 <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-                <View.ER_URLViewOnShow value={ record?.url } />
+                <View.EntURLViewOnShow value={ record?.url } />
                 <RA.Typography.Title level={5}>Last Sell</RA.Typography.Title>
-                <View.ER_DateViewOnShow value={ record?.lastSell } />
+                <View.EntDateViewOnShow value={ record?.lastSell } />
                 <RA.Typography.Title level={5}>Created At</RA.Typography.Title>
-                <View.ER_DateViewOnShow value={ record?.createdAt } />
+                <View.EntDateViewOnShow value={ record?.createdAt } />
                 <RA.Typography.Title level={5}>Status</RA.Typography.Title>
-                <View.ER_Enums_ProcessStatusViewOnShow value={ record?.status } />
+                <View.EntEnums_ProcessStatusViewOnShow value={ record?.status } />
                 <RA.Typography.Title level={5}>Build Status</RA.Typography.Title>
-                <View.ER_Enums_ProcessStatusViewOnShow value={ record?.buildStatus } />
+                <View.EntEnums_ProcessStatusViewOnShow value={ record?.buildStatus } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1425,7 +1601,7 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
 }
 
 export type VendorShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1438,7 +1614,8 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                 "name",
                 "schema",
                 {
-                    "warehouses": [
+                    operation: "warehouses",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -1449,14 +1626,19 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                                         "originalData",
                                         "enabled",
                                         "filters",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
-                    "products": [
+                    operation: "products",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -1470,11 +1652,15 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                                         "createdAt",
                                         "status",
                                         "buildStatus",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
             ],
         },
@@ -1501,12 +1687,24 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                     label: i.id,
                 }
             }),
+            Number(record._warehouses?.totalCount) > Number(record.warehouses?.length)
+                ? {
+                    id: "Warehouse_more",
+                    label: `More ${Number(record._warehouses?.totalCount) - Number(record.warehouses?.length)}`
+                }
+                : undefined,
             ...(record.products || []).map((i)=>{
                 return {
                     id: i.id,
                     label: i.id,
                 }
             }),
+            Number(record._products?.totalCount) > Number(record.products?.length)
+                ? {
+                    id: "Product_more",
+                    label: `More ${Number(record._products?.totalCount) - Number(record.products?.length)}`
+                }
+                : undefined,
         ];
     const links:Array<Diagram.Link|undefined> = [
             ...(record.warehouses || []).map((i)=>{
@@ -1516,6 +1714,13 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                     label: "Warehouses"
                 }
             }),
+            Number(record._warehouses?.totalCount) > Number(record.warehouses?.length)
+            ? {
+                source: record.id,
+                target: "Warehouse_more",
+                label: "Warehouses"
+            }
+            : undefined,
             ...(record.products || []).map((i)=>{
                 return {
                     source: record.id,
@@ -1523,10 +1728,15 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                     label: "Products"
                 }
             }),
+            Number(record._products?.totalCount) > Number(record.products?.length)
+            ? {
+                source: record.id,
+                target: "Product_more",
+                label: "Products"
+            }
+            : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1539,11 +1749,11 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.name } />
+                <View.EntStringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Schema</RA.Typography.Title>
-                <View.ER_CodeViewOnShow value={ record?.schema } />
+                <View.EntCodeViewOnShow value={ record?.schema } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1608,7 +1818,7 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
 }
 
 export type WarehouseShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1624,7 +1834,8 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                 "enabled",
                 "filters",
                 {
-                    "products": [
+                    operation: "products",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -1638,11 +1849,15 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                                         "createdAt",
                                         "status",
                                         "buildStatus",
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {
                     "vendor": [
@@ -1676,6 +1891,12 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                     label: i.id,
                 }
             }),
+            Number(record._products?.totalCount) > Number(record.products?.length)
+                ? {
+                    id: "Product_more",
+                    label: `More ${Number(record._products?.totalCount) - Number(record.products?.length)}`
+                }
+                : undefined,
             record.vendor ? {
                 id: record.vendor.id || "n/a",
                 label: record.vendor.id ||"n/a",
@@ -1689,6 +1910,13 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                     label: "Products"
                 }
             }),
+            Number(record._products?.totalCount) > Number(record.products?.length)
+            ? {
+                source: record.id,
+                target: "Product_more",
+                label: "Products"
+            }
+            : undefined,
             record.vendor ? {
                 source: record.id,
                 target: record.vendor?.id || "n/a",
@@ -1696,8 +1924,6 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1710,17 +1936,17 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Name</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.name } />
+                <View.EntStringViewOnShow value={ record?.name } />
                 <RA.Typography.Title level={5}>Last Update</RA.Typography.Title>
-                <View.ER_DateViewOnShow value={ record?.lastUpdate } />
+                <View.EntDateViewOnShow value={ record?.lastUpdate } />
                 <RA.Typography.Title level={5}>Original Data</RA.Typography.Title>
-                <View.ER_CodeViewOnShow value={ record?.originalData } />
+                <View.EntCodeViewOnShow value={ record?.originalData } />
                 <RA.Typography.Title level={5}>Enabled</RA.Typography.Title>
-                <View.ER_BooleanViewOnShow value={ record?.enabled } />
+                <View.EntBooleanViewOnShow value={ record?.enabled } />
                 <RA.Typography.Title level={5}>Filters</RA.Typography.Title>
-                <View.ER_StringListViewOnShow value={ record?.filters } />
+                <View.EntStringListViewOnShow value={ record?.filters } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
@@ -1769,7 +1995,7 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
 }
 
 export type WebsiteShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.EntID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...showProps}) => {
@@ -1837,8 +2063,6 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
             } : undefined,
         ]
 
-
-    
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
@@ -1851,13 +2075,13 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
         >
             {!edgesDiagram ? <>
                 <RA.Typography.Title level={5}>Id</RA.Typography.Title>
-                <View.ER_UUIDViewOnShow value={ record?.id } />
+                <View.EntUUIDViewOnShow value={ record?.id } />
                 <RA.Typography.Title level={5}>Title</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.title } />
+                <View.EntStringViewOnShow value={ record?.title } />
                 <RA.Typography.Title level={5}>Description</RA.Typography.Title>
-                <View.ER_StringViewOnShow value={ record?.description } />
+                <View.EntStringViewOnShow value={ record?.description } />
                 <RA.Typography.Title level={5}>Url</RA.Typography.Title>
-                <View.ER_URLViewOnShow value={ record?.url } />
+                <View.EntURLViewOnShow value={ record?.url } />
 
                 {withEdges ? <>
                     <RA.Typography.Title level={3}>Edges</RA.Typography.Title>

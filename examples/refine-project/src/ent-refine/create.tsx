@@ -156,38 +156,62 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_RichTextViewOnForm/>
+                     <View.EntRichTextViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Countries"
+                    name={["countryIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...countriesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="phones" name={["phoneIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Phones"
+                    name={["phoneIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...phonesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="emails" name={["emailIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Emails"
+                    name={["emailIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...emailsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="websites" name={["websiteIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Websites"
+                    name={["websiteIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...websitesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Locations"
+                    name={["locationIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_image" name="logoImageID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Logo Image"
+                    name="logoImageID"
+                    rules={[{required: false}]}>
                     <RA.Select {...logo_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="cover_image" name="coverImageID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Cover Image"
+                    name="coverImageID"
+                    rules={[{required: false}]}>
                     <RA.Select {...cover_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="gallery_images" name={["galleryImageIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Gallery Images"
+                    name={["galleryImageIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...gallery_imagesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -290,29 +314,44 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="code"
                     label="Code"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="companies" name={["companyIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Companies"
+                    name={["companyIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...companiesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="phones" name={["phoneIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Phones"
+                    name={["phoneIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...phonesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="emails" name={["emailIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Emails"
+                    name={["emailIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...emailsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="websites" name={["websiteIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Websites"
+                    name={["websiteIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...websitesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Locations"
+                    name={["locationIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -364,27 +403,33 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="address"
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -453,23 +498,32 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="originalURL"
                     label="Original Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_ImageViewOnForm/>
+                     <View.EntImageViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Gallery Company"
+                    name="galleryCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...gallery_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_company" name="logoCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Logo Company"
+                    name="logoCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...logo_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="cover_company" name="coverCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Cover Company"
+                    name="coverCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...cover_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -521,83 +575,89 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="latitude"
                     label="Latitude"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="longitude"
                     label="Longitude"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="address"
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="postcode"
                     label="Postcode"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="type"
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="state"
                     label="State"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="suburb"
                     label="Suburb"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="streetType"
                     label="Street Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="streetName"
                     label="Street Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -649,34 +709,40 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="number"
                     label="Number"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="type"
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -728,48 +794,54 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_RichTextViewOnForm/>
+                     <View.EntRichTextViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="image"
                     label="Image"
                     rules={[{required: true}]}
                 >
-                     <View.ER_ImageViewOnForm/>
+                     <View.EntImageViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="url"
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_URLViewOnForm/>
+                     <View.EntURLViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="status"
                     label="Status"
                     rules={[{required: true}]}
                 >
-                     <View.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.EntEnums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="buildStatus"
                     label="Build Status"
                     rules={[{required: true}]}
                 >
-                     <View.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.EntEnums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Warehouse"
+                    name="warehouseID"
+                    rules={[{required: false}]}>
                     <RA.Select {...warehouseSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="vendor" name="vendorID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Vendor"
+                    name="vendorID"
+                    rules={[{required: false}]}>
                     <RA.Select {...vendorSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -821,20 +893,26 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="schema"
                     label="Schema"
                     rules={[{required: true}]}
                 >
-                     <View.ER_CodeViewOnForm/>
+                     <View.EntCodeViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="warehouses" name={["warehouseIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Warehouses"
+                    name={["warehouseIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...warehousesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Products"
+                    name={["productIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...productsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -886,34 +964,40 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="originalData"
                     label="Original Data"
                     rules={[{required: false}]}
                 >
-                     <View.ER_CodeViewOnForm/>
+                     <View.EntCodeViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="enabled"
                     label="Enabled"
                     rules={[{required: true}]}
                 >
-                     <View.ER_BooleanViewOnForm/>
+                     <View.EntBooleanViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="filters"
                     label="Filters"
                     rules={[{required: false}]}
                 >
-                     <View.ER_StringListViewOnForm/>
+                     <View.EntStringListViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Products"
+                    name={["productIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...productsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="vendor" name="vendorID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Vendor"
+                    name="vendorID"
+                    rules={[{required: false}]}>
                     <RA.Select {...vendorSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -965,27 +1049,33 @@ import 'react-quill/dist/quill.snow.css';export const CompanyCreate: React.FC = 
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="description"
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 <RA.Form.Item
                     name="url"
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_URLViewOnForm/>
+                     <View.EntURLViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>

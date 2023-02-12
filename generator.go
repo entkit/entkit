@@ -82,11 +82,13 @@ type RefineGen struct {
 	Graph     *gen.Graph
 	SkipModes SkipModes
 	Ops       []gen.Op
+	Prefix    string
 }
 
 func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 	rg := &RefineGen{
 		Extension: extension,
+		Prefix:    extension.TypeScriptPrefix,
 		Graph:     graph,
 		SkipModes: SkipModes{
 			SkipEnumField:           entgql.SkipEnumField,

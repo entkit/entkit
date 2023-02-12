@@ -14,14 +14,6 @@ var (
 	//go:embed templates/*
 	_templates embed.FS
 
-	_funcMap = template.FuncMap{
-		"ER_label":          common.ToLabel,
-		"ER_fieldTSType":    common.FieldTSType,
-		"ER_tsType":         common.TSType,
-		"ER_resourceAlias":  common.ResourceAlias,
-		"ER_titleField":     titleField,
-		"ER_mainImageField": mainImageField,
-	}
 	funcMap = template.FuncMap{}
 )
 
@@ -30,10 +22,10 @@ type ExtensionOption = func(*Extension) error
 // Extension main struct
 type Extension struct {
 	entc.DefaultExtension
-	AppPath    string         // AppPath JS Application path (packages.json directory path)
-	SrcDirName string         // SrcDirName JS Application source dir name
-	Meta       map[string]any // Meta to share with frontend application
-
+	AppPath             string         // AppPath JS Application path (packages.json directory path)
+	SrcDirName          string         // SrcDirName JS Application source dir name
+	Meta                map[string]any // Meta to share with frontend application
+	TypeScriptPrefix    string
 	GoJs                GoJSOptions
 	ForceGraph2D        ForceGraph2DOptions
 	DefaultEdgesDiagram string
@@ -52,6 +44,14 @@ type ForceGraph2DOptions struct {
 func WithAppPath(path string) ExtensionOption {
 	return func(ex *Extension) (err error) {
 		ex.AppPath = path
+		return nil
+	}
+}
+
+// WithTypeScriptPrefix define typescript types/vars prefix
+func WithTypeScriptPrefix(prefix string) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.TypeScriptPrefix = prefix
 		return nil
 	}
 }
@@ -99,14 +99,27 @@ func WithMeta(meta map[string]any) ExtensionOption {
 // NewExtension initialize extension
 func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	ex := &Extension{
-		SrcDirName: "src",
-		Meta:       map[string]any{},
-
+		SrcDirName:          "src",
+		Meta:                map[string]any{},
+		TypeScriptPrefix:    "Ent",
 		DefaultEdgesDiagram: "Diagram.GoJS",
 		GoJs: GoJSOptions{
 			Enabled:    true,
 			LicenseKey: "test",
 		},
+	}
+
+	_funcMap := template.FuncMap{
+		"ER_label": common.ToLabel,
+		"ER_fieldTSType": func(f gen.Field) string {
+			return common.FieldTSType(f, ex.TypeScriptPrefix)
+		},
+		"ER_tsType": func(t string) string {
+			return common.TSType(t, ex.TypeScriptPrefix)
+		},
+		"ER_resourceAlias":  common.ResourceAlias,
+		"ER_titleField":     titleField,
+		"ER_mainImageField": mainImageField,
 	}
 
 	if len(funcMap) == 0 {

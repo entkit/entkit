@@ -8,26 +8,26 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 
-export interface ViewProps<T> {
+export type ViewProps<T> = Omit<React.HTMLProps<HTMLElement>, "value"> & {
     value: T | undefined
 }
 
 // region Date
-export const ER_DateViewOnShow: React.FC<ViewProps<Date>> = ({value}) => {
+export const EntDateViewOnShow: React.FC<ViewProps<Date>> = ({value}) => {
     return value ? <RA.DateField format="LLL" value={ value }/> : <RA.TextField value="Never"/>
 }
-export const ER_DateViewOnList: React.FC<ViewProps<Date>> = ER_DateViewOnShow
-export const ER_DateViewOnForm: React.FC = (props) => {
+export const EntDateViewOnList: React.FC<ViewProps<Date>> = EntDateViewOnShow
+export const EntDateViewOnForm: React.FC = (props) => {
     return <RA.DatePicker {...props} showTime={true} />
 }
 // endregion Date
 
 // region Boolean
-export const ER_BooleanViewOnShow: React.FC<ViewProps<Type.ER_Boolean>> = ({value}) => {
+export const EntBooleanViewOnShow: React.FC<ViewProps<Type.EntBoolean>> = ({value}) => {
     return <RA.TextField value={ value ? "Yes" : "No"}/>
 }
-export const ER_BooleanViewOnList = ER_BooleanViewOnShow
-export const ER_BooleanViewOnForm: React.FC = (props)=>{
+export const EntBooleanViewOnList = EntBooleanViewOnShow
+export const EntBooleanViewOnForm: React.FC = (props)=>{
     return <RA.Radio.Group {...props} >
         <RA.Radio value={true}>Yes</RA.Radio>
         <RA.Radio value={false}>No</RA.Radio>
@@ -36,61 +36,61 @@ export const ER_BooleanViewOnForm: React.FC = (props)=>{
 // endregion Boolean
 
 // region String
-export const ER_StringViewOnShow: React.FC<ViewProps<Type.ER_String>> = ({value}) => {
+export const EntStringViewOnShow: React.FC<ViewProps<Type.EntString>> = ({value}) => {
     return <RA.Typography.Text copyable={true}>{ value }</RA.Typography.Text>
 }
-export const ER_StringViewOnList: React.FC<ViewProps<Type.ER_String>> = ({value}) => {
+export const EntStringViewOnList: React.FC<ViewProps<Type.EntString>> = ({value}) => {
     return <RA.Tooltip title={value}>
         <RA.TextField value={value} ellipsis={true} style={ {width: '100px'} }/>
     </RA.Tooltip>
 }
-export const ER_StringViewOnForm: React.FC = (props) => {
+export const EntStringViewOnForm: React.FC = (props) => {
     return <RA.Input {...props} />
 }
 // endregion String
 
 // region Number
-export const ER_NumberViewOnShow: React.FC<ViewProps<Type.ER_Number>> = ({value, ...props}) => {
-    return <ER_StringViewOnShow value={String(value)} {...props} />
+export const EntNumberViewOnShow: React.FC<ViewProps<Type.EntNumber>> = ({value, ...props}) => {
+    return <EntStringViewOnShow value={String(value)} {...props} />
 }
-export const ER_NumberViewOnList: React.FC<ViewProps<Type.ER_Number>> = ({value, ...props}) => {
-    return <ER_NumberViewOnShow value={value} {...props} />
+export const EntNumberViewOnList: React.FC<ViewProps<Type.EntNumber>> = ({value, ...props}) => {
+    return <EntNumberViewOnShow value={value} {...props} />
 }
-export const ER_NumberViewOnForm: React.FC = (props) => {
+export const EntNumberViewOnForm: React.FC = (props) => {
     return <RA.InputNumber {...props} />
 }
 // endregion Number
 
 // region String List
-export const ER_StringListViewOnShow: React.FC<ViewProps<Type.ER_StringList>> = ({value}) => {
-    return <>{ value?.map( (v, i) => <ER_StringViewOnShow value={ String(i+1) + '. ' + v}/> ) }</>;
+export const EntStringListViewOnShow: React.FC<ViewProps<Type.EntStringList>> = ({value}) => {
+    return <>{ value?.map( (v, i) => <EntStringViewOnShow key={i} value={ String(i+1) + '. ' + v}/> ) }</>;
 }
-export const ER_StringListViewOnList: React.FC<ViewProps<Type.ER_StringList>> = ({value}) => {
+export const EntStringListViewOnList: React.FC<ViewProps<Type.EntStringList>> = ({value}) => {
     return <RA.Typography.Text>{ String( value?.length || 0 )+" items" }</RA.Typography.Text>
 }
-export const ER_StringListViewOnForm: React.FC = (props) => {
+export const EntStringListViewOnForm: React.FC = (props) => {
     return <RA.Select {...props}  mode="tags" />
 }
 // endregion
 
 // region Image
-export const ER_ImageViewOnShow: React.FC<ViewProps<Type.ER_Image>> = ({value}) => {
+export const EntImageViewOnShow: React.FC<ViewProps<Type.EntImage>> = ({value}) => {
     return <RA.Image style={ {width: '100%', maxWidth: '256px' } } src={value}/>
 }
-export const ER_ImageViewOnList: React.FC<ViewProps<Type.ER_Image>> = ({value}) => {
+export const EntImageViewOnList: React.FC<ViewProps<Type.EntImage>> = ({value}) => {
     return <RA.Image width={48} src={value}/>
 }
-export const ER_ImageViewOnForm: React.FC = ER_StringViewOnForm
+export const EntImageViewOnForm: React.FC = EntStringViewOnForm
 // endregion Image
 
 // region UUID
-export const ER_UUIDViewOnShow: React.FC<ViewProps<Type.ER_UUID>> = ER_StringViewOnShow
-export const ER_UUIDViewOnList: React.FC<ViewProps<Type.ER_UUID>> = ER_StringViewOnList
-export const ER_UUIDViewOnForm: React.FC = ER_StringListViewOnForm
+export const EntUUIDViewOnShow: React.FC<ViewProps<Type.EntUUID>> = EntStringViewOnShow
+export const EntUUIDViewOnList: React.FC<ViewProps<Type.EntUUID>> = EntStringViewOnList
+export const EntUUIDViewOnForm: React.FC = EntStringListViewOnForm
 // endregion UUID
 
 // region Code
-export const ER_CodeViewOnForm: React.FC<any> = (props) => {
+export const EntCodeViewOnForm: React.FC<any> = (props) => {
     return <CodeEditor
         {...props}
         language={props.Language || 'js'}
@@ -102,37 +102,37 @@ export const ER_CodeViewOnForm: React.FC<any> = (props) => {
         } }
     />
 }
-export const ER_CodeViewOnShow: React.FC<ViewProps<Type.ER_Code>> = ({value}) => {
-    return <ER_CodeViewOnForm value={value} readOnly={true}/>
+export const EntCodeViewOnShow: React.FC<ViewProps<Type.EntCode>> = ({value}) => {
+    return <EntCodeViewOnForm value={value} readOnly={true}/>
 }
-export const ER_CodeViewOnList: React.FC<ViewProps<Type.ER_Code>> = ({value}) => {
+export const EntCodeViewOnList: React.FC<ViewProps<Type.EntCode>> = ({value}) => {
     return <RA.TextField value={value} code={true} ellipsis={true} style={ {width: '100px'} }/>
 }
 // endregion Code
 
 // region Rich Text
-export const ER_RichTextViewOnShow: React.FC<ViewProps<Type.ER_RichText>> = ({value})=>{
+export const EntRichTextViewOnShow: React.FC<ViewProps<Type.EntRichText>> = ({value})=>{
     return <div dangerouslySetInnerHTML={ {__html: value || ""} }></div>
 }
-export const ER_RichTextViewOnList: React.FC<ViewProps<Type.ER_RichText>> = ER_StringViewOnList
-export const ER_RichTextViewOnForm: React.FC = (props) => <ReactQuill {...props} theme="snow"/>
+export const EntRichTextViewOnList: React.FC<ViewProps<Type.EntRichText>> = EntStringViewOnList
+export const EntRichTextViewOnForm: React.FC = (props) => <ReactQuill {...props} theme="snow"/>
 // endregion Rich Text
 
 // region URL
-export const ER_URLViewOnShow: React.FC<ViewProps<Type.ER_URL>> = ({value}) => {
+export const EntURLViewOnShow: React.FC<ViewProps<Type.EntURL>> = ({value}) => {
     return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>{ value }</RA.Button>
 }
-export const ER_URLViewOnList: React.FC<ViewProps<Type.ER_URL>> = ({value}) => {
+export const EntURLViewOnList: React.FC<ViewProps<Type.EntURL>> = ({value}) => {
     return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>
 }
-export const ER_URLViewOnForm: React.FC = ER_StringViewOnForm
+export const EntURLViewOnForm: React.FC = EntStringViewOnForm
 // endregion URL
 
 // region Enums
 
-export const ER_Enums_ProcessStatusViewOnShow = ER_StringViewOnShow
-export const ER_Enums_ProcessStatusViewOnList = ER_StringViewOnList
-export const ER_Enums_ProcessStatusViewOnForm: React.FC = (props)=>{
+export const EntEnums_ProcessStatusViewOnShow = EntStringViewOnShow
+export const EntEnums_ProcessStatusViewOnList = EntStringViewOnList
+export const EntEnums_ProcessStatusViewOnForm: React.FC = (props)=>{
     return  <RA.Select
         {...props}
         options={[

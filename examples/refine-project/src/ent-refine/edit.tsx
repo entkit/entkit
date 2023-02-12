@@ -241,7 +241,7 @@ export const CompanyEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -249,31 +249,55 @@ export const CompanyEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_RichTextViewOnForm/>
+                     <View.EntRichTextViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="countries" name={["countryIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Countries"
+                    name={["countryIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...countriesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="phones" name={["phoneIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Phones"
+                    name={["phoneIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...phonesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="emails" name={["emailIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Emails"
+                    name={["emailIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...emailsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="websites" name={["websiteIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Websites"
+                    name={["websiteIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...websitesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Locations"
+                    name={["locationIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_image" name="logoImageID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Logo Image"
+                    name="logoImageID"
+                    rules={[{required: false}]}>
                     <RA.Select {...logo_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="cover_image" name="coverImageID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Cover Image"
+                    name="coverImageID"
+                    rules={[{required: false}]}>
                     <RA.Select {...cover_imageSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="gallery_images" name={["galleryImageIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Gallery Images"
+                    name={["galleryImageIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...gallery_imagesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -444,7 +468,7 @@ export const CountryEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -452,22 +476,37 @@ export const CountryEdit: React.FC = () => {
                     label="Code"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="companies" name={["companyIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Companies"
+                    name={["companyIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...companiesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="phones" name={["phoneIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Phones"
+                    name={["phoneIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...phonesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="emails" name={["emailIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Emails"
+                    name={["emailIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...emailsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="websites" name={["websiteIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Websites"
+                    name={["websiteIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...websitesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="locations" name={["locationIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Locations"
+                    name={["locationIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...locationsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -539,7 +578,7 @@ export const EmailEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -547,7 +586,7 @@ export const EmailEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -555,13 +594,19 @@ export const EmailEdit: React.FC = () => {
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -652,7 +697,7 @@ export const ImageEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -660,16 +705,25 @@ export const ImageEdit: React.FC = () => {
                     label="Original Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_ImageViewOnForm/>
+                     <View.EntImageViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="gallery_company" name="galleryCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Gallery Company"
+                    name="galleryCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...gallery_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="logo_company" name="logoCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Logo Company"
+                    name="logoCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...logo_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="cover_company" name="coverCompanyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Cover Company"
+                    name="coverCompanyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...cover_companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -749,7 +803,7 @@ export const LocationEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -757,7 +811,7 @@ export const LocationEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -765,7 +819,7 @@ export const LocationEdit: React.FC = () => {
                     label="Latitude"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -773,7 +827,7 @@ export const LocationEdit: React.FC = () => {
                     label="Longitude"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -781,7 +835,7 @@ export const LocationEdit: React.FC = () => {
                     label="Address"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -789,7 +843,7 @@ export const LocationEdit: React.FC = () => {
                     label="Postcode"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -797,7 +851,7 @@ export const LocationEdit: React.FC = () => {
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -805,7 +859,7 @@ export const LocationEdit: React.FC = () => {
                     label="State"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -813,7 +867,7 @@ export const LocationEdit: React.FC = () => {
                     label="Suburb"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -821,7 +875,7 @@ export const LocationEdit: React.FC = () => {
                     label="Street Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -829,13 +883,19 @@ export const LocationEdit: React.FC = () => {
                     label="Street Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -908,7 +968,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -916,7 +976,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -924,7 +984,7 @@ export const PhoneEdit: React.FC = () => {
                     label="Number"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -932,13 +992,19 @@ export const PhoneEdit: React.FC = () => {
                     label="Type"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -956,8 +1022,6 @@ export const ProductEdit: React.FC = () => {
                     "description",
                     "image",
                     "url",
-                    "lastSell",
-                    "createdAt",
                     "status",
                     "buildStatus",
                     {
@@ -1015,7 +1079,7 @@ export const ProductEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1023,7 +1087,7 @@ export const ProductEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_RichTextViewOnForm/>
+                     <View.EntRichTextViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1031,7 +1095,7 @@ export const ProductEdit: React.FC = () => {
                     label="Image"
                     rules={[{required: true}]}
                 >
-                     <View.ER_ImageViewOnForm/>
+                     <View.EntImageViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1039,7 +1103,7 @@ export const ProductEdit: React.FC = () => {
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_URLViewOnForm/>
+                     <View.EntURLViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1050,7 +1114,7 @@ export const ProductEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <View.ER_DateViewOnForm/>
+                     <View.EntDateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1061,7 +1125,7 @@ export const ProductEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <View.ER_DateViewOnForm/>
+                     <View.EntDateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1069,7 +1133,7 @@ export const ProductEdit: React.FC = () => {
                     label="Status"
                     rules={[{required: true}]}
                 >
-                     <View.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.EntEnums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1077,13 +1141,19 @@ export const ProductEdit: React.FC = () => {
                     label="Build Status"
                     rules={[{required: true}]}
                 >
-                     <View.ER_Enums_ProcessStatusViewOnForm/>
+                     <View.EntEnums_ProcessStatusViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="warehouse" name="warehouseID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Warehouse"
+                    name="warehouseID"
+                    rules={[{required: false}]}>
                     <RA.Select {...warehouseSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="vendor" name="vendorID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Vendor"
+                    name="vendorID"
+                    rules={[{required: false}]}>
                     <RA.Select {...vendorSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -1170,7 +1240,7 @@ export const VendorEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1178,13 +1248,19 @@ export const VendorEdit: React.FC = () => {
                     label="Schema"
                     rules={[{required: true}]}
                 >
-                     <View.ER_CodeViewOnForm/>
+                     <View.EntCodeViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="warehouses" name={["warehouseIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Warehouses"
+                    name={["warehouseIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...warehousesSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Products"
+                    name={["productIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...productsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -1199,7 +1275,6 @@ export const WarehouseEdit: React.FC = () => {
             metaData: {
                 fields: [
                     "name",
-                    "lastUpdate",
                     "originalData",
                     "enabled",
                     "filters",
@@ -1266,7 +1341,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Name"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1277,7 +1352,7 @@ export const WarehouseEdit: React.FC = () => {
                         value: value ? dayjs(value) : "",
                     })}
                 >
-                     <View.ER_DateViewOnForm/>
+                     <View.EntDateViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1285,7 +1360,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Original Data"
                     rules={[{required: false}]}
                 >
-                     <View.ER_CodeViewOnForm/>
+                     <View.EntCodeViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1293,7 +1368,7 @@ export const WarehouseEdit: React.FC = () => {
                     label="Enabled"
                     rules={[{required: true}]}
                 >
-                     <View.ER_BooleanViewOnForm/>
+                     <View.EntBooleanViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1301,13 +1376,19 @@ export const WarehouseEdit: React.FC = () => {
                     label="Filters"
                     rules={[{required: false}]}
                 >
-                     <View.ER_StringListViewOnForm/>
+                     <View.EntStringListViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="products" name={["productIDs"]} rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Products"
+                    name={["productIDs"]}
+                    rules={[{required: false}]}>
                     <RA.Select {...productsSelectProps} mode={ "multiple" }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="vendor" name="vendorID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Vendor"
+                    name="vendorID"
+                    rules={[{required: false}]}>
                     <RA.Select {...vendorSelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>
@@ -1379,7 +1460,7 @@ export const WebsiteEdit: React.FC = () => {
                     label="Title"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1387,7 +1468,7 @@ export const WebsiteEdit: React.FC = () => {
                     label="Description"
                     rules={[{required: true}]}
                 >
-                     <View.ER_StringViewOnForm/>
+                     <View.EntStringViewOnForm/>
                 </RA.Form.Item>
                 
                 <RA.Form.Item
@@ -1395,13 +1476,19 @@ export const WebsiteEdit: React.FC = () => {
                     label="Url"
                     rules={[{required: true}]}
                 >
-                     <View.ER_URLViewOnForm/>
+                     <View.EntURLViewOnForm/>
                 </RA.Form.Item>
                 
-                <RA.Form.Item label="company" name="companyID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Company"
+                    name="companyID"
+                    rules={[{required: false}]}>
                     <RA.Select {...companySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
-                <RA.Form.Item label="country" name="countryID" rules={[{required: false}]}>
+                <RA.Form.Item
+                    label="Country"
+                    name="countryID"
+                    rules={[{required: false}]}>
                     <RA.Select {...countrySelectProps} mode={ undefined }/>
                 </RA.Form.Item>
             </RA.Form>

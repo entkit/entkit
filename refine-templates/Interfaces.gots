@@ -2,18 +2,18 @@
 {{- define "interfaces.tsx" -}}
 /* eslint no-use-before-define: 0 */
 // Custom types
-export type ER_String = string
-export type ER_Number = number
-export type ER_Boolean = boolean
-export type ER_Date = Date
-export type ER_UUID = string
-export type ER_Image = string
-export type ER_Code = string
-export type ER_URL = string
-export type ER_RichText = string
-export type ER_StringList = ER_String[]
-export type ER_NumberList = ER_Number[]
-export type ER_ID = ER_UUID | ER_Number
+export type {{$.Prefix}}String = string
+export type {{$.Prefix}}Number = number
+export type {{$.Prefix}}Boolean = boolean
+export type {{$.Prefix}}Date = Date
+export type {{$.Prefix}}UUID = string
+export type {{$.Prefix}}Image = string
+export type {{$.Prefix}}Code = string
+export type {{$.Prefix}}URL = string
+export type {{$.Prefix}}RichText = string
+export type {{$.Prefix}}StringList = {{$.Prefix}}String[]
+export type {{$.Prefix}}NumberList = {{$.Prefix}}Number[]
+export type {{$.Prefix}}ID = {{$.Prefix}}UUID | {{$.Prefix}}Number
 
 {{ $enums := list }}
 {{- range $n := $.Graph.Nodes }}
@@ -32,6 +32,13 @@ export enum {{ ER_fieldTSType $f }}{
 {{- end}}
 {{- end}}
 
+interface gqlField<T> {
+    edges?: {
+        nodes?: Array<T>
+    },
+    totalCount?: number,
+}
+
 {{ range $n := $.Graph.Nodes }}
 {{- $allFields:=prepend $n.Fields $n.ID}}
 export interface I{{ $n.Name}} {
@@ -43,6 +50,7 @@ export interface I{{ $n.Name}} {
     {{ camel $e.Name }}?: I{{$e.Type.Name}},
     {{- else }}
     {{ camel $e.Name }}?: I{{$e.Type.Name}}[],
+    _{{ camel $e.Name }}?: gqlField<I{{$e.Type.Name}}>,
     {{- end }}
     {{- end }}
 }

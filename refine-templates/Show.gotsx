@@ -1,10 +1,9 @@
 {{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
 {{- define "show.tsx" -}}
 /* eslint no-use-before-define: 0 */
-import { useState } from "react";
-import { useShow, useOne } from "@pankod/refine-core";
+import React, { useState } from "react";
+import { useShow } from "@pankod/refine-core";
 import * as RA  from "@pankod/refine-antd";
-import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
@@ -16,7 +15,7 @@ import * as Custom from "./custom";
 {{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}ShowProps = {
-    id?: Interfaces.ER_ID,
+    id?: Interfaces.{{$.Prefix}}ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges, ...showProps}) => {
@@ -41,7 +40,8 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                 },
                 {{- else }}
                 {
-                    "{{ camel $e.Name }}": [
+                    operation: "{{ $e.Name | camel }}",
+                    fields: [
                         {
                             edges: [
                                 {
@@ -49,11 +49,15 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                                         {{- range $f :=  $edgeAllFields}}
                                         "{{ $f.Name | camel }}",
                                         {{- end }}
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
                 },
                 {{- end }}
                 {{- end }}
@@ -90,6 +94,12 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                     label: i.{{$e.Type.ID.Name}},
                 }
             }),
+            Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
+                ? {
+                    id: "{{ $e.Type.Name }}_more",
+                    label: `More ${Number(record._{{ camel $e.Name }}?.totalCount) - Number(record.{{ camel $e.Name }}?.length)}`
+                }
+                : undefined,
             {{- end }}
             {{- end }}
         ];
@@ -109,12 +119,17 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                     label: "{{ER_label $e.Name }}"
                 }
             }),
+            Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
+            ? {
+                source: record.{{$n.ID.Name}},
+                target: "{{$e.Type.Name}}_more",
+                label: "{{ER_label $e.Name }}"
+            }
+            : undefined,
             {{- end }}
             {{- end }}
         ]
 
-
-    {{ $allFields := prepend $n.Fields $n.ID}}
     return (
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (

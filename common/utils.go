@@ -29,7 +29,7 @@ func LcFirst(str string) string {
 	return ""
 }
 
-func TSType(gotype string) string {
+func TSType(gotype string, prefix string) string {
 	unique := true
 	if strings.HasPrefix(gotype, "[]") {
 		unique = false
@@ -55,35 +55,35 @@ func TSType(gotype string) string {
 	if !unique {
 		t = UcFirst(t) + "List"
 	}
-	return "ER_" + t
+	return prefix + t
 }
 
-func FieldTSType(field gen.Field) string {
+func FieldTSType(field gen.Field, prefix string) string {
 	ant, ok := field.Annotations["REFINE"].(map[string]any)
 
 	if field.IsEnum() {
-		return "ER_" + UcFirst(strings.Replace(field.Type.String(), ".", "_", -1))
+		return prefix + UcFirst(strings.Replace(field.Type.String(), ".", "_", -1))
 	}
 
 	if ok {
 		isImage, ok := ant["ImageField"].(bool)
 		if ok && isImage {
-			return "ER_Image"
+			return prefix + "Image"
 		}
 		isURLField, ok := ant["URLField"].(bool)
 		if ok && isURLField {
-			return "ER_URL"
+			return prefix + "URL"
 		}
 		isRichTextField, ok := ant["RichTextField"].(bool)
 		if ok && isRichTextField {
-			return "ER_RichText"
+			return prefix + "RichText"
 		}
 		if ant["CodeField"] != nil {
-			return "ER_Code"
+			return prefix + "Code"
 		}
 	}
 
-	return TSType(field.Type.String())
+	return TSType(field.Type.String(), prefix)
 }
 
 func ResourceAlias(node gen.Type) string {

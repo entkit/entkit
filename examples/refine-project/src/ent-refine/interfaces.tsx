@@ -1,20 +1,20 @@
 /* eslint no-use-before-define: 0 */
 // Custom types
-export type ER_String = string
-export type ER_Number = number
-export type ER_Boolean = boolean
-export type ER_Date = Date
-export type ER_UUID = string
-export type ER_Image = string
-export type ER_Code = string
-export type ER_URL = string
-export type ER_RichText = string
-export type ER_StringList = ER_String[]
-export type ER_NumberList = ER_Number[]
-export type ER_ID = ER_UUID | ER_Number
+export type EntString = string
+export type EntNumber = number
+export type EntBoolean = boolean
+export type EntDate = Date
+export type EntUUID = string
+export type EntImage = string
+export type EntCode = string
+export type EntURL = string
+export type EntRichText = string
+export type EntStringList = EntString[]
+export type EntNumberList = EntNumber[]
+export type EntID = EntUUID | EntNumber
 
 
-export enum ER_Enums_ProcessStatus{
+export enum EntEnums_ProcessStatus{
     "none" = "none",
     "done" = "done",
     "enqueued" = "enqueued",
@@ -22,106 +22,127 @@ export enum ER_Enums_ProcessStatus{
     "failed" = "failed",
 }
 
+interface gqlField<T> {
+    edges?: {
+        nodes?: Array<T>
+    },
+    totalCount?: number,
+}
+
 
 export interface ICompany {
-    id: ER_UUID, // uuid.UUID
-    name: ER_String, // string
-    description: ER_RichText, // string
+    id: EntUUID, // uuid.UUID
+    name: EntString, // string
+    description: EntRichText, // string
     countries?: ICountry[],
+    _countries?: gqlField<ICountry>,
     phones?: IPhone[],
+    _phones?: gqlField<IPhone>,
     emails?: IEmail[],
+    _emails?: gqlField<IEmail>,
     websites?: IWebsite[],
+    _websites?: gqlField<IWebsite>,
     locations?: ILocation[],
+    _locations?: gqlField<ILocation>,
     logoImage?: IImage,
     coverImage?: IImage,
     galleryImages?: IImage[],
+    _galleryImages?: gqlField<IImage>,
 }
 export interface ICountry {
-    id: ER_UUID, // uuid.UUID
-    name: ER_String, // string
-    code: ER_String, // string
+    id: EntUUID, // uuid.UUID
+    name: EntString, // string
+    code: EntString, // string
     companies?: ICompany[],
+    _companies?: gqlField<ICompany>,
     phones?: IPhone[],
+    _phones?: gqlField<IPhone>,
     emails?: IEmail[],
+    _emails?: gqlField<IEmail>,
     websites?: IWebsite[],
+    _websites?: gqlField<IWebsite>,
     locations?: ILocation[],
+    _locations?: gqlField<ILocation>,
 }
 export interface IEmail {
-    id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    description: ER_String, // string
-    address: ER_String, // string
+    id: EntUUID, // uuid.UUID
+    title: EntString, // string
+    description: EntString, // string
+    address: EntString, // string
     company?: ICompany,
     country?: ICountry,
 }
 export interface IImage {
-    id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    originalURL: ER_Image, // string
+    id: EntUUID, // uuid.UUID
+    title: EntString, // string
+    originalURL: EntImage, // string
     galleryCompany?: ICompany,
     logoCompany?: ICompany,
     coverCompany?: ICompany,
 }
 export interface ILocation {
-    id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    description: ER_String, // string
-    latitude: ER_String, // float64
-    longitude: ER_String, // float64
-    address: ER_String, // string
-    postcode: ER_String, // string
-    type: ER_String, // string
-    state: ER_String, // string
-    suburb: ER_String, // string
-    streetType: ER_String, // string
-    streetName: ER_String, // string
+    id: EntUUID, // uuid.UUID
+    title: EntString, // string
+    description: EntString, // string
+    latitude: EntString, // float64
+    longitude: EntString, // float64
+    address: EntString, // string
+    postcode: EntString, // string
+    type: EntString, // string
+    state: EntString, // string
+    suburb: EntString, // string
+    streetType: EntString, // string
+    streetName: EntString, // string
     company?: ICompany,
     country?: ICountry,
 }
 export interface IPhone {
-    id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    description: ER_String, // string
-    number: ER_String, // string
-    type: ER_String, // string
+    id: EntUUID, // uuid.UUID
+    title: EntString, // string
+    description: EntString, // string
+    number: EntString, // string
+    type: EntString, // string
     company?: ICompany,
     country?: ICountry,
 }
 export interface IProduct {
-    id: ER_UUID, // uuid.UUID
-    name: ER_String, // string
-    description: ER_RichText, // string
-    image: ER_Image, // string
-    url: ER_URL, // string
-    lastSell: ER_Date, // time.Time
-    createdAt: ER_Date, // time.Time
-    status: ER_Enums_ProcessStatus, // enums.ProcessStatus
-    buildStatus: ER_Enums_ProcessStatus, // enums.ProcessStatus
+    id: EntUUID, // uuid.UUID
+    name: EntString, // string
+    description: EntRichText, // string
+    image: EntImage, // string
+    url: EntURL, // string
+    lastSell: EntDate, // time.Time
+    createdAt: EntDate, // time.Time
+    status: EntEnums_ProcessStatus, // enums.ProcessStatus
+    buildStatus: EntEnums_ProcessStatus, // enums.ProcessStatus
     warehouse?: IWarehouse,
     vendor?: IVendor,
 }
 export interface IVendor {
-    id: ER_UUID, // uuid.UUID
-    name: ER_String, // string
-    schema: ER_Code, // string
+    id: EntUUID, // uuid.UUID
+    name: EntString, // string
+    schema: EntCode, // string
     warehouses?: IWarehouse[],
+    _warehouses?: gqlField<IWarehouse>,
     products?: IProduct[],
+    _products?: gqlField<IProduct>,
 }
 export interface IWarehouse {
-    id: ER_UUID, // uuid.UUID
-    name: ER_String, // string
-    lastUpdate: ER_Date, // time.Time
-    originalData: ER_Code, // string
-    enabled: ER_Boolean, // bool
-    filters: ER_StringList, // []string
+    id: EntUUID, // uuid.UUID
+    name: EntString, // string
+    lastUpdate: EntDate, // time.Time
+    originalData: EntCode, // string
+    enabled: EntBoolean, // bool
+    filters: EntStringList, // []string
     products?: IProduct[],
+    _products?: gqlField<IProduct>,
     vendor?: IVendor,
 }
 export interface IWebsite {
-    id: ER_UUID, // uuid.UUID
-    title: ER_String, // string
-    description: ER_String, // string
-    url: ER_URL, // string
+    id: EntUUID, // uuid.UUID
+    title: EntString, // string
+    description: EntString, // string
+    url: EntURL, // string
     company?: ICompany,
     country?: ICountry,
 }/* eslint no-use-before-define: 2 */

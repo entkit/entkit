@@ -1,6 +1,6 @@
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
-import {IResourceComponentsProps, HttpError} from "@pankod/refine-core";
+import {HttpError} from "@pankod/refine-core";
 import RefineReactRouter from "@pankod/refine-react-router-v6";
 import * as RA from "@pankod/refine-antd";
 import * as Interfaces from "./interfaces";
@@ -38,7 +38,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                 "name",
                 "description",
                 {"countries": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -48,11 +48,11 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"phones": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -64,11 +64,11 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"emails": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -79,11 +79,11 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"websites": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -94,11 +94,11 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"locations": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -117,7 +117,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {
@@ -135,7 +135,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     ]
                 },
                 {"galleryImages": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -145,7 +145,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
             ],
@@ -155,9 +155,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -167,7 +165,7 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -377,7 +375,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                 "name",
                 "code",
                 {"companies": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -387,11 +385,11 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"phones": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -403,11 +401,11 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"emails": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -418,11 +416,11 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"websites": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -433,11 +431,11 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"locations": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -456,7 +454,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
             ],
@@ -466,9 +464,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -478,7 +474,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -494,7 +490,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -510,7 +506,7 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -707,9 +703,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -719,7 +713,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -735,7 +729,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -751,7 +745,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -767,7 +761,7 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -945,9 +939,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -957,7 +949,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -973,7 +965,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -989,7 +981,7 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_ImageViewOnList value={ value } />
+                        return <View.EntImageViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1212,9 +1204,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -1224,7 +1214,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1240,7 +1230,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1256,7 +1246,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1272,7 +1262,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1288,7 +1278,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1304,7 +1294,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1320,7 +1310,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1336,7 +1326,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1352,7 +1342,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1368,7 +1358,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1384,7 +1374,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1400,7 +1390,7 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1581,9 +1571,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -1593,7 +1581,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1609,7 +1597,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1625,7 +1613,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1641,7 +1629,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1657,7 +1645,7 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1857,9 +1845,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -1869,7 +1855,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1885,7 +1871,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1901,7 +1887,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_ImageViewOnList value={ value } />
+                        return <View.EntImageViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1917,7 +1903,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_URLViewOnList value={ value } />
+                        return <View.EntURLViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1933,7 +1919,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_DateViewOnList value={ value } />
+                        return <View.EntDateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1949,7 +1935,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_DateViewOnList value={ value } />
+                        return <View.EntDateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -1965,7 +1951,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_Enums_ProcessStatusViewOnList value={ value } />
+                        return <View.EntEnums_ProcessStatusViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2005,7 +1991,7 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_Enums_ProcessStatusViewOnList value={ value } />
+                        return <View.EntEnums_ProcessStatusViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2187,7 +2173,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                 "name",
                 "schema",
                 {"warehouses": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -2200,11 +2186,11 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {"products": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -2220,7 +2206,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
             ],
@@ -2230,9 +2216,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -2242,7 +2226,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2258,7 +2242,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2274,7 +2258,7 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_CodeViewOnList value={ value } />
+                        return <View.EntCodeViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2440,7 +2424,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                 "enabled",
                 "filters",
                 {"products": [
-                    {
+                    /*{
                         edges: [
                             {
                                 node: [
@@ -2456,7 +2440,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                                 ]
                             },
                         ],
-                    },
+                    },*/
                     "totalCount",
                 ]},
                 {
@@ -2473,9 +2457,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -2485,7 +2467,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2501,7 +2483,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2517,7 +2499,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_DateViewOnList value={ value } />
+                        return <View.EntDateViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2530,7 +2512,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="originalData"
                     title="Original Data"
                     render={ (value)=> {
-                        return <View.ER_CodeViewOnList value={ value } />
+                        return <View.EntCodeViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2546,7 +2528,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_BooleanViewOnList value={ value } />
+                        return <View.EntBooleanViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2559,7 +2541,7 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="filters"
                     title="Filters"
                     render={ (value)=> {
-                        return <View.ER_StringListViewOnList value={ value } />
+                        return <View.EntStringListViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2735,9 +2717,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
         ...extendTable,
     });
 
-
     const data = table.tableQueryResult.data as any
-    const { Link } = RefineReactRouter;
 
     return (
         <>
@@ -2747,7 +2727,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="id"
                     title="Id"
                     render={ (value)=> {
-                        return <View.ER_UUIDViewOnList value={ value } />
+                        return <View.EntUUIDViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2763,7 +2743,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2779,7 +2759,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_StringViewOnList value={ value } />
+                        return <View.EntStringViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
@@ -2795,7 +2775,7 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                         {}
                     }
                     render={ (value)=> {
-                        return <View.ER_URLViewOnList value={ value } />
+                        return <View.EntURLViewOnList value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>

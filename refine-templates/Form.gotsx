@@ -67,17 +67,22 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Na
 
 {{- define "partial:edgeInputs" -}}
 {{- range $e := .EdgesWithID }}
+{{- if not $e.Annotations.REFINE.HideOnForm }}
 {{- $gqlFieldName := print `{["` (singular $e.Name | camel) `IDs"]}` }}
 {{- $mode := `"multiple"` }}
 {{- if $e.Unique}}
 {{- $gqlFieldName = print `"` ($e.Name | camel ) `ID"` }}
 {{- $mode = `undefined` }}
 {{- end}}
-<RA.Form.Item label="{{ $e.Name }}" name={{ $gqlFieldName }} rules={[{required: {{ not $e.Optional }}}]}>
+<RA.Form.Item
+    label="{{ $e.Name | ER_label }}"
+    name={{ $gqlFieldName }}
+    rules={[{required: {{ not $e.Optional }}}]}>
     <RA.Select {...{{$e.Name}}SelectProps} mode={ {{$mode}} }/>
 </RA.Form.Item>
 {{- end }}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{- define "edit.tsx" -}}
 
@@ -92,9 +97,15 @@ export const {{$n.Name}}Edit: React.FC = () => {
             metaData: {
                 fields: [
                     {{- range $f := $n.Fields}}
+                    {{- if not $f.Annotations.REFINE.HideOnForm }}
+                    {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
                     "{{ camel $f.Name}}",
                     {{- end }}
+                    {{- end }}
+                    {{- end }}
                     {{- range $e := $n.EdgesWithID}}
+                    {{- if not $e.Annotations.REFINE.HideOnForm }}
+                    {{- if not (isSkipMode $e.Annotations.EntGQL.Skip "mutation_create_input" ) }}
                     {{- if $e.Unique}}
                     {
                         "{{ camel $e.Name }}": [ "id" ]
@@ -113,6 +124,8 @@ export const {{$n.Name}}Edit: React.FC = () => {
                     },
                     {{- end }}
                     {{- end }}
+                    {{- end }}
+                    {{- end }}
                 ],
             }
         }
@@ -124,8 +137,10 @@ export const {{$n.Name}}Edit: React.FC = () => {
         <RA.Edit saveButtonProps={saveButtonProps}>
             <RA.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
+                {{- if not $f.Annotations.REFINE.HideOnForm }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
                 {{ (include "partial:fieldInput" $f) | nindent 16 }}
+                {{- end }}
                 {{- end }}
                 {{- end }}
 
