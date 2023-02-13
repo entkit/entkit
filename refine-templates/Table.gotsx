@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
 {{- define "tables.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";

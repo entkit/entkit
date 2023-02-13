@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/country"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
 	"github.com/google/uuid"
 )
 

@@ -17,17 +17,17 @@
 package ent
 
 import (
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/country"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/email"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/image"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/product"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/warehouse"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/website"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
 

@@ -15,7 +15,7 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 
-	"github.com/diazoxide/ent-refine"
+	"github.com/diazoxide/entrefine"
 
 	"path/filepath"
 )
@@ -25,7 +25,7 @@ func main() {
 	// So the path for the config file, ent schema, and the GQL schema
 	// starts from internal/todo.
 	gqlEx, err := entgql.NewExtension(
-		EntRefine.EntgqlExtensionOptionsWrapper(
+		entrefine.EntgqlExtensionOptionsWrapper(
 			entgql.WithConfigPath("./gqlgen.yml"),
 			entgql.WithSchemaGenerator(),
 			entgql.WithSchemaPath("./ent.graphql"),
@@ -40,14 +40,14 @@ func main() {
 	if graphqlUri == "" {
 		graphqlUri = "http://localhost/query"
 	}
-	entRefine, err := EntRefine.NewExtension(
-		EntRefine.WithAppPath(filepath.Join("..", "refine-project")),
-		EntRefine.WithMeta(map[string]any{
+	entRefine, err := entrefine.NewExtension(
+		entrefine.WithAppPath(filepath.Join("..", "refine-project")),
+		entrefine.WithMeta(map[string]any{
 			"graphqlUri": graphqlUri,
 		}),
 	)
 	if err != nil {
-		log.Fatalf("creating ent-refine extension: %v", err)
+		log.Fatalf("creating entrefine extension: %v", err)
 	}
 
 	err = entc.Generate("./ent/schema", &gen.Config{

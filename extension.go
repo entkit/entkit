@@ -1,4 +1,4 @@
-package EntRefine
+package entrefine
 
 import (
 	"embed"
@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"github.com/Masterminds/sprig/v3"
-	"github.com/diazoxide/ent-refine/common"
+	"github.com/diazoxide/entrefine/common"
 	"text/template"
 )
 
@@ -88,7 +88,7 @@ func WithForceGraph2D(options ForceGraph2DOptions) ExtensionOption {
 	}
 }
 
-// WithMeta add metadata to `{AppPath}/ent-refine.json`
+// WithMeta add metadata to `{AppPath}/entrefine.json`
 func WithMeta(meta map[string]any) ExtensionOption {
 	return func(ex *Extension) (err error) {
 		ex.Meta = meta

@@ -1,23 +1,25 @@
-# ent-refine
-Ent-Refine is a powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
+# entrefine
+entrefine is a powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
 
-![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/ent-refine)
-[![GitHub issues](https://img.shields.io/github/issues/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine/issues)
-[![GitHub stars](https://img.shields.io/github/stars/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine/stargazers)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/diazoxide/ent-refine)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/diazoxide/ent-refine)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/diazoxide/ent-refine)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/ent-refine)
-[![GitHub license](https://img.shields.io/github/license/diazoxide/ent-refine)](https://github.com/diazoxide/ent-refine)
+![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/entrefine)
+[![GitHub issues](https://img.shields.io/github/issues/diazoxide/entrefine)](https://github.com/diazoxide/entrefine/issues)
+[![GitHub stars](https://img.shields.io/github/stars/diazoxide/entrefine)](https://github.com/diazoxide/entrefine/stargazers)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/diazoxide/entrefine)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/diazoxide/entrefine)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/diazoxide/entrefine)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/entrefine)
+[![GitHub license](https://img.shields.io/github/license/diazoxide/entrefine)](https://github.com/diazoxide/entrefine)
 
 ![cover.png](docs%2Fimages%2Fcover.svg)
 
 It simplifies the process of generating CRUDs from Ent definitions with customizable views, fields, actions and search features.
 
+![main.png](docs%2Fimages%2Fmain.png)
+
 ## Live Demo and Package Info
 Live demo: https://demo.entrefine.dev/
 
-Go.dev Package: https://pkg.go.dev/github.com/diazoxide/ent-refine
+Go.dev Package: https://pkg.go.dev/github.com/diazoxide/entrefine
 
 ## Features
 1. Generates CRUD operations based on Ent definitions
@@ -32,10 +34,13 @@ Go.dev Package: https://pkg.go.dev/github.com/diazoxide/ent-refine
 10. Column filters with customizable operators
 11. [Edges diagram graph view](#edges-diagram-graph-view) (with [gojs](https://github.com/NorthwoodsSoftware/GoJS) or [react-force-graph](https://github.com/vasturiano/react-force-graph))
 
-![main.png](docs%2Fimages%2Fmain.png)
+## Roadmap
+- [ ] I18n support
+- [ ] Keycloak Authentication
+- [ ] Keycloak Authorization
 
 ### Smart search
-Ent-Refine provides a smart search component to easily find records by any attribute with a custom operator.
+entrefine provides a smart search component to easily find records by any attribute with a custom operator.
 ![search.gif](docs%2Fimages%2Fsearch.gif)
 
 
@@ -54,7 +59,7 @@ package main
 import (
 	//...
 	"entgo.io/contrib/entgql"
-	"github.com/diazoxide/ent-refine"
+	"github.com/diazoxide/entrefine"
 )
 
 func main() {
@@ -107,7 +112,7 @@ func (r *queryResolver) Companies(
 	last *int,
 	orderBy *ent.CompanyOrder,
 	where *ent.CompanyWhereInput,
-	q *string, // Added by Ent-Refine
+	q *string, // Added by entrefine
 ) (*ent.CompanyConnection, error) {
 	return r.client.Company.Query().Paginate(ctx, after, first, before, last,
 		ent.WithCompanyOrder(orderBy),
@@ -157,7 +162,7 @@ e.g. `EntRefine.FilterOperator("contains")`
 
 1. After configuration regenerate Ent.
 2. Your package.json file is changed so run `npm install` to get deps.
-3. Check directory of refine application. On src directory you can find `ent-refine` folder with ent resources.
+3. Check directory of refine application. On src directory you can find `entrefine` folder with ent resources.
 4. Update your `App.ts` file
     ```tsx
     import React from "react";
@@ -166,8 +171,8 @@ e.g. `EntRefine.FilterOperator("contains")`
     import {ErrorComponent, Layout, notificationProvider, ReadyPage,} from "@pankod/refine-antd";
     import routerProvider from "@pankod/refine-react-router-v6";
     import {GraphQLClient} from "graphql-request";
-    import {Resources} from "./ent-refine/resources";
-    import dataProvider from "./ent-refine/data-provider";
+    import {Resources} from "./entrefine/resources";
+    import dataProvider from "./entrefine/data-provider";
     
     // Provide your graphql query endpoint
     const client = new GraphQLClient("http://localhost:8081/query");
@@ -215,7 +220,7 @@ function App() {
 #### Header component
 
 ```tsx
-import {SearchComponent} from "../../ent-refine/search-component";
+import {SearchComponent} from "../../entrefine/search-component";
 
 export const Header: React.FC = () => {
     const screens = useBreakpoint();
@@ -241,7 +246,7 @@ export const Header: React.FC = () => {
 
 ## File `custom.tsx`
 
-To customize Ent-Refine components you can find `./ent-refine/custom.tsx` file on your refine root directory.
+To customize entrefine components you can find `./entrefine/custom.tsx` file on your refine root directory.
 
 
 ## Custom List Actions Annotation
@@ -264,7 +269,7 @@ EntRefine.ListActions(
 ### Implementation Example
 
 ```tsx
-// ./ent-refine/custom.tsx
+// ./entrefine/custom.tsx
 //...
 export type MyPrettyButtonProps = ButtonProps &
     RefineButtonCommonProps &
@@ -306,7 +311,7 @@ react-force-graph-2d is an open-source option.
 
 ### How to switch GoJS to react-force-graph-2d
 
-Customize ent-refine extension configs on **entc.go** file
+Customize entrefine extension configs on **entc.go** file
 
 e.g.
 ```go
@@ -341,7 +346,7 @@ entRefine, err := EntRefine.NewExtension(
 
 ## Custom views
 
-On Ent-Refine every view of field is customizable for every type of layout.
+On entrefine every view of field is customizable for every type of layout.
 
 ### Special annotations
 1. View - *Forcing list and show views*

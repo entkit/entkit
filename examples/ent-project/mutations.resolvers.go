@@ -6,7 +6,7 @@ package ent_project
 import (
 	"context"
 
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent"
 	"github.com/google/uuid"
 )
 

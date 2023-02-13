@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
 	"github.com/google/uuid"
 )
 

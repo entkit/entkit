@@ -17,15 +17,15 @@ resolver:
 # gqlgen will search for any type names in the schema in the generated
 # ent package. If they match it will use them, otherwise it will new ones.
 autobind:
-  - github.com/diazoxide/ent-refine/examples/ent-project/ent
+  - github.com/diazoxide/entrefine/examples/ent-project/ent
 
 models:
   ID:
     model:
-      - github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/id.UUID
+      - github.com/diazoxide/entrefine/examples/ent-project/ent/schema/id.UUID
   Map:
     model:
       - github.com/99designs/gqlgen/graphql.Map
   Node:
     model:
-      - github.com/diazoxide/ent-refine/examples/ent-project/ent.Noder
+      - github.com/diazoxide/entrefine/examples/ent-project/ent.Noder

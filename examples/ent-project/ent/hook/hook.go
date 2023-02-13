@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent"
 )
 
 // The CompanyFunc type is an adapter to allow the use of ordinary

@@ -4,9 +4,9 @@ import (
 	"context"
 	"entgo.io/contrib/entgql"
 	"fmt"
-	"github.com/diazoxide/ent-refine/examples"
-	example "github.com/diazoxide/ent-refine/examples/ent-project"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent"
+	"github.com/diazoxide/entrefine/examples"
+	example "github.com/diazoxide/entrefine/examples/ent-project"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent"
 	"io"
 	"io/fs"
 	"log"
@@ -21,7 +21,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"go.uber.org/zap"
 
-	_ "github.com/diazoxide/ent-refine/examples/ent-project/ent/runtime"
+	_ "github.com/diazoxide/entrefine/examples/ent-project/ent/runtime"
 	_ "github.com/mattn/go-sqlite3"
 )
 

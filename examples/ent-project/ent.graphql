@@ -961,7 +961,7 @@ input LocationWhereInput {
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
-interface Node @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent.Noder") {
+interface Node @goModel(model: "github.com/diazoxide/entrefine/examples/ent-project/ent.Noder") {
   """The id of the object."""
   id: ID!
 }
@@ -1153,7 +1153,7 @@ enum ProductOrderField {
   BUILD_STATUS
 }
 """ProductProcessStatus is enum for the field status"""
-enum ProductProcessStatus @goModel(model: "github.com/diazoxide/ent-refine/examples/ent-project/ent/schema/enums.ProcessStatus") {
+enum ProductProcessStatus @goModel(model: "github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums.ProcessStatus") {
   none
   done
   enqueued

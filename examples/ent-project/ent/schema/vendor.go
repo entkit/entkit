@@ -7,7 +7,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/ent-refine"
+	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 

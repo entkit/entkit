@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/location"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
 )
 
 // LocationDelete is the builder for deleting a Location entity.

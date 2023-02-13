@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/diazoxide/ent-refine.RefineGen */ -}}
+{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
 {{- define "diagram.tsx" -}}
 
 import  { useMemo, useState, useCallback }  from "react";

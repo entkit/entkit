@@ -24,9 +24,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/company"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/image"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/predicate"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
 	"github.com/google/uuid"
 )
 

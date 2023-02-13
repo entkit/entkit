@@ -4,7 +4,7 @@ import {
     Col,
     AntdLayout,
 } from "@pankod/refine-antd";
-import {SearchComponent} from "../../ent-refine/search-component";
+import {SearchComponent} from "../../entrefine/search-component";
 
 const { Header: AntdHeader } = AntdLayout;
 

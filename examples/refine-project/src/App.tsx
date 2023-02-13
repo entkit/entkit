@@ -6,10 +6,10 @@ import {ErrorComponent, Layout, notificationProvider, ReadyPage} from "@pankod/r
 import "@pankod/refine-antd/dist/reset.css";
 import routerProvider from "@pankod/refine-react-router-v6";
 import {GraphQLClient} from "graphql-request";
-import {Resources} from "./ent-refine/resources";
-import dataProvider from "./ent-refine/data-provider";
+import {Resources} from "./entrefine/resources";
+import dataProvider from "./entrefine/data-provider";
 import {Header} from "./components/header";
-import {meta} from "./ent-refine/definition";
+import {meta} from "./entrefine/definition";
 import {Title} from "./components/title";
 
 const client = new GraphQLClient(meta.graphqlUri);

@@ -1,16 +1,16 @@
-package EntRefine
+package entrefine
 
 import (
 	"entgo.io/contrib/entgql"
 	_ "entgo.io/contrib/entgql"
 	"entgo.io/ent/entc/gen"
 	"fmt"
-	"github.com/diazoxide/ent-refine/common"
+	"github.com/diazoxide/entrefine/common"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
 // EntgqlExtensionOptionsWrapper Wrap options of EntGQL
-// Sometimes Ent-Refine using some custom GraphQL queries and mutations
+// Sometimes entrefine using some custom GraphQL queries and mutations
 // Wrapper can add custom configs/hooks
 func EntgqlExtensionOptionsWrapper(opts ...entgql.ExtensionOption) []entgql.ExtensionOption {
 	plural := gen.Funcs["plural"].(func(string) string)

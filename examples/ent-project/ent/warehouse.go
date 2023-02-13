@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/ent-refine/examples/ent-project/ent/warehouse"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
+	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 

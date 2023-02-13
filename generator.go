@@ -1,4 +1,4 @@
-package EntRefine
+package entrefine
 
 import (
 	"bytes"
@@ -143,7 +143,7 @@ func (rg *RefineGen) GetJSDependencies() JSDeps {
 
 // saveGenerated Save generated file
 func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	resDir := path.Join(rg.Extension.AppPath, rg.Extension.SrcDirName, "ent-refine")
+	resDir := path.Join(rg.Extension.AppPath, rg.Extension.SrcDirName, "entrefine")
 	p := filepath.Join(resDir, name)
 
 	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
