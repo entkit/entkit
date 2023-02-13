@@ -14,7 +14,7 @@ export const Title: React.FC<TitleProps> = ({collapsed}) => {
                 {collapsed ? (
                     <Icons.MenuOutlined style={{color: "white", fontSize: "32px"}}/>
                 ) : (
-                    <img src="/images/logo.svg" alt="Finefood"/>
+                    <img src="/images/logo.svg" alt="Ent-Refine"/>
                 )}
             </Logo>
         </Link>

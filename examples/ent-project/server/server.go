@@ -81,7 +81,7 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 
 	path := filepath.Clean(r.URL.Path)
 	path = strings.TrimPrefix(path, "/")
-	if !strings.HasPrefix(path, "static/") && path != "favicon.ico" && path != "asset-manifest.json" {
+	if !strings.HasPrefix(path, "static/") && !strings.HasPrefix(path, "images/") && path != "favicon.ico" && path != "asset-manifest.json" {
 		path = "index.html"
 	}
 
