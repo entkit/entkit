@@ -98,13 +98,12 @@ func (Product) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("FileOutlined"),
-		EntRefine.ListItemActions(
+		EntRefine.Actions(
 			EntRefine.ShowAction,
 			EntRefine.EditAction,
 			EntRefine.DeleteAction,
 			EntRefine.Action{
-				Name:  "Custom.MyCustomActionButton",
-				Attrs: map[string]any{},
+				Operation: "MyCustomActionButton",
 			},
 		),
 	}

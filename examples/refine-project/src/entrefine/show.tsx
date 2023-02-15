@@ -7,6 +7,7 @@ import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
+import * as Action from "./action";
 
 export type CompanyShowProps = {
     id?: Interfaces.EntID,
@@ -371,6 +372,11 @@ export const CompanyShow : React.FC<CompanyShowProps> = ({id, withEdges, ...show
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.CompanyDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.CompanyEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -813,6 +819,11 @@ export const CountryShow : React.FC<CountryShowProps> = ({id, withEdges, ...show
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.CountryDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.CountryEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1019,6 +1030,11 @@ export const EmailShow : React.FC<EmailShowProps> = ({id, withEdges, ...showProp
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.EmailDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.EmailEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1153,6 +1169,11 @@ export const ImageShow : React.FC<ImageShowProps> = ({id, withEdges, ...showProp
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.ImageDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.ImageEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1281,6 +1302,11 @@ export const LocationShow : React.FC<LocationShowProps> = ({id, withEdges, ...sh
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.LocationDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.LocationEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1417,6 +1443,11 @@ export const PhoneShow : React.FC<PhoneShowProps> = ({id, withEdges, ...showProp
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.PhoneDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.PhoneEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1546,6 +1577,12 @@ export const ProductShow : React.FC<ProductShowProps> = ({id, withEdges, ...show
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.ProductEditAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.ProductDeleteAction recordItemIDs={ [record.id] }/>
+                     
                      </>
                  )}
                  {...showProps}
@@ -1743,6 +1780,11 @@ export const VendorShow : React.FC<VendorShowProps> = ({id, withEdges, ...showPr
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.VendorDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.VendorEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -1930,6 +1972,11 @@ export const WarehouseShow : React.FC<WarehouseShowProps> = ({id, withEdges, ...
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.WarehouseDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.WarehouseEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}
@@ -2069,6 +2116,11 @@ export const WebsiteShow : React.FC<WebsiteShowProps> = ({id, withEdges, ...show
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     
+                     
+                     <Action.WebsiteDeleteAction recordItemIDs={ [record.id] }/>
+                     
+                     <Action.WebsiteEditAction recordItemIDs={ [record.id] }/>
                      </>
                  )}
                  {...showProps}

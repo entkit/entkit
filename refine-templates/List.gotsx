@@ -1,41 +1,41 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
 {{- define "list.tsx" -}}
 /* eslint no-use-before-define: 0 */
-import React, {useEffect, useState} from "react";
-import {IResourceComponentsProps, HttpError, useDeleteMany} from "@pankod/refine-core";
+import React, {useState} from "react";
+import {useInvalidate} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
 import * as Tables from "./tables";
-import * as Interfaces from "./interfaces";
+import * as Type from "./interfaces";
+import * as Action from "./action";
 
 {{- range $n := $.Graph.Nodes }}
 export type {{$n.Name}}ListProps = RA.ListProps & { tableProps?: Tables.{{$n.Name}}TableProps}
 export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...props} ) => {
-
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Prefix}}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const { mutate } = useDeleteMany<Interfaces.I{{$n.Name}}>();
+    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="{{$n.Name}}" headerButtons={({ defaultButtons }) => (
         <>
             {defaultButtons}
-            {selectedRowKeys.length ?
-                <RA.Popconfirm
-                    key="delete"
-                    okText="Delete all"
-                    cancelText="Cancel"
-                    okType="primary"
-                    title="Are you sure?"
-                    onConfirm={(): void => {
-                        mutate({
-                            resource: "{{$n.Name}}",
-                            ids: selectedRowKeys,
-                            mutationMode: "optimistic",
+            {selectedRowKeys.length ? <>
+                {{- range $a := $n.Annotations.REFINE.Actions }}
+                {{- if and $a.OnList $a.Bulk }}
+                {{- $aName:= ( print $n.Name "-" $a.Operation "-Action") | pascal}}
+                <Action.{{ $aName }}
+                    key="{{$aName}}"
+                    recordItemIDs={ selectedRowKeys }
+                    onSuccess={ ()=>{
+                        invalidate({
+                            resource: "{{ $n.Name }}",
+                            invalidates: ["list"],
                         });
-                    }}
-                >
-                    <RA.Button icon={<RA.Icons.DeleteOutlined />} type="primary" danger>Delete selected</RA.Button>
-                </RA.Popconfirm>
-                : null}
+                        setSelectedRowKeys([]);
+                    } }
+                />
+                {{- end }}
+                {{- end }}
+            </> : null }
         </>
     )}>
         <Tables.{{$n.Name}}Table {...tableProps} rowSelection={rowSelection}/>

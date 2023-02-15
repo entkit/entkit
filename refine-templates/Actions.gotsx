@@ -1,0 +1,112 @@
+{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- define "action.tsx" -}}
+import React from "react";
+import * as RA from "@pankod/refine-antd";
+import {
+    RefineButtonCommonProps,
+    RefineButtonLinkingProps,
+    RefineButtonResourceProps,
+    RefineButtonSingleProps
+} from "@pankod/refine-ui-types/src/types/button";
+import {ButtonProps} from "antd";
+import {DeleteOneResponse, useCan, useCustomMutation, useNotification, useResource} from "@pankod/refine-core";
+import {ViewProps} from "./view";
+import * as Custom from "./custom";
+import * as Type from "./interfaces";
+
+{{- range $n := $.Graph.Nodes }}
+{{- range $a := $n.Annotations.REFINE.Actions }}
+{{- $cName := ( print $n.Name "-" $a.Operation "-Action") | pascal }}
+
+export type {{$cName}}Props = ButtonProps &
+    RefineButtonCommonProps &
+    RefineButtonSingleProps &
+    RefineButtonLinkingProps & {
+    recordItemIDs: Type.{{ $.Prefix }}ID[],
+    onSuccess?: (data: any)=>void
+}
+
+export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
+    {{- $opName := $a.Operation }}
+    {{- $label := default $opName $a.Label }}
+
+    {{- $standards := list "Edit" "Show" }}
+    {{- if has $a.Operation $standards }}
+    return <RA.{{ $a.Operation }}Button
+        resource="{{$n.Name}}"
+        resourceNameOrRouteName="{{$n.Name}}"
+        recordItemId={ recordItemIDs[0] }
+        {...props}
+    >
+        {hideText || "{{$label}}"}
+    </RA.{{ $a.Operation }}Button>
+    {{- else }}
+    {{- if eq $a.Operation "Delete" }}
+        {{- $opName = print "delete-" ($n.Name | plural) | camel }}
+    {{- end }}
+
+    const  notification = useNotification();
+    const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
+    const additionalProps = {{ $a.Props | toJson }} || {};
+
+    return <RA.Popconfirm
+        key="{{ $opName }}"
+        okText="{{ $label }}"
+        cancelText="Cancel"
+        okType="primary"
+        title="Are you sure?"
+        okButtonProps={ { disabled: isLoading } }
+        onConfirm={(): void => {
+            mutate(
+                {
+                    method: "post",
+                    url: "",
+                    values: {},
+                    metaData: {
+                        operation: "{{ $opName }}",
+                        variables: {
+                            where: {
+                                value: {
+                                    idIn: recordItemIDs
+                                },
+                                type: "{{ $n.Name }}WhereInput",
+                                required: true
+                            },
+                        },
+                        fields: {{ $a.Fields | toJson }} || undefined,
+                    },
+                },
+                {
+                    onSuccess: (resp: any) => {
+                        notification.open?.({
+                            type: "success",
+                            message: `{{ default "Successfully" $a.SuccessMessage }}`,
+                        })
+                        !onSuccess || onSuccess(resp);
+                    },
+                    onError: (error) => {
+                        {{- $message := "" }}
+                        {{- if empty $a.FailMessage}}
+                        {{- $message = "error.message" }}
+                        {{- else }}
+                        {{- $message = print "`" $a.FailMessage "`"}}
+                        {{- end }}
+                        notification.open?.({
+                            type: "error",
+                            message: {{ $message }},
+                        })
+                    },
+                },
+            );
+        }}
+    >
+        <RA.Button icon={ <{{default "RA.Icons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
+            {hideText || "{{$label}}"}
+        </RA.Button>
+    </RA.Popconfirm>
+    {{- end }}
+}
+{{- end }}
+{{- end }}
+
+{{- end }}

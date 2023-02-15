@@ -58,7 +58,7 @@ func (Image) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("CameraOutlined"),
-		EntRefine.ListItemActions(
+		EntRefine.Actions(
 			EntRefine.ShowAction,
 			EntRefine.DeleteAction,
 			EntRefine.EditAction,

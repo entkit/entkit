@@ -14,52 +14,72 @@ type CodeFieldOptions struct {
 // e.g. show, edit, delete
 // also you can create custom actions
 type Action struct {
-	Name  string         `json:"Name,omitempty"`
-	Attrs map[string]any `json:"Attrs,omitempty"`
+	Operation       string         `json:"Operation,omitempty"`       // Operation of graphql
+	Fields          []string       `json:"Fields,omitempty"`          // Fields to take after operation
+	Props           map[string]any `json:"Props,omitempty"`           // Props are directly passing to react component
+	Single          bool           `json:"Single"`                    // Show on single item
+	Bulk            bool           `json:"Bulk,omitempty"`            // Show on bulk selected items
+	SuccessMessage  string         `json:"SuccessMessage,omitempty"`  // Message on success
+	FailMessage     string         `json:"FailMessage,omitempty"`     // Message on fail
+	CustomComponent string         `json:"CustomComponent,omitempty"` // TODO: custom component
+	Description     string         `json:"Description,omitempty"`     // Description of action
+	Label           string         `json:"Label,omitempty"`
+	Icon            string         `json:"Icon,omitempty"`
+	OnList          bool           `json:"OnList,omitempty"`
+	OnShow          bool           `json:"OnShow,omitempty"`
+	OnEdit          bool           `json:"OnEdit,omitempty"`
+	OnCreate        bool           `json:"OnCreate,omitempty"`
 }
 
 var (
 	// EditAction standard edit action
 	EditAction = Action{
-		Name:  "RA.EditButton",
-		Attrs: map[string]any{},
+		Operation: "Edit",
+		OnList:    true,
+		OnShow:    true,
 	}
 	// ShowAction standard show action
 	ShowAction = Action{
-		Name:  "RA.ShowButton",
-		Attrs: map[string]any{},
+		Operation: "Show",
+		OnList:    true,
 	}
 	// DeleteAction standard delete action
 	DeleteAction = Action{
-		Name:  "RA.DeleteButton",
-		Attrs: map[string]any{},
+		Operation: "Delete",
+		Label:     "Delete",
+		Icon:      "RA.Icons.DeleteOutlined",
+		OnList:    true,
+		OnShow:    true,
+		Bulk:      true,
+		Props: map[string]any{
+			"danger": true,
+		},
 	}
 )
 
 // RefineAnnotation struct container of all annotations
 type RefineAnnotation struct {
-	TitleField      bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
-	ImageField      bool              `json:"ImageField,omitempty"`     // Mark field as image
-	MainImageField  bool              `json:"MainImageField,omitempty"` // Mark field as main image of entity
-	CodeField       *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
-	URLField        bool              `json:"URLField,omitempty"`       // Mark field as url field
-	RichTextField   bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
-	NoList          bool              `json:"NoList,omitempty"`
-	NoShow          bool              `json:"NoShow,omitempty"`
-	NoCreate        bool              `json:"NoCreate,omitempty"`
-	NoEdit          bool              `json:"NoEdit,omitempty"`
-	HideOnList      bool              `json:"HideOnList,omitempty"`
-	HideOnShow      bool              `json:"HideOnShow,omitempty"`
-	HideOnForm      bool              `json:"HideOnForm,omitempty"`
-	FilterOperator  *string           `json:"FilterOperator,omitempty"`
-	Icon            *string           `json:"Icon,omitempty"`
-	Label           *string           `json:"Label,omitempty"`
-	Description     *string           `json:"Description,omitempty"`
-	Prefix          *string           `json:"Prefix,omitempty"`
-	Suffix          *string           `json:"Suffix,omitempty"`
-	ListItemActions []Action          `json:"ListItemActions,omitempty"`
-	ShowActions     []Action          `json:"ShowActions,omitempty"`
-	View            *string           `json:"View,omitempty"`
+	TitleField     bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
+	ImageField     bool              `json:"ImageField,omitempty"`     // Mark field as image
+	MainImageField bool              `json:"MainImageField,omitempty"` // Mark field as main image of entity
+	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
+	URLField       bool              `json:"URLField,omitempty"`       // Mark field as url field
+	RichTextField  bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
+	NoList         bool              `json:"NoList,omitempty"`
+	NoShow         bool              `json:"NoShow,omitempty"`
+	NoCreate       bool              `json:"NoCreate,omitempty"`
+	NoEdit         bool              `json:"NoEdit,omitempty"`
+	HideOnList     bool              `json:"HideOnList,omitempty"`
+	HideOnShow     bool              `json:"HideOnShow,omitempty"`
+	HideOnForm     bool              `json:"HideOnForm,omitempty"`
+	FilterOperator *string           `json:"FilterOperator,omitempty"`
+	Icon           *string           `json:"Icon,omitempty"`
+	Label          *string           `json:"Label,omitempty"`
+	Description    *string           `json:"Description,omitempty"`
+	Prefix         *string           `json:"Prefix,omitempty"`
+	Suffix         *string           `json:"Suffix,omitempty"`
+	Actions        []Action          `json:"Actions,omitempty"`
+	View           *string           `json:"View,omitempty"`
 
 	ViewOnShow *string `json:"ViewOnShow,omitempty"`
 	ViewOnList *string `json:"ViewOnList,omitempty"`
@@ -179,12 +199,8 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.Badge = annotation.Badge
 	}
 
-	if len(annotation.ListItemActions) > 0 {
-		ra.ListItemActions = append(ra.ListItemActions, annotation.ListItemActions...)
-	}
-
-	if len(annotation.ShowActions) > 0 {
-		ra.ShowActions = append(ra.ShowActions, annotation.ShowActions...)
+	if len(annotation.Actions) > 0 {
+		ra.Actions = append(ra.Actions, annotation.Actions...)
 	}
 
 	if annotation.EdgesDiagram != nil {
@@ -199,17 +215,10 @@ func (ra RefineAnnotation) Name() string {
 	return "REFINE"
 }
 
-// ListItemActions actions/buttons on list items
-func ListItemActions(actions ...Action) RefineAnnotation {
+// Actions actions/buttons on list items
+func Actions(actions ...Action) RefineAnnotation {
 	return RefineAnnotation{
-		ListItemActions: actions,
-	}
-}
-
-// ShowActions actions/buttons on show page
-func ShowActions(actions ...Action) RefineAnnotation {
-	return RefineAnnotation{
-		ShowActions: actions,
+		Actions: actions,
 	}
 }
 

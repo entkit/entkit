@@ -67,7 +67,7 @@ func (Company) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		EntRefine.Icon("ShopOutlined"),
-		EntRefine.ListItemActions(
+		EntRefine.Actions(
 			EntRefine.ShowAction,
 			EntRefine.DeleteAction,
 			EntRefine.EditAction,

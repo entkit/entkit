@@ -9,6 +9,7 @@ import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 import * as View from "./view";
+import * as Action from "./action";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
@@ -155,14 +156,14 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            {{- range $a := $n.Annotations.REFINE.ListItemActions }}
-                            <{{ $a.Name }}
-                                hideText={true}
-                                resource="{{$n.Name}}"
-                                resourceNameOrRouteName="{{$n.Name}}"
+                            {{- range $a := $n.Annotations.REFINE.Actions }}
+                            {{- if $a.OnList }}
+                            <Action.{{ ( print $n.Name "-" $a.Operation "-Action") | pascal }}
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
+                            {{- end }}
                             {{- end }}
                         </RA.Space>
                     )}

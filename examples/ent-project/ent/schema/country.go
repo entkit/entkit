@@ -59,7 +59,7 @@ func (Country) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		entrefine.Icon("GlobalOutlined"),
-		entrefine.ListItemActions(
+		entrefine.Actions(
 			entrefine.ShowAction,
 			entrefine.DeleteAction,
 			entrefine.EditAction,

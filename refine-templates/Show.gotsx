@@ -9,6 +9,7 @@ import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
 import * as View from "./view";
 import * as Custom from "./custom";
+import * as Action from "./action";
 
 {{- range $n := $.Graph.Nodes -}}
 {{- $titleField := (ER_titleField $n) }}
@@ -136,6 +137,11 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                      <>
                      {defaultButtons}
                      <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
+                     {{- range $a := $n.Annotations.REFINE.Actions }}
+                     {{ if $a.OnShow }}
+                     <Action.{{ ( print $n.Name "-" $a.Operation "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                     {{- end }}
+                     {{- end }}
                      </>
                  )}
                  {...showProps}

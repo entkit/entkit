@@ -65,7 +65,7 @@ import (
 func main() {
 	gqlEx, err := entgql.NewExtension(
 		// Make sure that EntGql configs are wrapped
-		EntRefine.EntgqlExtensionOptionsWrapper(
+		entrefine.EntgqlExtensionOptionsWrapper(
 			entgql.WithConfigPath("./gqlgen.yml"),
 			entgql.WithSchemaGenerator(),
 			entgql.WithSchemaPath("./graphql/ent.graphql"),
@@ -77,9 +77,9 @@ func main() {
 		entc.Extensions(
 			// GQL extension is mandatory
 			gqlEx,
-			// EntRefine configuration
-			EntRefine.NewExtension(
-				EntRefine.WithAppPath(filepath.Join("..", "refine"),
+			// entrefine configuration
+			entrefine.NewExtension(
+				entrefine.WithAppPath(filepath.Join("..", "refine"),
 			),
 		),
 	}
@@ -125,7 +125,7 @@ func (r *queryResolver) Companies(
 
 ### Configure your ent schemas with annotations
 
-e.g. `EntRefine.FilterOperator("contains")`
+e.g. `entrefine.FilterOperator("contains")`
 
 ## Supporting annotations
 
@@ -139,15 +139,15 @@ e.g. `EntRefine.FilterOperator("contains")`
 * HideOnList
 * HideOnShow
 * HideOnForm
-* FilterOperator `EntRefine.FilterOperator("contains")`
+* FilterOperator `entrefine.FilterOperator("contains")`
 * [View](#custom-views)
 * [ViewOnList](#custom-views)
 * [ViewOnShow](#custom-views)
 * [ViewOnForm](#custom-views)
 
 ### For Entities
-  * Icon (field/entity) `EntRefine.Icon("some-antdesign-icon")`
-  * [ListActions](#custom-list-actions-annotation) (entity)
+  * Icon (field/entity) `entrefine.Icon("some-antdesign-icon")`
+  * [Actions](#custom-actions)
   * NoList
   * NoShow
   * NoCreate
@@ -249,46 +249,53 @@ export const Header: React.FC = () => {
 To customize entrefine components you can find `./entrefine/custom.tsx` file on your refine root directory.
 
 
-## Custom List Actions Annotation
+## Custom Actions
 
 Add entity annotation to your schema
 
 ### Annotation Example
 ```
-EntRefine.ListActions(
-   EntRefine.ShowAction,
-   EntRefine.DeleteAction,
-   EntRefine.EditAction,
-   EntRefine.Action{
-       Name:  "Custom.MyPrettyButton",
-       Attrs: map[string]any{},
+entrefine.Actions(
+   entrefine.ShowAction,
+   entrefine.DeleteAction,
+   entrefine.EditAction,
+   entrefine.Action{
+        Operation: "myCustomGqlOperation",
+        Fields: []string{
+            "id", "title"
+        },
+        Label:          "Do something",
+        FailMessage:    "Something bad happened",
+        SuccessMessage: "${ resp.data.length } Pages processed",
+        OnList:         true,
+        OnShow:         true,
+        Bulk:           true,
+        Icon:           "RA.Icons.RadarChartOutlined",
    },
 ),
 ```
 
 ### Implementation Example
 
-```tsx
-// ./entrefine/custom.tsx
-//...
-export type MyPrettyButtonProps = ButtonProps &
-    RefineButtonCommonProps &
-    RefineButtonResourceProps &
-    RefineButtonSingleProps &
-    RefineButtonLinkingProps
-
-export const MyPrettyButton: React.FC<MyPrettyButtonProps> = (props) => {
-    return <Button
-        icon={<RA.Icons.RadarChartOutlined/>}
-        onClick={
-            () => {
-                alert(props.recordItemId)
-            }
-        }></Button>
-}
-//...
-```
-
+1. First you need to add custom graphql mutation with `WhereInput`
+    ```graphql
+    # ./mutations.graphql
+    myCustomGqlOperation(where: PageWhereInput!): [Page!]
+    ```
+2. Then let's write mutation resolver
+    ```go
+    func (r *mutationResolver) MyCustomGqlOperation(ctx context.Context, where generated.PageWhereInput) ([]*generated.Page, error) {
+        w, err := where.P()
+        p, err := r.client.Page.Query().Where(w).All(ctx)
+    
+        err = someCustomAction(p...)
+        if err != nil {
+            return nil, err
+        }
+        return p, nil
+    }
+    ```
+   
 ## Edges diagram graph view
 The Edge Graph Diagram is an effective tool for visualizing 
 the relationships between your entities. It presents an 
@@ -315,14 +322,14 @@ Customize entrefine extension configs on **entc.go** file
 
 e.g.
 ```go
-entRefine, err := EntRefine.NewExtension(
+entRefine, err := entrefine.NewExtension(
     ...
-    EntRefine.WithForceGraph2D(
-        EntRefine.ForceGraph2DOptions{
+    entrefine.WithForceGraph2D(
+        entrefine.ForceGraph2DOptions{
             Enabled: true,
         },
     ),
-    EntRefine.WithDefaultEdgesDiagram('Diagram.ForceGraph2D'),
+    entrefine.WithDefaultEdgesDiagram('Diagram.ForceGraph2D'),
     ...
 )
 ```
@@ -331,15 +338,15 @@ entRefine, err := EntRefine.NewExtension(
 
 e.g.
 ```go
-entRefine, err := EntRefine.NewExtension(
+entRefine, err := entrefine.NewExtension(
     ...
-    EntRefine.WithGoJs(
-        EntRefine.GoJSOptions{
+    entrefine.WithGoJs(
+        entrefine.GoJSOptions{
             Enabled: true,
             LicenseKey: "xxxxx-xxxxxx-xxxxx-xxxxx",
         },
     ),
-    EntRefine.WithDefaultEdgesDiagram('Diagram.GoJS'),
+    entrefine.WithDefaultEdgesDiagram('Diagram.GoJS'),
     ...
 )
 ```
@@ -364,12 +371,12 @@ On entrefine every view of field is customizable for every type of layout.
       return <RA.Typography.Text copyable={true} style={ {color: "red"} }>{ value }</RA.Typography.Text>
    }
    ```
-2. Define type of field on schema by `EntRefine.View` annotation
+2. Define type of field on schema by `entrefine.View` annotation
    ```go
    field.String("title").
         Annotations(
             ...
-            EntRefine.View("MyCustomTitle"),
+            entrefine.View("MyCustomTitle"),
             ...
         ),
    ```

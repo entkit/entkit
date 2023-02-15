@@ -7,6 +7,7 @@ import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 import * as View from "./view";
+import * as Action from "./action";
 
 
 export type CompanyTableProps = RA.TableProps<Interfaces.ICompany> & { extendTable?: RA.useTableProps<Interfaces.ICompany, HttpError> }
@@ -257,26 +258,23 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Company"
-                                resourceNameOrRouteName="Company"
+                            
+                            <Action.CompanyShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Company"
-                                resourceNameOrRouteName="Company"
+                            
+                            <Action.CompanyDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Company"
-                                resourceNameOrRouteName="Company"
+                            
+                            <Action.CompanyEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -560,26 +558,23 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Country"
-                                resourceNameOrRouteName="Country"
+                            
+                            <Action.CountryShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Country"
-                                resourceNameOrRouteName="Country"
+                            
+                            <Action.CountryDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Country"
-                                resourceNameOrRouteName="Country"
+                            
+                            <Action.CountryEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -794,26 +789,23 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Email"
-                                resourceNameOrRouteName="Email"
+                            
+                            <Action.EmailShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Email"
-                                resourceNameOrRouteName="Email"
+                            
+                            <Action.EmailDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Email"
-                                resourceNameOrRouteName="Email"
+                            
+                            <Action.EmailEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -1021,26 +1013,23 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Image"
-                                resourceNameOrRouteName="Image"
+                            
+                            <Action.ImageShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Image"
-                                resourceNameOrRouteName="Image"
+                            
+                            <Action.ImageDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Image"
-                                resourceNameOrRouteName="Image"
+                            
+                            <Action.ImageEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -1423,26 +1412,23 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Location"
-                                resourceNameOrRouteName="Location"
+                            
+                            <Action.LocationShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Location"
-                                resourceNameOrRouteName="Location"
+                            
+                            <Action.LocationDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Location"
-                                resourceNameOrRouteName="Location"
+                            
+                            <Action.LocationEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -1678,26 +1664,23 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Phone"
-                                resourceNameOrRouteName="Phone"
+                            
+                            <Action.PhoneShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Phone"
-                                resourceNameOrRouteName="Phone"
+                            
+                            <Action.PhoneDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Phone"
-                                resourceNameOrRouteName="Phone"
+                            
+                            <Action.PhoneEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -2048,34 +2031,25 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Product"
-                                resourceNameOrRouteName="Product"
+                            
+                            <Action.ProductShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
-                            />
-                            <RA.EditButton
                                 hideText={true}
-                                resource="Product"
-                                resourceNameOrRouteName="Product"
-                                size="small"
-                                recordItemId={record.id}
                             />
-                            <RA.DeleteButton
+                            
+                            <Action.ProductEditAction
+                                recordItemIDs={ [record.id] }
+                                size="small"
                                 hideText={true}
-                                resource="Product"
-                                resourceNameOrRouteName="Product"
-                                size="small"
-                                recordItemId={record.id}
                             />
-                            <Custom.MyCustomActionButton
+                            
+                            <Action.ProductDeleteAction
+                                recordItemIDs={ [record.id] }
+                                size="small"
                                 hideText={true}
-                                resource="Product"
-                                resourceNameOrRouteName="Product"
-                                size="small"
-                                recordItemId={record.id}
                             />
+                            
                         </RA.Space>
                     )}
                 />
@@ -2291,26 +2265,23 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Vendor"
-                                resourceNameOrRouteName="Vendor"
+                            
+                            <Action.VendorShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Vendor"
-                                resourceNameOrRouteName="Vendor"
+                            
+                            <Action.VendorDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Vendor"
-                                resourceNameOrRouteName="Vendor"
+                            
+                            <Action.VendorEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -2574,26 +2545,23 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Warehouse"
-                                resourceNameOrRouteName="Warehouse"
+                            
+                            <Action.WarehouseShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Warehouse"
-                                resourceNameOrRouteName="Warehouse"
+                            
+                            <Action.WarehouseDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Warehouse"
-                                resourceNameOrRouteName="Warehouse"
+                            
+                            <Action.WarehouseEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}
@@ -2808,26 +2776,23 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            <RA.ShowButton
-                                hideText={true}
-                                resource="Website"
-                                resourceNameOrRouteName="Website"
+                            
+                            <Action.WebsiteShowAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.DeleteButton
-                                hideText={true}
-                                resource="Website"
-                                resourceNameOrRouteName="Website"
+                            
+                            <Action.WebsiteDeleteAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
-                            <RA.EditButton
-                                hideText={true}
-                                resource="Website"
-                                resourceNameOrRouteName="Website"
+                            
+                            <Action.WebsiteEditAction
+                                recordItemIDs={ [record.id] }
                                 size="small"
-                                recordItemId={record.id}
+                                hideText={true}
                             />
                         </RA.Space>
                     )}

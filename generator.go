@@ -158,6 +158,7 @@ func (rg *RefineGen) exists(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
 }
+
 func (rg *RefineGen) saveFile(path string, content []byte, override bool) error {
 	if override {
 		_ = os.Remove(path)
@@ -208,6 +209,7 @@ func (rg *RefineGen) Generate() {
 			parseT("refine-templates/SearchComponent.gotsx"),
 			parseT("refine-templates/SorterEnums.gotsx"),
 			parseT("refine-templates/View.gotsx"),
+			parseT("refine-templates/Actions.gotsx"),
 			parseT("refine-templates/Helpers.gotsx"),
 			parseT("refine-templates/Diagram.gotsx"),
 		}
