@@ -1,5 +1,5 @@
 # entrefine
-entrefine is a powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
+Powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
 
 ![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/entrefine)
 [![GitHub issues](https://img.shields.io/github/issues/diazoxide/entrefine)](https://github.com/diazoxide/entrefine/issues)
@@ -21,28 +21,32 @@ Live demo: https://demo.entrefine.dev/
 
 Go.dev Package: https://pkg.go.dev/github.com/diazoxide/entrefine
 
-## Features
-1. Generates CRUD operations based on Ent definitions
-2. Customizable views for each CRUD operation
-3. Customizable fields for lists, forms, and show views using annotations
-4. Custom actions for items
-5. Relational view with nested lists and edges
-6. Smart search component to find records by every attribute with a custom operator
-7. Bulk actions on lists
-8. Uses only a Graphql API with a custom Refine data-provider
-9. Generates TypeScript types from Ent definitions
-10. Column filters with customizable operators
-11. [Edges diagram graph view](#edges-diagram-graph-view) (with [gojs](https://github.com/NorthwoodsSoftware/GoJS) or [react-force-graph](https://github.com/vasturiano/react-force-graph))
-
 ## Roadmap
+- [x] Generates CRUD operations based on Ent definitions
+- [x] Customizable views for each CRUD operation
+- [x] Customizable fields for lists, forms, and show views using annotations
+- [x] Custom actions for items
+  - [x] Actions on a list, show, or edit view that trigger a GraphQL mutation.
+  - [x] Bulk actions on lists
+- [x] Relational view with nested lists and edges
+- [x] Smart search component to find records by every attribute with a custom operator
+- [x] Uses only a Graphql API with a custom Refine data-provider
+- [x] Generates TypeScript types from Ent definitions
+- [x] Column filters with customizable operators
+- [x] [Edges diagram graph view](#edges-diagram-graph-view) (with [gojs](https://github.com/NorthwoodsSoftware/GoJS) or [react-force-graph](https://github.com/vasturiano/react-force-graph))
+- [ ] Nested create/edit
+  - [ ] Ability to create edges from form
+  - [ ] Ability to edit edges from form
 - [ ] I18n support
 - [ ] Keycloak Authentication
 - [ ] Keycloak Authorization
+- [ ] Filter by edges
+- [ ] Sort by edges
+- [ ] Godoc: provide comprehensive documentation
 
 ### Smart search
 entrefine provides a smart search component to easily find records by any attribute with a custom operator.
 ![search.gif](docs%2Fimages%2Fsearch.gif)
-
 
 ## Requirements
 The platform uses a Graphql API as the data-provider interface and therefore a GQL extension is mandatory.
@@ -130,6 +134,7 @@ e.g. `entrefine.FilterOperator("contains")`
 ## Supporting annotations
 
 ### For Fields
+
 * ImageField
 * MainImageField
 * TitleField

@@ -6,13 +6,21 @@ import (
 )
 
 // CodeFieldOptions code field is configurable
+//
+// **Example**
+//
+// ```go
+//
+//	CodeFieldOptions{
+//		Language: "javascript"
+//	}
+//
+// ```
 type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
 }
 
 // Action item related action
-// e.g. show, edit, delete
-// also you can create custom actions
 type Action struct {
 	Operation       string         `json:"Operation,omitempty"`       // Operation of graphql
 	Fields          []string       `json:"Fields,omitempty"`          // Fields to take after operation
@@ -21,14 +29,13 @@ type Action struct {
 	Bulk            bool           `json:"Bulk,omitempty"`            // Show on bulk selected items
 	SuccessMessage  string         `json:"SuccessMessage,omitempty"`  // Message on success
 	FailMessage     string         `json:"FailMessage,omitempty"`     // Message on fail
-	CustomComponent string         `json:"CustomComponent,omitempty"` // TODO: custom component
+	CustomComponent string         `json:"CustomComponent,omitempty"` // Custom component TODO: custom component
 	Description     string         `json:"Description,omitempty"`     // Description of action
-	Label           string         `json:"Label,omitempty"`
-	Icon            string         `json:"Icon,omitempty"`
-	OnList          bool           `json:"OnList,omitempty"`
-	OnShow          bool           `json:"OnShow,omitempty"`
-	OnEdit          bool           `json:"OnEdit,omitempty"`
-	OnCreate        bool           `json:"OnCreate,omitempty"`
+	Label           string         `json:"Label,omitempty"`           // Label of button
+	Icon            string         `json:"Icon,omitempty"`            // Icon of button
+	OnList          bool           `json:"OnList,omitempty"`          // Display on list
+	OnShow          bool           `json:"OnShow,omitempty"`          // Display on show
+	OnEdit          bool           `json:"OnEdit,omitempty"`          // Display on edit
 }
 
 var (
