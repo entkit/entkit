@@ -2,6 +2,7 @@
 {{- define "action.tsx" -}}
 import React from "react";
 import * as RA from "@pankod/refine-antd";
+import {useInvalidate} from "@pankod/refine-core";
 import {
     RefineButtonCommonProps,
     RefineButtonLinkingProps,
@@ -48,6 +49,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
     const additionalProps = {{ $a.Props | toJson }} || {};
+    const invalidate = useInvalidate();
 
     return <RA.Popconfirm
         key="{{ $opName }}"
@@ -78,6 +80,13 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                 },
                 {
                     onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "{{ $n.Name }}",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
                             message: `{{ default "Successfully" $a.SuccessMessage }}`,

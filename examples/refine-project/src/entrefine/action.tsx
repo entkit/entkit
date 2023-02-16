@@ -1,5 +1,6 @@
 import React from "react";
 import * as RA from "@pankod/refine-antd";
+import {useInvalidate} from "@pankod/refine-core";
 import {
     RefineButtonCommonProps,
     RefineButtonLinkingProps,
@@ -20,14 +21,15 @@ export type CompanyShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CompanyShowAction: React.FC<CompanyShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CompanyShowAction: React.FC<CompanyShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Company"
         resourceNameOrRouteName="Company"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type CompanyDeleteActionProps = ButtonProps &
@@ -38,11 +40,13 @@ export type CompanyDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CompanyDeleteAction: React.FC<CompanyDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CompanyDeleteAction: React.FC<CompanyDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.ICompany>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteCompanies"
         okText="Delete"
@@ -71,17 +75,24 @@ export const CompanyDeleteAction: React.FC<CompanyDeleteActionProps> = ({recordI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Company",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -89,8 +100,7 @@ export const CompanyDeleteAction: React.FC<CompanyDeleteActionProps> = ({recordI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -103,14 +113,15 @@ export type CompanyEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CompanyEditAction: React.FC<CompanyEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CompanyEditAction: React.FC<CompanyEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Company"
         resourceNameOrRouteName="Company"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type CountryShowActionProps = ButtonProps &
@@ -121,14 +132,15 @@ export type CountryShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CountryShowAction: React.FC<CountryShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CountryShowAction: React.FC<CountryShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Country"
         resourceNameOrRouteName="Country"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type CountryDeleteActionProps = ButtonProps &
@@ -139,11 +151,13 @@ export type CountryDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CountryDeleteAction: React.FC<CountryDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CountryDeleteAction: React.FC<CountryDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.ICountry>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteCountries"
         okText="Delete"
@@ -172,17 +186,24 @@ export const CountryDeleteAction: React.FC<CountryDeleteActionProps> = ({recordI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Country",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -190,8 +211,7 @@ export const CountryDeleteAction: React.FC<CountryDeleteActionProps> = ({recordI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -204,14 +224,15 @@ export type CountryEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const CountryEditAction: React.FC<CountryEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const CountryEditAction: React.FC<CountryEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Country"
         resourceNameOrRouteName="Country"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type EmailShowActionProps = ButtonProps &
@@ -222,14 +243,15 @@ export type EmailShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const EmailShowAction: React.FC<EmailShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const EmailShowAction: React.FC<EmailShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Email"
         resourceNameOrRouteName="Email"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type EmailDeleteActionProps = ButtonProps &
@@ -240,11 +262,13 @@ export type EmailDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const EmailDeleteAction: React.FC<EmailDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const EmailDeleteAction: React.FC<EmailDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IEmail>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteEmails"
         okText="Delete"
@@ -273,17 +297,24 @@ export const EmailDeleteAction: React.FC<EmailDeleteActionProps> = ({recordItemI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Email",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -291,8 +322,7 @@ export const EmailDeleteAction: React.FC<EmailDeleteActionProps> = ({recordItemI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -305,14 +335,15 @@ export type EmailEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const EmailEditAction: React.FC<EmailEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const EmailEditAction: React.FC<EmailEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Email"
         resourceNameOrRouteName="Email"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type ImageShowActionProps = ButtonProps &
@@ -323,14 +354,15 @@ export type ImageShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ImageShowAction: React.FC<ImageShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ImageShowAction: React.FC<ImageShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Image"
         resourceNameOrRouteName="Image"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type ImageDeleteActionProps = ButtonProps &
@@ -341,11 +373,13 @@ export type ImageDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ImageDeleteAction: React.FC<ImageDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ImageDeleteAction: React.FC<ImageDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IImage>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteImages"
         okText="Delete"
@@ -374,17 +408,24 @@ export const ImageDeleteAction: React.FC<ImageDeleteActionProps> = ({recordItemI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Image",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -392,8 +433,7 @@ export const ImageDeleteAction: React.FC<ImageDeleteActionProps> = ({recordItemI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -406,14 +446,15 @@ export type ImageEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ImageEditAction: React.FC<ImageEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ImageEditAction: React.FC<ImageEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Image"
         resourceNameOrRouteName="Image"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type LocationShowActionProps = ButtonProps &
@@ -424,14 +465,15 @@ export type LocationShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const LocationShowAction: React.FC<LocationShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const LocationShowAction: React.FC<LocationShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Location"
         resourceNameOrRouteName="Location"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type LocationDeleteActionProps = ButtonProps &
@@ -442,11 +484,13 @@ export type LocationDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const LocationDeleteAction: React.FC<LocationDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const LocationDeleteAction: React.FC<LocationDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.ILocation>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteLocations"
         okText="Delete"
@@ -475,17 +519,24 @@ export const LocationDeleteAction: React.FC<LocationDeleteActionProps> = ({recor
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Location",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -493,8 +544,7 @@ export const LocationDeleteAction: React.FC<LocationDeleteActionProps> = ({recor
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -507,14 +557,15 @@ export type LocationEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const LocationEditAction: React.FC<LocationEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const LocationEditAction: React.FC<LocationEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Location"
         resourceNameOrRouteName="Location"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type PhoneShowActionProps = ButtonProps &
@@ -525,14 +576,15 @@ export type PhoneShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const PhoneShowAction: React.FC<PhoneShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const PhoneShowAction: React.FC<PhoneShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Phone"
         resourceNameOrRouteName="Phone"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type PhoneDeleteActionProps = ButtonProps &
@@ -543,11 +595,13 @@ export type PhoneDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const PhoneDeleteAction: React.FC<PhoneDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const PhoneDeleteAction: React.FC<PhoneDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IPhone>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deletePhones"
         okText="Delete"
@@ -576,17 +630,24 @@ export const PhoneDeleteAction: React.FC<PhoneDeleteActionProps> = ({recordItemI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Phone",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -594,8 +655,7 @@ export const PhoneDeleteAction: React.FC<PhoneDeleteActionProps> = ({recordItemI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -608,14 +668,15 @@ export type PhoneEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const PhoneEditAction: React.FC<PhoneEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const PhoneEditAction: React.FC<PhoneEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Phone"
         resourceNameOrRouteName="Phone"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type ProductShowActionProps = ButtonProps &
@@ -626,14 +687,15 @@ export type ProductShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ProductShowAction: React.FC<ProductShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ProductShowAction: React.FC<ProductShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Product"
         resourceNameOrRouteName="Product"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type ProductEditActionProps = ButtonProps &
@@ -644,14 +706,15 @@ export type ProductEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ProductEditAction: React.FC<ProductEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ProductEditAction: React.FC<ProductEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Product"
         resourceNameOrRouteName="Product"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type ProductDeleteActionProps = ButtonProps &
@@ -662,11 +725,13 @@ export type ProductDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ProductDeleteAction: React.FC<ProductDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ProductDeleteAction: React.FC<ProductDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IProduct>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteProducts"
         okText="Delete"
@@ -695,17 +760,24 @@ export const ProductDeleteAction: React.FC<ProductDeleteActionProps> = ({recordI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Product",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -713,8 +785,7 @@ export const ProductDeleteAction: React.FC<ProductDeleteActionProps> = ({recordI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -727,11 +798,13 @@ export type ProductMyCustomActionButtonActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const ProductMyCustomActionButtonAction: React.FC<ProductMyCustomActionButtonActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const ProductMyCustomActionButtonAction: React.FC<ProductMyCustomActionButtonActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IProduct>();
     const additionalProps = null || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="MyCustomActionButton"
         okText="MyCustomActionButton"
@@ -760,17 +833,24 @@ export const ProductMyCustomActionButtonAction: React.FC<ProductMyCustomActionBu
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Product",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -778,8 +858,7 @@ export const ProductMyCustomActionButtonAction: React.FC<ProductMyCustomActionBu
         }}
     >
         <RA.Button icon={ <RA.Icons.FileOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "MyCustomActionButton")}
+            {hideText || "MyCustomActionButton"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -792,14 +871,15 @@ export type VendorShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const VendorShowAction: React.FC<VendorShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const VendorShowAction: React.FC<VendorShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Vendor"
         resourceNameOrRouteName="Vendor"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type VendorDeleteActionProps = ButtonProps &
@@ -810,11 +890,13 @@ export type VendorDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const VendorDeleteAction: React.FC<VendorDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const VendorDeleteAction: React.FC<VendorDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IVendor>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteVendors"
         okText="Delete"
@@ -843,17 +925,24 @@ export const VendorDeleteAction: React.FC<VendorDeleteActionProps> = ({recordIte
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Vendor",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -861,8 +950,7 @@ export const VendorDeleteAction: React.FC<VendorDeleteActionProps> = ({recordIte
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -875,14 +963,15 @@ export type VendorEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const VendorEditAction: React.FC<VendorEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const VendorEditAction: React.FC<VendorEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Vendor"
         resourceNameOrRouteName="Vendor"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type WarehouseShowActionProps = ButtonProps &
@@ -893,14 +982,15 @@ export type WarehouseShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WarehouseShowAction: React.FC<WarehouseShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WarehouseShowAction: React.FC<WarehouseShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Warehouse"
         resourceNameOrRouteName="Warehouse"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type WarehouseDeleteActionProps = ButtonProps &
@@ -911,11 +1001,13 @@ export type WarehouseDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WarehouseDeleteAction: React.FC<WarehouseDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WarehouseDeleteAction: React.FC<WarehouseDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IWarehouse>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteWarehouses"
         okText="Delete"
@@ -944,17 +1036,24 @@ export const WarehouseDeleteAction: React.FC<WarehouseDeleteActionProps> = ({rec
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Warehouse",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -962,8 +1061,7 @@ export const WarehouseDeleteAction: React.FC<WarehouseDeleteActionProps> = ({rec
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -976,14 +1074,15 @@ export type WarehouseEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WarehouseEditAction: React.FC<WarehouseEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WarehouseEditAction: React.FC<WarehouseEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Warehouse"
         resourceNameOrRouteName="Warehouse"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
 
 export type WebsiteShowActionProps = ButtonProps &
@@ -994,14 +1093,15 @@ export type WebsiteShowActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WebsiteShowAction: React.FC<WebsiteShowActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WebsiteShowAction: React.FC<WebsiteShowActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.ShowButton
-        hideText={true}
         resource="Website"
         resourceNameOrRouteName="Website"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Show"}
+    </RA.ShowButton>
 }
 
 export type WebsiteDeleteActionProps = ButtonProps &
@@ -1012,11 +1112,13 @@ export type WebsiteDeleteActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WebsiteDeleteAction: React.FC<WebsiteDeleteActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WebsiteDeleteAction: React.FC<WebsiteDeleteActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation<Type.IWebsite>();
     const additionalProps = {"danger":true} || {};
+    const invalidate = useInvalidate();
+
     return <RA.Popconfirm
         key="deleteWebsites"
         okText="Delete"
@@ -1045,17 +1147,24 @@ export const WebsiteDeleteAction: React.FC<WebsiteDeleteActionProps> = ({recordI
                     },
                 },
                 {
-                    onSuccess: (value) => {
+                    onSuccess: (resp: any) => {
+                        recordItemIDs.forEach((id)=>{
+                            invalidate({
+                                resource: "Website",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
                         notification.open?.({
                             type: "success",
-                            message: "Successfully",
+                            message: `Successfully`,
                         })
-                        !onSuccess || onSuccess(value);
+                        !onSuccess || onSuccess(resp);
                     },
-                    onError: (err) => {
+                    onError: (error) => {
                         notification.open?.({
                             type: "error",
-                            message: err.message,
+                            message: error.message,
                         })
                     },
                 },
@@ -1063,8 +1172,7 @@ export const WebsiteDeleteAction: React.FC<WebsiteDeleteActionProps> = ({recordI
         }}
     >
         <RA.Button icon={ <RA.Icons.DeleteOutlined/> } {...additionalProps} {...props} >
-            {!props.hideText &&
-                (props.children ?? "Delete")}
+            {hideText || "Delete"}
         </RA.Button>
     </RA.Popconfirm>
 }
@@ -1077,12 +1185,13 @@ export type WebsiteEditActionProps = ButtonProps &
     onSuccess?: (data: any)=>void
 }
 
-export const WebsiteEditAction: React.FC<WebsiteEditActionProps> = ({recordItemIDs, onSuccess, ...props}) => {
+export const WebsiteEditAction: React.FC<WebsiteEditActionProps> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
     return <RA.EditButton
-        hideText={true}
         resource="Website"
         resourceNameOrRouteName="Website"
         recordItemId={ recordItemIDs[0] }
         {...props}
-    />
+    >
+        {hideText || "Edit"}
+    </RA.EditButton>
 }
