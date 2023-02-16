@@ -120,7 +120,9 @@ export const EntRichTextViewOnForm: React.FC = (props) => <ReactQuill {...props}
 
 // region URL
 export const EntURLViewOnShow: React.FC<ViewProps<Type.EntURL>> = ({value}) => {
-    return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>{ value }</RA.Button>
+    return <RA.Button href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>
+        <RA.TextField value={value} ellipsis={true} style={ {width: '100%', maxWidth: "350px"} } type={"secondary"} />
+    </RA.Button>
 }
 export const EntURLViewOnList: React.FC<ViewProps<Type.EntURL>> = ({value}) => {
     return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>

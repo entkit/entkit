@@ -1022,6 +1022,8 @@ export const ProductEdit: React.FC = () => {
                     "description",
                     "image",
                     "url",
+                    "lastSell",
+                    "createdAt",
                     "status",
                     "buildStatus",
                     {
@@ -1275,6 +1277,7 @@ export const WarehouseEdit: React.FC = () => {
             metaData: {
                 fields: [
                     "name",
+                    "lastUpdate",
                     "originalData",
                     "enabled",
                     "filters",

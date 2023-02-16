@@ -79,6 +79,8 @@ type RefineAnnotation struct {
 	HideOnList     bool              `json:"HideOnList,omitempty"`
 	HideOnShow     bool              `json:"HideOnShow,omitempty"`
 	HideOnForm     bool              `json:"HideOnForm,omitempty"`
+	HideOnCreate   bool              `json:"HideOnCreate,omitempty"`
+	HideOnUpdate   bool              `json:"HideOnUpdate,omitempty"`
 	FilterOperator *string           `json:"FilterOperator,omitempty"`
 	Icon           *string           `json:"Icon,omitempty"`
 	Label          *string           `json:"Label,omitempty"`
@@ -142,12 +144,20 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.HideOnList = annotation.HideOnList
 	}
 
+	if annotation.HideOnList {
+		ra.HideOnList = annotation.HideOnList
+	}
+
 	if annotation.HideOnForm {
 		ra.HideOnForm = annotation.HideOnForm
 	}
 
-	if annotation.HideOnList {
-		ra.HideOnList = annotation.HideOnList
+	if annotation.HideOnCreate {
+		ra.HideOnCreate = annotation.HideOnCreate
+	}
+
+	if annotation.HideOnUpdate {
+		ra.HideOnUpdate = annotation.HideOnUpdate
 	}
 
 	if annotation.NoList {
@@ -302,6 +312,20 @@ func HideOnShow() RefineAnnotation {
 func HideOnForm() RefineAnnotation {
 	return RefineAnnotation{
 		HideOnForm: true,
+	}
+}
+
+// HideOnCreate hide field on form
+func HideOnCreate() RefineAnnotation {
+	return RefineAnnotation{
+		HideOnCreate: true,
+	}
+}
+
+// HideOnUpdate hide field on form
+func HideOnUpdate() RefineAnnotation {
+	return RefineAnnotation{
+		HideOnUpdate: true,
 	}
 }
 
