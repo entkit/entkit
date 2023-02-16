@@ -2,7 +2,6 @@
 {{- define "list.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
-import {useInvalidate} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
 import * as Tables from "./tables";
 import * as Type from "./interfaces";
@@ -13,7 +12,6 @@ export type {{$n.Name}}ListProps = RA.ListProps & { tableProps?: Tables.{{$n.Nam
 export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Prefix}}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="{{$n.Name}}" headerButtons={({ defaultButtons }) => (
         <>
@@ -26,10 +24,6 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
                     key="{{$aName}}"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "{{ $n.Name }}",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />

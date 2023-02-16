@@ -258,19 +258,16 @@ export const CompanyTable :React.FC<CompanyTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.CompanyShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.CompanyDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.CompanyEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -558,19 +555,16 @@ export const CountryTable :React.FC<CountryTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.CountryShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.CountryDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.CountryEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -789,19 +783,16 @@ export const EmailTable :React.FC<EmailTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.EmailShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.EmailDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.EmailEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -1013,19 +1004,16 @@ export const ImageTable :React.FC<ImageTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.ImageShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.ImageDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.ImageEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -1412,19 +1400,16 @@ export const LocationTable :React.FC<LocationTableProps> = ({extendTable, ...pro
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.LocationShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.LocationDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.LocationEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -1664,19 +1649,16 @@ export const PhoneTable :React.FC<PhoneTableProps> = ({extendTable, ...props} ) 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.PhoneShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.PhoneDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.PhoneEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -2031,25 +2013,21 @@ export const ProductTable :React.FC<ProductTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.ProductShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.ProductEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.ProductDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                         </RA.Space>
                     )}
                 />
@@ -2265,19 +2243,16 @@ export const VendorTable :React.FC<VendorTableProps> = ({extendTable, ...props} 
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.VendorShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.VendorDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.VendorEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -2545,19 +2520,16 @@ export const WarehouseTable :React.FC<WarehouseTableProps> = ({extendTable, ...p
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.WarehouseShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.WarehouseDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.WarehouseEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
@@ -2776,19 +2748,16 @@ export const WebsiteTable :React.FC<WebsiteTableProps> = ({extendTable, ...props
                     dataIndex="actions"
                     render={(_, record) => (
                         <RA.Space>
-                            
                             <Action.WebsiteShowAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.WebsiteDeleteAction
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
-                            
                             <Action.WebsiteEditAction
                                 recordItemIDs={ [record.id] }
                                 size="small"

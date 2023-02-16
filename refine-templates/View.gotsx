@@ -121,7 +121,9 @@ export const {{$.Prefix}}RichTextViewOnForm: React.FC = (props) => <ReactQuill {
 
 // region URL
 export const {{$.Prefix}}URLViewOnShow: React.FC<ViewProps<Type.{{$.Prefix}}URL>> = ({value}) => {
-    return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>{ value }</RA.Button>
+    return <RA.Button href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>
+        <RA.TextField value={value} ellipsis={true} style={ {width: '100%', maxWidth: "350px"} } type={"secondary"} />
+    </RA.Button>
 }
 export const {{$.Prefix}}URLViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}URL>> = ({value}) => {
     return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>

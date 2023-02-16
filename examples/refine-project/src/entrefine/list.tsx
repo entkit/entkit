@@ -1,6 +1,5 @@
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
-import {useInvalidate} from "@pankod/refine-core";
 import * as RA from "@pankod/refine-antd";
 import * as Tables from "./tables";
 import * as Type from "./interfaces";
@@ -9,7 +8,6 @@ export type CompanyListProps = RA.ListProps & { tableProps?: Tables.CompanyTable
 export const CompanyList :React.FC<CompanyListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Company" headerButtons={({ defaultButtons }) => (
         <>
@@ -19,10 +17,6 @@ export const CompanyList :React.FC<CompanyListProps> = ({tableProps, ...props} )
                     key="CompanyDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Company",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -36,7 +30,6 @@ export type CountryListProps = RA.ListProps & { tableProps?: Tables.CountryTable
 export const CountryList :React.FC<CountryListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Country" headerButtons={({ defaultButtons }) => (
         <>
@@ -46,10 +39,6 @@ export const CountryList :React.FC<CountryListProps> = ({tableProps, ...props} )
                     key="CountryDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Country",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -63,7 +52,6 @@ export type EmailListProps = RA.ListProps & { tableProps?: Tables.EmailTableProp
 export const EmailList :React.FC<EmailListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Email" headerButtons={({ defaultButtons }) => (
         <>
@@ -73,10 +61,6 @@ export const EmailList :React.FC<EmailListProps> = ({tableProps, ...props} ) => 
                     key="EmailDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Email",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -90,7 +74,6 @@ export type ImageListProps = RA.ListProps & { tableProps?: Tables.ImageTableProp
 export const ImageList :React.FC<ImageListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Image" headerButtons={({ defaultButtons }) => (
         <>
@@ -100,10 +83,6 @@ export const ImageList :React.FC<ImageListProps> = ({tableProps, ...props} ) => 
                     key="ImageDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Image",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -117,7 +96,6 @@ export type LocationListProps = RA.ListProps & { tableProps?: Tables.LocationTab
 export const LocationList :React.FC<LocationListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Location" headerButtons={({ defaultButtons }) => (
         <>
@@ -127,10 +105,6 @@ export const LocationList :React.FC<LocationListProps> = ({tableProps, ...props}
                     key="LocationDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Location",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -144,7 +118,6 @@ export type PhoneListProps = RA.ListProps & { tableProps?: Tables.PhoneTableProp
 export const PhoneList :React.FC<PhoneListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Phone" headerButtons={({ defaultButtons }) => (
         <>
@@ -154,10 +127,6 @@ export const PhoneList :React.FC<PhoneListProps> = ({tableProps, ...props} ) => 
                     key="PhoneDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Phone",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -171,7 +140,6 @@ export type ProductListProps = RA.ListProps & { tableProps?: Tables.ProductTable
 export const ProductList :React.FC<ProductListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Product" headerButtons={({ defaultButtons }) => (
         <>
@@ -181,10 +149,6 @@ export const ProductList :React.FC<ProductListProps> = ({tableProps, ...props} )
                     key="ProductDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Product",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -198,7 +162,6 @@ export type VendorListProps = RA.ListProps & { tableProps?: Tables.VendorTablePr
 export const VendorList :React.FC<VendorListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Vendor" headerButtons={({ defaultButtons }) => (
         <>
@@ -208,10 +171,6 @@ export const VendorList :React.FC<VendorListProps> = ({tableProps, ...props} ) =
                     key="VendorDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Vendor",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -225,7 +184,6 @@ export type WarehouseListProps = RA.ListProps & { tableProps?: Tables.WarehouseT
 export const WarehouseList :React.FC<WarehouseListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Warehouse" headerButtons={({ defaultButtons }) => (
         <>
@@ -235,10 +193,6 @@ export const WarehouseList :React.FC<WarehouseListProps> = ({tableProps, ...prop
                     key="WarehouseDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Warehouse",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
@@ -252,7 +206,6 @@ export type WebsiteListProps = RA.ListProps & { tableProps?: Tables.WebsiteTable
 export const WebsiteList :React.FC<WebsiteListProps> = ({tableProps, ...props} ) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.EntID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
-    const invalidate = useInvalidate();
 
     return <RA.List {...props} resource="Website" headerButtons={({ defaultButtons }) => (
         <>
@@ -262,10 +215,6 @@ export const WebsiteList :React.FC<WebsiteListProps> = ({tableProps, ...props} )
                     key="WebsiteDeleteAction"
                     recordItemIDs={ selectedRowKeys }
                     onSuccess={ ()=>{
-                        invalidate({
-                            resource: "Website",
-                            invalidates: ["list"],
-                        });
                         setSelectedRowKeys([]);
                     } }
                 />
