@@ -135,33 +135,32 @@ e.g. `entrefine.FilterOperator("contains")`
 
 ### For Fields
 
-* ImageField
-* MainImageField
-* TitleField
-* CodeField
-* URLField
-* RichTextField
-* HideOnList
-* HideOnShow
-* HideOnForm
-* FilterOperator `entrefine.FilterOperator("contains")`
-* [View](#custom-views)
-* [ViewOnList](#custom-views)
-* [ViewOnShow](#custom-views)
-* [ViewOnForm](#custom-views)
+- **ImageField** - mark field as image
+- **MainImageField** - mark field as main image field (force marking field as a **ImageField** too)
+- **TitleField** - mark field as title field
+- **CodeField** - mark field as code field
+- **URLField** - mark field as url field
+- **RichTextField** - mark field as rich text field
+- **HideOnList** - hide field on list
+- **HideOnShow** - hide field on show page
+- **HideOnForm** - hide field on create and edit forms
+- **HideOnEdit** - hide field on edit form
+- **HideOnCreate** - hide field on create form
+- **FilterOperator** `entrefine.FilterOperator("contains")`
+- [**View**](#custom-views) - custom view of field on list and show pages
+- [**ViewOnList**](#custom-views) - custom view of field on list page
+- [**ViewOnShow**](#custom-views) - custom view of field on show page
+- [**ViewOnForm**](#custom-views) - custom view of field on form
 
 ### For Entities
-  * Icon (field/entity) `entrefine.Icon("some-antdesign-icon")`
-  * [Actions](#custom-actions)
-  * NoList
-  * NoShow
-  * NoCreate
-  * NoEdit
-  * [View](#custom-views)
-  * [ViewOnList](#custom-views)
-  * [ViewOnShow](#custom-views)
-  * [ViewOnForm](#custom-views)
-  * [Badge](#badge-view)
+- **Icon** (field/entity) - set icon of entity to show on navigation, breadcrumbs, edges, etc.
+  * `entrefine.Icon("some-antdesign-icon")`
+- [**Actions**](#custom-actions) - custom actions
+- **NoList** - disable list and hide entity from navigation
+- **NoShow** - disable entity show page
+- **NoCreate** - disable entity creat form
+- **NoEdit** - disable entity edit form
+- [**Badge**](#badge-view) - custom badge view of entity
 
 ## Getting ready to use
 
