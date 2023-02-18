@@ -97,8 +97,11 @@ export const {{$.Prefix}}CodeViewOnForm: React.FC<any> = (props) => {
         language={props.Language || 'js'}
         padding={15}
         style={ {
+            overflow: 'auto',
+            maxHeight: "80vh",
+            minHeight: "400px",
             fontSize: 12,
-            backgroundColor: "#000",
+            backgroundColor: "#222",
             fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
         } }
     />
