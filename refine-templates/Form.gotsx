@@ -2,7 +2,8 @@
 {{- define "partial:imports" -}}
 /* eslint no-use-before-define: 0 */
 import {useState} from "react";
-import * as RA from "@pankod/refine-antd";
+import * as RA from "@refinedev/antd";
+import * as Antd from "antd";
 import * as Interfaces from "./interfaces";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
@@ -21,12 +22,12 @@ import 'react-quill/dist/quill.snow.css';
 const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
 {{- $titleField := $ed.Type.ID }}
 {{- range $f:=$ed.Type.Fields }}
-{{- if $f.Annotations.REFINE.TitleField }}
+{{- if $f.Annotations.ENTREFINE.TitleField }}
 {{- $titleField = $f }}
 {{- end }}
 
 {{- end}}
-const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Name}}>({
+const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$ed.Type.Name}}>({
     resource: "{{ $ed.Type.Name }}",
     optionLabel: "{{$titleField.Name}}",
     optionValue: "id",
@@ -47,7 +48,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Na
 {{- end -}}
 
 {{- define "partial:fieldInput" -}}
-<RA.Form.Item
+<Antd.Form.Item
     name="{{ camel .Name }}"
     label="{{ .Name | ER_label }}"
     rules={[{required: {{ not .Optional }}}]}
@@ -58,33 +59,33 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$.Na
     {{- end }}
 >
     {{- $viewName := ( print "View." (ER_fieldTSType .) "ViewOnForm" ) }}
-    {{- if not (empty .Annotations.REFINE.ViewOnForm) }}
-    {{ $viewName = print "Custom." .Annotations.REFINE.ViewOnForm }}
+    {{- if not (empty .Annotations.ENTREFINE.ViewOnForm) }}
+    {{ $viewName = print "Custom." .Annotations.ENTREFINE.ViewOnForm }}
     {{- end}}
      <{{$viewName}}/>
-</RA.Form.Item>
+</Antd.Form.Item>
 {{- end -}}
 
 {{- define "partial:edgeInputs" -}}
 {{- range $e := .EdgesWithID }}
-{{- if not $e.Annotations.REFINE.HideOnForm }}
+{{- if not $e.Annotations.ENTREFINE.HideOnForm }}
 {{- $gqlFieldName := print `{["` (singular $e.Name | camel) `IDs"]}` }}
 {{- $mode := `"multiple"` }}
 {{- if $e.Unique}}
 {{- $gqlFieldName = print `"` ($e.Name | camel ) `ID"` }}
 {{- $mode = `undefined` }}
 {{- end}}
-<RA.Form.Item
+<Antd.Form.Item
     label="{{ $e.Name | ER_label }}"
     name={{ $gqlFieldName }}
     rules={[{required: {{ not $e.Optional }}}]}>
-    <RA.Select {...{{$e.Name}}SelectProps} mode={ {{$mode}} }/>
-</RA.Form.Item>
+    <Antd.Select {...{{$e.Name}}SelectProps} mode={ {{$mode}} }/>
+</Antd.Form.Item>
 {{- end }}
 {{- end }}
 {{- end }}
 
-{{- define "edit.tsx" -}}
+{{- define "src/edit.tsx" -}}
 
 {{- template "partial:imports" . }}
 
@@ -98,15 +99,15 @@ export const {{$n.Name}}Edit: React.FC = () => {
                 fields: [
                     {{- range $f := $n.Fields}}
                     {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                    {{- if not $f.Annotations.REFINE.HideOnForm }}
-                    {{- if not $f.Annotations.REFINE.HideOnEdit }}
+                    {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
+                    {{- if not $f.Annotations.ENTREFINE.HideOnEdit }}
                     "{{ camel $f.Name}}",
                     {{- end }}
                     {{- end }}
                     {{- end }}
                     {{- end }}
                     {{- range $e := $n.EdgesWithID}}
-                    {{- if not $e.Annotations.REFINE.HideOnForm }}
+                    {{- if not $e.Annotations.ENTREFINE.HideOnForm }}
                     {{- if $e.Unique}}
                     {
                         "{{ camel $e.Name }}": [ "id" ]
@@ -135,11 +136,11 @@ export const {{$n.Name}}Edit: React.FC = () => {
 
     return (
         <RA.Edit saveButtonProps={saveButtonProps}>
-            <RA.Form {...formProps} layout="vertical">
+            <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                {{- if not $f.Annotations.REFINE.HideOnForm }}
-                {{- if not $f.Annotations.REFINE.HideOnEdit }}
+                {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
+                {{- if not $f.Annotations.ENTREFINE.HideOnEdit }}
                 {{ (include "partial:fieldInput" $f) | nindent 16 }}
                 {{- end }}
                 {{- end }}
@@ -147,7 +148,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
                 {{- end }}
 
                 {{- (include "partial:edgeInputs" $n) | nindent 16 }}
-            </RA.Form>
+            </Antd.Form>
         </RA.Edit>
     );
 };
@@ -157,10 +158,10 @@ export const {{$n.Name}}Edit: React.FC = () => {
 {{- end -}}
 
 
-{{- define "create.tsx" -}}
+{{- define "src/create.tsx" -}}
 {{- template "partial:imports" .}}
 
-{{- range $n := $.Graph.Nodes -}}
+{{- range $n := $.Graph.Nodes }}
 export const {{$n.Name}}Create: React.FC = () => {
     const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.I{{$n.Name}}>();
 
@@ -168,11 +169,11 @@ export const {{$n.Name}}Create: React.FC = () => {
 
     return (
         <RA.Create saveButtonProps={saveButtonProps}>
-            <RA.Form {...formProps} layout="vertical">
+            <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
-                {{- if not $f.Annotations.REFINE.HideOnForm }}
-                {{- if not $f.Annotations.REFINE.HideOnCreate }}
+                {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
+                {{- if not $f.Annotations.ENTREFINE.HideOnCreate }}
                 {{- (include "partial:fieldInput" $f) | nindent 16 }}
                 {{- end }}
                 {{- end }}
@@ -180,12 +181,11 @@ export const {{$n.Name}}Create: React.FC = () => {
                 {{- end }}
 
                 {{- (include "partial:edgeInputs" $n) | nindent 16 }}
-            </RA.Form>
+            </Antd.Form>
         </RA.Create>
     );
 };
-
-{{- end -}}
+{{- end }}
 {{ template "partial:footer" . }}
 {{- end -}}
 

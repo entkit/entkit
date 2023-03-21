@@ -22,8 +22,10 @@ type CodeFieldOptions struct {
 
 // Action item related action
 type Action struct {
-	Operation       string         `json:"Operation,omitempty"`       // Operation of graphql
-	Fields          []string       `json:"Fields,omitempty"`          // Fields to take after operation
+	Name            string         `json:"Name,omitempty"`            // Name of action (Required)
+	Route           *RouteAction   `json:"Route,omitempty"`           // Route of action
+	Operation       *Operation     `json:"Operation,omitempty"`       // Route of action
+	Element         string         `json:"Element,omitempty"`         // Element that should be rendered
 	Props           map[string]any `json:"Props,omitempty"`           // Props are directly passing to react component
 	Single          bool           `json:"Single"`                    // Show on single item
 	Bulk            bool           `json:"Bulk,omitempty"`            // Show on bulk selected items
@@ -38,26 +40,73 @@ type Action struct {
 	OnEdit          bool           `json:"OnEdit,omitempty"`          // Display on edit
 }
 
+type RouteAction struct {
+	Path  string `json:"Path,omitempty"`  // Route of action
+	Index bool   `json:"Index,omitempty"` // Mark action as index route
+}
+
+type Operation struct {
+	Name   string   `json:"Name,omitempty"`   // Operation of graphql
+	Fields []string `json:"Fields,omitempty"` // Fields to take after operation
+}
+
 var (
+	// ListAction standard list action
+	ListAction = &Action{
+		Name:    "list",
+		Element: "List.{name}List",
+		Icon:    "AntdIcons.UnorderedListOutlined",
+		Route: &RouteAction{
+			Index: true,
+		},
+		OnList: false,
+		OnShow: true,
+	}
 	// EditAction standard edit action
-	EditAction = Action{
-		Operation: "Edit",
-		OnList:    true,
-		OnShow:    true,
+	EditAction = &Action{
+		Name:    "edit",
+		Element: "Edit.{name}Edit",
+		Label:   "Edit",
+
+		Route: &RouteAction{
+			Path: "edit/:id",
+		},
+		Icon:   "AntdIcons.EditOutlined",
+		OnList: true,
+		OnShow: true,
+	}
+	// CreateAction standard create action
+	CreateAction = &Action{
+		Name:    "create",
+		Element: "Create.{name}Create",
+		Label:   "Create",
+		Route: &RouteAction{
+			Path: "create",
+		},
+		Icon:   "AntdIcons.PlusCircleOutlined",
+		OnList: false,
+		OnShow: false,
 	}
 	// ShowAction standard show action
-	ShowAction = Action{
-		Operation: "Show",
-		OnList:    true,
+	ShowAction = &Action{
+		Name: "show",
+		Route: &RouteAction{
+			Path: "show/:id",
+		},
+		Element: "Show.{name}MainShow",
+		Icon:    "AntdIcons.EyeOutlined",
+		OnList:  true,
 	}
 	// DeleteAction standard delete action
-	DeleteAction = Action{
-		Operation: "Delete",
-		Label:     "Delete",
-		Icon:      "RA.Icons.DeleteOutlined",
-		OnList:    true,
-		OnShow:    true,
-		Bulk:      true,
+	DeleteAction = &Action{
+		Name: "delete",
+		Operation: &Operation{
+			Name: "Delete",
+		},
+		Icon:   "AntdIcons.DeleteOutlined",
+		OnList: true,
+		OnShow: true,
+		Bulk:   true,
 		Props: map[string]any{
 			"danger": true,
 		},
@@ -72,10 +121,6 @@ type RefineAnnotation struct {
 	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
 	URLField       bool              `json:"URLField,omitempty"`       // Mark field as url field
 	RichTextField  bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
-	NoList         bool              `json:"NoList,omitempty"`
-	NoShow         bool              `json:"NoShow,omitempty"`
-	NoCreate       bool              `json:"NoCreate,omitempty"`
-	NoEdit         bool              `json:"NoEdit,omitempty"`
 	HideOnList     bool              `json:"HideOnList,omitempty"`
 	HideOnShow     bool              `json:"HideOnShow,omitempty"`
 	HideOnForm     bool              `json:"HideOnForm,omitempty"`
@@ -87,8 +132,11 @@ type RefineAnnotation struct {
 	Description    *string           `json:"Description,omitempty"`
 	Prefix         *string           `json:"Prefix,omitempty"`
 	Suffix         *string           `json:"Suffix,omitempty"`
-	Actions        []Action          `json:"Actions,omitempty"`
+	Actions        []*Action         `json:"Actions,omitempty"`
 	View           *string           `json:"View,omitempty"`
+
+	Route      *string `json:"Route,omitempty"`
+	IndexRoute bool    `json:"IndexRoute,omitempty"`
 
 	ViewOnShow *string `json:"ViewOnShow,omitempty"`
 	ViewOnList *string `json:"ViewOnList,omitempty"`
@@ -160,20 +208,12 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 		ra.HideOnUpdate = annotation.HideOnUpdate
 	}
 
-	if annotation.NoList {
-		ra.NoList = annotation.NoList
+	if annotation.Route != nil {
+		ra.Route = annotation.Route
 	}
 
-	if annotation.NoShow {
-		ra.NoShow = annotation.NoShow
-	}
-
-	if annotation.NoCreate {
-		ra.NoCreate = annotation.NoCreate
-	}
-
-	if annotation.NoEdit {
-		ra.NoEdit = annotation.NoEdit
+	if annotation.IndexRoute {
+		ra.IndexRoute = annotation.IndexRoute
 	}
 
 	if annotation.FilterOperator != nil {
@@ -229,11 +269,11 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 
 // Name annotation
 func (ra RefineAnnotation) Name() string {
-	return "REFINE"
+	return "ENTREFINE"
 }
 
 // Actions actions/buttons on list items
-func Actions(actions ...Action) RefineAnnotation {
+func Actions(actions ...*Action) RefineAnnotation {
 	return RefineAnnotation{
 		Actions: actions,
 	}
@@ -263,34 +303,6 @@ func OnlyOnShow() RefineAnnotation {
 		HideOnList: true,
 		HideOnShow: false,
 		HideOnForm: true,
-	}
-}
-
-// NoList disable entity browse, also hide from navigation
-func NoList() RefineAnnotation {
-	return RefineAnnotation{
-		NoList: true,
-	}
-}
-
-// NoShow disable entity show page
-func NoShow() RefineAnnotation {
-	return RefineAnnotation{
-		NoShow: true,
-	}
-}
-
-// NoCreate disable entity creation form
-func NoCreate() RefineAnnotation {
-	return RefineAnnotation{
-		NoCreate: true,
-	}
-}
-
-// NoEdit disable entity edit form
-func NoEdit() RefineAnnotation {
-	return RefineAnnotation{
-		NoEdit: true,
 	}
 }
 
@@ -372,10 +384,24 @@ func URLField() RefineAnnotation {
 	}
 }
 
-// Icon define icon of entity that will be shown on navigations, breadcrumbs e.t.c.
+// Icon define icon of entity that will be shown on navigations, breadcrumbs etc.
 func Icon(icon string) RefineAnnotation {
 	return RefineAnnotation{
 		Icon: &icon,
+	}
+}
+
+// Route define entity route for url.
+func Route(route string) RefineAnnotation {
+	return RefineAnnotation{
+		Route: &route,
+	}
+}
+
+// IndexRoute make entity route as index route
+func IndexRoute() RefineAnnotation {
+	return RefineAnnotation{
+		IndexRoute: true,
 	}
 }
 

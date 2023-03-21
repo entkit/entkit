@@ -23,12 +23,14 @@ type ExtensionOption = func(*Extension) error
 type Extension struct {
 	entc.DefaultExtension
 	AppPath             string         // AppPath JS Application path (packages.json directory path)
-	SrcDirName          string         // SrcDirName JS Application source dir name
+	GraphqlURL          string         // Graphql URL
 	Meta                map[string]any // Meta to share with frontend application
-	TypeScriptPrefix    string
+	Prefix              string
 	GoJs                GoJSOptions
 	ForceGraph2D        ForceGraph2DOptions
 	DefaultEdgesDiagram string
+
+	Keycloak *Keycloak
 }
 
 type GoJSOptions struct {
@@ -48,18 +50,26 @@ func WithAppPath(path string) ExtensionOption {
 	}
 }
 
-// WithTypeScriptPrefix define typescript types/vars prefix
-func WithTypeScriptPrefix(prefix string) ExtensionOption {
+// WithGraphqlURL define graphql server url
+func WithGraphqlURL(url string) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.TypeScriptPrefix = prefix
+		ex.GraphqlURL = url
 		return nil
 	}
 }
 
-// WithSrcDirName additional option to configure Refine repo code-source directory, default value is `src`
-func WithSrcDirName(name string) ExtensionOption {
+// WithTypeScriptPrefix define typescript types/vars prefix
+func WithTypeScriptPrefix(prefix string) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.SrcDirName = name
+		ex.Prefix = prefix
+		return nil
+	}
+}
+
+// WithKeycloak configure keycloak
+func WithKeycloak(keycloak *Keycloak) ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.Keycloak = keycloak
 		return nil
 	}
 }
@@ -99,9 +109,8 @@ func WithMeta(meta map[string]any) ExtensionOption {
 // NewExtension initialize extension
 func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	ex := &Extension{
-		SrcDirName:          "src",
 		Meta:                map[string]any{},
-		TypeScriptPrefix:    "Ent",
+		Prefix:              "Ent",
 		DefaultEdgesDiagram: "Diagram.GoJS",
 		GoJs: GoJSOptions{
 			Enabled:    true,
@@ -112,14 +121,15 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	_funcMap := template.FuncMap{
 		"ER_label": common.ToLabel,
 		"ER_fieldTSType": func(f gen.Field) string {
-			return common.FieldTSType(f, ex.TypeScriptPrefix)
+			return common.FieldTSType(f, ex.Prefix)
 		},
 		"ER_tsType": func(t string) string {
-			return common.TSType(t, ex.TypeScriptPrefix)
+			return common.TSType(t, ex.Prefix)
 		},
-		"ER_resourceAlias":  common.ResourceAlias,
-		"ER_titleField":     titleField,
-		"ER_mainImageField": mainImageField,
+		"ER_resourceAlias":   common.ResourceAlias,
+		"ER_titleField":      titleField,
+		"ER_mainImageField":  mainImageField,
+		"ER_getActionByName": getActionByName,
 	}
 
 	if len(funcMap) == 0 {
@@ -148,17 +158,33 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	return ex, nil
 }
 
+type Annotations struct {
+	Prefix string
+}
+
+// Name of the annotation. Used by the codegen templates.
+func (Annotations) Name() string {
+	return "ENTREFINE"
+}
+
 // Annotations Define Ent annotations
 func (ex *Extension) Annotations() []entc.Annotation {
-	return []entc.Annotation{}
+	return []entc.Annotation{
+		Annotations{
+			Prefix: ex.Prefix,
+		},
+	}
 }
 
 // Templates Define Ent templates
 func (ex *Extension) Templates() []*gen.Template {
 	return []*gen.Template{
-		gen.MustParse(gen.NewTemplate("greet").
+		gen.MustParse(gen.NewTemplate("search_query_apply").
 			Funcs(funcMap).
 			ParseFS(_templates, "templates/search_query_apply.tmpl")),
+		gen.MustParse(gen.NewTemplate("auth").
+			Funcs(funcMap).
+			ParseFS(_templates, "templates/auth.tmpl")),
 	}
 }
 
@@ -166,5 +192,6 @@ func (ex *Extension) Templates() []*gen.Template {
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{
 		GenerateRefineScripts(ex),
+		//GenerateKeycloakResources(ex),
 	}
 }

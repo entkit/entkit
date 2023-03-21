@@ -1,31 +1,42 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "resources.tsx" -}}
+{{- define "src/resources.tsx" -}}
 /* eslint no-use-before-define: 0 */
-import * as Lists from "./list";
-import * as MainShow from "./main-show";
-import * as Create from "./create";
-import * as Edit from "./edit";
-import {
-    Icons,
-} from "@pankod/refine-antd";
+import * as AntdIcons from "@ant-design/icons";
 
 export const Resources = [
     {{- range $n := $.Graph.Nodes}}
+    {{- $routePath := $n.Annotations.ENTREFINE.Route }}
+    {{- if empty $routePath}}
+    {{ $routePath = $n.Name | kebabcase }}
+    {{- end }}
     {
-        name: "{{ $n.Name }}",
-        {{- if not $n.Annotations.REFINE.NoList }}
-        list: Lists.{{ $n.Name }}List,
+        name: "{{ $n.Name | kebabcase }}",
+
+        {{- $action := ER_getActionByName $n "list" }}
+        {{- if not (empty $action) }}
+        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        list: "{{$path}}",
         {{- end }}
-        {{- if not $n.Annotations.REFINE.NoShow }}
-        show: MainShow.{{ $n.Name }}MainShow,
+
+        {{- $action = ER_getActionByName $n "show" }}
+        {{- if not (empty $action) }}
+        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        show:  "{{$path}}",
         {{- end }}
-        {{- if not $n.Annotations.REFINE.NoCreate }}
-        create: Create.{{ $n.Name }}Create,
+
+        {{- $action = ER_getActionByName $n "create" }}
+        {{- if not (empty $action) }}
+        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        create:  "{{$path}}",
         {{- end }}
-        {{- if not $n.Annotations.REFINE.NoEdit }}
-        edit: Edit.{{ $n.Name }}Edit,
+
+        {{- $action = ER_getActionByName $n "edit" }}
+        {{- if not (empty $action) }}
+        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        edit:  "{{$path}}",
         {{- end }}
-        icon: <Icons.{{default "FileOutlined" $n.Annotations.REFINE.Icon}}/>,
+
+        icon: <AntdIcons.{{ default "FileOutlined" $n.Annotations.ENTREFINE.Icon}}/>,
     },
     {{- end}}
 ];

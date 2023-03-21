@@ -1,0 +1,45 @@
+{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- define "src/routes.tsx" -}}
+/* eslint no-use-before-define: 0 */
+import * as List from "./list";
+import * as Show from "./show";
+import * as Create from "./create";
+import * as Edit from "./edit";
+import { Route } from "react-router-dom";
+import routerProvider, {
+    NavigateToResource,
+    CatchAllNavigate,
+    UnsavedChangesNotifier,
+} from "@refinedev/react-router-v6";
+
+
+export const ResourceRoutes = <>
+    {{- range $n := $.Graph.Nodes}}
+    {{- if $n.Annotations.ENTREFINE.IndexRoute }}
+    <Route index element={<NavigateToResource resource="{{ $n.Name | kebabcase }}" />}/>
+    {{- end }}
+
+    {{- $routePath := $n.Annotations.ENTREFINE.Route }}
+    {{- if empty $routePath }}
+    {{ $routePath = $n.Name | kebabcase }}
+    {{- end }}
+    <Route path="/{{ $routePath }}">
+        {{- range $a := $n.Annotations.ENTREFINE.Actions }}
+        {{- if not (empty $a.Route) }}
+        <Route
+            {{ if $a.Route.Index -}}
+            index
+            {{- end -}}
+            {{ if not (empty $a.Route.Path ) -}}
+            path="{{ $a.Route.Path }}"
+            {{- end -}}
+            {{- $element := replace $a.Element "{name}" $n.Name}}
+            element={<{{$element}}/>}
+        />
+        {{- end }}
+        {{- end }}
+    </Route>
+    {{- end}}
+</>
+/* eslint no-use-before-define: 2 */
+{{- end -}}

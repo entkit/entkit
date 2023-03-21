@@ -1,9 +1,12 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "show.tsx" -}}
+{{- define "src/show.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React, { useState } from "react";
-import { useShow } from "@pankod/refine-core";
-import * as RA  from "@pankod/refine-antd";
+import { useShow } from "@refinedev/core";
+import * as RA from "@refinedev/antd";
+import * as Antd from "antd";
+import * as AntdIcons from "@ant-design/icons";
+
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
 import * as Interfaces from "./interfaces";
@@ -21,7 +24,7 @@ export type {{$n.Name}}ShowProps = {
 } & RA.ShowProps
 export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges, ...showProps}) => {
     const { queryResult } = useShow<Interfaces.I{{$n.Name}}>({
-        resource: "{{ $n.Name }}",
+        resource: "{{ $n.Name | kebabcase }}",
         id,
         metaData: {
             fields: [
@@ -136,10 +139,10 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                  headerButtons={({ defaultButtons }) => (
                      <>
                      {defaultButtons}
-                     <RA.Button icon={<RA.Icons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</RA.Button>
-                     {{- range $a := $n.Annotations.REFINE.Actions }}
+                     <Antd.Button icon={<AntdIcons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</Antd.Button>
+                     {{- range $a := $n.Annotations.ENTREFINE.Actions }}
                      {{ if $a.OnShow }}
-                     <Action.{{ ( print $n.Name "-" $a.Operation "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                     <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
                      {{- end }}
                      {{- end }}
                      </>
@@ -148,31 +151,31 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
         >
             {!edgesDiagram ? <>
                 {{- range $f := $allFields}}
-                <RA.Typography.Title level={5}>{{ $f.Name | ER_label }}</RA.Typography.Title>
+                <Antd.Typography.Title level={5}>{{ $f.Name | ER_label }}</Antd.Typography.Title>
                 {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
-                {{- if not (empty $f.Annotations.REFINE.ViewOnShow) }}
-                {{ $viewName = print "Custom." $f.Annotations.REFINE.ViewOnShow }}
+                {{- if not (empty $f.Annotations.ENTREFINE.ViewOnShow) }}
+                {{ $viewName = print "Custom." $f.Annotations.ENTREFINE.ViewOnShow }}
                 {{- end}}
                 <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
                 {{- end }}
 
                 {withEdges ? <>
-                    <RA.Typography.Title level={3}>Edges</RA.Typography.Title>
-                    <RA.Descriptions>
+                    <Antd.Typography.Title level={3}>Edges</Antd.Typography.Title>
+                    <Antd.Descriptions>
                         {{- range $e := $n.EdgesWithID }}
                         {{- $titleField := (ER_titleField $e.Type) }}
                         {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.REFINE.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.REFINE.Badge }}
+                        {{- if not (empty $e.Annotations.ENTREFINE.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.ENTREFINE.Badge }}
                         {{- end}}
                         {{- if $e.Unique }}
-                        <RA.Descriptions.Item label="{{ $e.Name | ER_label }}">
+                        <Antd.Descriptions.Item label="{{ $e.Name | ER_label }}">
                             <{{$viewName}} { ...record?.{{ camel $e.Name }} } />
-                        </RA.Descriptions.Item>
+                        </Antd.Descriptions.Item>
                         {{- end}}
                         {{- end}}
-                    </RA.Descriptions>
-                    <RA.Tabs
+                    </Antd.Descriptions>
+                    <Antd.Tabs
                     defaultActiveKey="0"
                     items={[
                         {{- range $i, $e := $n.EdgesWithID }}
@@ -182,7 +185,7 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                         {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
                         {
                             label: <span>
-                                <RA.Icons.{{default "FileOutlined" $e.Type.Annotations.REFINE.Icon}} />
+                                <AntdIcons.{{default "FileOutlined" $e.Type.Annotations.ENTREFINE.Icon}} />
                                 {{$e.Name | ER_label}}
                             </span>,
                             key: "{{$i}}",
@@ -209,7 +212,7 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
             </> : null }
 
             { edgesDiagram ?
-                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.REFINE.EdgesDiagram }}
+                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTREFINE.EdgesDiagram }}
                 <{{$diagramView}}
                     nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
                     links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
@@ -219,6 +222,15 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
         </RA.Show>
     )
 }
+
+export const {{$n.Name}}MainShow : React.FC = () => {
+    return <{{$n.Name}}Show withEdges={true}/>
+};
+
+export const {{$n.Name}}PartialShow : React.FC = () => {
+    return <{{$n.Name}}Show withEdges={false}/>
+};
+
 {{- end -}}
 
 /* eslint no-use-before-define: 2 */

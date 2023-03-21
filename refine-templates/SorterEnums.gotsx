@@ -1,5 +1,5 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "sorter-enums.tsx" -}}
+{{- define "src/sorter-enums.tsx" -}}
 /* eslint no-use-before-define: 0 */
 {{- range $n := $.Graph.Nodes -}}
 export const {{$n.Name}}SorterEnums = {

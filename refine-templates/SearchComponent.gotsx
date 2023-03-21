@@ -1,12 +1,13 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "search-component.tsx" -}}
+{{- define "src/search-component.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import {useState, useEffect} from "react";
-import * as RA from "@pankod/refine-antd";
-import { useList } from "@pankod/refine-core";
+import * as RA from "@refinedev/antd";
+import { Typography, Avatar, AutoComplete, Input } from "antd";
+import { useList, useLink } from "@refinedev/core";
 import * as Interfaces from "./interfaces"
 import debounce from "lodash/debounce";
-import RefineReactRouter from "@pankod/refine-react-router-v6";
+import { FileImageOutlined, SearchOutlined } from "@ant-design/icons";
 
 interface IOptionGroup {
     value: string;
@@ -18,20 +19,20 @@ interface IOptions {
     options: IOptionGroup[];
 }
 
-const { Link } = RefineReactRouter;
-const { Text } = RA.Typography;
+const { Text } = Typography;
 
 export const SearchComponent: React.FC = () => {
     const [options, setOptions] = useState<IOptions[]>([]);
     const [value, setValue] = useState<string>("");
+    const Link = useLink();
 
     const renderTitle = (title: string) => (
-        <RA.Typography.Title>
-            <RA.Typography.Text style={
+        <Typography.Title>
+            <Typography.Text style={
                 { fontSize: "16px" }
-            }>{title}</RA.Typography.Text>
+            }>{title}</Typography.Text>
             {{/*<Link to={`/${title.toLowerCase()}`}>More</Link>*/}}
-        </RA.Typography.Title>
+        </Typography.Title>
     );
 
     const renderItem = (title: string, imageUrl: string|null, link: string) => ({
@@ -41,9 +42,9 @@ export const SearchComponent: React.FC = () => {
             <Link key={title+link} to={link} style={
                 { display: "flex", alignItems: "center" }
             }>
-                { imageUrl ? <RA.Avatar size={48} src={imageUrl} style={
+                { imageUrl ? <Avatar size={48} src={imageUrl} style={
                     { minWidth: "48px" }
-                } /> : <RA.Icons.FileImageOutlined style={ {fontSize: '48px'} } />}
+                } /> : <FileImageOutlined style={ {fontSize: '48px'} } />}
                 <Text style={
                     { marginLeft: "16px" }
                 }>{title}</Text>
@@ -57,7 +58,7 @@ export const SearchComponent: React.FC = () => {
     {{- $mainImageField := (ER_mainImageField $n) -}}
 
     const { refetch: refetch{{ $n.Name }} } = useList<Interfaces.I{{ $n.Name }}>({
-        resource: "{{ $n.Name }}",
+        resource: "{{ $n.Name | kebabcase }}",
         metaData: {
             fields: [
                 "{{$n.ID.Name}}",
@@ -79,7 +80,7 @@ export const SearchComponent: React.FC = () => {
                         {{- else }}
                         null,
                         {{- end }}
-                        `/{{$n.Name}}/show/${item.{{ $n.ID.Name}}}`,
+                        `/{{$n.Name | kebabcase}}/show/${item.{{ $n.ID.Name}}}`,
                     ),
                 );
                 if (storeOptionGroup.length > 0) {
@@ -107,7 +108,7 @@ export const SearchComponent: React.FC = () => {
     }, [value]);
 
     return (
-        <RA.AutoComplete
+        <AutoComplete
             style={
                 {
                     width: "100%",
@@ -121,12 +122,12 @@ export const SearchComponent: React.FC = () => {
                 300,
             )}
         >
-            <RA.Input
+            <Input
                 size="large"
                 placeholder="Search"
-                suffix={<RA.Icons.SearchOutlined/>}
+                suffix={<SearchOutlined/>}
             />
-        </RA.AutoComplete>
+        </AutoComplete>
     )
 }
 

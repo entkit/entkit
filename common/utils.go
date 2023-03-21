@@ -59,7 +59,7 @@ func TSType(gotype string, prefix string) string {
 }
 
 func FieldTSType(field gen.Field, prefix string) string {
-	ant, ok := field.Annotations["REFINE"].(map[string]any)
+	ant, ok := field.Annotations["ENTREFINE"].(map[string]any)
 
 	if field.IsEnum() {
 		return prefix + UcFirst(strings.Replace(field.Type.String(), ".", "_", -1))
@@ -88,4 +88,13 @@ func FieldTSType(field gen.Field, prefix string) string {
 
 func ResourceAlias(node gen.Type) string {
 	return strcase.SnakeCase(node.Name)
+}
+
+func Contains[T comparable](s []T, e T) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

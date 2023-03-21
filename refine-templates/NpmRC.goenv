@@ -1,0 +1,5 @@
+{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- define ".npmrc" -}}
+legacy-peer-deps=true
+strict-peer-dependencies=false
+{{- end -}}

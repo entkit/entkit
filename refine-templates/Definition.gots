@@ -1,7 +1,21 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "definition.tsx" -}}
-/* eslint no-use-before-define: 0 */
+{{- define "src/definition.tsx" -}}
 // Metadata
 export const meta = {{ $.Extension.Meta | toPrettyJson}}
-/* eslint no-use-before-define: 2 */
+
+{{ if not (empty $.Extension.Keycloak) -}}
+import {KeycloakConfig} from "keycloak-js";
+// Keycloak configuration
+{{- $keycloak := first $.Extension.Keycloak.FrontendClientConfigs }}
+export const keycloak: KeycloakConfig = {
+    url: "{{$.Extension.Keycloak.Host}}",
+    realm: "{{$.Extension.Keycloak.Realm}}",
+    clientId: "{{$keycloak.ClientID}}",
+}
+
+{{ if not (empty $.Extension.GraphqlURL) -}}
+export const graphqlUrl = "{{ $.Extension.GraphqlURL }}";
+{{- end }}
+
+{{- end }}
 {{- end -}}

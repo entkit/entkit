@@ -1,8 +1,10 @@
-{{- define "view.tsx" -}}
+{{- define "src/view.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React from "react";
-import * as RA  from "@pankod/refine-antd";
-import RefineReactRouter from "@pankod/refine-react-router-v6";
+import * as RA from "@refinedev/antd";
+import * as Antd from "antd";
+import * as AntdIcons from "@ant-design/icons";
+import { useLink } from "@refinedev/core";
 import * as Show from "./show";
 import * as Type  from "./interfaces";
 import ReactQuill from 'react-quill';
@@ -19,7 +21,7 @@ export const {{$.Prefix}}DateViewOnShow: React.FC<ViewProps<Date>> = ({value}) =
 }
 export const {{$.Prefix}}DateViewOnList: React.FC<ViewProps<Date>> = {{$.Prefix}}DateViewOnShow
 export const {{$.Prefix}}DateViewOnForm: React.FC = (props) => {
-    return <RA.DatePicker {...props} showTime={true} />
+    return <Antd.DatePicker {...props} showTime={true} />
 }
 // endregion Date
 
@@ -29,24 +31,24 @@ export const {{$.Prefix}}BooleanViewOnShow: React.FC<ViewProps<Type.{{$.Prefix}}
 }
 export const {{$.Prefix}}BooleanViewOnList = {{$.Prefix}}BooleanViewOnShow
 export const {{$.Prefix}}BooleanViewOnForm: React.FC = (props)=>{
-    return <RA.Radio.Group {...props} >
-        <RA.Radio value={true}>Yes</RA.Radio>
-        <RA.Radio value={false}>No</RA.Radio>
-    </RA.Radio.Group>
+    return <Antd.Radio.Group {...props} >
+        <Antd.Radio value={true}>Yes</Antd.Radio>
+        <Antd.Radio value={false}>No</Antd.Radio>
+    </Antd.Radio.Group>
 }
 // endregion Boolean
 
 // region String
 export const {{$.Prefix}}StringViewOnShow: React.FC<ViewProps<Type.{{$.Prefix}}String>> = ({value}) => {
-    return <RA.Typography.Text copyable={true}>{ value }</RA.Typography.Text>
+    return <Antd.Typography.Text copyable={true}>{ value }</Antd.Typography.Text>
 }
 export const {{$.Prefix}}StringViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}String>> = ({value}) => {
-    return <RA.Tooltip title={value}>
+    return <Antd.Tooltip title={value}>
         <RA.TextField value={value} ellipsis={true} style={ {width: '100px'} }/>
-    </RA.Tooltip>
+    </Antd.Tooltip>
 }
 export const {{$.Prefix}}StringViewOnForm: React.FC = (props) => {
-    return <RA.Input {...props} />
+    return <Antd.Input {...props} />
 }
 // endregion String
 
@@ -58,7 +60,7 @@ export const {{$.Prefix}}NumberViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}N
     return <{{$.Prefix}}NumberViewOnShow value={value} {...props} />
 }
 export const {{$.Prefix}}NumberViewOnForm: React.FC = (props) => {
-    return <RA.InputNumber {...props} />
+    return <Antd.InputNumber {...props} />
 }
 // endregion Number
 
@@ -67,19 +69,19 @@ export const {{$.Prefix}}StringListViewOnShow: React.FC<ViewProps<Type.{{$.Prefi
     return <>{ value?.map( (v, i) => <{{$.Prefix}}StringViewOnShow key={i} value={ String(i+1) + '. ' + v}/> ) }</>;
 }
 export const {{$.Prefix}}StringListViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}StringList>> = ({value}) => {
-    return <RA.Typography.Text>{ String( value?.length || 0 )+" items" }</RA.Typography.Text>
+    return <Antd.Typography.Text>{ String( value?.length || 0 )+" items" }</Antd.Typography.Text>
 }
 export const {{$.Prefix}}StringListViewOnForm: React.FC = (props) => {
-    return <RA.Select {...props}  mode="tags" />
+    return <Antd.Select {...props}  mode="tags" />
 }
 // endregion
 
 // region Image
 export const {{$.Prefix}}ImageViewOnShow: React.FC<ViewProps<Type.{{$.Prefix}}Image>> = ({value}) => {
-    return <RA.Image style={ {width: '100%', maxWidth: '256px' } } src={value}/>
+    return <Antd.Image style={ {width: '100%', maxWidth: '256px' } } src={value}/>
 }
 export const {{$.Prefix}}ImageViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}Image>> = ({value}) => {
-    return <RA.Image width={48} src={value}/>
+    return <Antd.Image width={48} src={value}/>
 }
 export const {{$.Prefix}}ImageViewOnForm: React.FC = {{$.Prefix}}StringViewOnForm
 // endregion Image
@@ -124,12 +126,12 @@ export const {{$.Prefix}}RichTextViewOnForm: React.FC = (props) => <ReactQuill {
 
 // region URL
 export const {{$.Prefix}}URLViewOnShow: React.FC<ViewProps<Type.{{$.Prefix}}URL>> = ({value}) => {
-    return <RA.Button href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>
+    return <Antd.Button href={ value } target="_blank" icon={<AntdIcons.LinkOutlined/>}>
         <RA.TextField value={value} ellipsis={true} style={ {width: '100%', maxWidth: "350px"} } type={"secondary"} />
-    </RA.Button>
+    </Antd.Button>
 }
 export const {{$.Prefix}}URLViewOnList: React.FC<ViewProps<Type.{{$.Prefix}}URL>> = ({value}) => {
-    return <RA.Button type="primary" href={ value } target="_blank" icon={<RA.Icons.LinkOutlined/>}>Open</RA.Button>
+    return <Antd.Button type="primary" href={ value } target="_blank" icon={<AntdIcons.LinkOutlined/>}>Open</Antd.Button>
 }
 export const {{$.Prefix}}URLViewOnForm: React.FC = {{$.Prefix}}StringViewOnForm
 // endregion URL
@@ -145,7 +147,7 @@ export const {{$.Prefix}}URLViewOnForm: React.FC = {{$.Prefix}}StringViewOnForm
 export const {{ ER_fieldTSType $f }}ViewOnShow = {{$.Prefix}}StringViewOnShow
 export const {{ ER_fieldTSType $f }}ViewOnList = {{$.Prefix}}StringViewOnList
 export const {{ ER_fieldTSType $f }}ViewOnForm: React.FC = (props)=>{
-    return  <RA.Select
+    return  <Antd.Select
         {...props}
         options={[
             {{- range $v := $f.EnumValues }}
@@ -164,14 +166,13 @@ export const {{ ER_fieldTSType $f }}ViewOnForm: React.FC = (props)=>{
 // endregion Enums
 
 // region Entity Badges
-const { Link } = RefineReactRouter;
-
 {{- range $n := $.Graph.Nodes }}
 
 export const {{ $n.Name }}Badge: React.FC<Partial<Type.I{{ $n.Name }}>> = (props) => {
+    const Link = useLink();
     {{- $titleField := (ER_titleField $n) }}
     {{- $mainImageField := (ER_mainImageField $n) }}
-    return <RA.Popover
+    return <Antd.Popover
         overlayInnerStyle={ {width: "50vw", height: "40vh", maxHeight:"400px", maxWidth:"500px", overflow: "auto"} }
         content={
             <Show.{{$n.Name}}Show
@@ -183,15 +184,15 @@ export const {{ $n.Name }}Badge: React.FC<Partial<Type.I{{ $n.Name }}>> = (props
             />
         }
     >
-        <Link to={ "/{{ $n.Name }}/show/"+ props.{{ $n.ID.Name | camel }}}>
+        <Link to={ "/{{ $n.Name | kebabcase}}/show/"+ props.{{ $n.ID.Name | camel }}}>
             {{- if not ( empty $mainImageField ) }}
             {{- $mainImageFieldName := $mainImageField.Name | camel }}
-            { props.{{ $mainImageFieldName }} ? <RA.Image width={48} preview={false} src={props.{{ $mainImageFieldName }} }/> : null }
+            { props.{{ $mainImageFieldName }} ? <Antd.Image width={48} preview={false} src={props.{{ $mainImageFieldName }} }/> : null }
             {{- else }}
             { props.{{ $titleField.Name | camel }} }
             {{- end }}
         </Link>
-    </RA.Popover>
+    </Antd.Popover>
 }
 
 {{- end }}

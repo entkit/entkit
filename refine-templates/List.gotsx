@@ -1,8 +1,8 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "list.tsx" -}}
+{{- define "src/list.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
-import * as RA from "@pankod/refine-antd";
+import * as RA from "@refinedev/antd";
 import * as Tables from "./tables";
 import * as Type from "./interfaces";
 import * as Action from "./action";
@@ -13,13 +13,13 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Prefix}}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
 
-    return <RA.List {...props} resource="{{$n.Name}}" headerButtons={({ defaultButtons }) => (
+    return <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (
         <>
             {defaultButtons}
             {selectedRowKeys.length ? <>
-                {{- range $a := $n.Annotations.REFINE.Actions }}
+                {{- range $a := $n.Annotations.ENTREFINE.Actions }}
                 {{- if and $a.OnList $a.Bulk }}
-                {{- $aName:= ( print $n.Name "-" $a.Operation "-Action") | pascal}}
+                {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
                 <Action.{{ $aName }}
                     key="{{$aName}}"
                     recordItemIDs={ selectedRowKeys }

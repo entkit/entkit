@@ -3,11 +3,10 @@ package entrefine
 import (
 	"bytes"
 	"embed"
-	"encoding/json"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/entc/gen"
-	"log"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -24,34 +23,6 @@ type JSDeps struct {
 var (
 	//go:embed refine-templates/*
 	_refineTemplates embed.FS
-
-	Dependencies = JSDeps{
-		Deps: map[string]string{
-			"pluralize":         "^8.0.0",
-			"camelcase":         "^6.2.0",
-			"gql-query-builder": "^3.5.5",
-			"graphql-request":   "^4.3.0",
-			"graphql":           "^15.6.1",
-			"lodash":            "^4.17.21",
-		},
-		DevDeps: map[string]string{
-			"@types/pluralize": "^0.0.29",
-			"@types/lodash":    "^4.14.171",
-		},
-	}
-
-	ForceGraph2DDependencies = JSDeps{
-		Deps: map[string]string{
-			"react-force-graph-2d": "^1.23.17",
-		},
-	}
-
-	GoJSDependencies = JSDeps{
-		Deps: map[string]string{
-			"gojs":       "^2.3.1",
-			"gojs-react": "^1.1.1",
-		},
-	}
 )
 
 type SkipModes struct {
@@ -66,7 +37,23 @@ type SkipModes struct {
 func GenerateRefineScripts(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
-			NewRefineGen(ex, g).Generate()
+
+			tracked := false
+			cmd := exec.Command("git", "update-index", "--refresh")
+			_ = cmd.Run()
+			cmd = exec.Command("git", "diff-index", "--quiet", "HEAD", "--")
+			err := cmd.Run()
+			if exitError, ok := err.(*exec.ExitError); ok {
+				if exitError.ExitCode() > 0 {
+					fmt.Println("entrefine: skipped: \"It seems you have uncommitted changes. Please commit them before proceeding with code generation.\"")
+				}
+			} else {
+				tracked = true
+			}
+
+			if tracked {
+				NewRefineGen(ex, g).Generate()
+			}
 			return next.Generate(g)
 		})
 	}
@@ -88,7 +75,7 @@ type RefineGen struct {
 func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 	rg := &RefineGen{
 		Extension: extension,
-		Prefix:    extension.TypeScriptPrefix,
+		Prefix:    extension.Prefix,
 		Graph:     graph,
 		SkipModes: SkipModes{
 			SkipEnumField:           entgql.SkipEnumField,
@@ -118,32 +105,9 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 	return rg
 }
 
-func (rg *RefineGen) GetJSDependencies() JSDeps {
-	combined := Dependencies
-
-	if rg.Extension.GoJs.Enabled {
-		for k, v := range GoJSDependencies.Deps {
-			combined.Deps[k] = v
-		}
-		for k, v := range GoJSDependencies.DevDeps {
-			combined.DevDeps[k] = v
-		}
-	}
-
-	if rg.Extension.ForceGraph2D.Enabled {
-		for k, v := range ForceGraph2DDependencies.Deps {
-			combined.Deps[k] = v
-		}
-		for k, v := range ForceGraph2DDependencies.DevDeps {
-			combined.DevDeps[k] = v
-		}
-	}
-	return combined
-}
-
 // saveGenerated Save generated file
 func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	resDir := path.Join(rg.Extension.AppPath, rg.Extension.SrcDirName, "entrefine")
+	resDir := rg.Extension.AppPath
 	p := filepath.Join(resDir, name)
 
 	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
@@ -197,13 +161,21 @@ func parseT(path string) *gen.Template {
 func (rg *RefineGen) Generate() {
 	var (
 		DynamicTemplates = []*gen.Template{
+			parseT("refine-templates/Tsconfig.gojson"),
+			parseT("refine-templates/Gitignore.goignore"),
+			parseT("refine-templates/NpmRC.goenv"),
+			parseT("refine-templates/Package.gojson"),
+			parseT("refine-templates/Index.gohtml"),
 			parseT("refine-templates/Definition.gots"),
+			parseT("refine-templates/Index.gotsx"),
+			parseT("refine-templates/Login.gotsx"),
+			parseT("refine-templates/App.gotsx"),
 			parseT("refine-templates/Show.gotsx"),
-			parseT("refine-templates/MainShow.gotsx"),
 			parseT("refine-templates/Form.gotsx"),
 			parseT("refine-templates/Table.gotsx"),
 			parseT("refine-templates/List.gotsx"),
 			parseT("refine-templates/Resources.gotsx"),
+			parseT("refine-templates/Routes.gotsx"),
 			parseT("refine-templates/Interfaces.gots"),
 			parseT("refine-templates/DataProvider.gots"),
 			parseT("refine-templates/SearchComponent.gotsx"),
@@ -225,55 +197,13 @@ func (rg *RefineGen) Generate() {
 		rg.rendAndSave(t, false)
 	}
 
-	rg.updatePackageJson()
+	rg.updatePackages()
 }
 
-func (rg *RefineGen) updatePackageJson() {
-	packageJsonPath := path.Join(rg.Extension.AppPath, "package.json")
-	dat, err := os.ReadFile(packageJsonPath)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var p map[string]interface{}
-	err = json.Unmarshal(dat, &p)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	deps := p["dependencies"]
-	v, ok := deps.(map[string]interface{})
-	if !ok {
-		log.Fatalln("Something bad happened. Check your package.json `dependencies`", deps)
-	}
-
-	_deps := rg.GetJSDependencies()
-
-	for name, ver := range _deps.Deps {
-		v[name] = ver
-	}
-	p["dependencies"] = v
-
-	devDeps := p["devDependencies"]
-	v, ok = devDeps.(map[string]interface{})
-	if !ok {
-		log.Fatalln("Something bad happened. Check your package.json `devDependencies`", devDeps)
-	}
-	for name, ver := range _deps.DevDeps {
-		v[name] = ver
-	}
-	p["devDependencies"] = v
-
-	r, err := json.MarshalIndent(p, "", "  ")
-
-	err = rg.saveFile(packageJsonPath, r, true)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	cmd := exec.Command("/bin/sh", "-c", "npm i; npm run build")
+func (rg *RefineGen) updatePackages() {
+	cmd := exec.Command("/bin/sh", "-c", "npm i && npm run lint && npm run build")
 	cmd.Dir = rg.Extension.AppPath
-	out, err := cmd.Output()
+	out, _ := cmd.Output()
 	println(string(out))
 }
 

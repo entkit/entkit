@@ -1,5 +1,5 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "interfaces.tsx" -}}
+{{- define "src/interfaces.tsx" -}}
 /* eslint no-use-before-define: 0 */
 // Custom types
 export type {{$.Prefix}}String = string

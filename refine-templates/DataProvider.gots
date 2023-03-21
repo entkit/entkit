@@ -1,12 +1,12 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "data-provider.ts" -}}
+{{- define "src/data-provider.ts" -}}
 /* eslint no-use-before-define: 0 */
 import {
     CrudFilters,
     CrudSorting,
     DataProvider,
     LogicalFilter,
-} from "@pankod/refine-core";
+} from "@refinedev/core";
 import { GraphQLClient } from "graphql-request";
 import * as gql from "gql-query-builder";
 import pluralize from "pluralize";
@@ -25,6 +25,13 @@ export type OrderQuery = {
     direction: "ASC" | "DESC"
 }
 
+function camel(str: string): string{
+    return camelCase(str, {preserveConsecutiveUppercase: true})
+}
+function pascal(str: string): string{
+    return camelCase(str, {preserveConsecutiveUppercase: true, pascalCase: true})
+}
+
 export const generateOrderQuery = (resource: string, sort?: CrudSorting): undefined|OrderQuery => {
     if (sort && sort.length > 0) {
 
@@ -32,7 +39,7 @@ export const generateOrderQuery = (resource: string, sort?: CrudSorting): undefi
             console.log("Multiple sorts not supporting because of EntGQL right not supporting multiple orders, only first order is working: https://github.com/ent/ent/issues/2198")
         }
 
-        const fieldGroupName :keyof typeof SorterEnums = resource+"SorterEnums" as any
+        const fieldGroupName :keyof typeof SorterEnums = pascal(resource)+"SorterEnums" as any
         const fieldGroup = SorterEnums[fieldGroupName] as any
         return {
             field: fieldGroup[sort[0].field],
@@ -54,9 +61,9 @@ export const generateFilter = (filters?: CrudFilters): Record<string, any> => {
             ) {
                 const { field, operator, value } = filter;
                 if (operator === "eq") {
-                    queryFilters[camelCase(`${field}`, {preserveConsecutiveUppercase: true})] = value;
+                    queryFilters[camel(field)] = value;
                 } else {
-                    queryFilters[camelCase(`${field}_${operator}`, {preserveConsecutiveUppercase: true})] = value;
+                    queryFilters[camel(`${field}_${operator}`)] = value;
                 }
             } else {
                 const value = filter.value as LogicalFilter[];
@@ -64,11 +71,11 @@ export const generateFilter = (filters?: CrudFilters): Record<string, any> => {
                 value.map((val) => {
                     if (val.operator === "eq") {
                         orFilters.push({
-                            [ camelCase(`${val.field}`, {preserveConsecutiveUppercase: true})]: val.value,
+                            [ camel(`${val.field}`)]: val.value,
                         });
                     } else {
                         orFilters.push({
-                            [ camelCase(`${val.field}_${val.operator}`, {preserveConsecutiveUppercase: true})]: val.value,
+                            [ camel(`${val.field}_${val.operator}`)]: val.value,
                         });
                     }
                 });
@@ -85,7 +92,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
         /** Done */
         getOne: async ({ resource, id, metaData }) => {
             const pluralRes = pluralize.plural(resource);
-            const camelRes = camelCase(pluralRes, {preserveConsecutiveUppercase: true});
+            const camelRes = camel(pluralRes);
             const operation = metaData?.operation || camelRes;
 
             const { query, variables } = gql.query({
@@ -95,7 +102,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                         value: {
                             id: id
                         },
-                        type: resource+"WhereInput",
+                        type: pascal(resource)+"WhereInput",
                         required: true
                     },
                     first: 1,
@@ -145,7 +152,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 
 
             const pluralRes = pluralize.plural(resource);
-            const camelRes = camelCase(pluralRes, {preserveConsecutiveUppercase: true});
+            const camelRes = camel(pluralRes);
 
             const operation = metaData?.operation || camelRes;
 
@@ -157,11 +164,11 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                     // where: { value: filterBy, type: "JSON" },
                     q: metaData?.searchQuery,
                     where: {
-                        type: resource+"WhereInput",
+                        type: pascal(resource)+"WhereInput",
                         value: where,
                     },
                     orderBy: {
-                        type: resource + "Order",
+                        type: pascal(resource) + "Order",
                         value: orderBy,
                     },
                     ...(hasPagination ? {
@@ -216,7 +223,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
         },
 
         getMany: async ({ resource, ids, metaData }) => {
-            const camelResource = camelCase(resource, {preserveConsecutiveUppercase: true});
+            const camelResource = camel(resource);
 
             const operation = metaData?.operation ?? camelResource;
 
@@ -240,7 +247,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 
         create: async ({ resource, variables, metaData }) => {
             const singularResource = pluralize.singular(resource);
-            const camelCreateName = camelCase(`create-${singularResource}`, {preserveConsecutiveUppercase: true});
+            const camelCreateName = camel(`create-${singularResource}`);
 
             const operation = metaData?.operation ?? camelCreateName;
             const { query, variables: gqlVariables } = gql.mutation({
@@ -248,7 +255,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 variables: {
                     input: {
                         value: variables,
-                        type: `Create${resource}Input`,
+                        type: `Create${pascal(resource)}Input`,
                         required: true
                     },
                 },
@@ -263,18 +270,17 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 
         createMany: async ({ resource, variables, metaData }) => {
             const singularResource = pluralize.singular(resource);
-            const camelCreateName = camelCase(`create-${singularResource}`, {preserveConsecutiveUppercase: true});
 
-            const operation = metaData?.operation ?? camelCreateName;
+            const operation = metaData?.operation ?? camel(`create-${singularResource}`);
 
             const response = await Promise.all(
                 variables.map(async (param) => {
                     const { query, variables: gqlVariables } = gql.mutation({
-                        operation,
+                        operation: operation,
                         variables: {
                             input: {
                                 value: { data: param },
-                                type: `${camelCreateName}Input`,
+                                type: `Create${pascal(singularResource)}Input`,
                             },
                         },
                         fields: metaData?.fields ?? [
@@ -296,21 +302,18 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
         },
 
         update: async({ resource, id, variables, metaData }) => {
-            const singularResource = pluralize.singular(resource);
-            const camelUpdateName = camelCase(`update-${singularResource}`, {preserveConsecutiveUppercase: true});
-
-            const operation = metaData?.operation ?? camelUpdateName;
+            const operation = metaData?.operation ?? `update${pascal(resource)}`;
 
             const cleanVars: Record<string, any> = {}
             for (const key in variables){
                 if(key.endsWith("IDs")){
-                    cleanVars[camelCase("clear-"+pluralize.plural(key.replace("IDs", "")))] = true
-                    cleanVars[camelCase("add-"+key)] = variables[key]
+                    cleanVars[camel("clear-"+pluralize.plural(key.replace("IDs", "")))] = true
+                    cleanVars[camel("add-"+key)] = variables[key]
                 } else if(key.endsWith("ID")){
-                    cleanVars[camelCase("clear-"+key.replace("ID", ""))] = true
+                    cleanVars[camel("clear-"+key.replace("ID", ""))] = true
                     cleanVars[key] = variables[key]
                 } else if(variables[key] === null){
-                    cleanVars[camelCase("clear-"+key)] = true
+                    cleanVars[camel("clear-"+key)] = true
                 } else{
                     cleanVars[key] = variables[key]
                 }
@@ -320,7 +323,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 variables: {
                     input: {
                         value: cleanVars,
-                        type: `Update${resource}Input`,
+                        type: `Update${pascal(resource)}Input`,
                         required: true
                     },
                     id: {
@@ -332,15 +335,14 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 fields: metaData?.fields ?? ["id"],
             });
             const response = await client.request(query, gqlVariables);
-
             return {
-                data: response[operation][singularResource],
+                data: response[operation],
             };
         },
 
         updateMany: async ({ resource, ids, variables, metaData }) => {
             const singularResource = pluralize.singular(resource);
-            const camelUpdateName = camelCase(`update-${singularResource}`, {preserveConsecutiveUppercase: true});
+            const camelUpdateName = camel(`update-${singularResource}`);
 
             const operation = metaData?.operation ?? camelUpdateName;
 
@@ -376,7 +378,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 
         deleteOne: async ({ resource, id, metaData }) => {
             const pluralRes = pluralize.plural(resource);
-            const camelDeleteName = camelCase(`delete-${pluralRes}`, {preserveConsecutiveUppercase: true});
+            const camelDeleteName = camel(`delete-${pluralRes}`);
 
             const operation = metaData?.operation ?? camelDeleteName;
 
@@ -384,7 +386,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 operation,
                 variables: {
                     where: {
-                        type: `${resource}WhereInput`,
+                        type: pascal(resource)+'WhereInput',
                         value: {id: id},
                         required: true,
                     }
@@ -400,7 +402,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
 
         deleteMany: async ({ resource, ids, metaData }) => {
             const pluralRes = pluralize.plural(resource);
-            const camelDeleteName = camelCase(`delete-${pluralRes}`, {preserveConsecutiveUppercase: true});
+            const camelDeleteName = camel(`delete-${pluralRes}`);
 
             const operation = metaData?.operation ?? camelDeleteName;
 
@@ -408,7 +410,7 @@ const dataProvider = (client: GraphQLClient): Required<DataProvider> => {
                 operation,
                 variables: {
                     where: {
-                        type: `${resource}WhereInput`,
+                        type: pascal(resource)+'WhereInput',
                         value: {idIn: ids},
                         required: true,
                     }

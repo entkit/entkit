@@ -1,4 +1,4 @@
-{{- define "helpers.tsx" -}}
+{{- define "src/helpers.tsx" -}}
 /* eslint no-use-before-define: 0 */
 export {}
 /* eslint no-use-before-define: 2 */

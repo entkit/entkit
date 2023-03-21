@@ -1,23 +1,35 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "action.tsx" -}}
+{{- define "src/action.tsx" -}}
 import React from "react";
-import * as RA from "@pankod/refine-antd";
-import {useInvalidate} from "@pankod/refine-core";
+import * as RA from "@refinedev/antd";
+import * as Antd from "antd";
+import * as AntdIcons from "@ant-design/icons";
 import {
-    RefineButtonCommonProps,
+    RefineButtonSingleProps,
     RefineButtonLinkingProps,
-    RefineButtonResourceProps,
-    RefineButtonSingleProps
-} from "@pankod/refine-ui-types/src/types/button";
-import {ButtonProps} from "antd";
-import {DeleteOneResponse, useCan, useCustomMutation, useNotification, useResource} from "@pankod/refine-core";
+    RefineButtonCommonProps
+} from "@refinedev/ui-types";
+import {ButtonProps, Popconfirm} from "antd";
+import {
+    DeleteOneResponse,
+    useCan,
+    useCustomMutation,
+    useNotification,
+    useResource,
+    useInvalidate,
+    useLink,
+} from "@refinedev/core";
 import {ViewProps} from "./view";
 import * as Custom from "./custom";
 import * as Type from "./interfaces";
 
 {{- range $n := $.Graph.Nodes }}
-{{- range $a := $n.Annotations.REFINE.Actions }}
-{{- $cName := ( print $n.Name "-" $a.Operation "-Action") | pascal }}
+{{- range $a := $n.Annotations.ENTREFINE.Actions }}
+{{- $cName := ( print $n.Name "-" $a.Name "-Action") | pascal }}
+{{- $routePath := $n.Annotations.ENTREFINE.Route }}
+{{- if empty $routePath}}
+{{ $routePath = $n.Name | kebabcase }}
+{{- end }}
 
 export type {{$cName}}Props = ButtonProps &
     RefineButtonCommonProps &
@@ -28,30 +40,37 @@ export type {{$cName}}Props = ButtonProps &
 }
 
 export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
-    {{- $opName := $a.Operation }}
-    {{- $label := default $opName $a.Label }}
+    const additionalProps = {{ $a.Props | toJson }} || {};
+
+    {{- $label := default $a.Name $a.Label }}
+
+    {{- if not (empty $a.Route) }}
+    const Link = useLink();
+    {{- $pattern := print "/" $routePath}}
+    {{- if not (empty $a.Route)}}
+    {{- $pattern = print $pattern "/" $a.Route.Path}}
+    {{- end}}
+
+    return <Link to={ "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
+        <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
+            {hideText || "{{$label}}"}
+        </Antd.Button>
+    </Link>
+    {{- end }}
+    {{- if not (empty $a.Operation )}}
 
     {{- $standards := list "Edit" "Show" }}
-    {{- if has $a.Operation $standards }}
-    return <RA.{{ $a.Operation }}Button
-        resource="{{$n.Name}}"
-        resourceNameOrRouteName="{{$n.Name}}"
-        recordItemId={ recordItemIDs[0] }
-        {...props}
-    >
-        {hideText || "{{$label}}"}
-    </RA.{{ $a.Operation }}Button>
-    {{- else }}
-    {{- if eq $a.Operation "Delete" }}
-        {{- $opName = print "delete-" ($n.Name | plural) | camel }}
+    {{- $opName := $a.Operation.Name }}
+    {{- if eq $a.Operation.Name "Delete" }}
+    {{- $opName = print "delete-" ($n.Name | plural) | camel }}
     {{- end }}
 
     const  notification = useNotification();
-    const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
-    const additionalProps = {{ $a.Props | toJson }} || {};
+    const { mutate, isLoading } = useCustomMutation();
+    //const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
     const invalidate = useInvalidate();
 
-    return <RA.Popconfirm
+    return <Popconfirm
         key="{{ $opName }}"
         okText="{{ $label }}"
         cancelText="Cancel"
@@ -75,44 +94,44 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                                 required: true
                             },
                         },
-                        fields: {{ $a.Fields | toJson }} || undefined,
-                    },
+                        fields: {{ $a.Operation.Fields | toJson }} || undefined,
                 },
-                {
-                    onSuccess: (resp: any) => {
-                        recordItemIDs.forEach((id)=>{
-                            invalidate({
-                                resource: "{{ $n.Name }}",
-                                invalidates: ["resourceAll"],
-                                id,
-                            });
-                        })
-                        notification.open?.({
-                            type: "success",
-                            message: `{{ default "Successfully" $a.SuccessMessage }}`,
-                        })
-                        !onSuccess || onSuccess(resp);
-                    },
+        },
+            {
+                onSuccess: (resp) => {
+                    recordItemIDs.forEach((id: Type.EntID)=>{
+                        invalidate({
+                            resource: "{{ $n.Name | kebabcase}}",
+                            invalidates: ["resourceAll"],
+                            id,
+                        });
+                    })
+                    notification.open?.({
+                        type: "success",
+                        message: `{{ default "Successfully" $a.SuccessMessage }}`,
+                    })
+                    !onSuccess || onSuccess(resp);
+                },
                     onError: (error) => {
-                        {{- $message := "" }}
-                        {{- if empty $a.FailMessage}}
-                        {{- $message = "error.message" }}
-                        {{- else }}
-                        {{- $message = print "`" $a.FailMessage "`"}}
-                        {{- end }}
-                        notification.open?.({
-                            type: "error",
-                            message: {{ $message }},
-                        })
-                    },
-                },
-            );
+                {{- $message := "" }}
+                {{- if empty $a.FailMessage}}
+                {{- $message = "error.message" }}
+                {{- else }}
+                {{- $message = print "`" $a.FailMessage "`"}}
+                {{- end }}
+                notification.open?.({
+                    type: "error",
+                    message: {{ $message }},
+                })
+            },
+            },
+        );
         }}
     >
-        <RA.Button icon={ <{{default "RA.Icons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
+        <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
             {hideText || "{{$label}}"}
-        </RA.Button>
-    </RA.Popconfirm>
+        </Antd.Button>
+    </Popconfirm>
     {{- end }}
 }
 {{- end }}

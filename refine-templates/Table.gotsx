@@ -1,10 +1,11 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
-{{- define "tables.tsx" -}}
+{{- define "src/tables.tsx" -}}
 /* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
-import {HttpError} from "@pankod/refine-core";
-import RefineReactRouter from "@pankod/refine-react-router-v6";
-import * as RA from "@pankod/refine-antd";
+import {HttpError} from "@refinedev/core";
+import * as RA from "@refinedev/antd";
+import * as Antd from "antd";
+import * as AntdIcons from "@ant-design/icons";
 import * as Interfaces from "./interfaces";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
@@ -13,7 +14,7 @@ import * as Action from "./action";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
-export type {{$n.Name}}TableProps = RA.TableProps<Interfaces.I{{$n.Name}}> & { extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError> }
+export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.I{{$n.Name}}> & { extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError> }
 export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, ...props} ) => {
 
     const [cursors, setCursors] = useState<Cursors>({first: 10,})
@@ -21,7 +22,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
 
     {{- $allFields := prepend $n.Fields $n.ID }}
     const table = RA.useTable<Interfaces.I{{$n.Name}}>({
-        resource: "{{$n.Name}}",
+        resource: "{{$n.Name | kebabcase}}",
         initialSorter: [
             {
                 field: "{{ (first $orderFields).Name }}",
@@ -30,11 +31,11 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
         ],
         initialFilter: [
             {{ range $f := $allFields }}
-            {{- if not $f.Annotations.REFINE.HideOnList -}}
+            {{- if not $f.Annotations.ENTREFINE.HideOnList -}}
             {
                 field: "{{$f.Name | camel }}",
                 value: null,
-                operator: "{{ lower (default "EQ" $f.Annotations.REFINE.FilterOperator) }}",
+                operator: "{{ lower (default "EQ" $f.Annotations.ENTREFINE.FilterOperator) }}",
             },
             {{- end -}}
             {{- end -}}
@@ -83,11 +84,11 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
 
     return (
         <>
-            <RA.Table {...table.tableProps} pagination={false} rowKey="{{$n.ID.Name}}" {...props}>
+            <Antd.Table {...table.tableProps} pagination={false} rowKey="{{$n.ID.Name}}" {...props}>
                 { /* region Fields */ }
                 {{- range $f := $allFields }}
-                {{- if not $f.Annotations.REFINE.HideOnList }}
-                <RA.Table.Column
+                {{- if not $f.Annotations.ENTREFINE.HideOnList }}
+                <Antd.Table.Column
                     dataIndex="{{ camel $f.Name }}"
                     title="{{ $f.Name | ER_label }}"
                     {{- if has $f $orderFields }}
@@ -97,15 +98,15 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     {{- end }}
                     render={ (value)=> {
                         {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnList" ) }}
-                        {{- if not (empty $f.Annotations.REFINE.ViewOnList) }}
-                        {{ $viewName = print "Custom." $f.Annotations.REFINE.ViewOnList }}
+                        {{- if not (empty $f.Annotations.ENTREFINE.ViewOnList) }}
+                        {{ $viewName = print "Custom." $f.Annotations.ENTREFINE.ViewOnList }}
                         {{- end}}
                         return <{{$viewName}} value={ value } />
                     } }
                     filterDropdown={(props) => (
                         <RA.FilterDropdown {...props}>
                             {{- if $f.IsEnum }}
-                            <RA.Select
+                            <Antd.Select
                                 options={[
                                     {{- range $v := $f.EnumValues }}
                                     {
@@ -117,7 +118,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                                 style={ { width: '100%', minWidth: "100px" } }
                             />
                             {{- else }}
-                            <RA.Input />
+                            <Antd.Input />
                             {{- end}}
                         </RA.FilterDropdown>
                     )}
@@ -129,16 +130,16 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
 
                 { /* region Edges */ }
                 {{- range $e := $n.Edges }}
-                {{- if not $e.Annotations.REFINE.HideOnList }}
+                {{- if not $e.Annotations.ENTREFINE.HideOnList }}
                 {{- $titleField := (ER_titleField $e.Type) }}
-                <RA.Table.Column
+                <Antd.Table.Column
                     dataIndex="{{ camel $e.Name }}"
                     title="{{ $e.Name | ER_label }}"
                     render={
                         {{- if $e.Unique }}
                         {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.REFINE.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.REFINE.Badge }}
+                        {{- if not (empty $e.Annotations.ENTREFINE.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.ENTREFINE.Badge }}
                         {{- end}}
                         (value)=>(<{{$viewName}} { ...value } />)
                         {{- else }}
@@ -151,28 +152,28 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                 {{- end }}
                 {/* endregion Edges*/}
 
-                <RA.Table.Column<Interfaces.I{{ $n.Name }}>
+                <Antd.Table.Column<Interfaces.I{{ $n.Name }}>
                     title="Actions"
                     dataIndex="actions"
                     render={(_, record) => (
-                        <RA.Space>
-                            {{- range $a := $n.Annotations.REFINE.Actions }}
+                        <Antd.Space>
+                            {{- range $a := $n.Annotations.ENTREFINE.Actions }}
                             {{- if $a.OnList }}
-                            <Action.{{ ( print $n.Name "-" $a.Operation "-Action") | pascal }}
+                            <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }}
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}
                             />
                             {{- end }}
                             {{- end }}
-                        </RA.Space>
+                        </Antd.Space>
                     )}
                 />
-            </RA.Table>
+            </Antd.Table>
 
-            <RA.Space style={ {marginTop: 20} }>
-                <RA.Typography.Text type="secondary">Total {data?.total || 0}</RA.Typography.Text>
-                <RA.Button
+            <Antd.Space style={ {marginTop: 20} }>
+                <Antd.Typography.Text type="secondary">Total {data?.total || 0}</Antd.Typography.Text>
+                <Antd.Button
                     disabled={!Boolean(data?.pageInfo?.hasPreviousPage)}
                     onClick={() => {
                         setCursors((ov)=>({
@@ -184,10 +185,10 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                         }))
                     }
                     }>
-                    <RA.Icons.LeftOutlined/>
+                    <AntdIcons.LeftOutlined/>
                     Prev
-                </RA.Button>
-                <RA.Button
+                </Antd.Button>
+                <Antd.Button
                     disabled={!Boolean(data?.pageInfo?.hasNextPage)}
                     onClick={() => {
                         setCursors((ov)=>{
@@ -201,9 +202,9 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                         })
                     }}>
                     Next
-                    <RA.Icons.RightOutlined/>
-                </RA.Button>
-                <RA.Select
+                    <AntdIcons.RightOutlined/>
+                </Antd.Button>
+                <Antd.Select
                     labelInValue
                     defaultValue={ { value: 10, label: '10 / page' } }
                     style={ { width: 110 } }
@@ -225,7 +226,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                         {value: 100, label: '100 / page'},
                     ]}
                 />
-            </RA.Space>
+            </Antd.Space>
         </>
     );
 };
