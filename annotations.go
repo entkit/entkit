@@ -20,99 +20,6 @@ type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
 }
 
-// Action item related action
-type Action struct {
-	Name            string         `json:"Name,omitempty"`            // Name of action (Required)
-	Route           *RouteAction   `json:"Route,omitempty"`           // Route of action
-	Operation       *Operation     `json:"Operation,omitempty"`       // Route of action
-	Element         string         `json:"Element,omitempty"`         // Element that should be rendered
-	Props           map[string]any `json:"Props,omitempty"`           // Props are directly passing to react component
-	Single          bool           `json:"Single"`                    // Show on single item
-	Bulk            bool           `json:"Bulk,omitempty"`            // Show on bulk selected items
-	SuccessMessage  string         `json:"SuccessMessage,omitempty"`  // Message on success
-	FailMessage     string         `json:"FailMessage,omitempty"`     // Message on fail
-	CustomComponent string         `json:"CustomComponent,omitempty"` // Custom component TODO: custom component
-	Description     string         `json:"Description,omitempty"`     // Description of action
-	Label           string         `json:"Label,omitempty"`           // Label of button
-	Icon            string         `json:"Icon,omitempty"`            // Icon of button
-	OnList          bool           `json:"OnList,omitempty"`          // Display on list
-	OnShow          bool           `json:"OnShow,omitempty"`          // Display on show
-	OnEdit          bool           `json:"OnEdit,omitempty"`          // Display on edit
-}
-
-type RouteAction struct {
-	Path  string `json:"Path,omitempty"`  // Route of action
-	Index bool   `json:"Index,omitempty"` // Mark action as index route
-}
-
-type Operation struct {
-	Name   string   `json:"Name,omitempty"`   // Operation of graphql
-	Fields []string `json:"Fields,omitempty"` // Fields to take after operation
-}
-
-var (
-	// ListAction standard list action
-	ListAction = &Action{
-		Name:    "list",
-		Element: "List.{name}List",
-		Icon:    "AntdIcons.UnorderedListOutlined",
-		Route: &RouteAction{
-			Index: true,
-		},
-		OnList: false,
-		OnShow: true,
-	}
-	// EditAction standard edit action
-	EditAction = &Action{
-		Name:    "edit",
-		Element: "Edit.{name}Edit",
-		Label:   "Edit",
-
-		Route: &RouteAction{
-			Path: "edit/:id",
-		},
-		Icon:   "AntdIcons.EditOutlined",
-		OnList: true,
-		OnShow: true,
-	}
-	// CreateAction standard create action
-	CreateAction = &Action{
-		Name:    "create",
-		Element: "Create.{name}Create",
-		Label:   "Create",
-		Route: &RouteAction{
-			Path: "create",
-		},
-		Icon:   "AntdIcons.PlusCircleOutlined",
-		OnList: false,
-		OnShow: false,
-	}
-	// ShowAction standard show action
-	ShowAction = &Action{
-		Name: "show",
-		Route: &RouteAction{
-			Path: "show/:id",
-		},
-		Element: "Show.{name}MainShow",
-		Icon:    "AntdIcons.EyeOutlined",
-		OnList:  true,
-	}
-	// DeleteAction standard delete action
-	DeleteAction = &Action{
-		Name: "delete",
-		Operation: &Operation{
-			Name: "Delete",
-		},
-		Icon:   "AntdIcons.DeleteOutlined",
-		OnList: true,
-		OnShow: true,
-		Bulk:   true,
-		Props: map[string]any{
-			"danger": true,
-		},
-	}
-)
-
 // RefineAnnotation struct container of all annotations
 type RefineAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
@@ -391,10 +298,10 @@ func Icon(icon string) RefineAnnotation {
 	}
 }
 
-// Route define entity route for url.
-func Route(route string) RefineAnnotation {
+// RoutePath define entity route for url.
+func RoutePath(path string) RefineAnnotation {
 	return RefineAnnotation{
-		Route: &route,
+		Route: &path,
 	}
 }
 

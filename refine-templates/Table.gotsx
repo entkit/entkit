@@ -158,7 +158,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     render={(_, record) => (
                         <Antd.Space>
                             {{- range $a := $n.Annotations.ENTREFINE.Actions }}
-                            {{- if $a.OnList }}
+                            {{- if and (not $a.General) $a.OnList }}
                             <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }}
                                 recordItemIDs={ [record.id] }
                                 size="small"

@@ -14,26 +14,34 @@ export const Resources = [
 
         {{- $action := ER_getActionByName $n "list" }}
         {{- if not (empty $action) }}
-        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        {{- if not (empty $action.Route) }}
+        {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/"}}
         list: "{{$path}}",
+        {{- end }}
         {{- end }}
 
         {{- $action = ER_getActionByName $n "show" }}
         {{- if not (empty $action) }}
-        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        {{- if not (empty $action.Route) }}
+        {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/"}}
         show:  "{{$path}}",
+        {{- end }}
         {{- end }}
 
         {{- $action = ER_getActionByName $n "create" }}
         {{- if not (empty $action) }}
-        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        {{- if not (empty $action.Route) }}
+        {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/"}}
         create:  "{{$path}}",
+        {{- end }}
         {{- end }}
 
         {{- $action = ER_getActionByName $n "edit" }}
         {{- if not (empty $action) }}
-        {{- $path := print "/" $routePath "/" $action.Route.Path | trimSuffix "/"}}
+        {{- if not (empty $action.Route) }}
+        {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/"}}
         edit:  "{{$path}}",
+        {{- end }}
         {{- end }}
 
         icon: <AntdIcons.{{ default "FileOutlined" $n.Annotations.ENTREFINE.Icon}}/>,

@@ -11,10 +11,53 @@ import (
 	"github.com/diazoxide/entrefine"
 	"github.com/diazoxide/entrefine/common"
 )
+{{- $auth := $.Config.Annotations.ENTREFINE.Auth }}
+{{ if (indirect $auth.Enabled) }}
+func EntrefineAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var err error
+
+		{{- if (indirect $auth.Keycloak.Enabled) }}
+		kc := entrefine.NewBackendKeycloak(
+			"{{$auth.Keycloak.Host}}",
+			"{{$auth.Keycloak.Realm}}",
+			"{{$auth.Keycloak.BackendClientConfig.ClientID}}",
+			"{{$auth.Keycloak.BackendClientConfig.Secret}}",
+		)
+		r, err = kc.MiddlewareReqHandlerFunc(w, r)
+		{{- end }}
+
+		if err == nil {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
+func EntrefineAuthGinMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var err error
+
+		{{- if (indirect $auth.Keycloak.Enabled) }}
+		kc := entrefine.NewBackendKeycloak(
+			"{{$auth.Keycloak.Host}}",
+			"{{$auth.Keycloak.Realm}}",
+			"{{$auth.Keycloak.BackendClientConfig.ClientID}}",
+			"{{$auth.Keycloak.BackendClientConfig.Secret}}",
+		)
+		c.Request, err = kc.MiddlewareReqHandlerFunc(c.Writer, c.Request)
+		{{- end }}
+
+		if err == nil {
+			c.Next()
+		} else {
+			c.Abort()
+		}
+	}
+}
 
 func AuthorizeByResource(ctx context.Context, resource string, scope string) error {
-	resource = "{{$.Annotations.ENTREFINE.Prefix}}"+resource;
-	scope = "{{$.Annotations.ENTREFINE.Prefix}}"+scope;
+	resource = entrefine.PrepareName("{{$.Annotations.ENTREFINE.Prefix}}", resource)
+	scope = entrefine.PrepareName("{{$.Annotations.ENTREFINE.Prefix}}", scope)
 	authContext, err := AuthContextFromRequestContext(ctx)
 	if err != nil {
 		return err
@@ -35,18 +78,19 @@ func AuthorizeByResource(ctx context.Context, resource string, scope string) err
 	return nil
 }
 
-func AuthContextFromRequestContext(ctx context.Context) (*entrefine.Context, error) {
+func AuthContextFromRequestContext(ctx context.Context) (*entrefine.AuthContext, error) {
 	val := ctx.Value(entrefine.AuthContextKey)
 	if val == nil {
 		err := fmt.Errorf("could not retrieve AuthContext")
 		return nil, err
 	}
 
-	raw, ok := val.(*entrefine.Context)
+	raw, ok := val.(*entrefine.AuthContext)
 	if !ok {
 		return nil, fmt.Errorf("could not convert AuthContext")
 	}
 	return raw, nil
 }
 
+{{- end }}
 {{- end }}

@@ -47,7 +47,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
     {{- if not (empty $a.Route) }}
     const Link = useLink();
     {{- $pattern := print "/" $routePath}}
-    {{- if not (empty $a.Route)}}
+    {{- if not (empty $a.Route.Path)}}
     {{- $pattern = print $pattern "/" $a.Route.Path}}
     {{- end}}
 
@@ -95,37 +95,37 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                             },
                         },
                         fields: {{ $a.Operation.Fields | toJson }} || undefined,
+                    },
                 },
-        },
-            {
-                onSuccess: (resp) => {
-                    recordItemIDs.forEach((id: Type.EntID)=>{
-                        invalidate({
-                            resource: "{{ $n.Name | kebabcase}}",
-                            invalidates: ["resourceAll"],
-                            id,
-                        });
-                    })
-                    notification.open?.({
-                        type: "success",
-                        message: `{{ default "Successfully" $a.SuccessMessage }}`,
-                    })
-                    !onSuccess || onSuccess(resp);
-                },
+                {
+                    onSuccess: (resp) => {
+                        recordItemIDs.forEach((id: Type.EntID)=>{
+                            invalidate({
+                                resource: "{{ $n.Name | kebabcase}}",
+                                invalidates: ["resourceAll"],
+                                id,
+                            });
+                        })
+                        notification.open?.({
+                            type: "success",
+                            message: `{{ default "Successfully" $a.Operation.SuccessMessage }}`,
+                        })
+                        !onSuccess || onSuccess(resp);
+                    },
                     onError: (error) => {
-                {{- $message := "" }}
-                {{- if empty $a.FailMessage}}
-                {{- $message = "error.message" }}
-                {{- else }}
-                {{- $message = print "`" $a.FailMessage "`"}}
-                {{- end }}
-                notification.open?.({
-                    type: "error",
-                    message: {{ $message }},
-                })
-            },
-            },
-        );
+                        {{- $message := "" }}
+                        {{- if empty $a.FailMessage}}
+                        {{- $message = "error.message" }}
+                        {{- else }}
+                        {{- $message = print "`" $a.Operation.FailMessage "`"}}
+                        {{- end }}
+                        notification.open?.({
+                            type: "error",
+                            message: {{ $message }},
+                        })
+                    },
+                },
+            );
         }}
     >
         <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
@@ -136,5 +136,4 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
 }
 {{- end }}
 {{- end }}
-
 {{- end }}

@@ -5,237 +5,272 @@ import (
 	"encoding/json"
 	"entgo.io/ent/entc/gen"
 	"errors"
+	"fmt"
 	"github.com/Nerzal/gocloak/v12"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 )
 
 type Keycloak struct {
-	Host                  string
-	Realm                 string
-	BackendClientID       string
-	BackendClientSecret   string
-	AdminUsername         string
-	AdminPassword         string
-	FrontendClientConfigs []*gocloak.Client
-	GoCloak               *gocloak.GoCloak
+	Enabled             *bool   `json:"Enabled,omitempty"`
+	Host                *string `json:"Host,omitempty"`
+	Realm               *string `json:"Realm,omitempty"`
+	MasterAdminUsername *string `json:"MasterAdminUsername,omitempty"`
+	MasterAdminPassword *string `json:"MasterAdminPassword,omitempty"`
+
+	AdminUsername         *string           `json:"AdminUsername,omitempty"`
+	AdminPassword         *string           `json:"AdminPassword,omitempty"`
+	BackendClientConfig   *gocloak.Client   `json:"BackendClientConfig,omitempty"`
+	FrontendClientConfigs []*gocloak.Client `json:"FrontendClientConfigs,omitempty"`
+
+	GoCloak *gocloak.GoCloak `json:"GoCloak,omitempty"`
 }
+
+type KeycloakOption = func(keycloak *Keycloak) error
 
 type KeycloakFrontendClientConfig struct {
 	ClientID string
 }
 
-func NewKeycloakGenerator(
+func NewKeycloak(
 	host string,
 	realm string,
-	adminUsername string,
+	masterAdminUsername string,
+	masterAdminPassword string,
+	adminUser string,
 	adminPassword string,
-	backendClientID string,
-	backendClientSecret string,
+	backendClientConfigs *gocloak.Client,
 	frontendClientConfigs []*gocloak.Client,
+	options ...KeycloakOption,
 ) *Keycloak {
-	k := Keycloak{
-		Host:                  host,
-		Realm:                 realm,
-		BackendClientID:       backendClientID,
-		BackendClientSecret:   backendClientSecret,
-		AdminUsername:         adminUsername,
-		AdminPassword:         adminPassword,
+	k := &Keycloak{
+		Host:                  StringP(host),
+		Realm:                 StringP(realm),
+		MasterAdminUsername:   StringP(masterAdminUsername),
+		MasterAdminPassword:   StringP(masterAdminPassword),
+		AdminUsername:         StringP(adminUser),
+		AdminPassword:         StringP(adminPassword),
+		BackendClientConfig:   backendClientConfigs,
 		FrontendClientConfigs: frontendClientConfigs,
 	}
-	k.GoCloak = gocloak.NewClient(k.Host)
-	return &k
+	for _, opt := range options {
+		if err := opt(k); err != nil {
+			panic(err)
+		}
+	}
+
+	k.GoCloak = gocloak.NewClient(*k.Host)
+	return k
 }
 
-func NewBackendKeycloak(host string, realm string, clientID string, secret string) *Keycloak {
+func NewBackendKeycloak(host string, realm string, clientId string, secret string) *Keycloak {
 	k := Keycloak{
-		Host:                host,
-		Realm:               realm,
-		BackendClientID:     clientID,
-		BackendClientSecret: secret,
+		Host:  StringP(host),
+		Realm: StringP(realm),
+		BackendClientConfig: &gocloak.Client{
+			ClientID: StringP(clientId),
+			Secret:   StringP(secret),
+		},
 	}
-	k.GoCloak = gocloak.NewClient(k.Host)
+	k.GoCloak = gocloak.NewClient(*k.Host)
 	return &k
 }
 
-//func (k *Keycloak) Middleware(next http.Handler) http.Handler {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		c := r.Header.Get("Authorization")
-//		if !strings.HasPrefix(c, "Bearer ") {
-//			http.Error(w, "Authentication required", http.StatusUnauthorized)
-//		}
-//		jwtStr := strings.TrimPrefix(c, "Bearer ")
-//
-//		introspect, err := k.ValidateToken(jwtStr)
-//		if err != nil {
-//			http.Error(w, "Invalid cookie", http.StatusForbidden)
-//			return
-//		}
-//
-//		println(introspect.Permissions)
-//		// get the user from the database
-//		//user := getUserByID(db, userId)
-//
-//		// put it in context
-//		ctx := context.WithValue(r.Context(), AuthContextKey, introspect.Permissions)
-//
-//		// and call the next with our new context
-//		r = r.WithContext(ctx)
-//		next.ServeHTTP(w, r)
-//	})
-//}
-
-func (k *Keycloak) GinMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		auth := c.GetHeader("Authorization")
-		_permissions, err := k.getResourcesPermissions(auth)
-
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusForbidden, err.Error())
-			return
-		}
-
-		var permissions []*Permission
-		for _, p := range *_permissions {
-			permissions = append(permissions, &Permission{
-				Resource: *p.ResourceName,
-				Scopes:   *p.Scopes,
-			})
-		}
-
-		authContext := &Context{Permissions: permissions}
-		ctx := context.WithValue(c.Request.Context(), AuthContextKey, authContext)
-		c.Request = c.Request.WithContext(ctx)
-
-		c.Next()
-	}
-}
-
-func (k *Keycloak) getResourcesPermissions(auth string) (*[]gocloak.RequestingPartyPermission, error) {
+func (kc *Keycloak) MiddlewareReqHandlerFunc(w http.ResponseWriter, r *http.Request) (*http.Request, error) {
+	auth := r.Header.Get("Authorization")
 	if !strings.HasPrefix(auth, "Bearer ") {
-		return nil, errors.New("unauthorized")
+		http.Error(w, "\"Invalid Authorization Header\"", http.StatusBadRequest)
+		return r, errors.New("stop")
 	}
 	token := strings.TrimPrefix(auth, "Bearer ")
-	return k.GoCloak.GetRequestingPartyPermissions(
+
+	_permissions, err := kc.getResourcesPermissions(token)
+	if err != nil {
+		http.Error(w, "\"Unauthorized\"", http.StatusUnauthorized)
+		return r, errors.New("stop")
+	}
+
+	var permissions []*Permission
+	for _, p := range *_permissions {
+		permissions = append(permissions, &Permission{
+			Resource: *p.ResourceName,
+			Scopes:   *p.Scopes,
+		})
+	}
+
+	authContext := &AuthContext{Permissions: permissions}
+	ctx := context.WithValue(r.Context(), AuthContextKey, authContext)
+	return r.WithContext(ctx), nil
+}
+
+func (kc *Keycloak) getResourcesPermissions(token string) (*[]gocloak.RequestingPartyPermission, error) {
+	return kc.GoCloak.GetRequestingPartyPermissions(
 		context.Background(),
 		token,
-		k.Realm,
+		PString(kc.Realm),
 		gocloak.RequestingPartyTokenOptions{
-			Audience:                    gocloak.StringP(k.BackendClientID),
+			Audience:                    kc.BackendClientConfig.ClientID,
 			ResponseIncludeResourceName: gocloak.BoolP(true),
 			ResponseMode:                gocloak.StringP("permissions"),
 		},
 	)
 }
 
-func GenerateKeycloakResources(ex *Extension) gen.Hook {
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			ctx := context.Background()
-			token, err := ex.Keycloak.GoCloak.LoginAdmin(ctx, ex.Keycloak.AdminUsername, ex.Keycloak.AdminPassword, ex.Keycloak.Realm)
-			if err != nil {
-				panic(err)
-			}
-			backendClient := ex.Keycloak.prepareBackendClient(ctx, token.AccessToken)
-
-			ex.Keycloak.prepareFrontendClients(ctx, token.AccessToken)
-
-			actions := []string{"Read", "Create", "Update", "Delete"}
-			scopesMap := map[string]*gocloak.ScopeRepresentation{}
-
-			// region scopes
-			for _, action := range actions {
-				scope := ex.Keycloak.prepareResourcesScopes(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+action)
-				scopesMap[action] = scope
-			}
-			// endregion scopes
-
-			var adminRoles []gocloak.Role
-			var readerRoles []gocloak.Role
-			var writerRoles []gocloak.Role
-
-			for _, node := range g.Nodes {
-				// region resource
-				resource := ex.Keycloak.prepareResource(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+node.Name, &[]gocloak.ScopeRepresentation{
-					*scopesMap["Create"],
-					*scopesMap["Read"],
-					*scopesMap["Update"],
-					*scopesMap["Delete"],
-				})
-				// endregion resource
-
-				// region roles
-				adminRole := ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+node.Name+" Admin", nil)
-				adminRoles = append(adminRoles, adminRole)
-
-				readerRole := ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+node.Name+" Reader", nil)
-				readerRoles = append(readerRoles, readerRole)
-
-				writerRole := ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+node.Name+" Writer", nil)
-				writerRoles = append(writerRoles, writerRole)
-				// endregion roles
-
-				// region policies
-				adminPolicy := ex.Keycloak.preparePolicy(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" only admin permission", []gocloak.Role{adminRole})
-				readerPolicy := ex.Keycloak.preparePolicy(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" only reader permission", []gocloak.Role{readerRole})
-				writerPolicy := ex.Keycloak.preparePolicy(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" only writer permission", []gocloak.Role{writerRole})
-				// endregion policies
-
-				// region permissions
-				/*adminPermission*/
-				_ = ex.Keycloak.preparePermission(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" admin permission (resource based)",
-					"resource",
-					&[]string{*resource.ID},
-					nil,
-					[]string{*adminPolicy.ID},
-				)
-
-				/*readPermission*/
-				_ = ex.Keycloak.preparePermission(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" read permission (scope based)",
-					"scope",
-					&[]string{*resource.ID},
-					&[]string{
-						*scopesMap["Read"].ID,
-					},
-					[]string{*readerPolicy.ID},
-				)
-
-				/*writerPermission*/
-				_ = ex.Keycloak.preparePermission(ctx, token.AccessToken, *backendClient.ID, ex.Prefix+" "+node.Name+" write permission (scope based)",
-					"scope",
-					&[]string{*resource.ID},
-					&[]string{
-						*scopesMap["Read"].ID,
-						*scopesMap["Create"].ID,
-						*scopesMap["Update"].ID,
-					},
-					[]string{*writerPolicy.ID},
-				)
-				// endregion permissions
-			}
-
-			// region general roles
-			ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+"Admin", &adminRoles)
-			ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+"Reader", &readerRoles)
-			ex.Keycloak.prepareRole(ctx, *backendClient.ID, token.AccessToken, ex.Prefix+"Writer", &writerRoles)
-			// endregion general roles
-			return next.Generate(g)
-		})
+func (kc *Keycloak) getAdminToken(ctx context.Context) string {
+	token, err := kc.GoCloak.LoginAdmin(
+		ctx,
+		PString(kc.MasterAdminUsername),
+		PString(kc.MasterAdminPassword),
+		"master",
+	)
+	if err != nil {
+		panic(err)
 	}
+	return token.AccessToken
 }
 
-func (k *Keycloak) prepareFrontendClients(ctx context.Context, token string) []*gocloak.Client {
+func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
+	ctx := context.Background()
+	token := kc.getAdminToken(ctx)
+
+	kc.prepareRealm(ctx, token)
+
+	backendClient := kc.prepareBackendClient(ctx, token)
+
+	kc.prepareFrontendClients(ctx, token)
+
+	actions := []string{"Read", "Create", "Update", "Delete"}
+	scopesMap := map[string]*gocloak.ScopeRepresentation{}
+
+	for _, action := range actions {
+		scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, prefix, action)
+		scopesMap[action] = scope
+	}
+	var adminRoles []gocloak.Role
+
+	for _, node := range g.Nodes {
+		var resScopes []gocloak.ScopeRepresentation
+		ant, ok := node.Annotations["ENTREFINE"].(map[string]any)
+		if ok {
+			b, _ := json.Marshal(ant["Actions"])
+			var _actions []*Action
+			err := json.Unmarshal(b, &_actions)
+			if err != nil {
+				fmt.Printf("%+v\n", ant["Actions"])
+				panic("Unexpected error.")
+			} else {
+				for _, a := range _actions {
+					name := a.Scope
+					if name == nil {
+						name = a.Name
+					}
+					scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, prefix, pascal(PString(name)))
+					resScopes = append(resScopes, *scope)
+				}
+			}
+		} else {
+			panic("Unexpected error.")
+		}
+
+		resource := kc.prepareResource(ctx, *backendClient.ID, token, prefix, node.Name, &resScopes)
+
+		adminRole := kc.prepareRole(ctx, *backendClient.ID, token, prefix, node.Name+" Admin", nil)
+		adminRoles = append(adminRoles, adminRole)
+
+		adminPolicy := kc.preparePolicy(ctx, token, *backendClient.ID, prefix, node.Name+"OnlyAdminPermission", []gocloak.Role{adminRole})
+
+		_ = kc.preparePermission(ctx, token, *backendClient.ID, prefix, node.Name+"AdminPermission",
+			"resource",
+			&[]string{*resource.ID},
+			nil,
+			[]string{*adminPolicy.ID},
+		)
+	}
+
+	adminRole := kc.prepareRole(ctx, *backendClient.ID, token, prefix, "Admin", &adminRoles)
+
+	kc.prepareUser(ctx, token, map[string][]gocloak.Role{
+		*backendClient.ID: {
+			adminRole,
+		},
+	})
+}
+
+func (kc *Keycloak) prepareUser(ctx context.Context, token string, clientRoles map[string][]gocloak.Role) *gocloak.User {
+	var user *gocloak.User
+	users, err := kc.GoCloak.GetUsers(ctx, token, PString(kc.Realm), gocloak.GetUsersParams{
+		Username: kc.AdminUsername,
+	})
+	if err != nil {
+		panic(err)
+	}
+	if len(users) == 0 {
+		userId, err := kc.GoCloak.CreateUser(ctx, token, PString(kc.Realm), gocloak.User{
+			Enabled:  gocloak.BoolP(true),
+			Username: kc.AdminUsername,
+			Credentials: &[]gocloak.CredentialRepresentation{
+				{
+					Type:  gocloak.StringP("password"),
+					Value: kc.AdminPassword,
+				},
+			},
+		})
+		if err != nil {
+			panic(err)
+		}
+		user, err = kc.GoCloak.GetUserByID(ctx, token, PString(kc.Realm), userId)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		user = users[0]
+	}
+
+	for idOfClient, clientRoles := range clientRoles {
+		err := kc.GoCloak.AddClientRolesToUser(ctx, token, PString(kc.Realm), idOfClient, *user.ID, clientRoles)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return user
+}
+
+func (kc *Keycloak) prepareRealm(ctx context.Context, token string) *gocloak.RealmRepresentation {
+	realm, _ := kc.GoCloak.GetRealm(ctx, token, PString(kc.Realm))
+	if realm == nil {
+		_, err := kc.GoCloak.CreateRealm(ctx, token, gocloak.RealmRepresentation{
+			Realm:   kc.Realm,
+			Enabled: gocloak.BoolP(true),
+		})
+		if err != nil {
+			panic(err)
+		}
+		realm, err := kc.GoCloak.GetRealm(ctx, token, PString(kc.Realm))
+		if err != nil {
+			panic(err)
+		}
+		return realm
+	} else {
+		realm.Enabled = gocloak.BoolP(true)
+		err := kc.GoCloak.UpdateRealm(ctx, token, *realm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return realm
+}
+
+func (kc *Keycloak) prepareFrontendClients(ctx context.Context, token string) []*gocloak.Client {
 	var result []*gocloak.Client
-	for _, config := range k.FrontendClientConfigs {
-		result = append(result, k.prepareFrontendClient(ctx, token, *config))
+	for _, config := range kc.FrontendClientConfigs {
+		result = append(result, kc.prepareFrontendClient(ctx, token, *config))
 	}
 	return result
 }
 
-func (k *Keycloak) prepareFrontendClient(ctx context.Context, token string, clientConfig gocloak.Client) *gocloak.Client {
+func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string, clientConfig gocloak.Client) *gocloak.Client {
 	var client *gocloak.Client
-	clients, err := k.GoCloak.GetClients(ctx, token, k.Realm, gocloak.GetClientsParams{
+	clients, err := kc.GoCloak.GetClients(ctx, token, PString(kc.Realm), gocloak.GetClientsParams{
 		ClientID: clientConfig.ClientID,
 	})
 	if err != nil {
@@ -244,7 +279,6 @@ func (k *Keycloak) prepareFrontendClient(ctx context.Context, token string, clie
 	if len(clients) == 0 {
 		client = &clientConfig
 	} else {
-
 		var m map[string]any
 
 		ja, _ := json.Marshal(clients[0])
@@ -278,16 +312,16 @@ func (k *Keycloak) prepareFrontendClient(ctx context.Context, token string, clie
 	client.FrontChannelLogout = gocloak.BoolP(true)
 
 	if client.ID == nil {
-		clientID, err := k.GoCloak.CreateClient(ctx, token, k.Realm, *client)
+		clientID, err := kc.GoCloak.CreateClient(ctx, token, PString(kc.Realm), *client)
 		if err != nil {
 			panic(err)
 		}
-		client, err = k.GoCloak.GetClient(ctx, token, k.Realm, clientID)
+		client, err = kc.GoCloak.GetClient(ctx, token, PString(kc.Realm), clientID)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		err := k.GoCloak.UpdateClient(ctx, token, k.Realm, *client)
+		err := kc.GoCloak.UpdateClient(ctx, token, PString(kc.Realm), *client)
 		if err != nil {
 			panic(err)
 		}
@@ -295,67 +329,91 @@ func (k *Keycloak) prepareFrontendClient(ctx context.Context, token string, clie
 	return client
 }
 
-func (k *Keycloak) prepareBackendClient(ctx context.Context, token string) *gocloak.Client {
+func (kc *Keycloak) prepareBackendClient(ctx context.Context, token string) *gocloak.Client {
+	clientConfig := kc.BackendClientConfig
 	var client *gocloak.Client
-	clients, err := k.GoCloak.GetClients(ctx, token, k.Realm, gocloak.GetClientsParams{
-		ClientID: &k.BackendClientID,
+	clients, err := kc.GoCloak.GetClients(ctx, token, PString(kc.Realm), gocloak.GetClientsParams{
+		ClientID: clientConfig.ClientID,
 	})
 	if err != nil {
 		panic(err)
 	}
 	if len(clients) == 0 {
-		client = &gocloak.Client{}
+		client = clientConfig
 	} else {
-		client = clients[0]
+		var m map[string]any
+
+		ja, _ := json.Marshal(clients[0])
+		err := json.Unmarshal(ja, &m)
+		if err != nil {
+			panic(err)
+		}
+
+		jb, _ := json.Marshal(clientConfig)
+		err = json.Unmarshal(jb, &m)
+		if err != nil {
+			panic(err)
+		}
+
+		jz, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+
+		_client := gocloak.Client{}
+		err = json.Unmarshal(jz, &_client)
+		if err != nil {
+			panic(err)
+		}
+		client = &_client
 	}
 
 	if client.AuthorizationSettings == nil {
 		client.AuthorizationSettings = &gocloak.ResourceServerRepresentation{}
 	}
 
-	client.ClientID = gocloak.StringP(k.BackendClientID)
-	client.Secret = gocloak.StringP(k.BackendClientSecret)
 	client.ServiceAccountsEnabled = gocloak.BoolP(true)
 	client.AuthorizationSettings.DecisionStrategy = gocloak.AFFIRMATIVE
 	client.DirectAccessGrantsEnabled = gocloak.BoolP(true)
 
 	if client.ID == nil {
-		clientID, err := k.GoCloak.CreateClient(ctx, token, k.Realm, *client)
+		clientID, err := kc.GoCloak.CreateClient(ctx, token, PString(kc.Realm), *client)
 		if err != nil {
 			panic(err)
 		}
-		client, err = k.GoCloak.GetClient(ctx, token, k.Realm, clientID)
+		client, err = kc.GoCloak.GetClient(ctx, token, PString(kc.Realm), clientID)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		err := k.GoCloak.UpdateClient(ctx, token, k.Realm, *client)
+		err := kc.GoCloak.UpdateClient(ctx, token, PString(kc.Realm), *client)
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	// Delete default authorization entities
-	defaultPermissions, _ := k.GoCloak.GetPermissions(ctx, token, k.Realm, *client.ID, gocloak.GetPermissionParams{
+	defaultPermissions, _ := kc.GoCloak.GetPermissions(ctx, token, PString(kc.Realm), *client.ID, gocloak.GetPermissionParams{
 		Name: gocloak.StringP("Default Permission"),
 	})
 	if len(defaultPermissions) > 0 {
-		_ = k.GoCloak.DeletePermission(ctx, token, k.Realm, *client.ID, *defaultPermissions[0].ID)
+		_ = kc.GoCloak.DeletePermission(ctx, token, PString(kc.Realm), *client.ID, *defaultPermissions[0].ID)
 	}
 
-	defaultPolicies, _ := k.GoCloak.GetPolicies(ctx, token, k.Realm, *client.ID, gocloak.GetPolicyParams{
+	defaultPolicies, _ := kc.GoCloak.GetPolicies(ctx, token, PString(kc.Realm), *client.ID, gocloak.GetPolicyParams{
 		Name: gocloak.StringP("Default Policy"),
 	})
 	if len(defaultPolicies) > 0 {
-		_ = k.GoCloak.DeletePermission(ctx, token, k.Realm, *client.ID, *defaultPolicies[0].ID)
+		_ = kc.GoCloak.DeletePermission(ctx, token, PString(kc.Realm), *client.ID, *defaultPolicies[0].ID)
 	}
 
 	return client
 }
 
-func (k *Keycloak) preparePermission(ctx context.Context, token string, idOfClient string, name string, permissionType string, resourcesIDs *[]string, scopesIDs *[]string, policies []string) *gocloak.PermissionRepresentation {
+func (kc *Keycloak) preparePermission(ctx context.Context, token string, idOfClient string, prefix string, name string, permissionType string, resourcesIDs *[]string, scopesIDs *[]string, policies []string) *gocloak.PermissionRepresentation {
+	name = PrepareName(prefix, name)
 	permission := &gocloak.PermissionRepresentation{}
-	permissions, err := k.GoCloak.GetPermissions(ctx, token, k.Realm, idOfClient, gocloak.GetPermissionParams{
+	permissions, err := kc.GoCloak.GetPermissions(ctx, token, PString(kc.Realm), idOfClient, gocloak.GetPermissionParams{
 		Name: &name,
 	})
 	if err != nil {
@@ -372,9 +430,9 @@ func (k *Keycloak) preparePermission(ctx context.Context, token string, idOfClie
 	permission.DecisionStrategy = gocloak.UNANIMOUS
 
 	if permission.ID == nil {
-		permission, err = k.GoCloak.CreatePermission(ctx, token, k.Realm, idOfClient, *permission)
+		permission, err = kc.GoCloak.CreatePermission(ctx, token, PString(kc.Realm), idOfClient, *permission)
 	} else {
-		err = k.GoCloak.UpdatePermission(ctx, token, k.Realm, idOfClient, *permission)
+		err = kc.GoCloak.UpdatePermission(ctx, token, PString(kc.Realm), idOfClient, *permission)
 	}
 	if err != nil {
 		panic(err)
@@ -382,14 +440,15 @@ func (k *Keycloak) preparePermission(ctx context.Context, token string, idOfClie
 	return permission
 }
 
-func (k *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient string, name string, roles []gocloak.Role) *gocloak.PolicyRepresentation {
+func (kc *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient string, prefix string, name string, roles []gocloak.Role) *gocloak.PolicyRepresentation {
+	name = PrepareName(prefix, name)
 	policy := &gocloak.PolicyRepresentation{}
 
-	policies, err := k.GoCloak.GetPolicies(ctx, token, k.Realm, idOfClient, gocloak.GetPolicyParams{
+	policies, err := kc.GoCloak.GetPolicies(ctx, token, PString(kc.Realm), idOfClient, gocloak.GetPolicyParams{
 		Name: gocloak.StringP(name),
 	})
 	if len(policies) > 0 {
-		err := k.GoCloak.DeletePolicy(ctx, token, k.Realm, idOfClient, *policies[0].ID)
+		err := kc.GoCloak.DeletePolicy(ctx, token, PString(kc.Realm), idOfClient, *policies[0].ID)
 		if err != nil {
 			panic(err)
 		}
@@ -407,7 +466,7 @@ func (k *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient s
 		Roles: &rolesDefinitions,
 	}
 
-	policy, err = k.GoCloak.CreatePolicy(ctx, token, k.Realm, idOfClient, *policy)
+	policy, err = kc.GoCloak.CreatePolicy(ctx, token, PString(kc.Realm), idOfClient, *policy)
 
 	if err != nil {
 		panic(err)
@@ -415,8 +474,9 @@ func (k *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient s
 	return policy
 }
 
-func (k *Keycloak) prepareRole(ctx context.Context, idOfClient string, token string, name string, compositeRoles *[]gocloak.Role) gocloak.Role {
-	role, err := k.GoCloak.GetClientRole(ctx, token, k.Realm, idOfClient, name)
+func (kc *Keycloak) prepareRole(ctx context.Context, idOfClient string, token string, prefix string, name string, compositeRoles *[]gocloak.Role) gocloak.Role {
+	name = PrepareName(prefix, name)
+	role, err := kc.GoCloak.GetClientRole(ctx, token, PString(kc.Realm), idOfClient, name)
 	if err != nil {
 	}
 	if role == nil {
@@ -425,16 +485,16 @@ func (k *Keycloak) prepareRole(ctx context.Context, idOfClient string, token str
 	role.Name = gocloak.StringP(name)
 
 	if role.ID == nil {
-		_, err := k.GoCloak.CreateClientRole(ctx, token, k.Realm, idOfClient, *role)
+		_, err := kc.GoCloak.CreateClientRole(ctx, token, PString(kc.Realm), idOfClient, *role)
 		if err != nil {
 			panic(err)
 		}
-		role, err = k.GoCloak.GetClientRole(ctx, token, k.Realm, idOfClient, name)
+		role, err = kc.GoCloak.GetClientRole(ctx, token, PString(kc.Realm), idOfClient, name)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		err = k.GoCloak.UpdateRole(ctx, token, k.Realm, idOfClient, *role)
+		err = kc.GoCloak.UpdateRole(ctx, token, PString(kc.Realm), idOfClient, *role)
 		if err != nil {
 			panic(err)
 		}
@@ -442,7 +502,7 @@ func (k *Keycloak) prepareRole(ctx context.Context, idOfClient string, token str
 
 	if compositeRoles != nil {
 
-		err = k.GoCloak.AddClientRoleComposite(ctx, token, k.Realm, *role.ID, *compositeRoles)
+		err = kc.GoCloak.AddClientRoleComposite(ctx, token, PString(kc.Realm), *role.ID, *compositeRoles)
 		if err != nil {
 			panic(err)
 		}
@@ -451,9 +511,10 @@ func (k *Keycloak) prepareRole(ctx context.Context, idOfClient string, token str
 	return *role
 }
 
-func (k *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient string, token string, name string) *gocloak.ScopeRepresentation {
+func (kc *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient string, token string, prefix string, name string) *gocloak.ScopeRepresentation {
+	name = PrepareName(prefix, name)
 	var scope *gocloak.ScopeRepresentation
-	scopes, err := k.GoCloak.GetScopes(ctx, token, k.Realm, idOfClient, gocloak.GetScopeParams{
+	scopes, err := kc.GoCloak.GetScopes(ctx, token, PString(kc.Realm), idOfClient, gocloak.GetScopeParams{
 		Name: &name,
 	})
 	if err != nil {
@@ -461,12 +522,12 @@ func (k *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient string
 	}
 	if len(scopes) > 0 {
 		scope = scopes[0]
-		err = k.GoCloak.UpdateScope(ctx, token, k.Realm, idOfClient, *scope)
+		err = kc.GoCloak.UpdateScope(ctx, token, PString(kc.Realm), idOfClient, *scope)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		scope, err = k.GoCloak.CreateScope(ctx, token, k.Realm, idOfClient, gocloak.ScopeRepresentation{
+		scope, err = kc.GoCloak.CreateScope(ctx, token, PString(kc.Realm), idOfClient, gocloak.ScopeRepresentation{
 			Name: &name,
 		})
 		if err != nil {
@@ -476,9 +537,10 @@ func (k *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient string
 	return scope
 }
 
-func (k *Keycloak) prepareResource(ctx context.Context, idOfClient string, token string, name string, scopes *[]gocloak.ScopeRepresentation) *gocloak.ResourceRepresentation {
+func (kc *Keycloak) prepareResource(ctx context.Context, idOfClient string, token string, prefix string, name string, scopes *[]gocloak.ScopeRepresentation) *gocloak.ResourceRepresentation {
+	name = PrepareName(prefix, name)
 	var resource gocloak.ResourceRepresentation
-	resources, err := k.GoCloak.GetResources(ctx, token, k.Realm, idOfClient, gocloak.GetResourceParams{Name: gocloak.StringP(name)})
+	resources, err := kc.GoCloak.GetResources(ctx, token, PString(kc.Realm), idOfClient, gocloak.GetResourceParams{Name: gocloak.StringP(name)})
 	if err != nil {
 		panic(err)
 	}
@@ -490,14 +552,14 @@ func (k *Keycloak) prepareResource(ctx context.Context, idOfClient string, token
 	resource.Name = gocloak.StringP(name)
 	resource.URIs = &[]string{"/*"}
 	resource.Scopes = scopes
-	resource.Type = gocloak.StringP("urn:" + k.BackendClientID + ":resources:entity")
+	resource.Type = gocloak.StringP("urn:" + PString(kc.BackendClientConfig.ClientID) + ":resources:entity")
 
 	if resource.ID == nil {
 		var r *gocloak.ResourceRepresentation
-		r, err = k.GoCloak.CreateResource(ctx, token, k.Realm, idOfClient, resource)
+		r, err = kc.GoCloak.CreateResource(ctx, token, PString(kc.Realm), idOfClient, resource)
 		resource = *r
 	} else {
-		err = k.GoCloak.UpdateResource(ctx, token, k.Realm, idOfClient, resource)
+		err = kc.GoCloak.UpdateResource(ctx, token, PString(kc.Realm), idOfClient, resource)
 	}
 
 	if err != nil {

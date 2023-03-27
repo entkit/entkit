@@ -1,15 +1,13 @@
 {{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
 {{- define "src/definition.tsx" -}}
-// Metadata
 export const meta = {{ $.Extension.Meta | toPrettyJson}}
 
-{{ if not (empty $.Extension.Keycloak) -}}
+{{ if not (empty $.Extension.Auth.Keycloak) -}}
 import {KeycloakConfig} from "keycloak-js";
-// Keycloak configuration
-{{- $keycloak := first $.Extension.Keycloak.FrontendClientConfigs }}
+{{- $keycloak := first $.Extension.Auth.Keycloak.FrontendClientConfigs }}
 export const keycloak: KeycloakConfig = {
-    url: "{{$.Extension.Keycloak.Host}}",
-    realm: "{{$.Extension.Keycloak.Realm}}",
+    url: "{{$.Extension.Auth.Keycloak.Host}}",
+    realm: "{{$.Extension.Auth.Keycloak.Realm}}",
     clientId: "{{$keycloak.ClientID}}",
 }
 

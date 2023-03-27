@@ -10,6 +10,7 @@ import {GraphQLClient} from "graphql-request";
 import {Resources} from "./resources";
 import dataProvider from "./data-provider";
 {{/*import {Header} from "./components/header";*/}}
+
 import {useKeycloak} from "@react-keycloak/web";
 import {Login} from "./login";
 import routerProvider, {
@@ -123,11 +124,6 @@ function App() {
                             </Authenticated>
                         }
                     >
-                        <Route
-                            index
-                            element={<NavigateToResource resource="posts" />}
-                        />
-
                         {ResourceRoutes}
                     </Route>
 

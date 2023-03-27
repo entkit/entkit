@@ -34,7 +34,7 @@ type SkipModes struct {
 	SkipWhereInput          entgql.SkipMode
 }
 
-func GenerateRefineScripts(ex *Extension) gen.Hook {
+func GenerateRefineScriptsHook(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 

@@ -30,7 +30,7 @@ type Extension struct {
 	ForceGraph2D        ForceGraph2DOptions
 	DefaultEdgesDiagram string
 
-	Keycloak *Keycloak
+	Auth *Auth
 }
 
 type GoJSOptions struct {
@@ -66,10 +66,10 @@ func WithTypeScriptPrefix(prefix string) ExtensionOption {
 	}
 }
 
-// WithKeycloak configure keycloak
-func WithKeycloak(keycloak *Keycloak) ExtensionOption {
+// WithAuth configure authentication and authorization
+func WithAuth(options ...AuthOption) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.Keycloak = keycloak
+		ex.Auth = NewAuth(options...)
 		return nil
 	}
 }
@@ -127,7 +127,9 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 			return common.TSType(t, ex.Prefix)
 		},
 		"ER_resourceAlias":   common.ResourceAlias,
+		"ER_someField":       someField,
 		"ER_titleField":      titleField,
+		"ER_someNode":        someNode,
 		"ER_mainImageField":  mainImageField,
 		"ER_getActionByName": getActionByName,
 	}
@@ -160,6 +162,7 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 
 type Annotations struct {
 	Prefix string
+	Auth   *Auth
 }
 
 // Name of the annotation. Used by the codegen templates.
@@ -172,6 +175,7 @@ func (ex *Extension) Annotations() []entc.Annotation {
 	return []entc.Annotation{
 		Annotations{
 			Prefix: ex.Prefix,
+			Auth:   ex.Auth,
 		},
 	}
 }
@@ -191,7 +195,7 @@ func (ex *Extension) Templates() []*gen.Template {
 // Hooks Define Ent hooks
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{
-		GenerateRefineScripts(ex),
-		//GenerateKeycloakResources(ex),
+		GenerateRefineScriptsHook(ex),
+		GenerateAuthResourcesHook(ex),
 	}
 }
