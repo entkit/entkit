@@ -23,13 +23,13 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/image"
+	"github.com/entkit/entkit/examples/ent-project/ent/location"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
 
@@ -282,13 +282,7 @@ func (cc *CompanyCreate) sqlSave(ctx context.Context) (*Company, error) {
 func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Company{config: cc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: company.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: company.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(company.Table, sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID))
 	)
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
@@ -310,10 +304,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: company.CountriesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -329,10 +320,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.PhonesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: phone.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(phone.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -348,10 +336,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: email.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -367,10 +352,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.WebsitesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: website.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(website.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -386,10 +368,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.LocationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: location.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(location.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -405,10 +384,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.LogoImageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: image.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -424,10 +400,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.CoverImageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: image.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -443,10 +416,7 @@ func (cc *CompanyCreate) createSpec() (*Company, *sqlgraph.CreateSpec) {
 			Columns: []string{company.GalleryImagesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: image.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -481,8 +451,8 @@ func (ccb *CompanyCreateBulk) Save(ctx context.Context) ([]*Company, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {

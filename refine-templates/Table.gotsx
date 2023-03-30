@@ -1,6 +1,6 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/tables.tsx" -}}
-/* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
 import {HttpError} from "@refinedev/core";
 import * as RA from "@refinedev/antd";
@@ -31,11 +31,11 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
         ],
         initialFilter: [
             {{ range $f := $allFields }}
-            {{- if not $f.Annotations.ENTREFINE.HideOnList -}}
+            {{- if not $f.Annotations.ENTKIT.HideOnList -}}
             {
                 field: "{{$f.Name | camel }}",
                 value: null,
-                operator: "{{ lower (default "EQ" $f.Annotations.ENTREFINE.FilterOperator) }}",
+                operator: "{{ lower (default "EQ" $f.Annotations.ENTKIT.FilterOperator) }}",
             },
             {{- end -}}
             {{- end -}}
@@ -87,7 +87,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
             <Antd.Table {...table.tableProps} pagination={false} rowKey="{{$n.ID.Name}}" {...props}>
                 { /* region Fields */ }
                 {{- range $f := $allFields }}
-                {{- if not $f.Annotations.ENTREFINE.HideOnList }}
+                {{- if not $f.Annotations.ENTKIT.HideOnList }}
                 <Antd.Table.Column
                     dataIndex="{{ camel $f.Name }}"
                     title="{{ $f.Name | ER_label }}"
@@ -98,8 +98,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     {{- end }}
                     render={ (value)=> {
                         {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnList" ) }}
-                        {{- if not (empty $f.Annotations.ENTREFINE.ViewOnList) }}
-                        {{ $viewName = print "Custom." $f.Annotations.ENTREFINE.ViewOnList }}
+                        {{- if not (empty $f.Annotations.ENTKIT.ViewOnList) }}
+                        {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnList }}
                         {{- end}}
                         return <{{$viewName}} value={ value } />
                     } }
@@ -130,7 +130,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
 
                 { /* region Edges */ }
                 {{- range $e := $n.Edges }}
-                {{- if not $e.Annotations.ENTREFINE.HideOnList }}
+                {{- if not $e.Annotations.ENTKIT.HideOnList }}
                 {{- $titleField := (ER_titleField $e.Type) }}
                 <Antd.Table.Column
                     dataIndex="{{ camel $e.Name }}"
@@ -138,8 +138,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     render={
                         {{- if $e.Unique }}
                         {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.ENTREFINE.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.ENTREFINE.Badge }}
+                        {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
                         {{- end}}
                         (value)=>(<{{$viewName}} { ...value } />)
                         {{- else }}
@@ -157,7 +157,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     dataIndex="actions"
                     render={(_, record) => (
                         <Antd.Space>
-                            {{- range $a := $n.Annotations.ENTREFINE.Actions }}
+                            {{- range $a := $n.Annotations.ENTKIT.Actions }}
                             {{- if and (not $a.General) $a.OnList }}
                             <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }}
                                 recordItemIDs={ [record.id] }
@@ -231,5 +231,4 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
     );
 };
 {{- end -}}
-/* eslint no-use-before-define: 2 */
 {{- end -}}

@@ -24,10 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 	"github.com/google/uuid"
 )
 
@@ -243,10 +243,12 @@ func (pq *PhoneQuery) AllX(ctx context.Context) []*Phone {
 }
 
 // IDs executes the query and returns a list of Phone IDs.
-func (pq *PhoneQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (pq *PhoneQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if pq.ctx.Unique == nil && pq.path != nil {
+		pq.Unique(true)
+	}
 	ctx = setContextOp(ctx, pq.ctx, "IDs")
-	if err := pq.Select(phone.FieldID).Scan(ctx, &ids); err != nil {
+	if err = pq.Select(phone.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -552,20 +554,12 @@ func (pq *PhoneQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (pq *PhoneQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   phone.Table,
-			Columns: phone.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: phone.FieldID,
-			},
-		},
-		From:   pq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(phone.Table, phone.Columns, sqlgraph.NewFieldSpec(phone.FieldID, field.TypeUUID))
+	_spec.From = pq.sql
 	if unique := pq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if pq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := pq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

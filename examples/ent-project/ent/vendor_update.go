@@ -24,10 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -174,16 +174,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := vu.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   vendor.Table,
-			Columns: vendor.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: vendor.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(vendor.Table, vendor.Columns, sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID))
 	if ps := vu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -205,10 +196,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -221,10 +209,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -240,10 +225,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -259,10 +241,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -275,10 +254,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -294,10 +270,7 @@ func (vu *VendorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -414,6 +387,12 @@ func (vuo *VendorUpdateOne) RemoveProducts(p ...*Product) *VendorUpdateOne {
 	return vuo.RemoveProductIDs(ids...)
 }
 
+// Where appends a list predicates to the VendorUpdate builder.
+func (vuo *VendorUpdateOne) Where(ps ...predicate.Vendor) *VendorUpdateOne {
+	vuo.mutation.Where(ps...)
+	return vuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (vuo *VendorUpdateOne) Select(field string, fields ...string) *VendorUpdateOne {
@@ -462,16 +441,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 	if err := vuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   vendor.Table,
-			Columns: vendor.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: vendor.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(vendor.Table, vendor.Columns, sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID))
 	id, ok := vuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Vendor.id" for update`)}
@@ -510,10 +480,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -526,10 +493,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -545,10 +509,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -564,10 +525,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -580,10 +538,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -599,10 +554,7 @@ func (vuo *VendorUpdateOne) sqlSave(ctx context.Context) (_node *Vendor, err err
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

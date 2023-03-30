@@ -25,10 +25,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -245,10 +245,12 @@ func (wq *WarehouseQuery) AllX(ctx context.Context) []*Warehouse {
 }
 
 // IDs executes the query and returns a list of Warehouse IDs.
-func (wq *WarehouseQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (wq *WarehouseQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if wq.ctx.Unique == nil && wq.path != nil {
+		wq.Unique(true)
+	}
 	ctx = setContextOp(ctx, wq.ctx, "IDs")
-	if err := wq.Select(warehouse.FieldID).Scan(ctx, &ids); err != nil {
+	if err = wq.Select(warehouse.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -561,20 +563,12 @@ func (wq *WarehouseQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (wq *WarehouseQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   warehouse.Table,
-			Columns: warehouse.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: warehouse.FieldID,
-			},
-		},
-		From:   wq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(warehouse.Table, warehouse.Columns, sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID))
+	_spec.From = wq.sql
 	if unique := wq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if wq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := wq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

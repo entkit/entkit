@@ -1,6 +1,6 @@
 {{- /* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */ -}}
 {{- /* gotype: entgo.io/ent/entc/gen.Graph */ -}}
-{{- define "entrefine-auth" -}}
+{{- define "entkit-auth" -}}
 
 {{ template "header" $ }}
 
@@ -8,17 +8,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/diazoxide/entrefine"
-	"github.com/diazoxide/entrefine/common"
+	"github.com/entkit/entkit"
+	"github.com/entkit/entkit/common"
 )
-{{- $auth := $.Config.Annotations.ENTREFINE.Auth }}
-{{ if (indirect $auth.Enabled) }}
-func EntrefineAuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var err error
+{{- $auth := $.Config.Annotations.ENTKIT.Auth }}
 
+func EntkitAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		{{- if (indirect $auth.Enabled)}}
+		var err error
 		{{- if (indirect $auth.Keycloak.Enabled) }}
-		kc := entrefine.NewBackendKeycloak(
+		kc := entkit.NewBackendKeycloak(
 			"{{$auth.Keycloak.Host}}",
 			"{{$auth.Keycloak.Realm}}",
 			"{{$auth.Keycloak.BackendClientConfig.ClientID}}",
@@ -26,19 +26,22 @@ func EntrefineAuthMiddleware(next http.Handler) http.Handler {
 		)
 		r, err = kc.MiddlewareReqHandlerFunc(w, r)
 		{{- end }}
-
 		if err == nil {
 			next.ServeHTTP(w, r)
 		}
+		{{- else }}
+		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthMiddleware, please enable this feature.")
+		next.ServeHTTP(w, r)
+		{{- end }}
 	})
 }
 
-func EntrefineAuthGinMiddleware() gin.HandlerFunc {
+func EntkitAuthGinMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		{{- if (indirect $auth.Enabled)}}
 		var err error
-
 		{{- if (indirect $auth.Keycloak.Enabled) }}
-		kc := entrefine.NewBackendKeycloak(
+		kc := entkit.NewBackendKeycloak(
 			"{{$auth.Keycloak.Host}}",
 			"{{$auth.Keycloak.Realm}}",
 			"{{$auth.Keycloak.BackendClientConfig.ClientID}}",
@@ -46,19 +49,23 @@ func EntrefineAuthGinMiddleware() gin.HandlerFunc {
 		)
 		c.Request, err = kc.MiddlewareReqHandlerFunc(c.Writer, c.Request)
 		{{- end }}
-
 		if err == nil {
 			c.Next()
 		} else {
 			c.Abort()
 		}
+		{{- else }}
+		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthGinMiddleware, please enable this feature.")
+		c.Next()
+		{{- end }}
 	}
 }
 
-func AuthorizeByResource(ctx context.Context, resource string, scope string) error {
-	resource = entrefine.PrepareName("{{$.Annotations.ENTREFINE.Prefix}}", resource)
-	scope = entrefine.PrepareName("{{$.Annotations.ENTREFINE.Prefix}}", scope)
-	authContext, err := AuthContextFromRequestContext(ctx)
+func EntkitAuthorizeByResource(ctx context.Context, resource string, scope string) error {
+	{{- if (indirect $auth.Keycloak.Enabled) }}
+	resource = entkit.PrepareName("{{$.Annotations.ENTKIT.Prefix}}", resource)
+	scope = entkit.PrepareName("{{$.Annotations.ENTKIT.Prefix}}", scope)
+	authContext, err := EntkitAuthContextFromRequestContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -74,23 +81,29 @@ func AuthorizeByResource(ctx context.Context, resource string, scope string) err
 	if !auth {
 		return errors.New("access restricted for " + resource + " " + scope)
 	}
-
+	{{- else }}
+	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthorizeByResource, please enable this feature.")
+	{{- end }}
 	return nil
 }
 
-func AuthContextFromRequestContext(ctx context.Context) (*entrefine.AuthContext, error) {
-	val := ctx.Value(entrefine.AuthContextKey)
+func EntkitAuthContextFromRequestContext(ctx context.Context) (*entkit.AuthContext, error) {
+	{{- if (indirect $auth.Keycloak.Enabled) }}
+	val := ctx.Value(entkit.AuthContextKey)
 	if val == nil {
 		err := fmt.Errorf("could not retrieve AuthContext")
 		return nil, err
 	}
 
-	raw, ok := val.(*entrefine.AuthContext)
+	raw, ok := val.(*entkit.AuthContext)
 	if !ok {
 		return nil, fmt.Errorf("could not convert AuthContext")
 	}
 	return raw, nil
+	{{- else }}
+	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthContextFromRequestContext, please enable this feature.")
+	return nil, nil
+	{{- end }}
 }
 
-{{- end }}
 {{- end }}

@@ -1,4 +1,5 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "package.json" -}}
 {
   "browserslist": {
@@ -8,20 +9,19 @@
       "last 1 safari version"
     ],
     "production": [
-      "\u003e0.2%",
+      ">0.2%",
       "not dead",
       "not op_mini all"
     ]
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
-    "@react-keycloak/web": "^3.4.0",
-    "@refinedev/antd": "latest",
-    "@refinedev/cli": "latest",
-    "@refinedev/core": "latest",
+    "@refinedev/antd": "^5.3.8",
+    "@refinedev/cli": "^2.1.2",
+    "@refinedev/core": "^4.5.4",
     "@refinedev/inferencer": "latest",
     "@refinedev/react-router-v6": "latest",
-    "@refinedev/ui-types": "latest",
+    "@refinedev/ui-types": "^1.5.0",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
@@ -39,6 +39,9 @@
     "gql-query-builder": "^3.5.5",
     "graphql": "^15.6.1",
     "graphql-request": "^4.3.0",
+    {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
+    "@react-keycloak/web": "^3.4.0",
+    {{- end }}
     "keycloak-js": "^20.0.5",
     "lodash": "^4.17.21",
     "pluralize": "^8.0.0",
@@ -55,6 +58,9 @@
     "@types/pluralize": "^0.0.29",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.6",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
     "typescript": "^4.7.4"
   },
   "eslintConfig": {
@@ -71,7 +77,7 @@
     "eject": "react-scripts eject",
     "refine": "refine",
     "test": "react-scripts test",
-    "lint": "eslint --fix --ext .ts,.tsx ./src"
+    "lint": "eslint -c ./.eslintrc ./src --fix"
   },
   "version": "0.1.0"
 }

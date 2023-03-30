@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/location"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 )
 
 // LocationDelete is the builder for deleting a Location entity.
@@ -54,15 +54,7 @@ func (ld *LocationDelete) ExecX(ctx context.Context) int {
 }
 
 func (ld *LocationDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: location.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: location.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(location.Table, sqlgraph.NewFieldSpec(location.FieldID, field.TypeUUID))
 	if ps := ld.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type LocationDeleteOne struct {
 	ld *LocationDelete
 }
 
+// Where appends a list predicates to the LocationDelete builder.
+func (ldo *LocationDeleteOne) Where(ps ...predicate.Location) *LocationDeleteOne {
+	ldo.ld.mutation.Where(ps...)
+	return ldo
+}
+
 // Exec executes the deletion query.
 func (ldo *LocationDeleteOne) Exec(ctx context.Context) error {
 	n, err := ldo.ld.Exec(ctx)
@@ -98,5 +96,7 @@ func (ldo *LocationDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (ldo *LocationDeleteOne) ExecX(ctx context.Context) {
-	ldo.ld.ExecX(ctx)
+	if err := ldo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

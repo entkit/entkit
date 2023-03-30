@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/image"
 	"github.com/google/uuid"
 )
 
@@ -417,9 +417,3 @@ func (c *Company) appendNamedGalleryImages(name string, edges ...*Image) {
 
 // Companies is a parsable slice of Company.
 type Companies []*Company
-
-func (c Companies) config(cfg config) {
-	for _i := range c {
-		c[_i].config = cfg
-	}
-}

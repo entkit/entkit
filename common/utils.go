@@ -59,10 +59,10 @@ func TSType(gotype string, prefix string) string {
 }
 
 func FieldTSType(field gen.Field, prefix string) string {
-	ant, ok := field.Annotations["ENTREFINE"].(map[string]any)
+	ant, ok := field.Annotations["ENTKIT"].(map[string]any)
 
 	if field.IsEnum() {
-		return prefix + UcFirst(strings.Replace(field.Type.String(), ".", "_", -1))
+		return prefix + UcFirst(strings.Replace(field.Type.String(), ".", "", -1))
 	}
 
 	if ok {

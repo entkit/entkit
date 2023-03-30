@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -251,9 +251,3 @@ func (w *Warehouse) appendNamedProducts(name string, edges ...*Product) {
 
 // Warehouses is a parsable slice of Warehouse.
 type Warehouses []*Warehouse
-
-func (w Warehouses) config(cfg config) {
-	for _i := range w {
-		w[_i].config = cfg
-	}
-}

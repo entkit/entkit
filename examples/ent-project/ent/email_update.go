@@ -24,10 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 	"github.com/google/uuid"
 )
 
@@ -168,16 +168,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := eu.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   email.Table,
-			Columns: email.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: email.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -202,10 +193,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{email.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -218,10 +206,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{email.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -237,10 +222,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{email.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -253,10 +235,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{email.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -357,6 +336,12 @@ func (euo *EmailUpdateOne) ClearCountry() *EmailUpdateOne {
 	return euo
 }
 
+// Where appends a list predicates to the EmailUpdate builder.
+func (euo *EmailUpdateOne) Where(ps ...predicate.Email) *EmailUpdateOne {
+	euo.mutation.Where(ps...)
+	return euo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (euo *EmailUpdateOne) Select(field string, fields ...string) *EmailUpdateOne {
@@ -415,16 +400,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 	if err := euo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   email.Table,
-			Columns: email.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: email.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID))
 	id, ok := euo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Email.id" for update`)}
@@ -466,10 +442,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 			Columns: []string{email.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -482,10 +455,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 			Columns: []string{email.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -501,10 +471,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 			Columns: []string{email.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -517,10 +484,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 			Columns: []string{email.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

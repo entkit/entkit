@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
 )
 
 // ProductDelete is the builder for deleting a Product entity.
@@ -54,15 +54,7 @@ func (pd *ProductDelete) ExecX(ctx context.Context) int {
 }
 
 func (pd *ProductDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: product.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: product.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
 	if ps := pd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type ProductDeleteOne struct {
 	pd *ProductDelete
 }
 
+// Where appends a list predicates to the ProductDelete builder.
+func (pdo *ProductDeleteOne) Where(ps ...predicate.Product) *ProductDeleteOne {
+	pdo.pd.mutation.Where(ps...)
+	return pdo
+}
+
 // Exec executes the deletion query.
 func (pdo *ProductDeleteOne) Exec(ctx context.Context) error {
 	n, err := pdo.pd.Exec(ctx)
@@ -98,5 +96,7 @@ func (pdo *ProductDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (pdo *ProductDeleteOne) ExecX(ctx context.Context) {
-	pdo.pd.ExecX(ctx)
+	if err := pdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

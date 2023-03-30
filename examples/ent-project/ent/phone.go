@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
 	"github.com/google/uuid"
 )
 
@@ -213,9 +213,3 @@ func (ph *Phone) String() string {
 
 // Phones is a parsable slice of Phone.
 type Phones []*Phone
-
-func (ph Phones) config(cfg config) {
-	for _i := range ph {
-		ph[_i].config = cfg
-	}
-}

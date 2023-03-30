@@ -24,10 +24,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -298,13 +298,7 @@ func (pc *ProductCreate) sqlSave(ctx context.Context) (*Product, error) {
 func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Product{config: pc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: product.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: product.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID))
 	)
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
@@ -350,10 +344,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Columns: []string{product.WarehouseColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -370,10 +361,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Columns: []string{product.VendorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: vendor.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -409,8 +397,8 @@ func (pcb *ProductCreateBulk) Save(ctx context.Context) ([]*Product, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
 				} else {

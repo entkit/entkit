@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,8 +24,8 @@ func (Country) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(128).
 			Annotations(
-				entrefine.TitleField(),
-				entrefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("NAME"),
 			),
 		field.String("code").
@@ -58,11 +57,12 @@ func (Country) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		entrefine.Icon("GlobalOutlined"),
-		entrefine.Actions(
-			entrefine.ShowAction,
-			entrefine.DeleteAction,
-			entrefine.EditAction,
+		entkit.Icon("GlobalOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

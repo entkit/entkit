@@ -5,6 +5,7 @@ package ent_project
 import (
 	"bytes"
 	"context"
+	"embed"
 	"errors"
 	"fmt"
 	"strconv"
@@ -14,9 +15,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/id"
+	"github.com/entkit/entkit/examples/ent-project/ent"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/id"
 	"github.com/google/uuid"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -2021,2091 +2022,20 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
+//go:embed "ent.graphql" "mutations.graphql"
+var sourcesFS embed.FS
+
+func sourceData(filename string) string {
+	data, err := sourcesFS.ReadFile(filename)
+	if err != nil {
+		panic(fmt.Sprintf("codegen problem: %s not available", filename))
+	}
+	return string(data)
+}
+
 var sources = []*ast.Source{
-	{Name: "ent.graphql", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
-directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
-type Company implements Node {
-  id: ID!
-  name: String!
-  description: String!
-  countries(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Countries returned from the connection."""
-    orderBy: CountryOrder
-
-    """Filtering options for Countries returned from the connection."""
-    where: CountryWhereInput
-  ): CountryConnection!
-  phones(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Phones returned from the connection."""
-    orderBy: PhoneOrder
-
-    """Filtering options for Phones returned from the connection."""
-    where: PhoneWhereInput
-  ): PhoneConnection!
-  emails(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Emails returned from the connection."""
-    orderBy: EmailOrder
-
-    """Filtering options for Emails returned from the connection."""
-    where: EmailWhereInput
-  ): EmailConnection!
-  websites(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Websites returned from the connection."""
-    orderBy: WebsiteOrder
-
-    """Filtering options for Websites returned from the connection."""
-    where: WebsiteWhereInput
-  ): WebsiteConnection!
-  locations(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Locations returned from the connection."""
-    orderBy: LocationOrder
-
-    """Filtering options for Locations returned from the connection."""
-    where: LocationWhereInput
-  ): LocationConnection!
-  logoImage: Image
-  coverImage: Image
-  galleryImages(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Images returned from the connection."""
-    orderBy: ImageOrder
-
-    """Filtering options for Images returned from the connection."""
-    where: ImageWhereInput
-  ): ImageConnection!
-}
-"""A connection to a list of items."""
-type CompanyConnection {
-  """A list of edges."""
-  edges: [CompanyEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type CompanyEdge {
-  """The item at the end of the edge."""
-  node: Company
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Company connections"""
-input CompanyOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Companies."""
-  field: CompanyOrderField!
-}
-"""Properties by which Company connections can be ordered."""
-enum CompanyOrderField {
-  NAME
-  DESCRIPTION
-}
-"""
-CompanyWhereInput is used for filtering Company objects.
-Input was generated by ent.
-"""
-input CompanyWhereInput {
-  not: CompanyWhereInput
-  and: [CompanyWhereInput!]
-  or: [CompanyWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """countries edge predicates"""
-  hasCountries: Boolean
-  hasCountriesWith: [CountryWhereInput!]
-  """phones edge predicates"""
-  hasPhones: Boolean
-  hasPhonesWith: [PhoneWhereInput!]
-  """emails edge predicates"""
-  hasEmails: Boolean
-  hasEmailsWith: [EmailWhereInput!]
-  """websites edge predicates"""
-  hasWebsites: Boolean
-  hasWebsitesWith: [WebsiteWhereInput!]
-  """locations edge predicates"""
-  hasLocations: Boolean
-  hasLocationsWith: [LocationWhereInput!]
-  """logo_image edge predicates"""
-  hasLogoImage: Boolean
-  hasLogoImageWith: [ImageWhereInput!]
-  """cover_image edge predicates"""
-  hasCoverImage: Boolean
-  hasCoverImageWith: [ImageWhereInput!]
-  """gallery_images edge predicates"""
-  hasGalleryImages: Boolean
-  hasGalleryImagesWith: [ImageWhereInput!]
-}
-type Country implements Node {
-  id: ID!
-  name: String!
-  code: String!
-  companies(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Companies returned from the connection."""
-    orderBy: CompanyOrder
-
-    """Filtering options for Companies returned from the connection."""
-    where: CompanyWhereInput
-  ): CompanyConnection!
-  phones(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Phones returned from the connection."""
-    orderBy: PhoneOrder
-
-    """Filtering options for Phones returned from the connection."""
-    where: PhoneWhereInput
-  ): PhoneConnection!
-  emails(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Emails returned from the connection."""
-    orderBy: EmailOrder
-
-    """Filtering options for Emails returned from the connection."""
-    where: EmailWhereInput
-  ): EmailConnection!
-  websites(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Websites returned from the connection."""
-    orderBy: WebsiteOrder
-
-    """Filtering options for Websites returned from the connection."""
-    where: WebsiteWhereInput
-  ): WebsiteConnection!
-  locations(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Locations returned from the connection."""
-    orderBy: LocationOrder
-
-    """Filtering options for Locations returned from the connection."""
-    where: LocationWhereInput
-  ): LocationConnection!
-}
-"""A connection to a list of items."""
-type CountryConnection {
-  """A list of edges."""
-  edges: [CountryEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type CountryEdge {
-  """The item at the end of the edge."""
-  node: Country
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Country connections"""
-input CountryOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Countries."""
-  field: CountryOrderField!
-}
-"""Properties by which Country connections can be ordered."""
-enum CountryOrderField {
-  NAME
-  CODE
-}
-"""
-CountryWhereInput is used for filtering Country objects.
-Input was generated by ent.
-"""
-input CountryWhereInput {
-  not: CountryWhereInput
-  and: [CountryWhereInput!]
-  or: [CountryWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """code field predicates"""
-  code: String
-  codeNEQ: String
-  codeIn: [String!]
-  codeNotIn: [String!]
-  codeGT: String
-  codeGTE: String
-  codeLT: String
-  codeLTE: String
-  codeContains: String
-  codeHasPrefix: String
-  codeHasSuffix: String
-  codeEqualFold: String
-  codeContainsFold: String
-  """companies edge predicates"""
-  hasCompanies: Boolean
-  hasCompaniesWith: [CompanyWhereInput!]
-  """phones edge predicates"""
-  hasPhones: Boolean
-  hasPhonesWith: [PhoneWhereInput!]
-  """emails edge predicates"""
-  hasEmails: Boolean
-  hasEmailsWith: [EmailWhereInput!]
-  """websites edge predicates"""
-  hasWebsites: Boolean
-  hasWebsitesWith: [WebsiteWhereInput!]
-  """locations edge predicates"""
-  hasLocations: Boolean
-  hasLocationsWith: [LocationWhereInput!]
-}
-"""
-CreateCompanyInput is used for create Company object.
-Input was generated by ent.
-"""
-input CreateCompanyInput {
-  name: String!
-  description: String!
-  countryIDs: [ID!]
-  phoneIDs: [ID!]
-  emailIDs: [ID!]
-  websiteIDs: [ID!]
-  locationIDs: [ID!]
-  logoImageID: ID
-  coverImageID: ID
-  galleryImageIDs: [ID!]
-}
-"""
-CreateCountryInput is used for create Country object.
-Input was generated by ent.
-"""
-input CreateCountryInput {
-  name: String!
-  code: String!
-  companyIDs: [ID!]
-  phoneIDs: [ID!]
-  emailIDs: [ID!]
-  websiteIDs: [ID!]
-  locationIDs: [ID!]
-}
-"""
-CreateEmailInput is used for create Email object.
-Input was generated by ent.
-"""
-input CreateEmailInput {
-  title: String!
-  description: String!
-  address: String!
-  companyID: ID
-  countryID: ID
-}
-"""
-CreateImageInput is used for create Image object.
-Input was generated by ent.
-"""
-input CreateImageInput {
-  title: String!
-  originalURL: String!
-  galleryCompanyID: ID
-  logoCompanyID: ID
-  coverCompanyID: ID
-}
-"""
-CreateLocationInput is used for create Location object.
-Input was generated by ent.
-"""
-input CreateLocationInput {
-  title: String!
-  description: String!
-  latitude: Float!
-  longitude: Float!
-  address: String!
-  postcode: String!
-  type: String!
-  state: String!
-  suburb: String!
-  streetType: String!
-  streetName: String!
-  companyID: ID
-  countryID: ID
-}
-"""
-CreatePhoneInput is used for create Phone object.
-Input was generated by ent.
-"""
-input CreatePhoneInput {
-  title: String!
-  description: String!
-  number: String!
-  type: String!
-  companyID: ID
-  countryID: ID
-}
-"""
-CreateProductInput is used for create Product object.
-Input was generated by ent.
-"""
-input CreateProductInput {
-  name: String!
-  description: String!
-  image: String!
-  url: String!
-  status: ProductProcessStatus
-  buildStatus: ProductProcessStatus
-  warehouseID: ID
-  vendorID: ID
-}
-"""
-CreateVendorInput is used for create Vendor object.
-Input was generated by ent.
-"""
-input CreateVendorInput {
-  name: String!
-  schema: String!
-  warehouseIDs: [ID!]
-  productIDs: [ID!]
-}
-"""
-CreateWarehouseInput is used for create Warehouse object.
-Input was generated by ent.
-"""
-input CreateWarehouseInput {
-  name: String!
-  originalData: String
-  enabled: Boolean
-  filters: [String!]
-  productIDs: [ID!]
-  vendorID: ID
-}
-"""
-CreateWebsiteInput is used for create Website object.
-Input was generated by ent.
-"""
-input CreateWebsiteInput {
-  title: String!
-  description: String!
-  url: String!
-  companyID: ID
-  countryID: ID
-}
-"""
-Define a Relay Cursor type:
-https://relay.dev/graphql/connections.htm#sec-Cursor
-"""
-scalar Cursor
-type Email implements Node {
-  id: ID!
-  title: String!
-  description: String!
-  address: String!
-  company: Company
-  country: Country
-}
-"""A connection to a list of items."""
-type EmailConnection {
-  """A list of edges."""
-  edges: [EmailEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type EmailEdge {
-  """The item at the end of the edge."""
-  node: Email
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Email connections"""
-input EmailOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Emails."""
-  field: EmailOrderField!
-}
-"""Properties by which Email connections can be ordered."""
-enum EmailOrderField {
-  TITLE
-  DESCRIPTION
-  ADDRESS
-}
-"""
-EmailWhereInput is used for filtering Email objects.
-Input was generated by ent.
-"""
-input EmailWhereInput {
-  not: EmailWhereInput
-  and: [EmailWhereInput!]
-  or: [EmailWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """address field predicates"""
-  address: String
-  addressNEQ: String
-  addressIn: [String!]
-  addressNotIn: [String!]
-  addressGT: String
-  addressGTE: String
-  addressLT: String
-  addressLTE: String
-  addressContains: String
-  addressHasPrefix: String
-  addressHasSuffix: String
-  addressEqualFold: String
-  addressContainsFold: String
-  """company edge predicates"""
-  hasCompany: Boolean
-  hasCompanyWith: [CompanyWhereInput!]
-  """country edge predicates"""
-  hasCountry: Boolean
-  hasCountryWith: [CountryWhereInput!]
-}
-type Image implements Node {
-  id: ID!
-  title: String!
-  originalURL: String!
-  galleryCompany: Company
-  logoCompany: Company
-  coverCompany: Company
-}
-"""A connection to a list of items."""
-type ImageConnection {
-  """A list of edges."""
-  edges: [ImageEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type ImageEdge {
-  """The item at the end of the edge."""
-  node: Image
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Image connections"""
-input ImageOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Images."""
-  field: ImageOrderField!
-}
-"""Properties by which Image connections can be ordered."""
-enum ImageOrderField {
-  TITLE
-  ORIGINAL_URL
-}
-"""
-ImageWhereInput is used for filtering Image objects.
-Input was generated by ent.
-"""
-input ImageWhereInput {
-  not: ImageWhereInput
-  and: [ImageWhereInput!]
-  or: [ImageWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """original_url field predicates"""
-  originalURL: String
-  originalURLNEQ: String
-  originalURLIn: [String!]
-  originalURLNotIn: [String!]
-  originalURLGT: String
-  originalURLGTE: String
-  originalURLLT: String
-  originalURLLTE: String
-  originalURLContains: String
-  originalURLHasPrefix: String
-  originalURLHasSuffix: String
-  originalURLEqualFold: String
-  originalURLContainsFold: String
-  """gallery_company edge predicates"""
-  hasGalleryCompany: Boolean
-  hasGalleryCompanyWith: [CompanyWhereInput!]
-  """logo_company edge predicates"""
-  hasLogoCompany: Boolean
-  hasLogoCompanyWith: [CompanyWhereInput!]
-  """cover_company edge predicates"""
-  hasCoverCompany: Boolean
-  hasCoverCompanyWith: [CompanyWhereInput!]
-}
-type Location implements Node {
-  id: ID!
-  title: String!
-  description: String!
-  latitude: Float!
-  longitude: Float!
-  address: String!
-  postcode: String!
-  type: String!
-  state: String!
-  suburb: String!
-  streetType: String!
-  streetName: String!
-  company: Company
-  country: Country
-}
-"""A connection to a list of items."""
-type LocationConnection {
-  """A list of edges."""
-  edges: [LocationEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type LocationEdge {
-  """The item at the end of the edge."""
-  node: Location
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Location connections"""
-input LocationOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Locations."""
-  field: LocationOrderField!
-}
-"""Properties by which Location connections can be ordered."""
-enum LocationOrderField {
-  TITLE
-  DESCRIPTION
-  LATITUDE
-  LONGITUDE
-  ADDRESS
-  POSTCODE
-  TYPE
-  STATE
-  SUBURB
-  STREET_TYPE
-  STREET_NAME
-}
-"""
-LocationWhereInput is used for filtering Location objects.
-Input was generated by ent.
-"""
-input LocationWhereInput {
-  not: LocationWhereInput
-  and: [LocationWhereInput!]
-  or: [LocationWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """latitude field predicates"""
-  latitude: Float
-  latitudeNEQ: Float
-  latitudeIn: [Float!]
-  latitudeNotIn: [Float!]
-  latitudeGT: Float
-  latitudeGTE: Float
-  latitudeLT: Float
-  latitudeLTE: Float
-  """longitude field predicates"""
-  longitude: Float
-  longitudeNEQ: Float
-  longitudeIn: [Float!]
-  longitudeNotIn: [Float!]
-  longitudeGT: Float
-  longitudeGTE: Float
-  longitudeLT: Float
-  longitudeLTE: Float
-  """address field predicates"""
-  address: String
-  addressNEQ: String
-  addressIn: [String!]
-  addressNotIn: [String!]
-  addressGT: String
-  addressGTE: String
-  addressLT: String
-  addressLTE: String
-  addressContains: String
-  addressHasPrefix: String
-  addressHasSuffix: String
-  addressEqualFold: String
-  addressContainsFold: String
-  """postcode field predicates"""
-  postcode: String
-  postcodeNEQ: String
-  postcodeIn: [String!]
-  postcodeNotIn: [String!]
-  postcodeGT: String
-  postcodeGTE: String
-  postcodeLT: String
-  postcodeLTE: String
-  postcodeContains: String
-  postcodeHasPrefix: String
-  postcodeHasSuffix: String
-  postcodeEqualFold: String
-  postcodeContainsFold: String
-  """type field predicates"""
-  type: String
-  typeNEQ: String
-  typeIn: [String!]
-  typeNotIn: [String!]
-  typeGT: String
-  typeGTE: String
-  typeLT: String
-  typeLTE: String
-  typeContains: String
-  typeHasPrefix: String
-  typeHasSuffix: String
-  typeEqualFold: String
-  typeContainsFold: String
-  """state field predicates"""
-  state: String
-  stateNEQ: String
-  stateIn: [String!]
-  stateNotIn: [String!]
-  stateGT: String
-  stateGTE: String
-  stateLT: String
-  stateLTE: String
-  stateContains: String
-  stateHasPrefix: String
-  stateHasSuffix: String
-  stateEqualFold: String
-  stateContainsFold: String
-  """suburb field predicates"""
-  suburb: String
-  suburbNEQ: String
-  suburbIn: [String!]
-  suburbNotIn: [String!]
-  suburbGT: String
-  suburbGTE: String
-  suburbLT: String
-  suburbLTE: String
-  suburbContains: String
-  suburbHasPrefix: String
-  suburbHasSuffix: String
-  suburbEqualFold: String
-  suburbContainsFold: String
-  """street_type field predicates"""
-  streetType: String
-  streetTypeNEQ: String
-  streetTypeIn: [String!]
-  streetTypeNotIn: [String!]
-  streetTypeGT: String
-  streetTypeGTE: String
-  streetTypeLT: String
-  streetTypeLTE: String
-  streetTypeContains: String
-  streetTypeHasPrefix: String
-  streetTypeHasSuffix: String
-  streetTypeEqualFold: String
-  streetTypeContainsFold: String
-  """street_name field predicates"""
-  streetName: String
-  streetNameNEQ: String
-  streetNameIn: [String!]
-  streetNameNotIn: [String!]
-  streetNameGT: String
-  streetNameGTE: String
-  streetNameLT: String
-  streetNameLTE: String
-  streetNameContains: String
-  streetNameHasPrefix: String
-  streetNameHasSuffix: String
-  streetNameEqualFold: String
-  streetNameContainsFold: String
-  """company edge predicates"""
-  hasCompany: Boolean
-  hasCompanyWith: [CompanyWhereInput!]
-  """country edge predicates"""
-  hasCountry: Boolean
-  hasCountryWith: [CountryWhereInput!]
-}
-"""
-An object with an ID.
-Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
-"""
-interface Node @goModel(model: "github.com/diazoxide/entrefine/examples/ent-project/ent.Noder") {
-  """The id of the object."""
-  id: ID!
-}
-"""Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument."""
-enum OrderDirection {
-  """Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
-  ASC
-  """Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
-  DESC
-}
-"""
-Information about pagination in a connection.
-https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-"""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-type Phone implements Node {
-  id: ID!
-  title: String!
-  description: String!
-  number: String!
-  type: String!
-  company: Company
-  country: Country
-}
-"""A connection to a list of items."""
-type PhoneConnection {
-  """A list of edges."""
-  edges: [PhoneEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type PhoneEdge {
-  """The item at the end of the edge."""
-  node: Phone
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Phone connections"""
-input PhoneOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Phones."""
-  field: PhoneOrderField!
-}
-"""Properties by which Phone connections can be ordered."""
-enum PhoneOrderField {
-  TITLE
-  DESCRIPTION
-  NUMBER
-  TYPE
-}
-"""
-PhoneWhereInput is used for filtering Phone objects.
-Input was generated by ent.
-"""
-input PhoneWhereInput {
-  not: PhoneWhereInput
-  and: [PhoneWhereInput!]
-  or: [PhoneWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """number field predicates"""
-  number: String
-  numberNEQ: String
-  numberIn: [String!]
-  numberNotIn: [String!]
-  numberGT: String
-  numberGTE: String
-  numberLT: String
-  numberLTE: String
-  numberContains: String
-  numberHasPrefix: String
-  numberHasSuffix: String
-  numberEqualFold: String
-  numberContainsFold: String
-  """type field predicates"""
-  type: String
-  typeNEQ: String
-  typeIn: [String!]
-  typeNotIn: [String!]
-  typeGT: String
-  typeGTE: String
-  typeLT: String
-  typeLTE: String
-  typeContains: String
-  typeHasPrefix: String
-  typeHasSuffix: String
-  typeEqualFold: String
-  typeContainsFold: String
-  """company edge predicates"""
-  hasCompany: Boolean
-  hasCompanyWith: [CompanyWhereInput!]
-  """country edge predicates"""
-  hasCountry: Boolean
-  hasCountryWith: [CountryWhereInput!]
-}
-type Product implements Node {
-  id: ID!
-  name: String!
-  description: String!
-  image: String!
-  url: String!
-  lastSell: Time
-  createdAt: Time
-  status: ProductProcessStatus!
-  buildStatus: ProductProcessStatus!
-  warehouse: Warehouse
-  vendor: Vendor
-}
-"""A connection to a list of items."""
-type ProductConnection {
-  """A list of edges."""
-  edges: [ProductEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type ProductEdge {
-  """The item at the end of the edge."""
-  node: Product
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Product connections"""
-input ProductOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Products."""
-  field: ProductOrderField!
-}
-"""Properties by which Product connections can be ordered."""
-enum ProductOrderField {
-  TITLE
-  DESCRIPTION
-  IMAGE
-  URL
-  LAST_SELL
-  CREATED_AT
-  STATUS
-  BUILD_STATUS
-}
-"""ProductProcessStatus is enum for the field status"""
-enum ProductProcessStatus @goModel(model: "github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums.ProcessStatus") {
-  none
-  done
-  enqueued
-  in_progress
-  failed
-}
-"""
-ProductWhereInput is used for filtering Product objects.
-Input was generated by ent.
-"""
-input ProductWhereInput {
-  not: ProductWhereInput
-  and: [ProductWhereInput!]
-  or: [ProductWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """image field predicates"""
-  image: String
-  imageNEQ: String
-  imageIn: [String!]
-  imageNotIn: [String!]
-  imageGT: String
-  imageGTE: String
-  imageLT: String
-  imageLTE: String
-  imageContains: String
-  imageHasPrefix: String
-  imageHasSuffix: String
-  imageEqualFold: String
-  imageContainsFold: String
-  """url field predicates"""
-  url: String
-  urlNEQ: String
-  urlIn: [String!]
-  urlNotIn: [String!]
-  urlGT: String
-  urlGTE: String
-  urlLT: String
-  urlLTE: String
-  urlContains: String
-  urlHasPrefix: String
-  urlHasSuffix: String
-  urlEqualFold: String
-  urlContainsFold: String
-  """last_sell field predicates"""
-  lastSell: Time
-  lastSellNEQ: Time
-  lastSellIn: [Time!]
-  lastSellNotIn: [Time!]
-  lastSellGT: Time
-  lastSellGTE: Time
-  lastSellLT: Time
-  lastSellLTE: Time
-  lastSellIsNil: Boolean
-  lastSellNotNil: Boolean
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  createdAtIsNil: Boolean
-  createdAtNotNil: Boolean
-  """status field predicates"""
-  status: ProductProcessStatus
-  statusNEQ: ProductProcessStatus
-  statusIn: [ProductProcessStatus!]
-  statusNotIn: [ProductProcessStatus!]
-  """build_status field predicates"""
-  buildStatus: ProductProcessStatus
-  buildStatusNEQ: ProductProcessStatus
-  buildStatusIn: [ProductProcessStatus!]
-  buildStatusNotIn: [ProductProcessStatus!]
-  """warehouse edge predicates"""
-  hasWarehouse: Boolean
-  hasWarehouseWith: [WarehouseWhereInput!]
-  """vendor edge predicates"""
-  hasVendor: Boolean
-  hasVendorWith: [VendorWhereInput!]
-}
-type Query {
-  """Fetches an object given its ID."""
-  node(
-    """ID of the object."""
-    id: ID!
-  ): Node
-  """Lookup nodes by a list of IDs."""
-  nodes(
-    """The list of node IDs."""
-    ids: [ID!]!
-  ): [Node]!
-  companies(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Companies returned from the connection."""
-    orderBy: CompanyOrder
-
-    """Filtering options for Companies returned from the connection."""
-    where: CompanyWhereInput
-
-    """Search query"""
-    q: String
-  ): CompanyConnection!
-  countries(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Countries returned from the connection."""
-    orderBy: CountryOrder
-
-    """Filtering options for Countries returned from the connection."""
-    where: CountryWhereInput
-
-    """Search query"""
-    q: String
-  ): CountryConnection!
-  emails(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Emails returned from the connection."""
-    orderBy: EmailOrder
-
-    """Filtering options for Emails returned from the connection."""
-    where: EmailWhereInput
-
-    """Search query"""
-    q: String
-  ): EmailConnection!
-  images(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Images returned from the connection."""
-    orderBy: ImageOrder
-
-    """Filtering options for Images returned from the connection."""
-    where: ImageWhereInput
-
-    """Search query"""
-    q: String
-  ): ImageConnection!
-  locations(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Locations returned from the connection."""
-    orderBy: LocationOrder
-
-    """Filtering options for Locations returned from the connection."""
-    where: LocationWhereInput
-
-    """Search query"""
-    q: String
-  ): LocationConnection!
-  phones(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Phones returned from the connection."""
-    orderBy: PhoneOrder
-
-    """Filtering options for Phones returned from the connection."""
-    where: PhoneWhereInput
-
-    """Search query"""
-    q: String
-  ): PhoneConnection!
-  products(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Products returned from the connection."""
-    orderBy: ProductOrder
-
-    """Filtering options for Products returned from the connection."""
-    where: ProductWhereInput
-
-    """Search query"""
-    q: String
-  ): ProductConnection!
-  vendors(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Vendors returned from the connection."""
-    orderBy: VendorOrder
-
-    """Filtering options for Vendors returned from the connection."""
-    where: VendorWhereInput
-
-    """Search query"""
-    q: String
-  ): VendorConnection!
-  warehouses(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Warehouses returned from the connection."""
-    orderBy: WarehouseOrder
-
-    """Filtering options for Warehouses returned from the connection."""
-    where: WarehouseWhereInput
-
-    """Search query"""
-    q: String
-  ): WarehouseConnection!
-  websites(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Websites returned from the connection."""
-    orderBy: WebsiteOrder
-
-    """Filtering options for Websites returned from the connection."""
-    where: WebsiteWhereInput
-
-    """Search query"""
-    q: String
-  ): WebsiteConnection!
-}
-"""The builtin Time type"""
-scalar Time
-"""
-UpdateCompanyInput is used for update Company object.
-Input was generated by ent.
-"""
-input UpdateCompanyInput {
-  name: String
-  description: String
-  addCountryIDs: [ID!]
-  removeCountryIDs: [ID!]
-  clearCountries: Boolean
-  addPhoneIDs: [ID!]
-  removePhoneIDs: [ID!]
-  clearPhones: Boolean
-  addEmailIDs: [ID!]
-  removeEmailIDs: [ID!]
-  clearEmails: Boolean
-  addWebsiteIDs: [ID!]
-  removeWebsiteIDs: [ID!]
-  clearWebsites: Boolean
-  addLocationIDs: [ID!]
-  removeLocationIDs: [ID!]
-  clearLocations: Boolean
-  logoImageID: ID
-  clearLogoImage: Boolean
-  coverImageID: ID
-  clearCoverImage: Boolean
-  addGalleryImageIDs: [ID!]
-  removeGalleryImageIDs: [ID!]
-  clearGalleryImages: Boolean
-}
-"""
-UpdateCountryInput is used for update Country object.
-Input was generated by ent.
-"""
-input UpdateCountryInput {
-  name: String
-  code: String
-  addCompanyIDs: [ID!]
-  removeCompanyIDs: [ID!]
-  clearCompanies: Boolean
-  addPhoneIDs: [ID!]
-  removePhoneIDs: [ID!]
-  clearPhones: Boolean
-  addEmailIDs: [ID!]
-  removeEmailIDs: [ID!]
-  clearEmails: Boolean
-  addWebsiteIDs: [ID!]
-  removeWebsiteIDs: [ID!]
-  clearWebsites: Boolean
-  addLocationIDs: [ID!]
-  removeLocationIDs: [ID!]
-  clearLocations: Boolean
-}
-"""
-UpdateEmailInput is used for update Email object.
-Input was generated by ent.
-"""
-input UpdateEmailInput {
-  title: String
-  description: String
-  address: String
-  companyID: ID
-  clearCompany: Boolean
-  countryID: ID
-  clearCountry: Boolean
-}
-"""
-UpdateImageInput is used for update Image object.
-Input was generated by ent.
-"""
-input UpdateImageInput {
-  title: String
-  originalURL: String
-  galleryCompanyID: ID
-  clearGalleryCompany: Boolean
-  logoCompanyID: ID
-  clearLogoCompany: Boolean
-  coverCompanyID: ID
-  clearCoverCompany: Boolean
-}
-"""
-UpdateLocationInput is used for update Location object.
-Input was generated by ent.
-"""
-input UpdateLocationInput {
-  title: String
-  description: String
-  latitude: Float
-  longitude: Float
-  address: String
-  postcode: String
-  type: String
-  state: String
-  suburb: String
-  streetType: String
-  streetName: String
-  companyID: ID
-  clearCompany: Boolean
-  countryID: ID
-  clearCountry: Boolean
-}
-"""
-UpdatePhoneInput is used for update Phone object.
-Input was generated by ent.
-"""
-input UpdatePhoneInput {
-  title: String
-  description: String
-  number: String
-  type: String
-  companyID: ID
-  clearCompany: Boolean
-  countryID: ID
-  clearCountry: Boolean
-}
-"""
-UpdateProductInput is used for update Product object.
-Input was generated by ent.
-"""
-input UpdateProductInput {
-  name: String
-  description: String
-  image: String
-  url: String
-  lastSell: Time
-  clearLastSell: Boolean
-  createdAt: Time
-  clearCreatedAt: Boolean
-  status: ProductProcessStatus
-  buildStatus: ProductProcessStatus
-  warehouseID: ID
-  clearWarehouse: Boolean
-  vendorID: ID
-  clearVendor: Boolean
-}
-"""
-UpdateVendorInput is used for update Vendor object.
-Input was generated by ent.
-"""
-input UpdateVendorInput {
-  name: String
-  schema: String
-  addWarehouseIDs: [ID!]
-  removeWarehouseIDs: [ID!]
-  clearWarehouses: Boolean
-  addProductIDs: [ID!]
-  removeProductIDs: [ID!]
-  clearProducts: Boolean
-}
-"""
-UpdateWarehouseInput is used for update Warehouse object.
-Input was generated by ent.
-"""
-input UpdateWarehouseInput {
-  name: String
-  lastUpdate: Time
-  clearLastUpdate: Boolean
-  originalData: String
-  clearOriginalData: Boolean
-  enabled: Boolean
-  filters: [String!]
-  appendFilters: [String!]
-  clearFilters: Boolean
-  addProductIDs: [ID!]
-  removeProductIDs: [ID!]
-  clearProducts: Boolean
-  vendorID: ID
-  clearVendor: Boolean
-}
-"""
-UpdateWebsiteInput is used for update Website object.
-Input was generated by ent.
-"""
-input UpdateWebsiteInput {
-  title: String
-  description: String
-  url: String
-  companyID: ID
-  clearCompany: Boolean
-  countryID: ID
-  clearCountry: Boolean
-}
-type Vendor implements Node {
-  id: ID!
-  name: String!
-  schema: String!
-  warehouses(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Warehouses returned from the connection."""
-    orderBy: WarehouseOrder
-
-    """Filtering options for Warehouses returned from the connection."""
-    where: WarehouseWhereInput
-  ): WarehouseConnection!
-  products(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Products returned from the connection."""
-    orderBy: ProductOrder
-
-    """Filtering options for Products returned from the connection."""
-    where: ProductWhereInput
-  ): ProductConnection!
-}
-"""A connection to a list of items."""
-type VendorConnection {
-  """A list of edges."""
-  edges: [VendorEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type VendorEdge {
-  """The item at the end of the edge."""
-  node: Vendor
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Vendor connections"""
-input VendorOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Vendors."""
-  field: VendorOrderField!
-}
-"""Properties by which Vendor connections can be ordered."""
-enum VendorOrderField {
-  NAME
-  SCHEMA
-}
-"""
-VendorWhereInput is used for filtering Vendor objects.
-Input was generated by ent.
-"""
-input VendorWhereInput {
-  not: VendorWhereInput
-  and: [VendorWhereInput!]
-  or: [VendorWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """schema field predicates"""
-  schema: String
-  schemaNEQ: String
-  schemaIn: [String!]
-  schemaNotIn: [String!]
-  schemaGT: String
-  schemaGTE: String
-  schemaLT: String
-  schemaLTE: String
-  schemaContains: String
-  schemaHasPrefix: String
-  schemaHasSuffix: String
-  schemaEqualFold: String
-  schemaContainsFold: String
-  """warehouses edge predicates"""
-  hasWarehouses: Boolean
-  hasWarehousesWith: [WarehouseWhereInput!]
-  """products edge predicates"""
-  hasProducts: Boolean
-  hasProductsWith: [ProductWhereInput!]
-}
-type Warehouse implements Node {
-  id: ID!
-  name: String!
-  lastUpdate: Time
-  originalData: String
-  enabled: Boolean!
-  filters: [String!]
-  products(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-
-    """Returns the first _n_ elements from the list."""
-    first: Int
-
-    """Returns the elements in the list that come before the specified cursor."""
-    before: Cursor
-
-    """Returns the last _n_ elements from the list."""
-    last: Int
-
-    """Ordering options for Products returned from the connection."""
-    orderBy: ProductOrder
-
-    """Filtering options for Products returned from the connection."""
-    where: ProductWhereInput
-  ): ProductConnection!
-  vendor: Vendor
-}
-"""A connection to a list of items."""
-type WarehouseConnection {
-  """A list of edges."""
-  edges: [WarehouseEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type WarehouseEdge {
-  """The item at the end of the edge."""
-  node: Warehouse
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Warehouse connections"""
-input WarehouseOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Warehouses."""
-  field: WarehouseOrderField!
-}
-"""Properties by which Warehouse connections can be ordered."""
-enum WarehouseOrderField {
-  NAME
-  LAST_UPDATE
-  ENABLED
-}
-"""
-WarehouseWhereInput is used for filtering Warehouse objects.
-Input was generated by ent.
-"""
-input WarehouseWhereInput {
-  not: WarehouseWhereInput
-  and: [WarehouseWhereInput!]
-  or: [WarehouseWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """last_update field predicates"""
-  lastUpdate: Time
-  lastUpdateNEQ: Time
-  lastUpdateIn: [Time!]
-  lastUpdateNotIn: [Time!]
-  lastUpdateGT: Time
-  lastUpdateGTE: Time
-  lastUpdateLT: Time
-  lastUpdateLTE: Time
-  lastUpdateIsNil: Boolean
-  lastUpdateNotNil: Boolean
-  """original_data field predicates"""
-  originalData: String
-  originalDataNEQ: String
-  originalDataIn: [String!]
-  originalDataNotIn: [String!]
-  originalDataGT: String
-  originalDataGTE: String
-  originalDataLT: String
-  originalDataLTE: String
-  originalDataContains: String
-  originalDataHasPrefix: String
-  originalDataHasSuffix: String
-  originalDataIsNil: Boolean
-  originalDataNotNil: Boolean
-  originalDataEqualFold: String
-  originalDataContainsFold: String
-  """enabled field predicates"""
-  enabled: Boolean
-  enabledNEQ: Boolean
-  """products edge predicates"""
-  hasProducts: Boolean
-  hasProductsWith: [ProductWhereInput!]
-  """vendor edge predicates"""
-  hasVendor: Boolean
-  hasVendorWith: [VendorWhereInput!]
-}
-type Website implements Node {
-  id: ID!
-  title: String!
-  description: String!
-  url: String!
-  company: Company
-  country: Country
-}
-"""A connection to a list of items."""
-type WebsiteConnection {
-  """A list of edges."""
-  edges: [WebsiteEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-"""An edge in a connection."""
-type WebsiteEdge {
-  """The item at the end of the edge."""
-  node: Website
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-}
-"""Ordering options for Website connections"""
-input WebsiteOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Websites."""
-  field: WebsiteOrderField!
-}
-"""Properties by which Website connections can be ordered."""
-enum WebsiteOrderField {
-  TITLE
-  DESCRIPTION
-  URL
-}
-"""
-WebsiteWhereInput is used for filtering Website objects.
-Input was generated by ent.
-"""
-input WebsiteWhereInput {
-  not: WebsiteWhereInput
-  and: [WebsiteWhereInput!]
-  or: [WebsiteWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """title field predicates"""
-  title: String
-  titleNEQ: String
-  titleIn: [String!]
-  titleNotIn: [String!]
-  titleGT: String
-  titleGTE: String
-  titleLT: String
-  titleLTE: String
-  titleContains: String
-  titleHasPrefix: String
-  titleHasSuffix: String
-  titleEqualFold: String
-  titleContainsFold: String
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  """url field predicates"""
-  url: String
-  urlNEQ: String
-  urlIn: [String!]
-  urlNotIn: [String!]
-  urlGT: String
-  urlGTE: String
-  urlLT: String
-  urlLTE: String
-  urlContains: String
-  urlHasPrefix: String
-  urlHasSuffix: String
-  urlEqualFold: String
-  urlContainsFold: String
-  """company edge predicates"""
-  hasCompany: Boolean
-  hasCompanyWith: [CompanyWhereInput!]
-  """country edge predicates"""
-  hasCountry: Boolean
-  hasCountryWith: [CountryWhereInput!]
-}
-`, BuiltIn: false},
-	{Name: "mutations.graphql", Input: `type Mutation {
-    createVendor(input: CreateVendorInput!): Vendor!
-    updateVendor(id: ID!, input: UpdateVendorInput!): Vendor!
-    deleteVendors(where: VendorWhereInput!): Int!
-
-    createWarehouse(input: CreateWarehouseInput!): Warehouse!
-    updateWarehouse(id: ID!, input: UpdateWarehouseInput!): Warehouse!
-    deleteWarehouses(where: WarehouseWhereInput!): Int!
-
-    createProduct(input: CreateProductInput!): Product!
-    updateProduct(id: ID!, input: UpdateProductInput!): Product!
-    deleteProducts(where: ProductWhereInput!): Int!
-
-    createCompany(input: CreateCompanyInput!): Company!
-    updateCompany(id: ID!, input: UpdateCompanyInput!): Company!
-    deleteCompanies(where: CompanyWhereInput!): Int!
-
-    createCountry(input: CreateCountryInput!): Country!
-    updateCountry(id: ID!, input: UpdateCountryInput!): Country!
-    deleteCountries(where: CountryWhereInput!): Int!
-
-    createPhone(input: CreatePhoneInput!): Phone!
-    updatePhone(id: ID!, input: UpdatePhoneInput!): Phone!
-    deletePhones(where: PhoneWhereInput!): Int!
-
-    createLocation(input: CreateLocationInput!): Location!
-    updateLocation(id: ID!, input: UpdateLocationInput!): Location!
-    deleteLocations(where: LocationWhereInput!): Int!
-
-    createWebsite(input: CreateWebsiteInput!): Website!
-    updateWebsite(id: ID!, input: UpdateWebsiteInput!): Website!
-    deleteWebsites(where: WebsiteWhereInput!): Int!
-
-    createEmail(input: CreateEmailInput!): Email!
-    updateEmail(id: ID!, input: UpdateEmailInput!): Email!
-    deleteEmails(where: EmailWhereInput!): Int!
-
-    createImage(input: CreateImageInput!): Image!
-    updateImage(id: ID!, input: UpdateImageInput!): Image!
-    deleteImages(where: ImageWhereInput!): Int!
-}
-`, BuiltIn: false},
+	{Name: "ent.graphql", Input: sourceData("ent.graphql"), BuiltIn: false},
+	{Name: "mutations.graphql", Input: sourceData("mutations.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -4119,7 +2049,7 @@ func (ec *executionContext) field_Company_countries_args(ctx context.Context, ra
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4137,7 +2067,7 @@ func (ec *executionContext) field_Company_countries_args(ctx context.Context, ra
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4155,7 +2085,7 @@ func (ec *executionContext) field_Company_countries_args(ctx context.Context, ra
 	var arg4 *ent.CountryOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4164,7 +2094,7 @@ func (ec *executionContext) field_Company_countries_args(ctx context.Context, ra
 	var arg5 *ent.CountryWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4179,7 +2109,7 @@ func (ec *executionContext) field_Company_emails_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4197,7 +2127,7 @@ func (ec *executionContext) field_Company_emails_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4215,7 +2145,7 @@ func (ec *executionContext) field_Company_emails_args(ctx context.Context, rawAr
 	var arg4 *ent.EmailOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4224,7 +2154,7 @@ func (ec *executionContext) field_Company_emails_args(ctx context.Context, rawAr
 	var arg5 *ent.EmailWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4239,7 +2169,7 @@ func (ec *executionContext) field_Company_galleryImages_args(ctx context.Context
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4257,7 +2187,7 @@ func (ec *executionContext) field_Company_galleryImages_args(ctx context.Context
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4275,7 +2205,7 @@ func (ec *executionContext) field_Company_galleryImages_args(ctx context.Context
 	var arg4 *ent.ImageOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4284,7 +2214,7 @@ func (ec *executionContext) field_Company_galleryImages_args(ctx context.Context
 	var arg5 *ent.ImageWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4299,7 +2229,7 @@ func (ec *executionContext) field_Company_locations_args(ctx context.Context, ra
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4317,7 +2247,7 @@ func (ec *executionContext) field_Company_locations_args(ctx context.Context, ra
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4335,7 +2265,7 @@ func (ec *executionContext) field_Company_locations_args(ctx context.Context, ra
 	var arg4 *ent.LocationOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4344,7 +2274,7 @@ func (ec *executionContext) field_Company_locations_args(ctx context.Context, ra
 	var arg5 *ent.LocationWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4359,7 +2289,7 @@ func (ec *executionContext) field_Company_phones_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4377,7 +2307,7 @@ func (ec *executionContext) field_Company_phones_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4395,7 +2325,7 @@ func (ec *executionContext) field_Company_phones_args(ctx context.Context, rawAr
 	var arg4 *ent.PhoneOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4404,7 +2334,7 @@ func (ec *executionContext) field_Company_phones_args(ctx context.Context, rawAr
 	var arg5 *ent.PhoneWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4419,7 +2349,7 @@ func (ec *executionContext) field_Company_websites_args(ctx context.Context, raw
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4437,7 +2367,7 @@ func (ec *executionContext) field_Company_websites_args(ctx context.Context, raw
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4455,7 +2385,7 @@ func (ec *executionContext) field_Company_websites_args(ctx context.Context, raw
 	var arg4 *ent.WebsiteOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4464,7 +2394,7 @@ func (ec *executionContext) field_Company_websites_args(ctx context.Context, raw
 	var arg5 *ent.WebsiteWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4479,7 +2409,7 @@ func (ec *executionContext) field_Country_companies_args(ctx context.Context, ra
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4497,7 +2427,7 @@ func (ec *executionContext) field_Country_companies_args(ctx context.Context, ra
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4515,7 +2445,7 @@ func (ec *executionContext) field_Country_companies_args(ctx context.Context, ra
 	var arg4 *ent.CompanyOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4524,7 +2454,7 @@ func (ec *executionContext) field_Country_companies_args(ctx context.Context, ra
 	var arg5 *ent.CompanyWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4539,7 +2469,7 @@ func (ec *executionContext) field_Country_emails_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4557,7 +2487,7 @@ func (ec *executionContext) field_Country_emails_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4575,7 +2505,7 @@ func (ec *executionContext) field_Country_emails_args(ctx context.Context, rawAr
 	var arg4 *ent.EmailOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4584,7 +2514,7 @@ func (ec *executionContext) field_Country_emails_args(ctx context.Context, rawAr
 	var arg5 *ent.EmailWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4599,7 +2529,7 @@ func (ec *executionContext) field_Country_locations_args(ctx context.Context, ra
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4617,7 +2547,7 @@ func (ec *executionContext) field_Country_locations_args(ctx context.Context, ra
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4635,7 +2565,7 @@ func (ec *executionContext) field_Country_locations_args(ctx context.Context, ra
 	var arg4 *ent.LocationOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4644,7 +2574,7 @@ func (ec *executionContext) field_Country_locations_args(ctx context.Context, ra
 	var arg5 *ent.LocationWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4659,7 +2589,7 @@ func (ec *executionContext) field_Country_phones_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4677,7 +2607,7 @@ func (ec *executionContext) field_Country_phones_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4695,7 +2625,7 @@ func (ec *executionContext) field_Country_phones_args(ctx context.Context, rawAr
 	var arg4 *ent.PhoneOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4704,7 +2634,7 @@ func (ec *executionContext) field_Country_phones_args(ctx context.Context, rawAr
 	var arg5 *ent.PhoneWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4719,7 +2649,7 @@ func (ec *executionContext) field_Country_websites_args(ctx context.Context, raw
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4737,7 +2667,7 @@ func (ec *executionContext) field_Country_websites_args(ctx context.Context, raw
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4755,7 +2685,7 @@ func (ec *executionContext) field_Country_websites_args(ctx context.Context, raw
 	var arg4 *ent.WebsiteOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4764,7 +2694,7 @@ func (ec *executionContext) field_Country_websites_args(ctx context.Context, raw
 	var arg5 *ent.WebsiteWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4779,7 +2709,7 @@ func (ec *executionContext) field_Mutation_createCompany_args(ctx context.Contex
 	var arg0 ent.CreateCompanyInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateCompanyInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateCompanyInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateCompanyInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateCompanyInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4794,7 +2724,7 @@ func (ec *executionContext) field_Mutation_createCountry_args(ctx context.Contex
 	var arg0 ent.CreateCountryInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateCountryInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateCountryInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateCountryInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateCountryInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4809,7 +2739,7 @@ func (ec *executionContext) field_Mutation_createEmail_args(ctx context.Context,
 	var arg0 ent.CreateEmailInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateEmailInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateEmailInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateEmailInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateEmailInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4824,7 +2754,7 @@ func (ec *executionContext) field_Mutation_createImage_args(ctx context.Context,
 	var arg0 ent.CreateImageInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateImageInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateImageInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateImageInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateImageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4839,7 +2769,7 @@ func (ec *executionContext) field_Mutation_createLocation_args(ctx context.Conte
 	var arg0 ent.CreateLocationInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateLocationInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateLocationInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateLocationInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateLocationInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4854,7 +2784,7 @@ func (ec *executionContext) field_Mutation_createPhone_args(ctx context.Context,
 	var arg0 ent.CreatePhoneInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreatePhoneInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreatePhoneInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreatePhoneInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreatePhoneInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4869,7 +2799,7 @@ func (ec *executionContext) field_Mutation_createProduct_args(ctx context.Contex
 	var arg0 ent.CreateProductInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateProductInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateProductInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateProductInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateProductInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4884,7 +2814,7 @@ func (ec *executionContext) field_Mutation_createVendor_args(ctx context.Context
 	var arg0 ent.CreateVendorInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateVendorInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateVendorInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateVendorInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateVendorInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4899,7 +2829,7 @@ func (ec *executionContext) field_Mutation_createWarehouse_args(ctx context.Cont
 	var arg0 ent.CreateWarehouseInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateWarehouseInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateWarehouseInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateWarehouseInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateWarehouseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4914,7 +2844,7 @@ func (ec *executionContext) field_Mutation_createWebsite_args(ctx context.Contex
 	var arg0 ent.CreateWebsiteInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateWebsiteInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateWebsiteInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateWebsiteInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateWebsiteInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4929,7 +2859,7 @@ func (ec *executionContext) field_Mutation_deleteCompanies_args(ctx context.Cont
 	var arg0 ent.CompanyWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNCompanyWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCompanyWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4944,7 +2874,7 @@ func (ec *executionContext) field_Mutation_deleteCountries_args(ctx context.Cont
 	var arg0 ent.CountryWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNCountryWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCountryWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4959,7 +2889,7 @@ func (ec *executionContext) field_Mutation_deleteEmails_args(ctx context.Context
 	var arg0 ent.EmailWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNEmailWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNEmailWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4974,7 +2904,7 @@ func (ec *executionContext) field_Mutation_deleteImages_args(ctx context.Context
 	var arg0 ent.ImageWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNImageWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNImageWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4989,7 +2919,7 @@ func (ec *executionContext) field_Mutation_deleteLocations_args(ctx context.Cont
 	var arg0 ent.LocationWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNLocationWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNLocationWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5004,7 +2934,7 @@ func (ec *executionContext) field_Mutation_deletePhones_args(ctx context.Context
 	var arg0 ent.PhoneWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNPhoneWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNPhoneWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5019,7 +2949,7 @@ func (ec *executionContext) field_Mutation_deleteProducts_args(ctx context.Conte
 	var arg0 ent.ProductWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNProductWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNProductWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5034,7 +2964,7 @@ func (ec *executionContext) field_Mutation_deleteVendors_args(ctx context.Contex
 	var arg0 ent.VendorWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNVendorWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNVendorWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5049,7 +2979,7 @@ func (ec *executionContext) field_Mutation_deleteWarehouses_args(ctx context.Con
 	var arg0 ent.WarehouseWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNWarehouseWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNWarehouseWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5064,7 +2994,7 @@ func (ec *executionContext) field_Mutation_deleteWebsites_args(ctx context.Conte
 	var arg0 ent.WebsiteWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNWebsiteWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
+		arg0, err = ec.unmarshalNWebsiteWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5088,7 +3018,7 @@ func (ec *executionContext) field_Mutation_updateCompany_args(ctx context.Contex
 	var arg1 ent.UpdateCompanyInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateCompanyInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateCompanyInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateCompanyInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateCompanyInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5112,7 +3042,7 @@ func (ec *executionContext) field_Mutation_updateCountry_args(ctx context.Contex
 	var arg1 ent.UpdateCountryInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateCountryInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateCountryInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateCountryInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateCountryInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5136,7 +3066,7 @@ func (ec *executionContext) field_Mutation_updateEmail_args(ctx context.Context,
 	var arg1 ent.UpdateEmailInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateEmailInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateEmailInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateEmailInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateEmailInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5160,7 +3090,7 @@ func (ec *executionContext) field_Mutation_updateImage_args(ctx context.Context,
 	var arg1 ent.UpdateImageInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateImageInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateImageInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateImageInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateImageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5184,7 +3114,7 @@ func (ec *executionContext) field_Mutation_updateLocation_args(ctx context.Conte
 	var arg1 ent.UpdateLocationInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateLocationInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateLocationInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateLocationInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateLocationInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5208,7 +3138,7 @@ func (ec *executionContext) field_Mutation_updatePhone_args(ctx context.Context,
 	var arg1 ent.UpdatePhoneInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdatePhoneInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdatePhoneInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdatePhoneInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdatePhoneInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5232,7 +3162,7 @@ func (ec *executionContext) field_Mutation_updateProduct_args(ctx context.Contex
 	var arg1 ent.UpdateProductInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateProductInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateProductInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateProductInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateProductInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5256,7 +3186,7 @@ func (ec *executionContext) field_Mutation_updateVendor_args(ctx context.Context
 	var arg1 ent.UpdateVendorInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateVendorInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateVendorInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateVendorInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateVendorInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5280,7 +3210,7 @@ func (ec *executionContext) field_Mutation_updateWarehouse_args(ctx context.Cont
 	var arg1 ent.UpdateWarehouseInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateWarehouseInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateWarehouseInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateWarehouseInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateWarehouseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5304,7 +3234,7 @@ func (ec *executionContext) field_Mutation_updateWebsite_args(ctx context.Contex
 	var arg1 ent.UpdateWebsiteInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateWebsiteInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateWebsiteInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateWebsiteInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateWebsiteInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5334,7 +3264,7 @@ func (ec *executionContext) field_Query_companies_args(ctx context.Context, rawA
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5352,7 +3282,7 @@ func (ec *executionContext) field_Query_companies_args(ctx context.Context, rawA
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5370,7 +3300,7 @@ func (ec *executionContext) field_Query_companies_args(ctx context.Context, rawA
 	var arg4 *ent.CompanyOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5379,7 +3309,7 @@ func (ec *executionContext) field_Query_companies_args(ctx context.Context, rawA
 	var arg5 *ent.CompanyWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5403,7 +3333,7 @@ func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawA
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5421,7 +3351,7 @@ func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawA
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5439,7 +3369,7 @@ func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawA
 	var arg4 *ent.CountryOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5448,7 +3378,7 @@ func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawA
 	var arg5 *ent.CountryWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5472,7 +3402,7 @@ func (ec *executionContext) field_Query_emails_args(ctx context.Context, rawArgs
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5490,7 +3420,7 @@ func (ec *executionContext) field_Query_emails_args(ctx context.Context, rawArgs
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5508,7 +3438,7 @@ func (ec *executionContext) field_Query_emails_args(ctx context.Context, rawArgs
 	var arg4 *ent.EmailOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5517,7 +3447,7 @@ func (ec *executionContext) field_Query_emails_args(ctx context.Context, rawArgs
 	var arg5 *ent.EmailWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5541,7 +3471,7 @@ func (ec *executionContext) field_Query_images_args(ctx context.Context, rawArgs
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5559,7 +3489,7 @@ func (ec *executionContext) field_Query_images_args(ctx context.Context, rawArgs
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5577,7 +3507,7 @@ func (ec *executionContext) field_Query_images_args(ctx context.Context, rawArgs
 	var arg4 *ent.ImageOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5586,7 +3516,7 @@ func (ec *executionContext) field_Query_images_args(ctx context.Context, rawArgs
 	var arg5 *ent.ImageWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5610,7 +3540,7 @@ func (ec *executionContext) field_Query_locations_args(ctx context.Context, rawA
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5628,7 +3558,7 @@ func (ec *executionContext) field_Query_locations_args(ctx context.Context, rawA
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5646,7 +3576,7 @@ func (ec *executionContext) field_Query_locations_args(ctx context.Context, rawA
 	var arg4 *ent.LocationOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5655,7 +3585,7 @@ func (ec *executionContext) field_Query_locations_args(ctx context.Context, rawA
 	var arg5 *ent.LocationWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5709,7 +3639,7 @@ func (ec *executionContext) field_Query_phones_args(ctx context.Context, rawArgs
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5727,7 +3657,7 @@ func (ec *executionContext) field_Query_phones_args(ctx context.Context, rawArgs
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5745,7 +3675,7 @@ func (ec *executionContext) field_Query_phones_args(ctx context.Context, rawArgs
 	var arg4 *ent.PhoneOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5754,7 +3684,7 @@ func (ec *executionContext) field_Query_phones_args(ctx context.Context, rawArgs
 	var arg5 *ent.PhoneWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5778,7 +3708,7 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5796,7 +3726,7 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5814,7 +3744,7 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 	var arg4 *ent.ProductOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5823,7 +3753,7 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 	var arg5 *ent.ProductWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5847,7 +3777,7 @@ func (ec *executionContext) field_Query_vendors_args(ctx context.Context, rawArg
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5865,7 +3795,7 @@ func (ec *executionContext) field_Query_vendors_args(ctx context.Context, rawArg
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5883,7 +3813,7 @@ func (ec *executionContext) field_Query_vendors_args(ctx context.Context, rawArg
 	var arg4 *ent.VendorOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOVendorOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOVendorOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5892,7 +3822,7 @@ func (ec *executionContext) field_Query_vendors_args(ctx context.Context, rawArg
 	var arg5 *ent.VendorWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5916,7 +3846,7 @@ func (ec *executionContext) field_Query_warehouses_args(ctx context.Context, raw
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5934,7 +3864,7 @@ func (ec *executionContext) field_Query_warehouses_args(ctx context.Context, raw
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5952,7 +3882,7 @@ func (ec *executionContext) field_Query_warehouses_args(ctx context.Context, raw
 	var arg4 *ent.WarehouseOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5961,7 +3891,7 @@ func (ec *executionContext) field_Query_warehouses_args(ctx context.Context, raw
 	var arg5 *ent.WarehouseWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5985,7 +3915,7 @@ func (ec *executionContext) field_Query_websites_args(ctx context.Context, rawAr
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6003,7 +3933,7 @@ func (ec *executionContext) field_Query_websites_args(ctx context.Context, rawAr
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6021,7 +3951,7 @@ func (ec *executionContext) field_Query_websites_args(ctx context.Context, rawAr
 	var arg4 *ent.WebsiteOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6030,7 +3960,7 @@ func (ec *executionContext) field_Query_websites_args(ctx context.Context, rawAr
 	var arg5 *ent.WebsiteWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6054,7 +3984,7 @@ func (ec *executionContext) field_Vendor_products_args(ctx context.Context, rawA
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6072,7 +4002,7 @@ func (ec *executionContext) field_Vendor_products_args(ctx context.Context, rawA
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6090,7 +4020,7 @@ func (ec *executionContext) field_Vendor_products_args(ctx context.Context, rawA
 	var arg4 *ent.ProductOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6099,7 +4029,7 @@ func (ec *executionContext) field_Vendor_products_args(ctx context.Context, rawA
 	var arg5 *ent.ProductWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6114,7 +4044,7 @@ func (ec *executionContext) field_Vendor_warehouses_args(ctx context.Context, ra
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6132,7 +4062,7 @@ func (ec *executionContext) field_Vendor_warehouses_args(ctx context.Context, ra
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6150,7 +4080,7 @@ func (ec *executionContext) field_Vendor_warehouses_args(ctx context.Context, ra
 	var arg4 *ent.WarehouseOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6159,7 +4089,7 @@ func (ec *executionContext) field_Vendor_warehouses_args(ctx context.Context, ra
 	var arg5 *ent.WarehouseWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6174,7 +4104,7 @@ func (ec *executionContext) field_Warehouse_products_args(ctx context.Context, r
 	var arg0 *ent.Cursor
 	if tmp, ok := rawArgs["after"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6192,7 +4122,7 @@ func (ec *executionContext) field_Warehouse_products_args(ctx context.Context, r
 	var arg2 *ent.Cursor
 	if tmp, ok := rawArgs["before"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6210,7 +4140,7 @@ func (ec *executionContext) field_Warehouse_products_args(ctx context.Context, r
 	var arg4 *ent.ProductOrder
 	if tmp, ok := rawArgs["orderBy"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
+		arg4, err = ec.unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6219,7 +4149,7 @@ func (ec *executionContext) field_Warehouse_products_args(ctx context.Context, r
 	var arg5 *ent.ProductWhereInput
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
+		arg5, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6426,7 +4356,7 @@ func (ec *executionContext) _Company_countries(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.CountryConnection)
 	fc.Result = res
-	return ec.marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx, field.Selections, res)
+	return ec.marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_countries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6489,7 +4419,7 @@ func (ec *executionContext) _Company_phones(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.PhoneConnection)
 	fc.Result = res
-	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
+	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_phones(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6552,7 +4482,7 @@ func (ec *executionContext) _Company_emails(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.EmailConnection)
 	fc.Result = res
-	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
+	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_emails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6615,7 +4545,7 @@ func (ec *executionContext) _Company_websites(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.WebsiteConnection)
 	fc.Result = res
-	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
+	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_websites(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6678,7 +4608,7 @@ func (ec *executionContext) _Company_locations(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.LocationConnection)
 	fc.Result = res
-	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
+	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_locations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6738,7 +4668,7 @@ func (ec *executionContext) _Company_logoImage(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.Image)
 	fc.Result = res
-	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_logoImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6793,7 +4723,7 @@ func (ec *executionContext) _Company_coverImage(ctx context.Context, field graph
 	}
 	res := resTmp.(*ent.Image)
 	fc.Result = res
-	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_coverImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6851,7 +4781,7 @@ func (ec *executionContext) _Company_galleryImages(ctx context.Context, field gr
 	}
 	res := resTmp.(*ent.ImageConnection)
 	fc.Result = res
-	return ec.marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx, field.Selections, res)
+	return ec.marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Company_galleryImages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6911,7 +4841,7 @@ func (ec *executionContext) _CompanyConnection_edges(ctx context.Context, field 
 	}
 	res := resTmp.([]*ent.CompanyEdge)
 	fc.Result = res
-	return ec.marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx, field.Selections, res)
+	return ec.marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompanyConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6961,7 +4891,7 @@ func (ec *executionContext) _CompanyConnection_pageInfo(ctx context.Context, fie
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompanyConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7056,7 +4986,7 @@ func (ec *executionContext) _CompanyEdge_node(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompanyEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7124,7 +5054,7 @@ func (ec *executionContext) _CompanyEdge_cursor(ctx context.Context, field graph
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompanyEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7300,7 +5230,7 @@ func (ec *executionContext) _Country_companies(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.CompanyConnection)
 	fc.Result = res
-	return ec.marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx, field.Selections, res)
+	return ec.marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Country_companies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7363,7 +5293,7 @@ func (ec *executionContext) _Country_phones(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.PhoneConnection)
 	fc.Result = res
-	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
+	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Country_phones(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7426,7 +5356,7 @@ func (ec *executionContext) _Country_emails(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.EmailConnection)
 	fc.Result = res
-	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
+	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Country_emails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7489,7 +5419,7 @@ func (ec *executionContext) _Country_websites(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.WebsiteConnection)
 	fc.Result = res
-	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
+	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Country_websites(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7552,7 +5482,7 @@ func (ec *executionContext) _Country_locations(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.LocationConnection)
 	fc.Result = res
-	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
+	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Country_locations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7612,7 +5542,7 @@ func (ec *executionContext) _CountryConnection_edges(ctx context.Context, field 
 	}
 	res := resTmp.([]*ent.CountryEdge)
 	fc.Result = res
-	return ec.marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx, field.Selections, res)
+	return ec.marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CountryConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7662,7 +5592,7 @@ func (ec *executionContext) _CountryConnection_pageInfo(ctx context.Context, fie
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CountryConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7757,7 +5687,7 @@ func (ec *executionContext) _CountryEdge_node(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CountryEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7819,7 +5749,7 @@ func (ec *executionContext) _CountryEdge_cursor(ctx context.Context, field graph
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CountryEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8036,7 +5966,7 @@ func (ec *executionContext) _Email_company(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Email_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8101,7 +6031,7 @@ func (ec *executionContext) _Email_country(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Email_country(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8160,7 +6090,7 @@ func (ec *executionContext) _EmailConnection_edges(ctx context.Context, field gr
 	}
 	res := resTmp.([]*ent.EmailEdge)
 	fc.Result = res
-	return ec.marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx, field.Selections, res)
+	return ec.marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EmailConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8210,7 +6140,7 @@ func (ec *executionContext) _EmailConnection_pageInfo(ctx context.Context, field
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EmailConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8305,7 +6235,7 @@ func (ec *executionContext) _EmailEdge_node(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.Email)
 	fc.Result = res
-	return ec.marshalOEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
+	return ec.marshalOEmail2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EmailEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8363,7 +6293,7 @@ func (ec *executionContext) _EmailEdge_cursor(ctx context.Context, field graphql
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EmailEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8536,7 +6466,7 @@ func (ec *executionContext) _Image_galleryCompany(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Image_galleryCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8601,7 +6531,7 @@ func (ec *executionContext) _Image_logoCompany(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Image_logoCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8666,7 +6596,7 @@ func (ec *executionContext) _Image_coverCompany(ctx context.Context, field graph
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Image_coverCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8731,7 +6661,7 @@ func (ec *executionContext) _ImageConnection_edges(ctx context.Context, field gr
 	}
 	res := resTmp.([]*ent.ImageEdge)
 	fc.Result = res
-	return ec.marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx, field.Selections, res)
+	return ec.marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ImageConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8781,7 +6711,7 @@ func (ec *executionContext) _ImageConnection_pageInfo(ctx context.Context, field
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ImageConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8876,7 +6806,7 @@ func (ec *executionContext) _ImageEdge_node(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.Image)
 	fc.Result = res
-	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+	return ec.marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ImageEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8934,7 +6864,7 @@ func (ec *executionContext) _ImageEdge_cursor(ctx context.Context, field graphql
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ImageEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9503,7 +7433,7 @@ func (ec *executionContext) _Location_company(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Location_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9568,7 +7498,7 @@ func (ec *executionContext) _Location_country(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Location_country(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9627,7 +7557,7 @@ func (ec *executionContext) _LocationConnection_edges(ctx context.Context, field
 	}
 	res := resTmp.([]*ent.LocationEdge)
 	fc.Result = res
-	return ec.marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx, field.Selections, res)
+	return ec.marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LocationConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9677,7 +7607,7 @@ func (ec *executionContext) _LocationConnection_pageInfo(ctx context.Context, fi
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LocationConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9772,7 +7702,7 @@ func (ec *executionContext) _LocationEdge_node(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.Location)
 	fc.Result = res
-	return ec.marshalOLocation2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
+	return ec.marshalOLocation2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LocationEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9846,7 +7776,7 @@ func (ec *executionContext) _LocationEdge_cursor(ctx context.Context, field grap
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LocationEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9890,7 +7820,7 @@ func (ec *executionContext) _Mutation_createVendor(ctx context.Context, field gr
 	}
 	res := resTmp.(*ent.Vendor)
 	fc.Result = res
-	return ec.marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9957,7 +7887,7 @@ func (ec *executionContext) _Mutation_updateVendor(ctx context.Context, field gr
 	}
 	res := resTmp.(*ent.Vendor)
 	fc.Result = res
-	return ec.marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateVendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10079,7 +8009,7 @@ func (ec *executionContext) _Mutation_createWarehouse(ctx context.Context, field
 	}
 	res := resTmp.(*ent.Warehouse)
 	fc.Result = res
-	return ec.marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
+	return ec.marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createWarehouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10152,7 +8082,7 @@ func (ec *executionContext) _Mutation_updateWarehouse(ctx context.Context, field
 	}
 	res := resTmp.(*ent.Warehouse)
 	fc.Result = res
-	return ec.marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
+	return ec.marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateWarehouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10280,7 +8210,7 @@ func (ec *executionContext) _Mutation_createProduct(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Product)
 	fc.Result = res
-	return ec.marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10359,7 +8289,7 @@ func (ec *executionContext) _Mutation_updateProduct(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Product)
 	fc.Result = res
-	return ec.marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10493,7 +8423,7 @@ func (ec *executionContext) _Mutation_createCompany(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10572,7 +8502,7 @@ func (ec *executionContext) _Mutation_updateCompany(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateCompany(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10706,7 +8636,7 @@ func (ec *executionContext) _Mutation_createCountry(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createCountry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10779,7 +8709,7 @@ func (ec *executionContext) _Mutation_updateCountry(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateCountry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10907,7 +8837,7 @@ func (ec *executionContext) _Mutation_createPhone(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Phone)
 	fc.Result = res
-	return ec.marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
+	return ec.marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createPhone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10978,7 +8908,7 @@ func (ec *executionContext) _Mutation_updatePhone(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Phone)
 	fc.Result = res
-	return ec.marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
+	return ec.marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updatePhone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11104,7 +9034,7 @@ func (ec *executionContext) _Mutation_createLocation(ctx context.Context, field 
 	}
 	res := resTmp.(*ent.Location)
 	fc.Result = res
-	return ec.marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
+	return ec.marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11189,7 +9119,7 @@ func (ec *executionContext) _Mutation_updateLocation(ctx context.Context, field 
 	}
 	res := resTmp.(*ent.Location)
 	fc.Result = res
-	return ec.marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
+	return ec.marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11329,7 +9259,7 @@ func (ec *executionContext) _Mutation_createWebsite(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Website)
 	fc.Result = res
-	return ec.marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
+	return ec.marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createWebsite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11398,7 +9328,7 @@ func (ec *executionContext) _Mutation_updateWebsite(ctx context.Context, field g
 	}
 	res := resTmp.(*ent.Website)
 	fc.Result = res
-	return ec.marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
+	return ec.marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateWebsite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11522,7 +9452,7 @@ func (ec *executionContext) _Mutation_createEmail(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Email)
 	fc.Result = res
-	return ec.marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
+	return ec.marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11591,7 +9521,7 @@ func (ec *executionContext) _Mutation_updateEmail(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Email)
 	fc.Result = res
-	return ec.marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
+	return ec.marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11715,7 +9645,7 @@ func (ec *executionContext) _Mutation_createImage(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Image)
 	fc.Result = res
-	return ec.marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+	return ec.marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11784,7 +9714,7 @@ func (ec *executionContext) _Mutation_updateImage(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Image)
 	fc.Result = res
-	return ec.marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
+	return ec.marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11993,7 +9923,7 @@ func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field gra
 	}
 	res := resTmp.(*ent.Cursor)
 	fc.Result = res
-	return ec.marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PageInfo_startCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12034,7 +9964,7 @@ func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graph
 	}
 	res := resTmp.(*ent.Cursor)
 	fc.Result = res
-	return ec.marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PageInfo_endCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12295,7 +10225,7 @@ func (ec *executionContext) _Phone_company(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Phone_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12360,7 +10290,7 @@ func (ec *executionContext) _Phone_country(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Phone_country(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12419,7 +10349,7 @@ func (ec *executionContext) _PhoneConnection_edges(ctx context.Context, field gr
 	}
 	res := resTmp.([]*ent.PhoneEdge)
 	fc.Result = res
-	return ec.marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx, field.Selections, res)
+	return ec.marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PhoneConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12469,7 +10399,7 @@ func (ec *executionContext) _PhoneConnection_pageInfo(ctx context.Context, field
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PhoneConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12564,7 +10494,7 @@ func (ec *executionContext) _PhoneEdge_node(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.Phone)
 	fc.Result = res
-	return ec.marshalOPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
+	return ec.marshalOPhone2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PhoneEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12624,7 +10554,7 @@ func (ec *executionContext) _PhoneEdge_cursor(ctx context.Context, field graphql
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PhoneEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12970,7 +10900,7 @@ func (ec *executionContext) _Product_status(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(enums.ProcessStatus)
 	fc.Result = res
-	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
+	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13014,7 +10944,7 @@ func (ec *executionContext) _Product_buildStatus(ctx context.Context, field grap
 	}
 	res := resTmp.(enums.ProcessStatus)
 	fc.Result = res
-	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
+	return ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_buildStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13055,7 +10985,7 @@ func (ec *executionContext) _Product_warehouse(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.Warehouse)
 	fc.Result = res
-	return ec.marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
+	return ec.marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_warehouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13114,7 +11044,7 @@ func (ec *executionContext) _Product_vendor(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.Vendor)
 	fc.Result = res
-	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
+	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_vendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13167,7 +11097,7 @@ func (ec *executionContext) _ProductConnection_edges(ctx context.Context, field 
 	}
 	res := resTmp.([]*ent.ProductEdge)
 	fc.Result = res
-	return ec.marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx, field.Selections, res)
+	return ec.marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProductConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13217,7 +11147,7 @@ func (ec *executionContext) _ProductConnection_pageInfo(ctx context.Context, fie
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProductConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13312,7 +11242,7 @@ func (ec *executionContext) _ProductEdge_node(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Product)
 	fc.Result = res
-	return ec.marshalOProduct2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
+	return ec.marshalOProduct2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProductEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13380,7 +11310,7 @@ func (ec *executionContext) _ProductEdge_cursor(ctx context.Context, field graph
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProductEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13421,7 +11351,7 @@ func (ec *executionContext) _Query_node(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(ent.Noder)
 	fc.Result = res
-	return ec.marshalONode2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, field.Selections, res)
+	return ec.marshalONode2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13476,7 +11406,7 @@ func (ec *executionContext) _Query_nodes(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]ent.Noder)
 	fc.Result = res
-	return ec.marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, field.Selections, res)
+	return ec.marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13531,7 +11461,7 @@ func (ec *executionContext) _Query_companies(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.CompanyConnection)
 	fc.Result = res
-	return ec.marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx, field.Selections, res)
+	return ec.marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_companies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13594,7 +11524,7 @@ func (ec *executionContext) _Query_countries(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.CountryConnection)
 	fc.Result = res
-	return ec.marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx, field.Selections, res)
+	return ec.marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_countries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13657,7 +11587,7 @@ func (ec *executionContext) _Query_emails(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*ent.EmailConnection)
 	fc.Result = res
-	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
+	return ec.marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_emails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13720,7 +11650,7 @@ func (ec *executionContext) _Query_images(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*ent.ImageConnection)
 	fc.Result = res
-	return ec.marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx, field.Selections, res)
+	return ec.marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13783,7 +11713,7 @@ func (ec *executionContext) _Query_locations(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.LocationConnection)
 	fc.Result = res
-	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
+	return ec.marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_locations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13846,7 +11776,7 @@ func (ec *executionContext) _Query_phones(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*ent.PhoneConnection)
 	fc.Result = res
-	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
+	return ec.marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_phones(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13909,7 +11839,7 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.ProductConnection)
 	fc.Result = res
-	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
+	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_products(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13972,7 +11902,7 @@ func (ec *executionContext) _Query_vendors(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ent.VendorConnection)
 	fc.Result = res
-	return ec.marshalNVendorConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx, field.Selections, res)
+	return ec.marshalNVendorConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_vendors(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14035,7 +11965,7 @@ func (ec *executionContext) _Query_warehouses(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.WarehouseConnection)
 	fc.Result = res
-	return ec.marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx, field.Selections, res)
+	return ec.marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_warehouses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14098,7 +12028,7 @@ func (ec *executionContext) _Query_websites(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ent.WebsiteConnection)
 	fc.Result = res
-	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
+	return ec.marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_websites(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14422,7 +12352,7 @@ func (ec *executionContext) _Vendor_warehouses(ctx context.Context, field graphq
 	}
 	res := resTmp.(*ent.WarehouseConnection)
 	fc.Result = res
-	return ec.marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx, field.Selections, res)
+	return ec.marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Vendor_warehouses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14485,7 +12415,7 @@ func (ec *executionContext) _Vendor_products(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.ProductConnection)
 	fc.Result = res
-	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
+	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Vendor_products(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14545,7 +12475,7 @@ func (ec *executionContext) _VendorConnection_edges(ctx context.Context, field g
 	}
 	res := resTmp.([]*ent.VendorEdge)
 	fc.Result = res
-	return ec.marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx, field.Selections, res)
+	return ec.marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VendorConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14595,7 +12525,7 @@ func (ec *executionContext) _VendorConnection_pageInfo(ctx context.Context, fiel
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VendorConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14690,7 +12620,7 @@ func (ec *executionContext) _VendorEdge_node(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.Vendor)
 	fc.Result = res
-	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
+	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VendorEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14746,7 +12676,7 @@ func (ec *executionContext) _VendorEdge_cursor(ctx context.Context, field graphq
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VendorEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15045,7 +12975,7 @@ func (ec *executionContext) _Warehouse_products(ctx context.Context, field graph
 	}
 	res := resTmp.(*ent.ProductConnection)
 	fc.Result = res
-	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
+	return ec.marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Warehouse_products(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15105,7 +13035,7 @@ func (ec *executionContext) _Warehouse_vendor(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Vendor)
 	fc.Result = res
-	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
+	return ec.marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Warehouse_vendor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15158,7 +13088,7 @@ func (ec *executionContext) _WarehouseConnection_edges(ctx context.Context, fiel
 	}
 	res := resTmp.([]*ent.WarehouseEdge)
 	fc.Result = res
-	return ec.marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx, field.Selections, res)
+	return ec.marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WarehouseConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15208,7 +13138,7 @@ func (ec *executionContext) _WarehouseConnection_pageInfo(ctx context.Context, f
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WarehouseConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15303,7 +13233,7 @@ func (ec *executionContext) _WarehouseEdge_node(ctx context.Context, field graph
 	}
 	res := resTmp.(*ent.Warehouse)
 	fc.Result = res
-	return ec.marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
+	return ec.marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WarehouseEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15365,7 +13295,7 @@ func (ec *executionContext) _WarehouseEdge_cursor(ctx context.Context, field gra
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WarehouseEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15582,7 +13512,7 @@ func (ec *executionContext) _Website_company(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.Company)
 	fc.Result = res
-	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Website_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15647,7 +13577,7 @@ func (ec *executionContext) _Website_country(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*ent.Country)
 	fc.Result = res
-	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
+	return ec.marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Website_country(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15706,7 +13636,7 @@ func (ec *executionContext) _WebsiteConnection_edges(ctx context.Context, field 
 	}
 	res := resTmp.([]*ent.WebsiteEdge)
 	fc.Result = res
-	return ec.marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx, field.Selections, res)
+	return ec.marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WebsiteConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15756,7 +13686,7 @@ func (ec *executionContext) _WebsiteConnection_pageInfo(ctx context.Context, fie
 	}
 	res := resTmp.(ent.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WebsiteConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15851,7 +13781,7 @@ func (ec *executionContext) _WebsiteEdge_node(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ent.Website)
 	fc.Result = res
-	return ec.marshalOWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
+	return ec.marshalOWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WebsiteEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15909,7 +13839,7 @@ func (ec *executionContext) _WebsiteEdge_cursor(ctx context.Context, field graph
 	}
 	res := resTmp.(ent.Cursor)
 	fc.Result = res
-	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
+	return ec.marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WebsiteEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17709,13 +15639,18 @@ func (ec *executionContext) unmarshalInputCompanyOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17723,7 +15658,7 @@ func (ec *executionContext) unmarshalInputCompanyOrder(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17740,13 +15675,18 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "hasCountries", "hasCountriesWith", "hasPhones", "hasPhonesWith", "hasEmails", "hasEmailsWith", "hasWebsites", "hasWebsitesWith", "hasLocations", "hasLocationsWith", "hasLogoImage", "hasLogoImageWith", "hasCoverImage", "hasCoverImageWith", "hasGalleryImages", "hasGalleryImagesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17754,7 +15694,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17762,7 +15702,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18050,7 +15990,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCountriesWith"))
-			it.HasCountriesWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.HasCountriesWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18066,7 +16006,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasPhonesWith"))
-			it.HasPhonesWith, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
+			it.HasPhonesWith, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18082,7 +16022,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailsWith"))
-			it.HasEmailsWith, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
+			it.HasEmailsWith, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18098,7 +16038,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasWebsitesWith"))
-			it.HasWebsitesWith, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
+			it.HasWebsitesWith, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18114,7 +16054,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLocationsWith"))
-			it.HasLocationsWith, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
+			it.HasLocationsWith, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18130,7 +16070,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLogoImageWith"))
-			it.HasLogoImageWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			it.HasLogoImageWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18146,7 +16086,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverImageWith"))
-			it.HasCoverImageWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			it.HasCoverImageWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18162,7 +16102,7 @@ func (ec *executionContext) unmarshalInputCompanyWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasGalleryImagesWith"))
-			it.HasGalleryImagesWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			it.HasGalleryImagesWith, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18183,13 +16123,18 @@ func (ec *executionContext) unmarshalInputCountryOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18197,7 +16142,7 @@ func (ec *executionContext) unmarshalInputCountryOrder(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18214,13 +16159,18 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "code", "codeNEQ", "codeIn", "codeNotIn", "codeGT", "codeGTE", "codeLT", "codeLTE", "codeContains", "codeHasPrefix", "codeHasSuffix", "codeEqualFold", "codeContainsFold", "hasCompanies", "hasCompaniesWith", "hasPhones", "hasPhonesWith", "hasEmails", "hasEmailsWith", "hasWebsites", "hasWebsitesWith", "hasLocations", "hasLocationsWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18228,7 +16178,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18236,7 +16186,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18524,7 +16474,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompaniesWith"))
-			it.HasCompaniesWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCompaniesWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18540,7 +16490,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasPhonesWith"))
-			it.HasPhonesWith, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
+			it.HasPhonesWith, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18556,7 +16506,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailsWith"))
-			it.HasEmailsWith, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
+			it.HasEmailsWith, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18572,7 +16522,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasWebsitesWith"))
-			it.HasWebsitesWith, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
+			it.HasWebsitesWith, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18588,7 +16538,7 @@ func (ec *executionContext) unmarshalInputCountryWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLocationsWith"))
-			it.HasLocationsWith, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
+			it.HasLocationsWith, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18605,7 +16555,12 @@ func (ec *executionContext) unmarshalInputCreateCompanyInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "description", "countryIDs", "phoneIDs", "emailIDs", "websiteIDs", "locationIDs", "logoImageID", "coverImageID", "galleryImageIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -18700,7 +16655,12 @@ func (ec *executionContext) unmarshalInputCreateCountryInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "code", "companyIDs", "phoneIDs", "emailIDs", "websiteIDs", "locationIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -18771,7 +16731,12 @@ func (ec *executionContext) unmarshalInputCreateEmailInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "address", "companyID", "countryID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -18826,7 +16791,12 @@ func (ec *executionContext) unmarshalInputCreateImageInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "originalURL", "galleryCompanyID", "logoCompanyID", "coverCompanyID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -18881,7 +16851,12 @@ func (ec *executionContext) unmarshalInputCreateLocationInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "latitude", "longitude", "address", "postcode", "type", "state", "suburb", "streetType", "streetName", "companyID", "countryID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -19000,7 +16975,12 @@ func (ec *executionContext) unmarshalInputCreatePhoneInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "number", "type", "companyID", "countryID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -19063,7 +17043,12 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "description", "image", "url", "status", "buildStatus", "warehouseID", "vendorID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -19101,7 +17086,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19109,7 +17094,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19142,7 +17127,12 @@ func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "schema", "warehouseIDs", "productIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -19189,7 +17179,12 @@ func (ec *executionContext) unmarshalInputCreateWarehouseInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "originalData", "enabled", "filters", "productIDs", "vendorID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -19252,7 +17247,12 @@ func (ec *executionContext) unmarshalInputCreateWebsiteInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "url", "companyID", "countryID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -19311,13 +17311,18 @@ func (ec *executionContext) unmarshalInputEmailOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19325,7 +17330,7 @@ func (ec *executionContext) unmarshalInputEmailOrder(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19342,13 +17347,18 @@ func (ec *executionContext) unmarshalInputEmailWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressEqualFold", "addressContainsFold", "hasCompany", "hasCompanyWith", "hasCountry", "hasCountryWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19356,7 +17366,7 @@ func (ec *executionContext) unmarshalInputEmailWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19364,7 +17374,7 @@ func (ec *executionContext) unmarshalInputEmailWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19756,7 +17766,7 @@ func (ec *executionContext) unmarshalInputEmailWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompanyWith"))
-			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19772,7 +17782,7 @@ func (ec *executionContext) unmarshalInputEmailWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCountryWith"))
-			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19793,13 +17803,18 @@ func (ec *executionContext) unmarshalInputImageOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19807,7 +17822,7 @@ func (ec *executionContext) unmarshalInputImageOrder(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19824,13 +17839,18 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "originalURL", "originalURLNEQ", "originalURLIn", "originalURLNotIn", "originalURLGT", "originalURLGTE", "originalURLLT", "originalURLLTE", "originalURLContains", "originalURLHasPrefix", "originalURLHasSuffix", "originalURLEqualFold", "originalURLContainsFold", "hasGalleryCompany", "hasGalleryCompanyWith", "hasLogoCompany", "hasLogoCompanyWith", "hasCoverCompany", "hasCoverCompanyWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19838,7 +17858,7 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19846,7 +17866,7 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20134,7 +18154,7 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasGalleryCompanyWith"))
-			it.HasGalleryCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasGalleryCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20150,7 +18170,7 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLogoCompanyWith"))
-			it.HasLogoCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasLogoCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20166,7 +18186,7 @@ func (ec *executionContext) unmarshalInputImageWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCoverCompanyWith"))
-			it.HasCoverCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCoverCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20187,13 +18207,18 @@ func (ec *executionContext) unmarshalInputLocationOrder(ctx context.Context, obj
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20201,7 +18226,7 @@ func (ec *executionContext) unmarshalInputLocationOrder(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20218,13 +18243,18 @@ func (ec *executionContext) unmarshalInputLocationWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "latitude", "latitudeNEQ", "latitudeIn", "latitudeNotIn", "latitudeGT", "latitudeGTE", "latitudeLT", "latitudeLTE", "longitude", "longitudeNEQ", "longitudeIn", "longitudeNotIn", "longitudeGT", "longitudeGTE", "longitudeLT", "longitudeLTE", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressEqualFold", "addressContainsFold", "postcode", "postcodeNEQ", "postcodeIn", "postcodeNotIn", "postcodeGT", "postcodeGTE", "postcodeLT", "postcodeLTE", "postcodeContains", "postcodeHasPrefix", "postcodeHasSuffix", "postcodeEqualFold", "postcodeContainsFold", "type", "typeNEQ", "typeIn", "typeNotIn", "typeGT", "typeGTE", "typeLT", "typeLTE", "typeContains", "typeHasPrefix", "typeHasSuffix", "typeEqualFold", "typeContainsFold", "state", "stateNEQ", "stateIn", "stateNotIn", "stateGT", "stateGTE", "stateLT", "stateLTE", "stateContains", "stateHasPrefix", "stateHasSuffix", "stateEqualFold", "stateContainsFold", "suburb", "suburbNEQ", "suburbIn", "suburbNotIn", "suburbGT", "suburbGTE", "suburbLT", "suburbLTE", "suburbContains", "suburbHasPrefix", "suburbHasSuffix", "suburbEqualFold", "suburbContainsFold", "streetType", "streetTypeNEQ", "streetTypeIn", "streetTypeNotIn", "streetTypeGT", "streetTypeGTE", "streetTypeLT", "streetTypeLTE", "streetTypeContains", "streetTypeHasPrefix", "streetTypeHasSuffix", "streetTypeEqualFold", "streetTypeContainsFold", "streetName", "streetNameNEQ", "streetNameIn", "streetNameNotIn", "streetNameGT", "streetNameGTE", "streetNameLT", "streetNameLTE", "streetNameContains", "streetNameHasPrefix", "streetNameHasSuffix", "streetNameEqualFold", "streetNameContainsFold", "hasCompany", "hasCompanyWith", "hasCountry", "hasCountryWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20232,7 +18262,7 @@ func (ec *executionContext) unmarshalInputLocationWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20240,7 +18270,7 @@ func (ec *executionContext) unmarshalInputLocationWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21384,7 +19414,7 @@ func (ec *executionContext) unmarshalInputLocationWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompanyWith"))
-			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21400,7 +19430,7 @@ func (ec *executionContext) unmarshalInputLocationWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCountryWith"))
-			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21421,13 +19451,18 @@ func (ec *executionContext) unmarshalInputPhoneOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21435,7 +19470,7 @@ func (ec *executionContext) unmarshalInputPhoneOrder(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21452,13 +19487,18 @@ func (ec *executionContext) unmarshalInputPhoneWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "number", "numberNEQ", "numberIn", "numberNotIn", "numberGT", "numberGTE", "numberLT", "numberLTE", "numberContains", "numberHasPrefix", "numberHasSuffix", "numberEqualFold", "numberContainsFold", "type", "typeNEQ", "typeIn", "typeNotIn", "typeGT", "typeGTE", "typeLT", "typeLTE", "typeContains", "typeHasPrefix", "typeHasSuffix", "typeEqualFold", "typeContainsFold", "hasCompany", "hasCompanyWith", "hasCountry", "hasCountryWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21466,7 +19506,7 @@ func (ec *executionContext) unmarshalInputPhoneWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21474,7 +19514,7 @@ func (ec *executionContext) unmarshalInputPhoneWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21970,7 +20010,7 @@ func (ec *executionContext) unmarshalInputPhoneWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompanyWith"))
-			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21986,7 +20026,7 @@ func (ec *executionContext) unmarshalInputPhoneWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCountryWith"))
-			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22007,13 +20047,18 @@ func (ec *executionContext) unmarshalInputProductOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22021,7 +20066,7 @@ func (ec *executionContext) unmarshalInputProductOrder(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22038,13 +20083,18 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "image", "imageNEQ", "imageIn", "imageNotIn", "imageGT", "imageGTE", "imageLT", "imageLTE", "imageContains", "imageHasPrefix", "imageHasSuffix", "imageEqualFold", "imageContainsFold", "url", "urlNEQ", "urlIn", "urlNotIn", "urlGT", "urlGTE", "urlLT", "urlLTE", "urlContains", "urlHasPrefix", "urlHasSuffix", "urlEqualFold", "urlContainsFold", "lastSell", "lastSellNEQ", "lastSellIn", "lastSellNotIn", "lastSellGT", "lastSellGTE", "lastSellLT", "lastSellLTE", "lastSellIsNil", "lastSellNotNil", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "status", "statusNEQ", "statusIn", "statusNotIn", "buildStatus", "buildStatusNEQ", "buildStatusIn", "buildStatusNotIn", "hasWarehouse", "hasWarehouseWith", "hasVendor", "hasVendorWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22052,7 +20102,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22060,7 +20110,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22708,7 +20758,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22716,7 +20766,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.StatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22724,7 +20774,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.StatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22732,7 +20782,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.StatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22740,7 +20790,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22748,7 +20798,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusNEQ"))
-			it.BuildStatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatusNEQ, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22756,7 +20806,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusIn"))
-			it.BuildStatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.BuildStatusIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22764,7 +20814,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatusNotIn"))
-			it.BuildStatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
+			it.BuildStatusNotIn, err = ec.unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22780,7 +20830,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasWarehouseWith"))
-			it.HasWarehouseWith, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
+			it.HasWarehouseWith, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22796,7 +20846,7 @@ func (ec *executionContext) unmarshalInputProductWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasVendorWith"))
-			it.HasVendorWith, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
+			it.HasVendorWith, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22813,7 +20863,12 @@ func (ec *executionContext) unmarshalInputUpdateCompanyInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "description", "addCountryIDs", "removeCountryIDs", "clearCountries", "addPhoneIDs", "removePhoneIDs", "clearPhones", "addEmailIDs", "removeEmailIDs", "clearEmails", "addWebsiteIDs", "removeWebsiteIDs", "clearWebsites", "addLocationIDs", "removeLocationIDs", "clearLocations", "logoImageID", "clearLogoImage", "coverImageID", "clearCoverImage", "addGalleryImageIDs", "removeGalleryImageIDs", "clearGalleryImages"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -23020,7 +21075,12 @@ func (ec *executionContext) unmarshalInputUpdateCountryInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "code", "addCompanyIDs", "removeCompanyIDs", "clearCompanies", "addPhoneIDs", "removePhoneIDs", "clearPhones", "addEmailIDs", "removeEmailIDs", "clearEmails", "addWebsiteIDs", "removeWebsiteIDs", "clearWebsites", "addLocationIDs", "removeLocationIDs", "clearLocations"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -23171,7 +21231,12 @@ func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "address", "companyID", "clearCompany", "countryID", "clearCountry"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -23242,7 +21307,12 @@ func (ec *executionContext) unmarshalInputUpdateImageInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "originalURL", "galleryCompanyID", "clearGalleryCompany", "logoCompanyID", "clearLogoCompany", "coverCompanyID", "clearCoverCompany"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -23321,7 +21391,12 @@ func (ec *executionContext) unmarshalInputUpdateLocationInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "latitude", "longitude", "address", "postcode", "type", "state", "suburb", "streetType", "streetName", "companyID", "clearCompany", "countryID", "clearCountry"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -23456,7 +21531,12 @@ func (ec *executionContext) unmarshalInputUpdatePhoneInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "number", "type", "companyID", "clearCompany", "countryID", "clearCountry"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -23535,7 +21615,12 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "description", "image", "url", "lastSell", "clearLastSell", "createdAt", "clearCreatedAt", "status", "buildStatus", "warehouseID", "clearWarehouse", "vendorID", "clearVendor"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -23605,7 +21690,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.Status, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23613,7 +21698,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("buildStatus"))
-			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
+			it.BuildStatus, err = ec.unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23662,7 +21747,12 @@ func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "schema", "addWarehouseIDs", "removeWarehouseIDs", "clearWarehouses", "addProductIDs", "removeProductIDs", "clearProducts"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -23741,7 +21831,12 @@ func (ec *executionContext) unmarshalInputUpdateWarehouseInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"name", "lastUpdate", "clearLastUpdate", "originalData", "clearOriginalData", "enabled", "filters", "appendFilters", "clearFilters", "addProductIDs", "removeProductIDs", "clearProducts", "vendorID", "clearVendor"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "name":
 			var err error
@@ -23868,7 +21963,12 @@ func (ec *executionContext) unmarshalInputUpdateWebsiteInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"title", "description", "url", "companyID", "clearCompany", "countryID", "clearCountry"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "title":
 			var err error
@@ -23943,13 +22043,18 @@ func (ec *executionContext) unmarshalInputVendorOrder(ctx context.Context, obj i
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23957,7 +22062,7 @@ func (ec *executionContext) unmarshalInputVendorOrder(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23974,13 +22079,18 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "schema", "schemaNEQ", "schemaIn", "schemaNotIn", "schemaGT", "schemaGTE", "schemaLT", "schemaLTE", "schemaContains", "schemaHasPrefix", "schemaHasSuffix", "schemaEqualFold", "schemaContainsFold", "hasWarehouses", "hasWarehousesWith", "hasProducts", "hasProductsWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23988,7 +22098,7 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23996,7 +22106,7 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24284,7 +22394,7 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasWarehousesWith"))
-			it.HasWarehousesWith, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
+			it.HasWarehousesWith, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24300,7 +22410,7 @@ func (ec *executionContext) unmarshalInputVendorWhereInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProductsWith"))
-			it.HasProductsWith, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
+			it.HasProductsWith, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24321,13 +22431,18 @@ func (ec *executionContext) unmarshalInputWarehouseOrder(ctx context.Context, ob
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24335,7 +22450,7 @@ func (ec *executionContext) unmarshalInputWarehouseOrder(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24352,13 +22467,18 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "lastUpdate", "lastUpdateNEQ", "lastUpdateIn", "lastUpdateNotIn", "lastUpdateGT", "lastUpdateGTE", "lastUpdateLT", "lastUpdateLTE", "lastUpdateIsNil", "lastUpdateNotNil", "originalData", "originalDataNEQ", "originalDataIn", "originalDataNotIn", "originalDataGT", "originalDataGTE", "originalDataLT", "originalDataLTE", "originalDataContains", "originalDataHasPrefix", "originalDataHasSuffix", "originalDataIsNil", "originalDataNotNil", "originalDataEqualFold", "originalDataContainsFold", "enabled", "enabledNEQ", "hasProducts", "hasProductsWith", "hasVendor", "hasVendorWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24366,7 +22486,7 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24374,7 +22494,7 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24774,7 +22894,7 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProductsWith"))
-			it.HasProductsWith, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
+			it.HasProductsWith, err = ec.unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24790,7 +22910,7 @@ func (ec *executionContext) unmarshalInputWarehouseWhereInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasVendorWith"))
-			it.HasVendorWith, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
+			it.HasVendorWith, err = ec.unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24811,13 +22931,18 @@ func (ec *executionContext) unmarshalInputWebsiteOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
-			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24825,7 +22950,7 @@ func (ec *executionContext) unmarshalInputWebsiteOrder(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx, v)
+			it.Field, err = ec.unmarshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24842,13 +22967,18 @@ func (ec *executionContext) unmarshalInputWebsiteWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionEqualFold", "descriptionContainsFold", "url", "urlNEQ", "urlIn", "urlNotIn", "urlGT", "urlGTE", "urlLT", "urlLTE", "urlContains", "urlHasPrefix", "urlHasSuffix", "urlEqualFold", "urlContainsFold", "hasCompany", "hasCompanyWith", "hasCountry", "hasCountryWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, v)
+			it.Not, err = ec.unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24856,7 +22986,7 @@ func (ec *executionContext) unmarshalInputWebsiteWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
+			it.And, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24864,7 +22994,7 @@ func (ec *executionContext) unmarshalInputWebsiteWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
+			it.Or, err = ec.unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25256,7 +23386,7 @@ func (ec *executionContext) unmarshalInputWebsiteWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCompanyWith"))
-			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
+			it.HasCompanyWith, err = ec.unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25272,7 +23402,7 @@ func (ec *executionContext) unmarshalInputWebsiteWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCountryWith"))
-			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
+			it.HasCountryWith, err = ec.unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -28161,11 +26291,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCompany2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v ent.Company) graphql.Marshaler {
+func (ec *executionContext) marshalNCompany2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v ent.Company) graphql.Marshaler {
 	return ec._Company(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v *ent.Company) graphql.Marshaler {
+func (ec *executionContext) marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v *ent.Company) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28175,11 +26305,11 @@ func (ec *executionContext) marshalNCompany2ᚖgithubᚗcomᚋdiazoxideᚋentref
 	return ec._Company(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompanyConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx context.Context, sel ast.SelectionSet, v ent.CompanyConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompanyConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx context.Context, sel ast.SelectionSet, v ent.CompanyConnection) graphql.Marshaler {
 	return ec._CompanyConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28189,13 +26319,13 @@ func (ec *executionContext) marshalNCompanyConnection2ᚖgithubᚗcomᚋdiazoxid
 	return ec._CompanyConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx context.Context, v interface{}) (*ent.CompanyOrderField, error) {
+func (ec *executionContext) unmarshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx context.Context, v interface{}) (*ent.CompanyOrderField, error) {
 	var res = new(ent.CompanyOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28205,21 +26335,21 @@ func (ec *executionContext) marshalNCompanyOrderField2ᚖgithubᚗcomᚋdiazoxid
 	return v
 }
 
-func (ec *executionContext) unmarshalNCompanyWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (ent.CompanyWhereInput, error) {
+func (ec *executionContext) unmarshalNCompanyWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (ent.CompanyWhereInput, error) {
 	res, err := ec.unmarshalInputCompanyWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (*ent.CompanyWhereInput, error) {
+func (ec *executionContext) unmarshalNCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (*ent.CompanyWhereInput, error) {
 	res, err := ec.unmarshalInputCompanyWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCountry2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v ent.Country) graphql.Marshaler {
+func (ec *executionContext) marshalNCountry2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v ent.Country) graphql.Marshaler {
 	return ec._Country(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v *ent.Country) graphql.Marshaler {
+func (ec *executionContext) marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v *ent.Country) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28229,11 +26359,11 @@ func (ec *executionContext) marshalNCountry2ᚖgithubᚗcomᚋdiazoxideᚋentref
 	return ec._Country(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCountryConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx context.Context, sel ast.SelectionSet, v ent.CountryConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCountryConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx context.Context, sel ast.SelectionSet, v ent.CountryConnection) graphql.Marshaler {
 	return ec._CountryConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CountryConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CountryConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28243,13 +26373,13 @@ func (ec *executionContext) marshalNCountryConnection2ᚖgithubᚗcomᚋdiazoxid
 	return ec._CountryConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx context.Context, v interface{}) (*ent.CountryOrderField, error) {
+func (ec *executionContext) unmarshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx context.Context, v interface{}) (*ent.CountryOrderField, error) {
 	var res = new(ent.CountryOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CountryOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CountryOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28259,81 +26389,81 @@ func (ec *executionContext) marshalNCountryOrderField2ᚖgithubᚗcomᚋdiazoxid
 	return v
 }
 
-func (ec *executionContext) unmarshalNCountryWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (ent.CountryWhereInput, error) {
+func (ec *executionContext) unmarshalNCountryWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (ent.CountryWhereInput, error) {
 	res, err := ec.unmarshalInputCountryWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (*ent.CountryWhereInput, error) {
+func (ec *executionContext) unmarshalNCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (*ent.CountryWhereInput, error) {
 	res, err := ec.unmarshalInputCountryWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateCompanyInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateCompanyInput(ctx context.Context, v interface{}) (ent.CreateCompanyInput, error) {
+func (ec *executionContext) unmarshalNCreateCompanyInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateCompanyInput(ctx context.Context, v interface{}) (ent.CreateCompanyInput, error) {
 	res, err := ec.unmarshalInputCreateCompanyInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateCountryInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateCountryInput(ctx context.Context, v interface{}) (ent.CreateCountryInput, error) {
+func (ec *executionContext) unmarshalNCreateCountryInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateCountryInput(ctx context.Context, v interface{}) (ent.CreateCountryInput, error) {
 	res, err := ec.unmarshalInputCreateCountryInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateEmailInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateEmailInput(ctx context.Context, v interface{}) (ent.CreateEmailInput, error) {
+func (ec *executionContext) unmarshalNCreateEmailInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateEmailInput(ctx context.Context, v interface{}) (ent.CreateEmailInput, error) {
 	res, err := ec.unmarshalInputCreateEmailInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateImageInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateImageInput(ctx context.Context, v interface{}) (ent.CreateImageInput, error) {
+func (ec *executionContext) unmarshalNCreateImageInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateImageInput(ctx context.Context, v interface{}) (ent.CreateImageInput, error) {
 	res, err := ec.unmarshalInputCreateImageInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateLocationInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateLocationInput(ctx context.Context, v interface{}) (ent.CreateLocationInput, error) {
+func (ec *executionContext) unmarshalNCreateLocationInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateLocationInput(ctx context.Context, v interface{}) (ent.CreateLocationInput, error) {
 	res, err := ec.unmarshalInputCreateLocationInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreatePhoneInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreatePhoneInput(ctx context.Context, v interface{}) (ent.CreatePhoneInput, error) {
+func (ec *executionContext) unmarshalNCreatePhoneInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreatePhoneInput(ctx context.Context, v interface{}) (ent.CreatePhoneInput, error) {
 	res, err := ec.unmarshalInputCreatePhoneInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateProductInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateProductInput(ctx context.Context, v interface{}) (ent.CreateProductInput, error) {
+func (ec *executionContext) unmarshalNCreateProductInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateProductInput(ctx context.Context, v interface{}) (ent.CreateProductInput, error) {
 	res, err := ec.unmarshalInputCreateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateVendorInput(ctx context.Context, v interface{}) (ent.CreateVendorInput, error) {
+func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateVendorInput(ctx context.Context, v interface{}) (ent.CreateVendorInput, error) {
 	res, err := ec.unmarshalInputCreateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateWarehouseInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateWarehouseInput(ctx context.Context, v interface{}) (ent.CreateWarehouseInput, error) {
+func (ec *executionContext) unmarshalNCreateWarehouseInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateWarehouseInput(ctx context.Context, v interface{}) (ent.CreateWarehouseInput, error) {
 	res, err := ec.unmarshalInputCreateWarehouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateWebsiteInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCreateWebsiteInput(ctx context.Context, v interface{}) (ent.CreateWebsiteInput, error) {
+func (ec *executionContext) unmarshalNCreateWebsiteInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCreateWebsiteInput(ctx context.Context, v interface{}) (ent.CreateWebsiteInput, error) {
 	res, err := ec.unmarshalInputCreateWebsiteInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, v interface{}) (ent.Cursor, error) {
+func (ec *executionContext) unmarshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, v interface{}) (ent.Cursor, error) {
 	var res ent.Cursor
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCursor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, sel ast.SelectionSet, v ent.Cursor) graphql.Marshaler {
+func (ec *executionContext) marshalNCursor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, sel ast.SelectionSet, v ent.Cursor) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNEmail2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v ent.Email) graphql.Marshaler {
+func (ec *executionContext) marshalNEmail2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v ent.Email) graphql.Marshaler {
 	return ec._Email(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v *ent.Email) graphql.Marshaler {
+func (ec *executionContext) marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v *ent.Email) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28343,11 +26473,11 @@ func (ec *executionContext) marshalNEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefin
 	return ec._Email(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNEmailConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx context.Context, sel ast.SelectionSet, v ent.EmailConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNEmailConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx context.Context, sel ast.SelectionSet, v ent.EmailConnection) graphql.Marshaler {
 	return ec._EmailConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx context.Context, sel ast.SelectionSet, v *ent.EmailConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailConnection(ctx context.Context, sel ast.SelectionSet, v *ent.EmailConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28357,13 +26487,13 @@ func (ec *executionContext) marshalNEmailConnection2ᚖgithubᚗcomᚋdiazoxide�
 	return ec._EmailConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx context.Context, v interface{}) (*ent.EmailOrderField, error) {
+func (ec *executionContext) unmarshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx context.Context, v interface{}) (*ent.EmailOrderField, error) {
 	var res = new(ent.EmailOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.EmailOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.EmailOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28373,12 +26503,12 @@ func (ec *executionContext) marshalNEmailOrderField2ᚖgithubᚗcomᚋdiazoxide�
 	return v
 }
 
-func (ec *executionContext) unmarshalNEmailWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (ent.EmailWhereInput, error) {
+func (ec *executionContext) unmarshalNEmailWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (ent.EmailWhereInput, error) {
 	res, err := ec.unmarshalInputEmailWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (*ent.EmailWhereInput, error) {
+func (ec *executionContext) unmarshalNEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (*ent.EmailWhereInput, error) {
 	res, err := ec.unmarshalInputEmailWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -28445,11 +26575,11 @@ func (ec *executionContext) marshalNID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ
 	return ret
 }
 
-func (ec *executionContext) marshalNImage2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v ent.Image) graphql.Marshaler {
+func (ec *executionContext) marshalNImage2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v ent.Image) graphql.Marshaler {
 	return ec._Image(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v *ent.Image) graphql.Marshaler {
+func (ec *executionContext) marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v *ent.Image) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28459,11 +26589,11 @@ func (ec *executionContext) marshalNImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefin
 	return ec._Image(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNImageConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx context.Context, sel ast.SelectionSet, v ent.ImageConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNImageConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx context.Context, sel ast.SelectionSet, v ent.ImageConnection) graphql.Marshaler {
 	return ec._ImageConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ImageConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ImageConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28473,13 +26603,13 @@ func (ec *executionContext) marshalNImageConnection2ᚖgithubᚗcomᚋdiazoxide�
 	return ec._ImageConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx context.Context, v interface{}) (*ent.ImageOrderField, error) {
+func (ec *executionContext) unmarshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx context.Context, v interface{}) (*ent.ImageOrderField, error) {
 	var res = new(ent.ImageOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ImageOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ImageOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28489,12 +26619,12 @@ func (ec *executionContext) marshalNImageOrderField2ᚖgithubᚗcomᚋdiazoxide�
 	return v
 }
 
-func (ec *executionContext) unmarshalNImageWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (ent.ImageWhereInput, error) {
+func (ec *executionContext) unmarshalNImageWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (ent.ImageWhereInput, error) {
 	res, err := ec.unmarshalInputImageWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (*ent.ImageWhereInput, error) {
+func (ec *executionContext) unmarshalNImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (*ent.ImageWhereInput, error) {
 	res, err := ec.unmarshalInputImageWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -28514,11 +26644,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNLocation2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v ent.Location) graphql.Marshaler {
+func (ec *executionContext) marshalNLocation2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v ent.Location) graphql.Marshaler {
 	return ec._Location(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v *ent.Location) graphql.Marshaler {
+func (ec *executionContext) marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v *ent.Location) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28528,11 +26658,11 @@ func (ec *executionContext) marshalNLocation2ᚖgithubᚗcomᚋdiazoxideᚋentre
 	return ec._Location(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNLocationConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx context.Context, sel ast.SelectionSet, v ent.LocationConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNLocationConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx context.Context, sel ast.SelectionSet, v ent.LocationConnection) graphql.Marshaler {
 	return ec._LocationConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx context.Context, sel ast.SelectionSet, v *ent.LocationConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationConnection(ctx context.Context, sel ast.SelectionSet, v *ent.LocationConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28542,13 +26672,13 @@ func (ec *executionContext) marshalNLocationConnection2ᚖgithubᚗcomᚋdiazoxi
 	return ec._LocationConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx context.Context, v interface{}) (*ent.LocationOrderField, error) {
+func (ec *executionContext) unmarshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx context.Context, v interface{}) (*ent.LocationOrderField, error) {
 	var res = new(ent.LocationOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.LocationOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.LocationOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28558,17 +26688,17 @@ func (ec *executionContext) marshalNLocationOrderField2ᚖgithubᚗcomᚋdiazoxi
 	return v
 }
 
-func (ec *executionContext) unmarshalNLocationWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (ent.LocationWhereInput, error) {
+func (ec *executionContext) unmarshalNLocationWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (ent.LocationWhereInput, error) {
 	res, err := ec.unmarshalInputLocationWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (*ent.LocationWhereInput, error) {
+func (ec *executionContext) unmarshalNLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (*ent.LocationWhereInput, error) {
 	res, err := ec.unmarshalInputLocationWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v []ent.Noder) graphql.Marshaler {
+func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v []ent.Noder) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -28592,7 +26722,7 @@ func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentrefine
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONode2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, sel, v[i])
+			ret[i] = ec.marshalONode2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -28606,25 +26736,25 @@ func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdiazoxideᚋentrefine
 	return ret
 }
 
-func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx context.Context, v interface{}) (ent.OrderDirection, error) {
+func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx context.Context, v interface{}) (ent.OrderDirection, error) {
 	var res ent.OrderDirection
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx context.Context, sel ast.SelectionSet, v ent.OrderDirection) graphql.Marshaler {
+func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐOrderDirection(ctx context.Context, sel ast.SelectionSet, v ent.OrderDirection) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v ent.PageInfo) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v ent.PageInfo) graphql.Marshaler {
 	return ec._PageInfo(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPhone2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v ent.Phone) graphql.Marshaler {
+func (ec *executionContext) marshalNPhone2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v ent.Phone) graphql.Marshaler {
 	return ec._Phone(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v *ent.Phone) graphql.Marshaler {
+func (ec *executionContext) marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v *ent.Phone) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28634,11 +26764,11 @@ func (ec *executionContext) marshalNPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefin
 	return ec._Phone(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPhoneConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx context.Context, sel ast.SelectionSet, v ent.PhoneConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNPhoneConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx context.Context, sel ast.SelectionSet, v ent.PhoneConnection) graphql.Marshaler {
 	return ec._PhoneConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneConnection(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28648,13 +26778,13 @@ func (ec *executionContext) marshalNPhoneConnection2ᚖgithubᚗcomᚋdiazoxide�
 	return ec._PhoneConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx context.Context, v interface{}) (*ent.PhoneOrderField, error) {
+func (ec *executionContext) unmarshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx context.Context, v interface{}) (*ent.PhoneOrderField, error) {
 	var res = new(ent.PhoneOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28664,21 +26794,21 @@ func (ec *executionContext) marshalNPhoneOrderField2ᚖgithubᚗcomᚋdiazoxide�
 	return v
 }
 
-func (ec *executionContext) unmarshalNPhoneWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (ent.PhoneWhereInput, error) {
+func (ec *executionContext) unmarshalNPhoneWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (ent.PhoneWhereInput, error) {
 	res, err := ec.unmarshalInputPhoneWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (*ent.PhoneWhereInput, error) {
+func (ec *executionContext) unmarshalNPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (*ent.PhoneWhereInput, error) {
 	res, err := ec.unmarshalInputPhoneWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProduct2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v ent.Product) graphql.Marshaler {
+func (ec *executionContext) marshalNProduct2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v ent.Product) graphql.Marshaler {
 	return ec._Product(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v *ent.Product) graphql.Marshaler {
+func (ec *executionContext) marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v *ent.Product) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28688,11 +26818,11 @@ func (ec *executionContext) marshalNProduct2ᚖgithubᚗcomᚋdiazoxideᚋentref
 	return ec._Product(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProductConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx context.Context, sel ast.SelectionSet, v ent.ProductConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNProductConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx context.Context, sel ast.SelectionSet, v ent.ProductConnection) graphql.Marshaler {
 	return ec._ProductConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ProductConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ProductConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28702,13 +26832,13 @@ func (ec *executionContext) marshalNProductConnection2ᚖgithubᚗcomᚋdiazoxid
 	return ec._ProductConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx context.Context, v interface{}) (*ent.ProductOrderField, error) {
+func (ec *executionContext) unmarshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx context.Context, v interface{}) (*ent.ProductOrderField, error) {
 	var res = new(ent.ProductOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ProductOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ProductOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28718,22 +26848,22 @@ func (ec *executionContext) marshalNProductOrderField2ᚖgithubᚗcomᚋdiazoxid
 	return v
 }
 
-func (ec *executionContext) unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (enums.ProcessStatus, error) {
 	var res enums.ProcessStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v enums.ProcessStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNProductWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (ent.ProductWhereInput, error) {
+func (ec *executionContext) unmarshalNProductWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (ent.ProductWhereInput, error) {
 	res, err := ec.unmarshalInputProductWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (*ent.ProductWhereInput, error) {
+func (ec *executionContext) unmarshalNProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (*ent.ProductWhereInput, error) {
 	res, err := ec.unmarshalInputProductWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -28768,61 +26898,61 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateCompanyInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateCompanyInput(ctx context.Context, v interface{}) (ent.UpdateCompanyInput, error) {
+func (ec *executionContext) unmarshalNUpdateCompanyInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateCompanyInput(ctx context.Context, v interface{}) (ent.UpdateCompanyInput, error) {
 	res, err := ec.unmarshalInputUpdateCompanyInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateCountryInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateCountryInput(ctx context.Context, v interface{}) (ent.UpdateCountryInput, error) {
+func (ec *executionContext) unmarshalNUpdateCountryInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateCountryInput(ctx context.Context, v interface{}) (ent.UpdateCountryInput, error) {
 	res, err := ec.unmarshalInputUpdateCountryInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateEmailInput(ctx context.Context, v interface{}) (ent.UpdateEmailInput, error) {
+func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateEmailInput(ctx context.Context, v interface{}) (ent.UpdateEmailInput, error) {
 	res, err := ec.unmarshalInputUpdateEmailInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateImageInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateImageInput(ctx context.Context, v interface{}) (ent.UpdateImageInput, error) {
+func (ec *executionContext) unmarshalNUpdateImageInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateImageInput(ctx context.Context, v interface{}) (ent.UpdateImageInput, error) {
 	res, err := ec.unmarshalInputUpdateImageInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateLocationInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateLocationInput(ctx context.Context, v interface{}) (ent.UpdateLocationInput, error) {
+func (ec *executionContext) unmarshalNUpdateLocationInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateLocationInput(ctx context.Context, v interface{}) (ent.UpdateLocationInput, error) {
 	res, err := ec.unmarshalInputUpdateLocationInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdatePhoneInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdatePhoneInput(ctx context.Context, v interface{}) (ent.UpdatePhoneInput, error) {
+func (ec *executionContext) unmarshalNUpdatePhoneInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdatePhoneInput(ctx context.Context, v interface{}) (ent.UpdatePhoneInput, error) {
 	res, err := ec.unmarshalInputUpdatePhoneInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateProductInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateProductInput(ctx context.Context, v interface{}) (ent.UpdateProductInput, error) {
+func (ec *executionContext) unmarshalNUpdateProductInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateProductInput(ctx context.Context, v interface{}) (ent.UpdateProductInput, error) {
 	res, err := ec.unmarshalInputUpdateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateVendorInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateVendorInput(ctx context.Context, v interface{}) (ent.UpdateVendorInput, error) {
+func (ec *executionContext) unmarshalNUpdateVendorInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateVendorInput(ctx context.Context, v interface{}) (ent.UpdateVendorInput, error) {
 	res, err := ec.unmarshalInputUpdateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateWarehouseInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateWarehouseInput(ctx context.Context, v interface{}) (ent.UpdateWarehouseInput, error) {
+func (ec *executionContext) unmarshalNUpdateWarehouseInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateWarehouseInput(ctx context.Context, v interface{}) (ent.UpdateWarehouseInput, error) {
 	res, err := ec.unmarshalInputUpdateWarehouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateWebsiteInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐUpdateWebsiteInput(ctx context.Context, v interface{}) (ent.UpdateWebsiteInput, error) {
+func (ec *executionContext) unmarshalNUpdateWebsiteInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐUpdateWebsiteInput(ctx context.Context, v interface{}) (ent.UpdateWebsiteInput, error) {
 	res, err := ec.unmarshalInputUpdateWebsiteInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNVendor2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v ent.Vendor) graphql.Marshaler {
+func (ec *executionContext) marshalNVendor2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v ent.Vendor) graphql.Marshaler {
 	return ec._Vendor(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v *ent.Vendor) graphql.Marshaler {
+func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v *ent.Vendor) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28832,11 +26962,11 @@ func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefi
 	return ec._Vendor(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNVendorConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx context.Context, sel ast.SelectionSet, v ent.VendorConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNVendorConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx context.Context, sel ast.SelectionSet, v ent.VendorConnection) graphql.Marshaler {
 	return ec._VendorConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNVendorConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx context.Context, sel ast.SelectionSet, v *ent.VendorConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNVendorConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorConnection(ctx context.Context, sel ast.SelectionSet, v *ent.VendorConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28846,13 +26976,13 @@ func (ec *executionContext) marshalNVendorConnection2ᚖgithubᚗcomᚋdiazoxide
 	return ec._VendorConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx context.Context, v interface{}) (*ent.VendorOrderField, error) {
+func (ec *executionContext) unmarshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx context.Context, v interface{}) (*ent.VendorOrderField, error) {
 	var res = new(ent.VendorOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.VendorOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.VendorOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28862,21 +26992,21 @@ func (ec *executionContext) marshalNVendorOrderField2ᚖgithubᚗcomᚋdiazoxide
 	return v
 }
 
-func (ec *executionContext) unmarshalNVendorWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (ent.VendorWhereInput, error) {
+func (ec *executionContext) unmarshalNVendorWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (ent.VendorWhereInput, error) {
 	res, err := ec.unmarshalInputVendorWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (*ent.VendorWhereInput, error) {
+func (ec *executionContext) unmarshalNVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (*ent.VendorWhereInput, error) {
 	res, err := ec.unmarshalInputVendorWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWarehouse2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v ent.Warehouse) graphql.Marshaler {
+func (ec *executionContext) marshalNWarehouse2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v ent.Warehouse) graphql.Marshaler {
 	return ec._Warehouse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v *ent.Warehouse) graphql.Marshaler {
+func (ec *executionContext) marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v *ent.Warehouse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28886,11 +27016,11 @@ func (ec *executionContext) marshalNWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentr
 	return ec._Warehouse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWarehouseConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx context.Context, sel ast.SelectionSet, v ent.WarehouseConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNWarehouseConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx context.Context, sel ast.SelectionSet, v ent.WarehouseConnection) graphql.Marshaler {
 	return ec._WarehouseConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseConnection(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28900,13 +27030,13 @@ func (ec *executionContext) marshalNWarehouseConnection2ᚖgithubᚗcomᚋdiazox
 	return ec._WarehouseConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx context.Context, v interface{}) (*ent.WarehouseOrderField, error) {
+func (ec *executionContext) unmarshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx context.Context, v interface{}) (*ent.WarehouseOrderField, error) {
 	var res = new(ent.WarehouseOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28916,21 +27046,21 @@ func (ec *executionContext) marshalNWarehouseOrderField2ᚖgithubᚗcomᚋdiazox
 	return v
 }
 
-func (ec *executionContext) unmarshalNWarehouseWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (ent.WarehouseWhereInput, error) {
+func (ec *executionContext) unmarshalNWarehouseWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (ent.WarehouseWhereInput, error) {
 	res, err := ec.unmarshalInputWarehouseWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (*ent.WarehouseWhereInput, error) {
+func (ec *executionContext) unmarshalNWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (*ent.WarehouseWhereInput, error) {
 	res, err := ec.unmarshalInputWarehouseWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWebsite2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v ent.Website) graphql.Marshaler {
+func (ec *executionContext) marshalNWebsite2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v ent.Website) graphql.Marshaler {
 	return ec._Website(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v *ent.Website) graphql.Marshaler {
+func (ec *executionContext) marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v *ent.Website) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28940,11 +27070,11 @@ func (ec *executionContext) marshalNWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentref
 	return ec._Website(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWebsiteConnection2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx context.Context, sel ast.SelectionSet, v ent.WebsiteConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNWebsiteConnection2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx context.Context, sel ast.SelectionSet, v ent.WebsiteConnection) graphql.Marshaler {
 	return ec._WebsiteConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteConnection(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28954,13 +27084,13 @@ func (ec *executionContext) marshalNWebsiteConnection2ᚖgithubᚗcomᚋdiazoxid
 	return ec._WebsiteConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx context.Context, v interface{}) (*ent.WebsiteOrderField, error) {
+func (ec *executionContext) unmarshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx context.Context, v interface{}) (*ent.WebsiteOrderField, error) {
 	var res = new(ent.WebsiteOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -28970,12 +27100,12 @@ func (ec *executionContext) marshalNWebsiteOrderField2ᚖgithubᚗcomᚋdiazoxid
 	return v
 }
 
-func (ec *executionContext) unmarshalNWebsiteWhereInput2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (ent.WebsiteWhereInput, error) {
+func (ec *executionContext) unmarshalNWebsiteWhereInput2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (ent.WebsiteWhereInput, error) {
 	res, err := ec.unmarshalInputWebsiteWhereInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (*ent.WebsiteWhereInput, error) {
+func (ec *executionContext) unmarshalNWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (*ent.WebsiteWhereInput, error) {
 	res, err := ec.unmarshalInputWebsiteWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -29259,14 +27389,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v *ent.Company) graphql.Marshaler {
+func (ec *executionContext) marshalOCompany2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompany(ctx context.Context, sel ast.SelectionSet, v *ent.Company) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Company(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CompanyEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CompanyEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29293,7 +27423,7 @@ func (ec *executionContext) marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOCompanyEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOCompanyEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29307,14 +27437,14 @@ func (ec *executionContext) marshalOCompanyEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 	return ret
 }
 
-func (ec *executionContext) marshalOCompanyEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOCompanyEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CompanyEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompanyEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx context.Context, v interface{}) (*ent.CompanyOrder, error) {
+func (ec *executionContext) unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyOrder(ctx context.Context, v interface{}) (*ent.CompanyOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29322,7 +27452,7 @@ func (ec *executionContext) unmarshalOCompanyOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CompanyWhereInput, error) {
+func (ec *executionContext) unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CompanyWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29334,7 +27464,7 @@ func (ec *executionContext) unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdia
 	res := make([]*ent.CompanyWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29342,7 +27472,7 @@ func (ec *executionContext) unmarshalOCompanyWhereInput2ᚕᚖgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (*ent.CompanyWhereInput, error) {
+func (ec *executionContext) unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCompanyWhereInput(ctx context.Context, v interface{}) (*ent.CompanyWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29350,14 +27480,14 @@ func (ec *executionContext) unmarshalOCompanyWhereInput2ᚖgithubᚗcomᚋdiazox
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v *ent.Country) graphql.Marshaler {
+func (ec *executionContext) marshalOCountry2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountry(ctx context.Context, sel ast.SelectionSet, v *ent.Country) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Country(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CountryEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CountryEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29384,7 +27514,7 @@ func (ec *executionContext) marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOCountryEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOCountryEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29398,14 +27528,14 @@ func (ec *executionContext) marshalOCountryEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 	return ret
 }
 
-func (ec *executionContext) marshalOCountryEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CountryEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOCountryEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CountryEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CountryEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx context.Context, v interface{}) (*ent.CountryOrder, error) {
+func (ec *executionContext) unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryOrder(ctx context.Context, v interface{}) (*ent.CountryOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29413,7 +27543,7 @@ func (ec *executionContext) unmarshalOCountryOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CountryWhereInput, error) {
+func (ec *executionContext) unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CountryWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29425,7 +27555,7 @@ func (ec *executionContext) unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdia
 	res := make([]*ent.CountryWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29433,7 +27563,7 @@ func (ec *executionContext) unmarshalOCountryWhereInput2ᚕᚖgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (*ent.CountryWhereInput, error) {
+func (ec *executionContext) unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCountryWhereInput(ctx context.Context, v interface{}) (*ent.CountryWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29441,7 +27571,7 @@ func (ec *executionContext) unmarshalOCountryWhereInput2ᚖgithubᚗcomᚋdiazox
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, v interface{}) (*ent.Cursor, error) {
+func (ec *executionContext) unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, v interface{}) (*ent.Cursor, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29450,21 +27580,21 @@ func (ec *executionContext) unmarshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentre
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, sel ast.SelectionSet, v *ent.Cursor) graphql.Marshaler {
+func (ec *executionContext) marshalOCursor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐCursor(ctx context.Context, sel ast.SelectionSet, v *ent.Cursor) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOEmail2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v *ent.Email) graphql.Marshaler {
+func (ec *executionContext) marshalOEmail2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmail(ctx context.Context, sel ast.SelectionSet, v *ent.Email) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Email(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.EmailEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.EmailEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29491,7 +27621,7 @@ func (ec *executionContext) marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOEmailEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOEmailEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29505,14 +27635,14 @@ func (ec *executionContext) marshalOEmailEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 	return ret
 }
 
-func (ec *executionContext) marshalOEmailEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx context.Context, sel ast.SelectionSet, v *ent.EmailEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOEmailEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailEdge(ctx context.Context, sel ast.SelectionSet, v *ent.EmailEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._EmailEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx context.Context, v interface{}) (*ent.EmailOrder, error) {
+func (ec *executionContext) unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailOrder(ctx context.Context, v interface{}) (*ent.EmailOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29520,7 +27650,7 @@ func (ec *executionContext) unmarshalOEmailOrder2ᚖgithubᚗcomᚋdiazoxideᚋe
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.EmailWhereInput, error) {
+func (ec *executionContext) unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.EmailWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29532,7 +27662,7 @@ func (ec *executionContext) unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	res := make([]*ent.EmailWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29540,7 +27670,7 @@ func (ec *executionContext) unmarshalOEmailWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (*ent.EmailWhereInput, error) {
+func (ec *executionContext) unmarshalOEmailWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐEmailWhereInput(ctx context.Context, v interface{}) (*ent.EmailWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29656,14 +27786,14 @@ func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ct
 	return res
 }
 
-func (ec *executionContext) marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v *ent.Image) graphql.Marshaler {
+func (ec *executionContext) marshalOImage2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImage(ctx context.Context, sel ast.SelectionSet, v *ent.Image) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Image(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ImageEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ImageEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29690,7 +27820,7 @@ func (ec *executionContext) marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOImageEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOImageEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29704,14 +27834,14 @@ func (ec *executionContext) marshalOImageEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 	return ret
 }
 
-func (ec *executionContext) marshalOImageEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ImageEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOImageEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ImageEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ImageEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx context.Context, v interface{}) (*ent.ImageOrder, error) {
+func (ec *executionContext) unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageOrder(ctx context.Context, v interface{}) (*ent.ImageOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29719,7 +27849,7 @@ func (ec *executionContext) unmarshalOImageOrder2ᚖgithubᚗcomᚋdiazoxideᚋe
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ImageWhereInput, error) {
+func (ec *executionContext) unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ImageWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29731,7 +27861,7 @@ func (ec *executionContext) unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	res := make([]*ent.ImageWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29739,7 +27869,7 @@ func (ec *executionContext) unmarshalOImageWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (*ent.ImageWhereInput, error) {
+func (ec *executionContext) unmarshalOImageWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐImageWhereInput(ctx context.Context, v interface{}) (*ent.ImageWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29763,14 +27893,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOLocation2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v *ent.Location) graphql.Marshaler {
+func (ec *executionContext) marshalOLocation2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocation(ctx context.Context, sel ast.SelectionSet, v *ent.Location) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Location(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.LocationEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.LocationEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29797,7 +27927,7 @@ func (ec *executionContext) marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOLocationEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOLocationEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29811,14 +27941,14 @@ func (ec *executionContext) marshalOLocationEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 	return ret
 }
 
-func (ec *executionContext) marshalOLocationEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx context.Context, sel ast.SelectionSet, v *ent.LocationEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOLocationEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationEdge(ctx context.Context, sel ast.SelectionSet, v *ent.LocationEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._LocationEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx context.Context, v interface{}) (*ent.LocationOrder, error) {
+func (ec *executionContext) unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationOrder(ctx context.Context, v interface{}) (*ent.LocationOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29826,7 +27956,7 @@ func (ec *executionContext) unmarshalOLocationOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.LocationWhereInput, error) {
+func (ec *executionContext) unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.LocationWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29838,7 +27968,7 @@ func (ec *executionContext) unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdi
 	res := make([]*ent.LocationWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29846,7 +27976,7 @@ func (ec *executionContext) unmarshalOLocationWhereInput2ᚕᚖgithubᚗcomᚋdi
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (*ent.LocationWhereInput, error) {
+func (ec *executionContext) unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐLocationWhereInput(ctx context.Context, v interface{}) (*ent.LocationWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29854,21 +27984,21 @@ func (ec *executionContext) unmarshalOLocationWhereInput2ᚖgithubᚗcomᚋdiazo
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONode2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
+func (ec *executionContext) marshalONode2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOPhone2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v *ent.Phone) graphql.Marshaler {
+func (ec *executionContext) marshalOPhone2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhone(ctx context.Context, sel ast.SelectionSet, v *ent.Phone) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Phone(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.PhoneEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.PhoneEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29895,7 +28025,7 @@ func (ec *executionContext) marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOPhoneEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOPhoneEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -29909,14 +28039,14 @@ func (ec *executionContext) marshalOPhoneEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋe
 	return ret
 }
 
-func (ec *executionContext) marshalOPhoneEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOPhoneEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneEdge(ctx context.Context, sel ast.SelectionSet, v *ent.PhoneEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._PhoneEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx context.Context, v interface{}) (*ent.PhoneOrder, error) {
+func (ec *executionContext) unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneOrder(ctx context.Context, v interface{}) (*ent.PhoneOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29924,7 +28054,7 @@ func (ec *executionContext) unmarshalOPhoneOrder2ᚖgithubᚗcomᚋdiazoxideᚋe
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.PhoneWhereInput, error) {
+func (ec *executionContext) unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.PhoneWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29936,7 +28066,7 @@ func (ec *executionContext) unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	res := make([]*ent.PhoneWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -29944,7 +28074,7 @@ func (ec *executionContext) unmarshalOPhoneWhereInput2ᚕᚖgithubᚗcomᚋdiazo
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (*ent.PhoneWhereInput, error) {
+func (ec *executionContext) unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐPhoneWhereInput(ctx context.Context, v interface{}) (*ent.PhoneWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -29952,14 +28082,14 @@ func (ec *executionContext) unmarshalOPhoneWhereInput2ᚖgithubᚗcomᚋdiazoxid
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v *ent.Product) graphql.Marshaler {
+func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProduct(ctx context.Context, sel ast.SelectionSet, v *ent.Product) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Product(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ProductEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ProductEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -29986,7 +28116,7 @@ func (ec *executionContext) marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOProductEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOProductEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30000,14 +28130,14 @@ func (ec *executionContext) marshalOProductEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 	return ret
 }
 
-func (ec *executionContext) marshalOProductEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ProductEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOProductEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ProductEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ProductEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx context.Context, v interface{}) (*ent.ProductOrder, error) {
+func (ec *executionContext) unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductOrder(ctx context.Context, v interface{}) (*ent.ProductOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30015,7 +28145,7 @@ func (ec *executionContext) unmarshalOProductOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, v interface{}) ([]enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, v interface{}) ([]enums.ProcessStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30027,7 +28157,7 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdia
 	res := make([]enums.ProcessStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -30035,7 +28165,7 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚕgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.ProcessStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -30062,7 +28192,7 @@ func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNProductProcessStatus2githubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30082,7 +28212,7 @@ func (ec *executionContext) marshalOProductProcessStatus2ᚕgithubᚗcomᚋdiazo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (*enums.ProcessStatus, error) {
+func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, v interface{}) (*enums.ProcessStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30091,14 +28221,14 @@ func (ec *executionContext) unmarshalOProductProcessStatus2ᚖgithubᚗcomᚋdia
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v *enums.ProcessStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProductProcessStatus2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚋschemaᚋenumsᚐProcessStatus(ctx context.Context, sel ast.SelectionSet, v *enums.ProcessStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ProductWhereInput, error) {
+func (ec *executionContext) unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ProductWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30110,7 +28240,7 @@ func (ec *executionContext) unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdia
 	res := make([]*ent.ProductWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -30118,7 +28248,7 @@ func (ec *executionContext) unmarshalOProductWhereInput2ᚕᚖgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (*ent.ProductWhereInput, error) {
+func (ec *executionContext) unmarshalOProductWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐProductWhereInput(ctx context.Context, v interface{}) (*ent.ProductWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30234,14 +28364,14 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	return res
 }
 
-func (ec *executionContext) marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v *ent.Vendor) graphql.Marshaler {
+func (ec *executionContext) marshalOVendor2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendor(ctx context.Context, sel ast.SelectionSet, v *ent.Vendor) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Vendor(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.VendorEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.VendorEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -30268,7 +28398,7 @@ func (ec *executionContext) marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOVendorEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOVendorEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30282,14 +28412,14 @@ func (ec *executionContext) marshalOVendorEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalOVendorEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx context.Context, sel ast.SelectionSet, v *ent.VendorEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOVendorEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorEdge(ctx context.Context, sel ast.SelectionSet, v *ent.VendorEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._VendorEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorOrder(ctx context.Context, v interface{}) (*ent.VendorOrder, error) {
+func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorOrder(ctx context.Context, v interface{}) (*ent.VendorOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30297,7 +28427,7 @@ func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋdiazoxideᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.VendorWhereInput, error) {
+func (ec *executionContext) unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.VendorWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30309,7 +28439,7 @@ func (ec *executionContext) unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiaz
 	res := make([]*ent.VendorWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -30317,7 +28447,7 @@ func (ec *executionContext) unmarshalOVendorWhereInput2ᚕᚖgithubᚗcomᚋdiaz
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (*ent.VendorWhereInput, error) {
+func (ec *executionContext) unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐVendorWhereInput(ctx context.Context, v interface{}) (*ent.VendorWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30325,14 +28455,14 @@ func (ec *executionContext) unmarshalOVendorWhereInput2ᚖgithubᚗcomᚋdiazoxi
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v *ent.Warehouse) graphql.Marshaler {
+func (ec *executionContext) marshalOWarehouse2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouse(ctx context.Context, sel ast.SelectionSet, v *ent.Warehouse) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Warehouse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.WarehouseEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.WarehouseEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -30359,7 +28489,7 @@ func (ec *executionContext) marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxide
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOWarehouseEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOWarehouseEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30373,14 +28503,14 @@ func (ec *executionContext) marshalOWarehouseEdge2ᚕᚖgithubᚗcomᚋdiazoxide
 	return ret
 }
 
-func (ec *executionContext) marshalOWarehouseEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOWarehouseEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseEdge(ctx context.Context, sel ast.SelectionSet, v *ent.WarehouseEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._WarehouseEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx context.Context, v interface{}) (*ent.WarehouseOrder, error) {
+func (ec *executionContext) unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseOrder(ctx context.Context, v interface{}) (*ent.WarehouseOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30388,7 +28518,7 @@ func (ec *executionContext) unmarshalOWarehouseOrder2ᚖgithubᚗcomᚋdiazoxide
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.WarehouseWhereInput, error) {
+func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.WarehouseWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30400,7 +28530,7 @@ func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋd
 	res := make([]*ent.WarehouseWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -30408,7 +28538,7 @@ func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚕᚖgithubᚗcomᚋd
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (*ent.WarehouseWhereInput, error) {
+func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWarehouseWhereInput(ctx context.Context, v interface{}) (*ent.WarehouseWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30416,14 +28546,14 @@ func (ec *executionContext) unmarshalOWarehouseWhereInput2ᚖgithubᚗcomᚋdiaz
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v *ent.Website) graphql.Marshaler {
+func (ec *executionContext) marshalOWebsite2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsite(ctx context.Context, sel ast.SelectionSet, v *ent.Website) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Website(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.WebsiteEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.WebsiteEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -30450,7 +28580,7 @@ func (ec *executionContext) marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOWebsiteEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalOWebsiteEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -30464,14 +28594,14 @@ func (ec *executionContext) marshalOWebsiteEdge2ᚕᚖgithubᚗcomᚋdiazoxide�
 	return ret
 }
 
-func (ec *executionContext) marshalOWebsiteEdge2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteEdge) graphql.Marshaler {
+func (ec *executionContext) marshalOWebsiteEdge2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteEdge(ctx context.Context, sel ast.SelectionSet, v *ent.WebsiteEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._WebsiteEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx context.Context, v interface{}) (*ent.WebsiteOrder, error) {
+func (ec *executionContext) unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteOrder(ctx context.Context, v interface{}) (*ent.WebsiteOrder, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30479,7 +28609,7 @@ func (ec *executionContext) unmarshalOWebsiteOrder2ᚖgithubᚗcomᚋdiazoxide�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.WebsiteWhereInput, error) {
+func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.WebsiteWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -30491,7 +28621,7 @@ func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdia
 	res := make([]*ent.WebsiteWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -30499,7 +28629,7 @@ func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚕᚖgithubᚗcomᚋdia
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentrefineᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (*ent.WebsiteWhereInput, error) {
+func (ec *executionContext) unmarshalOWebsiteWhereInput2ᚖgithubᚗcomᚋdiazoxideᚋentkitᚋexamplesᚋentᚑprojectᚋentᚐWebsiteWhereInput(ctx context.Context, v interface{}) (*ent.WebsiteWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}

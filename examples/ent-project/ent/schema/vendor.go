@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,16 +24,16 @@ func (Vendor) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("NAME"),
 			),
 		field.Text("schema").
 			Annotations(
 				entgql.OrderField("SCHEMA"),
-				EntRefine.FilterOperator(gen.Contains),
-				EntRefine.CodeField(
-					&EntRefine.CodeFieldOptions{
+				entkit.FilterOperator(gen.Contains),
+				entkit.CodeField(
+					&entkit.CodeFieldOptions{
 						Language: "graphql",
 					},
 				),
@@ -56,11 +55,12 @@ func (Vendor) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("StarOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.DeleteAction,
-			EntRefine.EditAction,
+		entkit.Icon("StarOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

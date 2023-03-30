@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
 	"github.com/google/uuid"
 )
 

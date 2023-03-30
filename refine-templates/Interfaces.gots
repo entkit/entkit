@@ -1,6 +1,6 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/interfaces.tsx" -}}
-/* eslint no-use-before-define: 0 */
 // Custom types
 export type {{$.Prefix}}String = string
 export type {{$.Prefix}}Number = number
@@ -55,5 +55,4 @@ export interface I{{ $n.Name}} {
     {{- end }}
 }
 {{- end -}}
-/* eslint no-use-before-define: 2 */
 {{- end -}}

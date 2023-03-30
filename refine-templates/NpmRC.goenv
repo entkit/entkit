@@ -1,4 +1,5 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define ".npmrc" -}}
 legacy-peer-deps=true
 strict-peer-dependencies=false

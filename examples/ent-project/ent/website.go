@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
 
@@ -202,9 +202,3 @@ func (w *Website) String() string {
 
 // Websites is a parsable slice of Website.
 type Websites []*Website
-
-func (w Websites) config(cfg config) {
-	for _i := range w {
-		w[_i].config = cfg
-	}
-}

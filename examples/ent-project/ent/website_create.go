@@ -23,9 +23,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
 
@@ -202,13 +202,7 @@ func (wc *WebsiteCreate) sqlSave(ctx context.Context) (*Website, error) {
 func (wc *WebsiteCreate) createSpec() (*Website, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Website{config: wc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: website.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: website.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(website.Table, sqlgraph.NewFieldSpec(website.FieldID, field.TypeUUID))
 	)
 	if id, ok := wc.mutation.ID(); ok {
 		_node.ID = id
@@ -234,10 +228,7 @@ func (wc *WebsiteCreate) createSpec() (*Website, *sqlgraph.CreateSpec) {
 			Columns: []string{website.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -254,10 +245,7 @@ func (wc *WebsiteCreate) createSpec() (*Website, *sqlgraph.CreateSpec) {
 			Columns: []string{website.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -293,8 +281,8 @@ func (wcb *WebsiteCreateBulk) Save(ctx context.Context) ([]*Website, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, wcb.builders[i+1].mutation)
 				} else {

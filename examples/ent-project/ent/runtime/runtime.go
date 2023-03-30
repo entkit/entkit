@@ -16,9 +16,9 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/diazoxide/entrefine/examples/ent-project/ent/runtime.go
+// The schema-stitching logic is generated in github.com/entkit/entkit/examples/ent-project/ent/runtime.go
 
 const (
-	Version = "v0.11.6"                                         // Version of ent codegen.
-	Sum     = "h1:fMQwhuzbPv12AXdrAGyHoOcgh9r0D9F8WEsCRoUWxVc=" // Sum of ent codegen.
+	Version = "v0.11.11-0.20230320171104-c35f786f8663"          // Version of ent codegen.
+	Sum     = "h1:LsUI7igPqehUh0VzufVfV9x40cWeeRk/kmS53f66HQs=" // Sum of ent codegen.
 )

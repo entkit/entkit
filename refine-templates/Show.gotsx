@@ -1,6 +1,6 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/show.tsx" -}}
-/* eslint no-use-before-define: 0 */
 import React, { useState } from "react";
 import { useShow } from "@refinedev/core";
 import * as RA from "@refinedev/antd";
@@ -72,7 +72,7 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [edgesDiagram, setedgesDiagram] = useState(false)
+    const [edgesDiagram, setEdgesDiagram] = useState(false)
 
     if(!record){
         return <></>
@@ -138,9 +138,9 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
         <RA.Show isLoading={isLoading}
                  headerButtons={({ defaultButtons }) => (
                      <>
-                     {defaultButtons}
-                     <Antd.Button icon={<AntdIcons.ClusterOutlined />} type="primary" onClick={ ()=>{ setedgesDiagram(!edgesDiagram) } }>Edges Diagram</Antd.Button>
-                     {{- range $a := $n.Annotations.ENTREFINE.Actions }}
+                     {{/*{defaultButtons}*/}}
+                     <Antd.Button icon={<AntdIcons.ClusterOutlined />} type="primary" onClick={ ()=>{ setEdgesDiagram(!edgesDiagram) } }>Edges Diagram</Antd.Button>
+                     {{- range $a := $n.Annotations.ENTKIT.Actions }}
                      {{ if $a.OnShow }}
                      <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
                      {{- end }}
@@ -153,8 +153,8 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                 {{- range $f := $allFields}}
                 <Antd.Typography.Title level={5}>{{ $f.Name | ER_label }}</Antd.Typography.Title>
                 {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
-                {{- if not (empty $f.Annotations.ENTREFINE.ViewOnShow) }}
-                {{ $viewName = print "Custom." $f.Annotations.ENTREFINE.ViewOnShow }}
+                {{- if not (empty $f.Annotations.ENTKIT.ViewOnShow) }}
+                {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnShow }}
                 {{- end}}
                 <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
                 {{- end }}
@@ -165,8 +165,8 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                         {{- range $e := $n.EdgesWithID }}
                         {{- $titleField := (ER_titleField $e.Type) }}
                         {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.ENTREFINE.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.ENTREFINE.Badge }}
+                        {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
+                        {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
                         {{- end}}
                         {{- if $e.Unique }}
                         <Antd.Descriptions.Item label="{{ $e.Name | ER_label }}">
@@ -185,7 +185,7 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
                         {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
                         {
                             label: <span>
-                                <AntdIcons.{{default "FileOutlined" $e.Type.Annotations.ENTREFINE.Icon}} />
+                                <AntdIcons.{{default "FileOutlined" $e.Type.Annotations.ENTKIT.Icon}} />
                                 {{$e.Name | ER_label}}
                             </span>,
                             key: "{{$i}}",
@@ -212,7 +212,7 @@ export const {{$n.Name}}Show : React.FC<{{$n.Name}}ShowProps> = ({id, withEdges,
             </> : null }
 
             { edgesDiagram ?
-                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTREFINE.EdgesDiagram }}
+                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTKIT.EdgesDiagram }}
                 <{{$diagramView}}
                     nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
                     links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
@@ -233,5 +233,4 @@ export const {{$n.Name}}PartialShow : React.FC = () => {
 
 {{- end -}}
 
-/* eslint no-use-before-define: 2 */
 {{- end -}}

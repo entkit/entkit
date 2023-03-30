@@ -19,12 +19,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/diazoxide/entrefine/examples/ent-project/ent"
+	"github.com/entkit/entkit/examples/ent-project/ent"
 	// required by schema hooks.
-	_ "github.com/diazoxide/entrefine/examples/ent-project/ent/runtime"
+	_ "github.com/entkit/entkit/examples/ent-project/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/migrate"
+	"github.com/entkit/entkit/examples/ent-project/ent/migrate"
 )
 
 type (

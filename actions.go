@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"strings"
@@ -41,7 +41,7 @@ var (
 		ActionWithRoute(NewRoute("edit/:id", "Edit.{name}Edit")),
 		ActionWithIcon("AntdIcons.EditOutlined"),
 		ActionDisplayOnList(true),
-		ActionDisplayOnShow(false),
+		ActionDisplayOnShow(true),
 		ActionDisplayOnEdit(false),
 	)
 	// CreateAction standard create action
@@ -52,7 +52,7 @@ var (
 		ActionWithIcon("AntdIcons.PlusCircleOutlined"),
 		ActionWithRoute(NewRoute("create", "Create.{name}Create")),
 		ActionDisplayOnList(true),
-		ActionDisplayOnShow(true),
+		ActionDisplayOnShow(false),
 		ActionDisplayOnEdit(false),
 	)
 	// ShowAction standard show action

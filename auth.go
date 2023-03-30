@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"entgo.io/ent/entc/gen"
@@ -12,7 +12,11 @@ type Auth struct {
 type AuthOption = func(auth *Auth) error
 
 func NewAuth(options ...AuthOption) *Auth {
-	auth := &Auth{}
+	auth := &Auth{
+		Keycloak: &Keycloak{
+			Enabled: BoolP(false),
+		},
+	}
 	for _, opt := range options {
 		if err := opt(auth); err != nil {
 			panic(err)
@@ -39,7 +43,7 @@ func GenerateAuthResourcesHook(ex *Extension) gen.Hook {
 			}
 
 			if ex.Auth.Keycloak != nil && PBool(ex.Auth.Keycloak.Enabled) {
-				ex.Auth.Keycloak.GenerateKeycloakResources(g, ex.Prefix)
+				ex.Auth.Keycloak.GenerateKeycloakResources(g, PString(ex.Prefix))
 			}
 
 			return next.Generate(g)
@@ -47,7 +51,7 @@ func GenerateAuthResourcesHook(ex *Extension) gen.Hook {
 	}
 }
 
-var AuthContextKey = "entrefine_auth_context"
+var AuthContextKey = "entkit_auth_context"
 
 type contextKey struct {
 	name string

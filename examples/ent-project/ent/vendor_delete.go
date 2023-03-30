@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
 )
 
 // VendorDelete is the builder for deleting a Vendor entity.
@@ -54,15 +54,7 @@ func (vd *VendorDelete) ExecX(ctx context.Context) int {
 }
 
 func (vd *VendorDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: vendor.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: vendor.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(vendor.Table, sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID))
 	if ps := vd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type VendorDeleteOne struct {
 	vd *VendorDelete
 }
 
+// Where appends a list predicates to the VendorDelete builder.
+func (vdo *VendorDeleteOne) Where(ps ...predicate.Vendor) *VendorDeleteOne {
+	vdo.vd.mutation.Where(ps...)
+	return vdo
+}
+
 // Exec executes the deletion query.
 func (vdo *VendorDeleteOne) Exec(ctx context.Context) error {
 	n, err := vdo.vd.Exec(ctx)
@@ -98,5 +96,7 @@ func (vdo *VendorDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (vdo *VendorDeleteOne) ExecX(ctx context.Context) {
-	vdo.vd.ExecX(ctx)
+	if err := vdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

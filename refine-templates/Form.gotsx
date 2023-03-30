@@ -1,6 +1,6 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "partial:imports" -}}
-/* eslint no-use-before-define: 0 */
 import {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
@@ -14,7 +14,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 {{- end -}}
 {{- define "partial:footer" -}}
-/* eslint no-use-before-define: 2 */
 {{- end -}}
 
 {{- define "partial:selectProps" }}
@@ -22,7 +21,7 @@ import 'react-quill/dist/quill.snow.css';
 const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
 {{- $titleField := $ed.Type.ID }}
 {{- range $f:=$ed.Type.Fields }}
-{{- if $f.Annotations.ENTREFINE.TitleField }}
+{{- if $f.Annotations.ENTKIT.TitleField }}
 {{- $titleField = $f }}
 {{- end }}
 
@@ -59,8 +58,8 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$ed.
     {{- end }}
 >
     {{- $viewName := ( print "View." (ER_fieldTSType .) "ViewOnForm" ) }}
-    {{- if not (empty .Annotations.ENTREFINE.ViewOnForm) }}
-    {{ $viewName = print "Custom." .Annotations.ENTREFINE.ViewOnForm }}
+    {{- if not (empty .Annotations.ENTKIT.ViewOnForm) }}
+    {{ $viewName = print "Custom." .Annotations.ENTKIT.ViewOnForm }}
     {{- end}}
      <{{$viewName}}/>
 </Antd.Form.Item>
@@ -68,7 +67,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$ed.
 
 {{- define "partial:edgeInputs" -}}
 {{- range $e := .EdgesWithID }}
-{{- if not $e.Annotations.ENTREFINE.HideOnForm }}
+{{- if not $e.Annotations.ENTKIT.HideOnForm }}
 {{- $gqlFieldName := print `{["` (singular $e.Name | camel) `IDs"]}` }}
 {{- $mode := `"multiple"` }}
 {{- if $e.Unique}}
@@ -99,15 +98,15 @@ export const {{$n.Name}}Edit: React.FC = () => {
                 fields: [
                     {{- range $f := $n.Fields}}
                     {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                    {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
-                    {{- if not $f.Annotations.ENTREFINE.HideOnEdit }}
+                    {{- if not $f.Annotations.ENTKIT.HideOnForm }}
+                    {{- if not $f.Annotations.ENTKIT.HideOnEdit }}
                     "{{ camel $f.Name}}",
                     {{- end }}
                     {{- end }}
                     {{- end }}
                     {{- end }}
                     {{- range $e := $n.EdgesWithID}}
-                    {{- if not $e.Annotations.ENTREFINE.HideOnForm }}
+                    {{- if not $e.Annotations.ENTKIT.HideOnForm }}
                     {{- if $e.Unique}}
                     {
                         "{{ camel $e.Name }}": [ "id" ]
@@ -139,8 +138,8 @@ export const {{$n.Name}}Edit: React.FC = () => {
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
-                {{- if not $f.Annotations.ENTREFINE.HideOnEdit }}
+                {{- if not $f.Annotations.ENTKIT.HideOnForm }}
+                {{- if not $f.Annotations.ENTKIT.HideOnEdit }}
                 {{ (include "partial:fieldInput" $f) | nindent 16 }}
                 {{- end }}
                 {{- end }}
@@ -172,8 +171,8 @@ export const {{$n.Name}}Create: React.FC = () => {
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
-                {{- if not $f.Annotations.ENTREFINE.HideOnForm }}
-                {{- if not $f.Annotations.ENTREFINE.HideOnCreate }}
+                {{- if not $f.Annotations.ENTKIT.HideOnForm }}
+                {{- if not $f.Annotations.ENTKIT.HideOnCreate }}
                 {{- (include "partial:fieldInput" $f) | nindent 16 }}
                 {{- end }}
                 {{- end }}

@@ -26,7 +26,7 @@ import "context"
 
 		{{- $allFields := append $n.Fields $n.ID }}
 		{{- range $f := $allFields }}
-		{{- $operator := default "EQ" $f.Annotations.REFINE.FilterOperator }}
+		{{- $operator := default "EQ" $f.Annotations.ENTKIT.FilterOperator }}
 		{{- if $f.IsUUID }}
 		// id uuid Field
 		u, err := uuid.Parse(*q)

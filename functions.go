@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 
 func someField(node *gen.Type, field string) *gen.Field {
 	for _, f := range node.Fields {
-		_ant := f.Annotations["ENTREFINE"]
+		_ant := f.Annotations["ENTKIT"]
 		ant, ok := _ant.(map[string]any)
 
 		if !ok {
@@ -24,7 +24,7 @@ func someField(node *gen.Type, field string) *gen.Field {
 
 func someNode(graph *gen.Graph, field string) *gen.Type {
 	for _, n := range graph.Nodes {
-		_ant := n.Annotations["ENTREFINE"]
+		_ant := n.Annotations["ENTKIT"]
 		ant, ok := _ant.(map[string]any)
 
 		if !ok {
@@ -52,7 +52,7 @@ func mainImageField(node *gen.Type) *gen.Field {
 }
 
 func getActionByName(node *gen.Type, name string) *Action {
-	_ant, ok := node.Annotations["ENTREFINE"].(map[string]any)
+	_ant, ok := node.Annotations["ENTKIT"].(map[string]any)
 	j, _ := json.Marshal(_ant)
 	var ant RefineAnnotation
 	_ = json.Unmarshal(j, &ant)

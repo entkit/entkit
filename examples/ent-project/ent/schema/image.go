@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,14 +24,14 @@ func (Image) Fields() []ent.Field {
 		field.String("title").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("TITLE"),
 			),
 		field.String("original_url").
 			Annotations(
 				entgql.OrderField("ORIGINAL_URL"),
-				EntRefine.MainImageField(),
+				entkit.MainImageField(),
 			).
 			MaxLen(128),
 	}
@@ -57,11 +56,12 @@ func (Image) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("CameraOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.DeleteAction,
-			EntRefine.EditAction,
+		entkit.Icon("CameraOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

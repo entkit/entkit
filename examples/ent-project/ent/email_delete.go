@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 )
 
 // EmailDelete is the builder for deleting a Email entity.
@@ -54,15 +54,7 @@ func (ed *EmailDelete) ExecX(ctx context.Context) int {
 }
 
 func (ed *EmailDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: email.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: email.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(email.Table, sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID))
 	if ps := ed.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type EmailDeleteOne struct {
 	ed *EmailDelete
 }
 
+// Where appends a list predicates to the EmailDelete builder.
+func (edo *EmailDeleteOne) Where(ps ...predicate.Email) *EmailDeleteOne {
+	edo.ed.mutation.Where(ps...)
+	return edo
+}
+
 // Exec executes the deletion query.
 func (edo *EmailDeleteOne) Exec(ctx context.Context) error {
 	n, err := edo.ed.Exec(ctx)
@@ -98,5 +96,7 @@ func (edo *EmailDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (edo *EmailDeleteOne) ExecX(ctx context.Context) {
-	edo.ed.ExecX(ctx)
+	if err := edo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

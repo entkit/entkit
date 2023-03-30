@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,22 +24,22 @@ func (Website) Fields() []ent.Field {
 		field.String("title").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
+				entkit.TitleField(),
 				entgql.OrderField("TITLE"),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 			),
 		field.String("description").
 			MaxLen(500).
 			Annotations(
 				entgql.OrderField("DESCRIPTION"),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 			),
 		field.String("url").
 			MaxLen(128).
 			Annotations(
 				entgql.OrderField("URL"),
-				EntRefine.FilterOperator(gen.Contains),
-				EntRefine.URLField(),
+				entkit.FilterOperator(gen.Contains),
+				entkit.URLField(),
 			),
 	}
 }
@@ -61,11 +60,12 @@ func (Website) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("LinkOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.DeleteAction,
-			EntRefine.EditAction,
+		entkit.Icon("LinkOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

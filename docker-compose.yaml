@@ -5,6 +5,6 @@ services:
     build:
       context: "./"
       args:
-        GRAPHQL_URI: "https://demo.entrefine.dev/query"
+        GRAPHQL_URI: "https://demo.entkit.dev/query"
     ports:
       - "80:80"

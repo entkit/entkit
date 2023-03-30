@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 )
 
 // PhoneDelete is the builder for deleting a Phone entity.
@@ -54,15 +54,7 @@ func (pd *PhoneDelete) ExecX(ctx context.Context) int {
 }
 
 func (pd *PhoneDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: phone.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: phone.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(phone.Table, sqlgraph.NewFieldSpec(phone.FieldID, field.TypeUUID))
 	if ps := pd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type PhoneDeleteOne struct {
 	pd *PhoneDelete
 }
 
+// Where appends a list predicates to the PhoneDelete builder.
+func (pdo *PhoneDeleteOne) Where(ps ...predicate.Phone) *PhoneDeleteOne {
+	pdo.pd.mutation.Where(ps...)
+	return pdo
+}
+
 // Exec executes the deletion query.
 func (pdo *PhoneDeleteOne) Exec(ctx context.Context) error {
 	n, err := pdo.pd.Exec(ctx)
@@ -98,5 +96,7 @@ func (pdo *PhoneDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (pdo *PhoneDeleteOne) ExecX(ctx context.Context) {
-	pdo.pd.ExecX(ctx)
+	if err := pdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

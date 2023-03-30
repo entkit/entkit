@@ -1,12 +1,13 @@
-package entrefine
+package entkit
 
 import (
 	"embed"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"errors"
 	"github.com/Masterminds/sprig/v3"
-	"github.com/diazoxide/entrefine/common"
+	"github.com/entkit/entkit/common"
 	"text/template"
 )
 
@@ -22,15 +23,16 @@ type ExtensionOption = func(*Extension) error
 // Extension main struct
 type Extension struct {
 	entc.DefaultExtension
-	AppPath             string         // AppPath JS Application path (packages.json directory path)
-	GraphqlURL          string         // Graphql URL
-	Meta                map[string]any // Meta to share with frontend application
-	Prefix              string
-	GoJs                GoJSOptions
-	ForceGraph2D        ForceGraph2DOptions
-	DefaultEdgesDiagram string
+	IgnoreUncommittedChanges *bool
+	AppPath                  *string // AppPath JS Application path (packages.json directory path)
+	GraphqlURL               *string // Graphql URL
+	Prefix                   *string // General prefix for all generated resources
+	GoJs                     GoJSOptions
+	ForceGraph2D             ForceGraph2DOptions
+	DefaultEdgesDiagram      string
+	Auth                     *Auth
 
-	Auth *Auth
+	Meta map[string]any // Meta to share with frontend application
 }
 
 type GoJSOptions struct {
@@ -45,7 +47,14 @@ type ForceGraph2DOptions struct {
 // WithAppPath define refine-project directory
 func WithAppPath(path string) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.AppPath = path
+		ex.AppPath = StringP(path)
+		return nil
+	}
+}
+
+func IgnoreUncommittedChanges() ExtensionOption {
+	return func(ex *Extension) (err error) {
+		ex.IgnoreUncommittedChanges = BoolP(true)
 		return nil
 	}
 }
@@ -53,7 +62,8 @@ func WithAppPath(path string) ExtensionOption {
 // WithGraphqlURL define graphql server url
 func WithGraphqlURL(url string) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.GraphqlURL = url
+		ex.GraphqlURL = StringP(url)
+		WithMeta("GraphqlURL", url)
 		return nil
 	}
 }
@@ -61,7 +71,7 @@ func WithGraphqlURL(url string) ExtensionOption {
 // WithTypeScriptPrefix define typescript types/vars prefix
 func WithTypeScriptPrefix(prefix string) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.Prefix = prefix
+		ex.Prefix = StringP(prefix)
 		return nil
 	}
 }
@@ -98,10 +108,10 @@ func WithForceGraph2D(options ForceGraph2DOptions) ExtensionOption {
 	}
 }
 
-// WithMeta add metadata to `{AppPath}/entrefine.json`
-func WithMeta(meta map[string]any) ExtensionOption {
+// WithMeta add metadata to `{AppPath}/entkit.json`
+func WithMeta(key string, value any) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.Meta = meta
+		ex.Meta[key] = value
 		return nil
 	}
 }
@@ -110,21 +120,22 @@ func WithMeta(meta map[string]any) ExtensionOption {
 func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	ex := &Extension{
 		Meta:                map[string]any{},
-		Prefix:              "Ent",
+		Prefix:              StringP("Ent"),
 		DefaultEdgesDiagram: "Diagram.GoJS",
 		GoJs: GoJSOptions{
 			Enabled:    true,
 			LicenseKey: "test",
 		},
+		Auth: NewAuth(),
 	}
 
 	_funcMap := template.FuncMap{
 		"ER_label": common.ToLabel,
 		"ER_fieldTSType": func(f gen.Field) string {
-			return common.FieldTSType(f, ex.Prefix)
+			return common.FieldTSType(f, PString(ex.Prefix))
 		},
 		"ER_tsType": func(t string) string {
-			return common.TSType(t, ex.Prefix)
+			return common.TSType(t, PString(ex.Prefix))
 		},
 		"ER_resourceAlias":   common.ResourceAlias,
 		"ER_someField":       someField,
@@ -132,6 +143,9 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		"ER_someNode":        someNode,
 		"ER_mainImageField":  mainImageField,
 		"ER_getActionByName": getActionByName,
+		"ER_prepareName": func(str string) string {
+			return PrepareName(PString(ex.Prefix), str)
+		},
 	}
 
 	if len(funcMap) == 0 {
@@ -157,6 +171,15 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 			return nil, err
 		}
 	}
+
+	if ex.AppPath == nil {
+		return nil, errors.New("'AppPath' is required. Use 'WithAppPath' method to set it")
+	}
+
+	if ex.GraphqlURL == nil {
+		return nil, errors.New("'GraphqlURL' is required. Use 'WithGraphqlURL' method to set it")
+	}
+
 	return ex, nil
 }
 
@@ -167,14 +190,14 @@ type Annotations struct {
 
 // Name of the annotation. Used by the codegen templates.
 func (Annotations) Name() string {
-	return "ENTREFINE"
+	return "ENTKIT"
 }
 
 // Annotations Define Ent annotations
 func (ex *Extension) Annotations() []entc.Annotation {
 	return []entc.Annotation{
 		Annotations{
-			Prefix: ex.Prefix,
+			Prefix: PString(ex.Prefix),
 			Auth:   ex.Auth,
 		},
 	}

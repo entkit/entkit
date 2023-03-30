@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
 	"github.com/google/uuid"
 )
 
@@ -202,9 +202,3 @@ func (e *Email) String() string {
 
 // Emails is a parsable slice of Email.
 type Emails []*Email
-
-func (e Emails) config(cfg config) {
-	for _i := range e {
-		e[_i].config = cfg
-	}
-}

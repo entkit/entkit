@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"entgo.io/ent/entc/gen"
@@ -176,7 +176,7 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 
 // Name annotation
 func (ra RefineAnnotation) Name() string {
-	return "ENTREFINE"
+	return "ENTKIT"
 }
 
 // Actions actions/buttons on list items

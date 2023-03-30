@@ -24,10 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
 	"github.com/google/uuid"
 )
 
@@ -243,10 +243,12 @@ func (eq *EmailQuery) AllX(ctx context.Context) []*Email {
 }
 
 // IDs executes the query and returns a list of Email IDs.
-func (eq *EmailQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (eq *EmailQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if eq.ctx.Unique == nil && eq.path != nil {
+		eq.Unique(true)
+	}
 	ctx = setContextOp(ctx, eq.ctx, "IDs")
-	if err := eq.Select(email.FieldID).Scan(ctx, &ids); err != nil {
+	if err = eq.Select(email.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -552,20 +554,12 @@ func (eq *EmailQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (eq *EmailQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   email.Table,
-			Columns: email.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: email.FieldID,
-			},
-		},
-		From:   eq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID))
+	_spec.From = eq.sql
 	if unique := eq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if eq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := eq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

@@ -24,10 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 	"github.com/google/uuid"
 )
 
@@ -243,10 +243,12 @@ func (wq *WebsiteQuery) AllX(ctx context.Context) []*Website {
 }
 
 // IDs executes the query and returns a list of Website IDs.
-func (wq *WebsiteQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (wq *WebsiteQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if wq.ctx.Unique == nil && wq.path != nil {
+		wq.Unique(true)
+	}
 	ctx = setContextOp(ctx, wq.ctx, "IDs")
-	if err := wq.Select(website.FieldID).Scan(ctx, &ids); err != nil {
+	if err = wq.Select(website.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -552,20 +554,12 @@ func (wq *WebsiteQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (wq *WebsiteQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   website.Table,
-			Columns: website.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: website.FieldID,
-			},
-		},
-		From:   wq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(website.Table, website.Columns, sqlgraph.NewFieldSpec(website.FieldID, field.TypeUUID))
+	_spec.From = wq.sql
 	if unique := wq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if wq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := wq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

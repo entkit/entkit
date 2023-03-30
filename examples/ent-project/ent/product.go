@@ -22,10 +22,10 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -267,9 +267,3 @@ func (pr *Product) String() string {
 
 // Products is a parsable slice of Product.
 type Products []*Product
-
-func (pr Products) config(cfg config) {
-	for _i := range pr {
-		pr[_i].config = cfg
-	}
-}

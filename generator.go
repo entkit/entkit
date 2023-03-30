@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"bytes"
@@ -38,22 +38,28 @@ func GenerateRefineScriptsHook(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 
-			tracked := false
-			cmd := exec.Command("git", "update-index", "--refresh")
-			_ = cmd.Run()
-			cmd = exec.Command("git", "diff-index", "--quiet", "HEAD", "--")
-			err := cmd.Run()
-			if exitError, ok := err.(*exec.ExitError); ok {
-				if exitError.ExitCode() > 0 {
-					fmt.Println("entrefine: skipped: \"It seems you have uncommitted changes. Please commit them before proceeding with code generation.\"")
-				}
-			} else {
+			var tracked = false
+
+			if PBool(ex.IgnoreUncommittedChanges) {
 				tracked = true
+			} else {
+				cmd := exec.Command("git", "update-index", "--refresh")
+				_ = cmd.Run()
+				cmd = exec.Command("git", "diff-index", "--quiet", "HEAD", "--")
+				err := cmd.Run()
+				if exitError, ok := err.(*exec.ExitError); ok {
+					if exitError.ExitCode() > 0 {
+						fmt.Println("entkit: skipped: \"It seems you have uncommitted changes. Please commit them before proceeding with code generation.\"")
+					}
+				} else {
+					tracked = true
+				}
 			}
 
 			if tracked {
 				NewRefineGen(ex, g).Generate()
 			}
+
 			return next.Generate(g)
 		})
 	}
@@ -75,7 +81,7 @@ type RefineGen struct {
 func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 	rg := &RefineGen{
 		Extension: extension,
-		Prefix:    extension.Prefix,
+		Prefix:    PString(extension.Prefix),
 		Graph:     graph,
 		SkipModes: SkipModes{
 			SkipEnumField:           entgql.SkipEnumField,
@@ -107,7 +113,7 @@ func NewRefineGen(extension *Extension, graph *gen.Graph) *RefineGen {
 
 // saveGenerated Save generated file
 func (rg *RefineGen) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	resDir := rg.Extension.AppPath
+	resDir := PString(rg.Extension.AppPath)
 	p := filepath.Join(resDir, name)
 
 	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
@@ -162,11 +168,16 @@ func (rg *RefineGen) Generate() {
 	var (
 		DynamicTemplates = []*gen.Template{
 			parseT("refine-templates/Tsconfig.gojson"),
+			parseT("refine-templates/Eslintignore.goignore"),
+			parseT("refine-templates/Eslintrc.gojson"),
+			parseT("refine-templates/Prettierignore.goignore"),
+			parseT("refine-templates/Prettierrc.gojson"),
 			parseT("refine-templates/Gitignore.goignore"),
 			parseT("refine-templates/NpmRC.goenv"),
 			parseT("refine-templates/Package.gojson"),
 			parseT("refine-templates/Index.gohtml"),
-			parseT("refine-templates/Definition.gots"),
+			parseT("refine-templates/Header.gotsx"),
+			parseT("refine-templates/Environment.gotsx"),
 			parseT("refine-templates/Index.gotsx"),
 			parseT("refine-templates/Login.gotsx"),
 			parseT("refine-templates/App.gotsx"),
@@ -174,7 +185,6 @@ func (rg *RefineGen) Generate() {
 			parseT("refine-templates/Form.gotsx"),
 			parseT("refine-templates/Table.gotsx"),
 			parseT("refine-templates/List.gotsx"),
-			parseT("refine-templates/Resources.gotsx"),
 			parseT("refine-templates/Routes.gotsx"),
 			parseT("refine-templates/Interfaces.gots"),
 			parseT("refine-templates/DataProvider.gots"),
@@ -202,7 +212,7 @@ func (rg *RefineGen) Generate() {
 
 func (rg *RefineGen) updatePackages() {
 	cmd := exec.Command("/bin/sh", "-c", "npm i && npm run lint && npm run build")
-	cmd.Dir = rg.Extension.AppPath
+	cmd.Dir = PString(rg.Extension.AppPath)
 	out, _ := cmd.Output()
 	println(string(out))
 }

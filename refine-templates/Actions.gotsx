@@ -1,7 +1,7 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/action.tsx" -}}
 import React from "react";
-import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
 import * as AntdIcons from "@ant-design/icons";
 import {
@@ -11,22 +11,21 @@ import {
 } from "@refinedev/ui-types";
 import {ButtonProps, Popconfirm} from "antd";
 import {
-    DeleteOneResponse,
-    useCan,
     useCustomMutation,
     useNotification,
-    useResource,
     useInvalidate,
     useLink,
 } from "@refinedev/core";
-import {ViewProps} from "./view";
 import * as Custom from "./custom";
 import * as Type from "./interfaces";
+{{- if $.Extension.Auth.Enabled }}
+import { usePermissions } from "@refinedev/core";
+{{- end }}
 
 {{- range $n := $.Graph.Nodes }}
-{{- range $a := $n.Annotations.ENTREFINE.Actions }}
+{{- range $a := $n.Annotations.ENTKIT.Actions }}
 {{- $cName := ( print $n.Name "-" $a.Name "-Action") | pascal }}
-{{- $routePath := $n.Annotations.ENTREFINE.Route }}
+{{- $routePath := $n.Annotations.ENTKIT.Route }}
 {{- if empty $routePath}}
 {{ $routePath = $n.Name | kebabcase }}
 {{- end }}
@@ -40,6 +39,12 @@ export type {{$cName}}Props = ButtonProps &
 }
 
 export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText, onSuccess, ...props}) => {
+    {{- if $.Extension.Auth.Enabled }}
+    const { data: permissions } = usePermissions<Record<string, string[]>>();
+    const can = Boolean(permissions?.{{$n.Name | pascal }}?.includes("{{ default $a.Name $a.Scope | pascal }}"));
+    {{- else }}
+    const can = true;
+    {{- end }}
     const additionalProps = {{ $a.Props | toJson }} || {};
 
     {{- $label := default $a.Name $a.Label }}
@@ -51,11 +56,11 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
     {{- $pattern = print $pattern "/" $a.Route.Path}}
     {{- end}}
 
-    return <Link to={ "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
+    return can ? <Link to={ "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
         <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
             {hideText || "{{$label}}"}
         </Antd.Button>
-    </Link>
+    </Link> : null
     {{- end }}
     {{- if not (empty $a.Operation )}}
 
@@ -70,7 +75,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
     //const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
     const invalidate = useInvalidate();
 
-    return <Popconfirm
+    return can ? <Popconfirm
         key="{{ $opName }}"
         okText="{{ $label }}"
         cancelText="Cancel"
@@ -131,7 +136,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
         <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
             {hideText || "{{$label}}"}
         </Antd.Button>
-    </Popconfirm>
+    </Popconfirm> : null
     {{- end }}
 }
 {{- end }}

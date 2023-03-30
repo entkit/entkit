@@ -2,7 +2,7 @@ package ent_project
 
 import (
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent"
+	"github.com/entkit/entkit/examples/ent-project/ent"
 )
 
 // This file will not be regenerated automatically.

@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"strings"

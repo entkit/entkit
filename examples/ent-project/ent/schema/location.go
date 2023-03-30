@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,14 +24,14 @@ func (Location) Fields() []ent.Field {
 		field.String("title").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("TITLE"),
 			),
 		field.String("description").
 			MaxLen(500).
 			Annotations(
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("DESCRIPTION"),
 			),
 		field.Float("latitude").
@@ -46,7 +45,7 @@ func (Location) Fields() []ent.Field {
 		field.String("address").
 			MaxLen(128).
 			Annotations(
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("ADDRESS"),
 			),
 		field.String("postcode").
@@ -62,13 +61,13 @@ func (Location) Fields() []ent.Field {
 		field.String("state").
 			MaxLen(64).
 			Annotations(
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("STATE"),
 			),
 		field.String("suburb").
 			MaxLen(64).
 			Annotations(
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("SUBURB"),
 			),
 		field.String("street_type").
@@ -79,7 +78,7 @@ func (Location) Fields() []ent.Field {
 		field.String("street_name").
 			MaxLen(64).
 			Annotations(
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("STREET_NAME"),
 			),
 	}
@@ -101,11 +100,12 @@ func (Location) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("PushpinOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.DeleteAction,
-			EntRefine.EditAction,
+		entkit.Icon("PushpinOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

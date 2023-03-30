@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
 	"github.com/google/uuid"
 )
 
@@ -212,9 +212,3 @@ func (v *Vendor) appendNamedProducts(name string, edges ...*Product) {
 
 // Vendors is a parsable slice of Vendor.
 type Vendors []*Vendor
-
-func (v Vendors) config(cfg config) {
-	for _i := range v {
-		v[_i].config = cfg
-	}
-}

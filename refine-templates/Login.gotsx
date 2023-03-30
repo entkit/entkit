@@ -1,3 +1,5 @@
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/login.tsx" -}}
 import { Layout as AntdLayout, Button } from "antd";
 import { useLogin } from "@refinedev/core";

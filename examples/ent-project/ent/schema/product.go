@@ -7,8 +7,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
 	"github.com/google/uuid"
 )
 
@@ -26,30 +25,30 @@ func (Product) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("TITLE"),
 			),
 		field.String("description").
 			MaxLen(512).
 			Annotations(
-				EntRefine.RichTextField(),
-				EntRefine.FilterOperator(gen.Contains),
-				EntRefine.HideOnList(),
+				entkit.RichTextField(),
+				entkit.FilterOperator(gen.Contains),
+				entkit.HideOnList(),
 				entgql.OrderField("DESCRIPTION"),
 			),
 		field.String("image").
 			MaxLen(128).
 			Annotations(
 				entgql.OrderField("IMAGE"),
-				EntRefine.MainImageField(),
+				entkit.MainImageField(),
 			),
 		field.String("url").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.URLField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.URLField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("URL"),
 			),
 		field.Time("last_sell").
@@ -97,14 +96,17 @@ func (Product) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("FileOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.EditAction,
-			EntRefine.DeleteAction,
-			EntRefine.Action{
-				Operation: "MyCustomActionButton",
-			},
+		entkit.Icon("FileOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.EditAction,
+			entkit.DeleteAction,
+			entkit.NewAction("MyCustomActionButton",
+				entkit.ActionWithOperation(
+					entkit.NewOperation("MyCustomActionButton"),
+				),
+			),
 		),
 	}
 }

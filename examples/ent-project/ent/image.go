@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/image"
 	"github.com/google/uuid"
 )
 
@@ -220,9 +220,3 @@ func (i *Image) String() string {
 
 // Images is a parsable slice of Image.
 type Images []*Image
-
-func (i Images) config(cfg config) {
-	for _i := range i {
-		i[_i].config = cfg
-	}
-}

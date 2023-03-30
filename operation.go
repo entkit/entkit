@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 type Operation struct {
 	Mutation       *bool     `json:"Mutation,omitempty"`

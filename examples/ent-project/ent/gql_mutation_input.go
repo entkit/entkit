@@ -19,7 +19,7 @@ package ent
 import (
 	"time"
 
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/schema/enums"
+	"github.com/entkit/entkit/examples/ent-project/ent/schema/enums"
 	"github.com/google/uuid"
 )
 

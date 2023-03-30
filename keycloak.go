@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 import (
 	"context"
@@ -147,10 +147,11 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 		scopesMap[action] = scope
 	}
 	var adminRoles []gocloak.Role
+	var readerRoles []gocloak.Role
 
 	for _, node := range g.Nodes {
 		var resScopes []gocloak.ScopeRepresentation
-		ant, ok := node.Annotations["ENTREFINE"].(map[string]any)
+		ant, ok := node.Annotations["ENTKIT"].(map[string]any)
 		if ok {
 			b, _ := json.Marshal(ant["Actions"])
 			var _actions []*Action
@@ -163,6 +164,9 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 					name := a.Scope
 					if name == nil {
 						name = a.Name
+					}
+					if PString(name) == "Read" {
+
 					}
 					scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, prefix, pascal(PString(name)))
 					resScopes = append(resScopes, *scope)
@@ -177,7 +181,11 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 		adminRole := kc.prepareRole(ctx, *backendClient.ID, token, prefix, node.Name+" Admin", nil)
 		adminRoles = append(adminRoles, adminRole)
 
+		readerRole := kc.prepareRole(ctx, *backendClient.ID, token, prefix, node.Name+" Reader", nil)
+		readerRoles = append(readerRoles, readerRole)
+
 		adminPolicy := kc.preparePolicy(ctx, token, *backendClient.ID, prefix, node.Name+"OnlyAdminPermission", []gocloak.Role{adminRole})
+		readerPolicy := kc.preparePolicy(ctx, token, *backendClient.ID, prefix, node.Name+"OnlyReaderPermission", []gocloak.Role{readerRole})
 
 		_ = kc.preparePermission(ctx, token, *backendClient.ID, prefix, node.Name+"AdminPermission",
 			"resource",
@@ -185,9 +193,19 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 			nil,
 			[]string{*adminPolicy.ID},
 		)
+
+		_ = kc.preparePermission(ctx, token, *backendClient.ID, prefix, node.Name+"ReaderPermission",
+			"scope",
+			&[]string{*resource.ID},
+			&[]string{
+				PString(scopesMap["Read"].ID),
+			},
+			[]string{*readerPolicy.ID},
+		)
 	}
 
 	adminRole := kc.prepareRole(ctx, *backendClient.ID, token, prefix, "Admin", &adminRoles)
+	kc.prepareRole(ctx, *backendClient.ID, token, prefix, "Reader", &readerRoles)
 
 	kc.prepareUser(ctx, token, map[string][]gocloak.Role{
 		*backendClient.ID: {

@@ -1,40 +1,83 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/routes.tsx" -}}
-/* eslint no-use-before-define: 0 */
+import React from "react";
 import * as List from "./list";
 import * as Show from "./show";
 import * as Create from "./create";
 import * as Edit from "./edit";
-import { Route } from "react-router-dom";
-import { NavigateToResource } from "@refinedev/react-router-v6";
+import { Login } from "./login";
+import { Header } from "./header";
+import { Authenticated} from "@refinedev/core";
+import { ErrorComponent, Layout } from "@refinedev/antd";
+import { Route, Routes, Outlet } from "react-router-dom";
+import { NavigateToResource, CatchAllNavigate } from "@refinedev/react-router-v6";
+{{- if $.Extension.Auth.Enabled }}
+import { usePermissions } from "@refinedev/core";
+{{- end }}
 
-export const ResourceRoutes = <>
-    {{- range $n := $.Graph.Nodes}}
-    {{- if $n.Annotations.ENTREFINE.IndexRoute }}
-    <Route index element={<NavigateToResource resource="{{ $n.Name | kebabcase }}" />}/>
-    {{- end }}
-
-    {{- $routePath := $n.Annotations.ENTREFINE.Route }}
-    {{- if empty $routePath }}
-    {{ $routePath = $n.Name | kebabcase }}
-    {{- end }}
-    <Route path="/{{ $routePath }}">
-        {{- range $a := $n.Annotations.ENTREFINE.Actions }}
-        {{- if not (empty $a.Route) }}
+export const RoutesBundle: React.FC = ()=>{
+    return <Routes>
         <Route
-            {{ if $a.Route.Index -}}
-            index
-            {{- end -}}
-            {{ if not (empty $a.Route.Path ) -}}
-            path="{{ $a.Route.Path }}"
-            {{- end -}}
-            {{- $element := replace $a.Route.Element "{name}" $n.Name}}
-            element={<{{$element}}/>}
-        />
-        {{- end }}
-        {{- end }}
-    </Route>
-    {{- end}}
-</>
-/* eslint no-use-before-define: 2 */
+            element={
+                <Authenticated
+                    fallback={<CatchAllNavigate to="/login" />}
+                >
+                    <Layout Header={Header}>
+                        <Outlet />
+                    </Layout>
+                </Authenticated>
+            }
+        >
+            {{- range $n := $.Graph.Nodes}}
+            {{- if $n.Annotations.ENTKIT.IndexRoute }}
+            <Route index element={<NavigateToResource resource="{{ $n.Name | kebabcase }}" />}/>
+            {{- end }}
+
+            {{- $routePath := $n.Annotations.ENTKIT.Route }}
+            {{- if empty $routePath }}
+            {{ $routePath = $n.Name | kebabcase }}
+            {{- end }}
+            <Route path="/{{ $routePath }}">
+                {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                {{- if not (empty $a.Route) }}
+                <Route
+                    {{ if $a.Route.Index -}}
+                    index
+                    {{- end -}}
+                    {{ if not (empty $a.Route.Path ) -}}
+                    path="{{ $a.Route.Path }}"
+                    {{- end -}}
+                    {{- $element := replace $a.Route.Element "{name}" $n.Name}}
+                    element={<{{$element}}/>}
+                />
+                {{- end }}
+                {{- end }}
+            </Route>
+            {{- end}}
+        </Route>
+
+        <Route
+            element={
+                <Authenticated fallback={<Outlet />}>
+                    <NavigateToResource resource="posts" />
+                </Authenticated>
+            }
+        >
+            <Route path="/login" element={<Login />} />
+        </Route>
+
+        <Route
+            element={
+                <Authenticated>
+                    <Layout>
+                        <Outlet />
+                    </Layout>
+                </Authenticated>
+            }
+        >
+            <Route path="*" element={<ErrorComponent />} />
+        </Route>
+    </Routes>
+}
 {{- end -}}

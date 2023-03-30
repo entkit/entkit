@@ -1,4 +1,4 @@
-package entrefine
+package entkit
 
 // StringP returns a pointer of a string variable
 func StringP(value string) *string {

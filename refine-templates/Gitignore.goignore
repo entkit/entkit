@@ -1,4 +1,5 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define ".gitignore" -}}
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 

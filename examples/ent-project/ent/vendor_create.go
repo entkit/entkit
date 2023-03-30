@@ -23,9 +23,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -175,13 +175,7 @@ func (vc *VendorCreate) sqlSave(ctx context.Context) (*Vendor, error) {
 func (vc *VendorCreate) createSpec() (*Vendor, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Vendor{config: vc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: vendor.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: vendor.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(vendor.Table, sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID))
 	)
 	if id, ok := vc.mutation.ID(); ok {
 		_node.ID = id
@@ -203,10 +197,7 @@ func (vc *VendorCreate) createSpec() (*Vendor, *sqlgraph.CreateSpec) {
 			Columns: []string{vendor.WarehousesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: warehouse.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(warehouse.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -222,10 +213,7 @@ func (vc *VendorCreate) createSpec() (*Vendor, *sqlgraph.CreateSpec) {
 			Columns: []string{vendor.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -260,8 +248,8 @@ func (vcb *VendorCreateBulk) Save(ctx context.Context) ([]*Vendor, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, vcb.builders[i+1].mutation)
 				} else {

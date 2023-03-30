@@ -23,9 +23,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
 	"github.com/google/uuid"
 )
 
@@ -216,13 +216,7 @@ func (pc *PhoneCreate) sqlSave(ctx context.Context) (*Phone, error) {
 func (pc *PhoneCreate) createSpec() (*Phone, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Phone{config: pc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: phone.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: phone.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(phone.Table, sqlgraph.NewFieldSpec(phone.FieldID, field.TypeUUID))
 	)
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
@@ -252,10 +246,7 @@ func (pc *PhoneCreate) createSpec() (*Phone, *sqlgraph.CreateSpec) {
 			Columns: []string{phone.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -272,10 +263,7 @@ func (pc *PhoneCreate) createSpec() (*Phone, *sqlgraph.CreateSpec) {
 			Columns: []string{phone.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -311,8 +299,8 @@ func (pcb *PhoneCreateBulk) Save(ctx context.Context) ([]*Phone, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
 				} else {

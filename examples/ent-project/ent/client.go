@@ -22,23 +22,23 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/migrate"
+	"github.com/entkit/entkit/examples/ent-project/ent/migrate"
 	"github.com/google/uuid"
 
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/image"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/phone"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
-
+	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/image"
+	"github.com/entkit/entkit/examples/ent-project/ent/location"
+	"github.com/entkit/entkit/examples/ent-project/ent/phone"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 )
 
 // Client is the client that holds all ent builders.
@@ -89,6 +89,55 @@ func (c *Client) init() {
 	c.Vendor = NewVendorClient(c.config)
 	c.Warehouse = NewWarehouseClient(c.config)
 	c.Website = NewWebsiteClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -189,31 +238,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Company.Use(hooks...)
-	c.Country.Use(hooks...)
-	c.Email.Use(hooks...)
-	c.Image.Use(hooks...)
-	c.Location.Use(hooks...)
-	c.Phone.Use(hooks...)
-	c.Product.Use(hooks...)
-	c.Vendor.Use(hooks...)
-	c.Warehouse.Use(hooks...)
-	c.Website.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Company, c.Country, c.Email, c.Image, c.Location, c.Phone, c.Product,
+		c.Vendor, c.Warehouse, c.Website,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Company.Intercept(interceptors...)
-	c.Country.Intercept(interceptors...)
-	c.Email.Intercept(interceptors...)
-	c.Image.Intercept(interceptors...)
-	c.Location.Intercept(interceptors...)
-	c.Phone.Intercept(interceptors...)
-	c.Product.Intercept(interceptors...)
-	c.Vendor.Intercept(interceptors...)
-	c.Warehouse.Intercept(interceptors...)
-	c.Website.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Company, c.Country, c.Email, c.Image, c.Location, c.Phone, c.Product,
+		c.Vendor, c.Warehouse, c.Website,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -260,7 +301,7 @@ func (c *CompanyClient) Use(hooks ...Hook) {
 	c.hooks.Company = append(c.hooks.Company, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `company.Intercept(f(g(h())))`.
 func (c *CompanyClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Company = append(c.inters.Company, interceptors...)
@@ -506,7 +547,7 @@ func (c *CountryClient) Use(hooks ...Hook) {
 	c.hooks.Country = append(c.hooks.Country, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `country.Intercept(f(g(h())))`.
 func (c *CountryClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Country = append(c.inters.Country, interceptors...)
@@ -704,7 +745,7 @@ func (c *EmailClient) Use(hooks ...Hook) {
 	c.hooks.Email = append(c.hooks.Email, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `email.Intercept(f(g(h())))`.
 func (c *EmailClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Email = append(c.inters.Email, interceptors...)
@@ -854,7 +895,7 @@ func (c *ImageClient) Use(hooks ...Hook) {
 	c.hooks.Image = append(c.hooks.Image, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `image.Intercept(f(g(h())))`.
 func (c *ImageClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Image = append(c.inters.Image, interceptors...)
@@ -1020,7 +1061,7 @@ func (c *LocationClient) Use(hooks ...Hook) {
 	c.hooks.Location = append(c.hooks.Location, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `location.Intercept(f(g(h())))`.
 func (c *LocationClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Location = append(c.inters.Location, interceptors...)
@@ -1170,7 +1211,7 @@ func (c *PhoneClient) Use(hooks ...Hook) {
 	c.hooks.Phone = append(c.hooks.Phone, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `phone.Intercept(f(g(h())))`.
 func (c *PhoneClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Phone = append(c.inters.Phone, interceptors...)
@@ -1320,7 +1361,7 @@ func (c *ProductClient) Use(hooks ...Hook) {
 	c.hooks.Product = append(c.hooks.Product, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `product.Intercept(f(g(h())))`.
 func (c *ProductClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Product = append(c.inters.Product, interceptors...)
@@ -1470,7 +1511,7 @@ func (c *VendorClient) Use(hooks ...Hook) {
 	c.hooks.Vendor = append(c.hooks.Vendor, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `vendor.Intercept(f(g(h())))`.
 func (c *VendorClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Vendor = append(c.inters.Vendor, interceptors...)
@@ -1620,7 +1661,7 @@ func (c *WarehouseClient) Use(hooks ...Hook) {
 	c.hooks.Warehouse = append(c.hooks.Warehouse, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `warehouse.Intercept(f(g(h())))`.
 func (c *WarehouseClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Warehouse = append(c.inters.Warehouse, interceptors...)
@@ -1770,7 +1811,7 @@ func (c *WebsiteClient) Use(hooks ...Hook) {
 	c.hooks.Website = append(c.hooks.Website, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `website.Intercept(f(g(h())))`.
 func (c *WebsiteClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Website = append(c.inters.Website, interceptors...)
@@ -1903,3 +1944,15 @@ func (c *WebsiteClient) mutate(ctx context.Context, m *WebsiteMutation) (Value, 
 		return nil, fmt.Errorf("ent: unknown Website mutation op: %q", m.Op())
 	}
 }
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Company, Country, Email, Image, Location, Phone, Product, Vendor, Warehouse,
+		Website []ent.Hook
+	}
+	inters struct {
+		Company, Country, Email, Image, Location, Phone, Product, Vendor, Warehouse,
+		Website []ent.Interceptor
+	}
+)

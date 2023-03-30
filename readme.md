@@ -1,14 +1,14 @@
-# entrefine
+# entkit
 Powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
 
-![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/entrefine)
-[![GitHub issues](https://img.shields.io/github/issues/diazoxide/entrefine)](https://github.com/diazoxide/entrefine/issues)
-[![GitHub stars](https://img.shields.io/github/stars/diazoxide/entrefine)](https://github.com/diazoxide/entrefine/stargazers)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/diazoxide/entrefine)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/diazoxide/entrefine)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/diazoxide/entrefine)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/entrefine)
-[![GitHub license](https://img.shields.io/github/license/diazoxide/entrefine)](https://github.com/diazoxide/entrefine)
+![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/entkit)
+[![GitHub issues](https://img.shields.io/github/issues/diazoxide/entkit)](https://github.com/entkit/entkit/issues)
+[![GitHub stars](https://img.shields.io/github/stars/diazoxide/entkit)](https://github.com/entkit/entkit/stargazers)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/diazoxide/entkit)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/diazoxide/entkit)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/diazoxide/entkit)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/diazoxide/entkit)
+[![GitHub license](https://img.shields.io/github/license/diazoxide/entkit)](https://github.com/entkit/entkit)
 
 ![cover.png](docs%2Fimages%2Fcover.svg)
 
@@ -17,9 +17,9 @@ It simplifies the process of generating CRUDs from Ent definitions with customiz
 ![main.png](docs%2Fimages%2Fmain.png)
 
 ## Live Demo and Package Info
-Live demo: https://demo.entrefine.dev/
+Live demo: https://demo.entkit.dev/
 
-Go.dev Package: https://pkg.go.dev/github.com/diazoxide/entrefine
+Go.dev Package: https://pkg.go.dev/github.com/entkit/entkit
 
 ## Roadmap
 - [x] Generates CRUD operations based on Ent definitions
@@ -45,7 +45,7 @@ Go.dev Package: https://pkg.go.dev/github.com/diazoxide/entrefine
 - [ ] Godoc: provide comprehensive documentation
 
 ### Smart search
-entrefine provides a smart search component to easily find records by any attribute with a custom operator.
+entkit provides a smart search component to easily find records by any attribute with a custom operator.
 ![search.gif](docs%2Fimages%2Fsearch.gif)
 
 ## Requirements
@@ -63,13 +63,13 @@ package main
 import (
 	//...
 	"entgo.io/contrib/entgql"
-	"github.com/diazoxide/entrefine"
+	"github.com/entkit/entkit"
 )
 
 func main() {
 	gqlEx, err := entgql.NewExtension(
 		// Make sure that EntGql configs are wrapped
-		entrefine.EntgqlExtensionOptionsWrapper(
+		entkit.EntgqlExtensionOptionsWrapper(
 			entgql.WithConfigPath("./gqlgen.yml"),
 			entgql.WithSchemaGenerator(),
 			entgql.WithSchemaPath("./graphql/ent.graphql"),
@@ -81,9 +81,9 @@ func main() {
 		entc.Extensions(
 			// GQL extension is mandatory
 			gqlEx,
-			// entrefine configuration
-			entrefine.NewExtension(
-				entrefine.WithAppPath(filepath.Join("..", "refine"),
+			// entkit configuration
+			entkit.NewExtension(
+				entkit.WithAppPath(filepath.Join("..", "refine"),
 			),
 		),
 	}
@@ -116,7 +116,7 @@ func (r *queryResolver) Companies(
 	last *int,
 	orderBy *ent.CompanyOrder,
 	where *ent.CompanyWhereInput,
-	q *string, // Added by entrefine
+	q *string, // Added by entkit
 ) (*ent.CompanyConnection, error) {
 	return r.client.Company.Query().Paginate(ctx, after, first, before, last,
 		ent.WithCompanyOrder(orderBy),
@@ -129,7 +129,7 @@ func (r *queryResolver) Companies(
 
 ### Configure your ent schemas with annotations
 
-e.g. `entrefine.FilterOperator("contains")`
+e.g. `entkit.FilterOperator("contains")`
 
 ## Supporting annotations
 
@@ -146,7 +146,7 @@ e.g. `entrefine.FilterOperator("contains")`
 - **HideOnForm** - hide field on create and edit forms
 - **HideOnEdit** - hide field on edit form
 - **HideOnCreate** - hide field on create form
-- **FilterOperator** `entrefine.FilterOperator("contains")`
+- **FilterOperator** `entkit.FilterOperator("contains")`
 - [**View**](#custom-views) - custom view of field on list and show pages
 - [**ViewOnList**](#custom-views) - custom view of field on list page
 - [**ViewOnShow**](#custom-views) - custom view of field on show page
@@ -154,7 +154,7 @@ e.g. `entrefine.FilterOperator("contains")`
 
 ### For Entities
 - **Icon** (field/entity) - set icon of entity to show on navigation, breadcrumbs, edges, etc.
-  * `entrefine.Icon("some-antdesign-icon")`
+  * `entkit.Icon("some-antdesign-icon")`
 - [**Actions**](#custom-actions) - custom actions
 - **NoList** - disable list and hide entity from navigation
 - **NoShow** - disable entity show page
@@ -166,7 +166,7 @@ e.g. `entrefine.FilterOperator("contains")`
 
 1. After configuration regenerate Ent.
 2. Your package.json file is changed so run `npm install` to get deps.
-3. Check directory of refine application. On src directory you can find `entrefine` folder with ent resources.
+3. Check directory of refine application. On src directory you can find `entkit` folder with ent resources.
 4. Update your `App.ts` file
     ```tsx
     import React from "react";
@@ -175,8 +175,8 @@ e.g. `entrefine.FilterOperator("contains")`
     import {ErrorComponent, Layout, notificationProvider, ReadyPage,} from "@pankod/refine-antd";
     import routerProvider from "@pankod/refine-react-router-v6";
     import {GraphQLClient} from "graphql-request";
-    import {Resources} from "./entrefine/resources";
-    import dataProvider from "./entrefine/data-provider";
+    import {Resources} from "./entkit/resources";
+    import dataProvider from "./entkit/data-provider";
     
     // Provide your graphql query endpoint
     const client = new GraphQLClient("http://localhost:8081/query");
@@ -224,7 +224,7 @@ function App() {
 #### Header component
 
 ```tsx
-import {SearchComponent} from "../../entrefine/search-component";
+import {SearchComponent} from "../../entkit/search-component";
 
 export const Header: React.FC = () => {
     const screens = useBreakpoint();
@@ -250,7 +250,7 @@ export const Header: React.FC = () => {
 
 ## File `custom.tsx`
 
-To customize entrefine components you can find `./entrefine/custom.tsx` file on your refine root directory.
+To customize entkit components you can find `./entkit/custom.tsx` file on your refine root directory.
 
 
 ## Custom Actions
@@ -259,11 +259,11 @@ Add entity annotation to your schema
 
 ### Annotation Example
 ```
-entrefine.Actions(
-   entrefine.ShowAction,
-   entrefine.DeleteAction,
-   entrefine.EditAction,
-   entrefine.Action{
+entkit.Actions(
+   entkit.ShowAction,
+   entkit.DeleteAction,
+   entkit.EditAction,
+   entkit.Action{
         Operation: "myCustomGqlOperation",
         Fields: []string{
             "id", "title"
@@ -322,18 +322,18 @@ react-force-graph-2d is an open-source option.
 
 ### How to switch GoJS to react-force-graph-2d
 
-Customize entrefine extension configs on **entc.go** file
+Customize entkit extension configs on **entc.go** file
 
 e.g.
 ```go
-entRefine, err := entrefine.NewExtension(
+entRefine, err := entkit.NewExtension(
     ...
-    entrefine.WithForceGraph2D(
-        entrefine.ForceGraph2DOptions{
+    entkit.WithForceGraph2D(
+        entkit.ForceGraph2DOptions{
             Enabled: true,
         },
     ),
-    entrefine.WithDefaultEdgesDiagram('Diagram.ForceGraph2D'),
+    entkit.WithDefaultEdgesDiagram('Diagram.ForceGraph2D'),
     ...
 )
 ```
@@ -342,22 +342,22 @@ entRefine, err := entrefine.NewExtension(
 
 e.g.
 ```go
-entRefine, err := entrefine.NewExtension(
+entRefine, err := entkit.NewExtension(
     ...
-    entrefine.WithGoJs(
-        entrefine.GoJSOptions{
+    entkit.WithGoJs(
+        entkit.GoJSOptions{
             Enabled: true,
             LicenseKey: "xxxxx-xxxxxx-xxxxx-xxxxx",
         },
     ),
-    entrefine.WithDefaultEdgesDiagram('Diagram.GoJS'),
+    entkit.WithDefaultEdgesDiagram('Diagram.GoJS'),
     ...
 )
 ```
 
 ## Custom views
 
-On entrefine every view of field is customizable for every type of layout.
+On entkit every view of field is customizable for every type of layout.
 
 ### Special annotations
 1. View - *Forcing list and show views*
@@ -375,12 +375,12 @@ On entrefine every view of field is customizable for every type of layout.
       return <RA.Typography.Text copyable={true} style={ {color: "red"} }>{ value }</RA.Typography.Text>
    }
    ```
-2. Define type of field on schema by `entrefine.View` annotation
+2. Define type of field on schema by `entkit.View` annotation
    ```go
    field.String("title").
         Annotations(
             ...
-            entrefine.View("MyCustomTitle"),
+            entkit.View("MyCustomTitle"),
             ...
         ),
    ```

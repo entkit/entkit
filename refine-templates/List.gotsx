@@ -1,22 +1,32 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/list.tsx" -}}
-/* eslint no-use-before-define: 0 */
 import React, {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Tables from "./tables";
 import * as Type from "./interfaces";
 import * as Action from "./action";
+{{- if $.Extension.Auth.Enabled }}
+import { usePermissions } from "@refinedev/core";
+{{- end }}
 
 {{- range $n := $.Graph.Nodes }}
 export type {{$n.Name}}ListProps = RA.ListProps & { tableProps?: Tables.{{$n.Name}}TableProps}
 export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...props} ) => {
+    {{- if $.Extension.Auth.Enabled }}
+    const { data: permissions } = usePermissions<Record<string, string[]>>();
+    const can = Boolean(permissions?.{{$n.Name | pascal }}?.includes("{{"Read"}}"));
+    {{- else }}
+    const can = true;
+    {{- end }}
+
     const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Prefix}}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
 
-    return <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (
+    return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (
         <>
             {{/*{defaultButtons}*/}}
-            {{- range $a := $n.Annotations.ENTREFINE.Actions }}
+            {{- range $a := $n.Annotations.ENTKIT.Actions }}
             {{- if $a.General }}
             {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
             <Action.{{ $aName }} key="{{$aName}}" recordItemIDs={ selectedRowKeys }/>
@@ -24,7 +34,7 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
             {{- end }}
 
             {selectedRowKeys.length ? <>
-                {{- range $a := $n.Annotations.ENTREFINE.Actions }}
+                {{- range $a := $n.Annotations.ENTKIT.Actions }}
                 {{- if not (empty $a.Operation) }}
                 {{- if and (not $a.General) $a.OnList $a.Operation.Bulk }}
                 {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
@@ -40,9 +50,8 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
         </>
     )}>
         <Tables.{{$n.Name}}Table {...tableProps} rowSelection={rowSelection}/>
-    </RA.List>
+    </RA.List> : null
 };
 
 {{- end -}}
-/* eslint no-use-before-define: 2 */
 {{- end -}}

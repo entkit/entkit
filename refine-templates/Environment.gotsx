@@ -1,0 +1,27 @@
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
+{{- define "src/environment.tsx" -}}
+{{- $keycloakEnabled := and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled -}}
+{{- if $keycloakEnabled -}}
+import {KeycloakConfig} from "keycloak-js";
+{{- end }}
+
+export const meta = {{ $.Extension.Meta | toPrettyJson}}
+
+{{ if $keycloakEnabled -}}
+{{- $keycloak := first $.Extension.Auth.Keycloak.FrontendClientConfigs -}}
+export const keycloak: KeycloakConfig = {
+    url: "{{$.Extension.Auth.Keycloak.Host}}",
+    realm: "{{$.Extension.Auth.Keycloak.Realm}}",
+    clientId: "{{$keycloak.ClientID}}",
+};
+
+export const keycloakBackendClientId = "{{$.Extension.Auth.Keycloak.BackendClientConfig.ClientID}}";
+
+{{- end }}
+
+{{ if not (empty $.Extension.GraphqlURL) -}}
+export const graphqlUrl = "{{ $.Extension.GraphqlURL }}";
+{{- end }}
+
+{{- end -}}

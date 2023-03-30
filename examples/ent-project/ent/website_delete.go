@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/website"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/website"
 )
 
 // WebsiteDelete is the builder for deleting a Website entity.
@@ -54,15 +54,7 @@ func (wd *WebsiteDelete) ExecX(ctx context.Context) int {
 }
 
 func (wd *WebsiteDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: website.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: website.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(website.Table, sqlgraph.NewFieldSpec(website.FieldID, field.TypeUUID))
 	if ps := wd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -83,6 +75,12 @@ type WebsiteDeleteOne struct {
 	wd *WebsiteDelete
 }
 
+// Where appends a list predicates to the WebsiteDelete builder.
+func (wdo *WebsiteDeleteOne) Where(ps ...predicate.Website) *WebsiteDeleteOne {
+	wdo.wd.mutation.Where(ps...)
+	return wdo
+}
+
 // Exec executes the deletion query.
 func (wdo *WebsiteDeleteOne) Exec(ctx context.Context) error {
 	n, err := wdo.wd.Exec(ctx)
@@ -98,5 +96,7 @@ func (wdo *WebsiteDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (wdo *WebsiteDeleteOne) ExecX(ctx context.Context) {
-	wdo.wd.ExecX(ctx)
+	if err := wdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

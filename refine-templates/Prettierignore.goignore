@@ -1,0 +1,10 @@
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
+{{- define ".prettierignore"}}
+build/
+dist/
+node_modules/
+.snapshots/
+*.min.js
+**/**/coverage
+{{- end }}

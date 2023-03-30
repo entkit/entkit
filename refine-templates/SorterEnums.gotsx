@@ -1,6 +1,6 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/sorter-enums.tsx" -}}
-/* eslint no-use-before-define: 0 */
 {{- range $n := $.Graph.Nodes -}}
 export const {{$n.Name}}SorterEnums = {
 {{- $allFields := orderFields $n}}
@@ -11,5 +11,4 @@ export const {{$n.Name}}SorterEnums = {
 {{- end}}
 }
 {{ end }}
-/* eslint no-use-before-define: 2 */
 {{- end -}}

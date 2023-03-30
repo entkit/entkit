@@ -1,8 +1,7 @@
-{{- /* gotype: github.com/diazoxide/entrefine.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/search-component.tsx" -}}
-/* eslint no-use-before-define: 0 */
 import {useState, useEffect} from "react";
-import * as RA from "@refinedev/antd";
 import { Typography, Avatar, AutoComplete, Input } from "antd";
 import { useList, useLink } from "@refinedev/core";
 import * as Interfaces from "./interfaces"
@@ -131,5 +130,4 @@ export const SearchComponent: React.FC = () => {
     )
 }
 
-/* eslint no-use-before-define: 2 */
 {{- end -}}

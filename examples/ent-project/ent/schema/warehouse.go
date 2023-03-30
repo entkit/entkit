@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	EntRefine "github.com/diazoxide/entrefine"
 	"github.com/google/uuid"
 )
 
@@ -25,8 +24,8 @@ func (Warehouse) Fields() []ent.Field {
 		field.String("name").
 			MaxLen(128).
 			Annotations(
-				EntRefine.TitleField(),
-				EntRefine.FilterOperator(gen.Contains),
+				entkit.TitleField(),
+				entkit.FilterOperator(gen.Contains),
 				entgql.OrderField("NAME"),
 			),
 		field.Time("last_update").
@@ -40,10 +39,9 @@ func (Warehouse) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Annotations(
-				//EntRefine.HideOnList(),
-				EntRefine.FilterOperator(gen.Contains),
-				EntRefine.CodeField(
-					&EntRefine.CodeFieldOptions{
+				entkit.FilterOperator(gen.Contains),
+				entkit.CodeField(
+					&entkit.CodeFieldOptions{
 						Language: "json",
 					},
 				),
@@ -75,11 +73,12 @@ func (Warehouse) Annotations() []schema.Annotation {
 		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-		EntRefine.Icon("OrderedListOutlined"),
-		EntRefine.Actions(
-			EntRefine.ShowAction,
-			EntRefine.DeleteAction,
-			EntRefine.EditAction,
+		entkit.Icon("OrderedListOutlined"),
+		entkit.Actions(
+			entkit.ListAction,
+			entkit.ShowAction,
+			entkit.DeleteAction,
+			entkit.EditAction,
 		),
 	}
 }

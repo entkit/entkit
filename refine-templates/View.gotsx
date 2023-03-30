@@ -1,5 +1,6 @@
+{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+
 {{- define "src/view.tsx" -}}
-/* eslint no-use-before-define: 0 */
 import React from "react";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
@@ -199,5 +200,4 @@ export const {{ $n.Name }}Badge: React.FC<Partial<Type.I{{ $n.Name }}>> = (props
 
 // endregion
 
-/* eslint no-use-before-define: 2 */
 {{- end }}

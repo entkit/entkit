@@ -15,8 +15,6 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 
-	"github.com/diazoxide/entrefine"
-
 	"path/filepath"
 )
 
@@ -24,13 +22,11 @@ func main() {
 	// The codegen is executed from internal/todo/gen.go.
 	// So the path for the config file, ent schema, and the GQL schema
 	// starts from internal/todo.
-	gqlEx, err := entgql.NewExtension(
-		entrefine.EntgqlExtensionOptionsWrapper(
-			entgql.WithConfigPath("./gqlgen.yml"),
-			entgql.WithSchemaGenerator(),
-			entgql.WithSchemaPath("./ent.graphql"),
-			entgql.WithWhereInputs(true),
-		)...,
+	gqlEx, err := entkit.NewEntgqlExtension(
+		entgql.WithConfigPath("./gqlgen.yml"),
+		entgql.WithSchemaGenerator(),
+		entgql.WithSchemaPath("./ent.graphql"),
+		entgql.WithWhereInputs(true),
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)
@@ -40,14 +36,45 @@ func main() {
 	if graphqlUri == "" {
 		graphqlUri = "http://localhost/query"
 	}
-	entRefine, err := entrefine.NewExtension(
-		entrefine.WithAppPath(filepath.Join("..", "refine-project")),
-		entrefine.WithMeta(map[string]any{
-			"graphqlUri": graphqlUri,
-		}),
+	entRefine, err := entkit.NewExtension(
+		entkit.WithAppPath(filepath.Join("..", "refine-project")),
+		entkit.WithGraphqlURL(graphqlUri),
+		entkit.IgnoreUncommittedChanges(),
+		//entkit.WithAuth(
+		//	entkit.AuthWithKeycloak(
+		//		entkit.NewKeycloak(
+		//			"http://localhost:8080",
+		//			"entkit",
+		//			"admin",
+		//			"admin",
+		//			"entadmin",
+		//			"entadmin",
+		//			&gocloak.Client{
+		//				ClientID: gocloak.StringP("xcontain-backend"),
+		//				Secret:   gocloak.StringP("test-secret"),
+		//			},
+		//			[]*gocloak.Client{
+		//				{
+		//					ClientID: gocloak.StringP("xcontain-frontend"),
+		//					RootURL:  gocloak.StringP("https://console.xcontain.com"),
+		//					RedirectURIs: &[]string{
+		//						"https://console.xcontain.com/*",
+		//						"http://localhost:3000/*",
+		//					},
+		//					Attributes: &map[string]string{
+		//						"post.logout.redirect.uris": "+",
+		//					},
+		//					WebOrigins: &[]string{
+		//						"+",
+		//					},
+		//				},
+		//			},
+		//		),
+		//	),
+		//),
 	)
 	if err != nil {
-		log.Fatalf("creating entrefine extension: %v", err)
+		log.Fatalf("creating entkit extension: %v", err)
 	}
 
 	err = entc.Generate("./ent/schema", &gen.Config{

@@ -23,9 +23,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/email"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/email"
 	"github.com/google/uuid"
 )
 
@@ -202,13 +202,7 @@ func (ec *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
 func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Email{config: ec.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: email.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: email.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(email.Table, sqlgraph.NewFieldSpec(email.FieldID, field.TypeUUID))
 	)
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
@@ -234,10 +228,7 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 			Columns: []string{email.CompanyColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: company.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(company.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -254,10 +245,7 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 			Columns: []string{email.CountryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: country.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(country.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -293,8 +281,8 @@ func (ecb *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ecb.builders[i+1].mutation)
 				} else {

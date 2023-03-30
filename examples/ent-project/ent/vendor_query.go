@@ -25,10 +25,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/predicate"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/product"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/vendor"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/warehouse"
+	"github.com/entkit/entkit/examples/ent-project/ent/predicate"
+	"github.com/entkit/entkit/examples/ent-project/ent/product"
+	"github.com/entkit/entkit/examples/ent-project/ent/vendor"
+	"github.com/entkit/entkit/examples/ent-project/ent/warehouse"
 	"github.com/google/uuid"
 )
 
@@ -245,10 +245,12 @@ func (vq *VendorQuery) AllX(ctx context.Context) []*Vendor {
 }
 
 // IDs executes the query and returns a list of Vendor IDs.
-func (vq *VendorQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (vq *VendorQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if vq.ctx.Unique == nil && vq.path != nil {
+		vq.Unique(true)
+	}
 	ctx = setContextOp(ctx, vq.ctx, "IDs")
-	if err := vq.Select(vendor.FieldID).Scan(ctx, &ids); err != nil {
+	if err = vq.Select(vendor.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -561,20 +563,12 @@ func (vq *VendorQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (vq *VendorQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   vendor.Table,
-			Columns: vendor.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
-				Column: vendor.FieldID,
-			},
-		},
-		From:   vq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(vendor.Table, vendor.Columns, sqlgraph.NewFieldSpec(vendor.FieldID, field.TypeUUID))
+	_spec.From = vq.sql
 	if unique := vq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if vq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := vq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

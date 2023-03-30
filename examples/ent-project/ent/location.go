@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/company"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/country"
-	"github.com/diazoxide/entrefine/examples/ent-project/ent/location"
+	"github.com/entkit/entkit/examples/ent-project/ent/company"
+	"github.com/entkit/entkit/examples/ent-project/ent/country"
+	"github.com/entkit/entkit/examples/ent-project/ent/location"
 	"github.com/google/uuid"
 )
 
@@ -292,9 +292,3 @@ func (l *Location) String() string {
 
 // Locations is a parsable slice of Location.
 type Locations []*Location
-
-func (l Locations) config(cfg config) {
-	for _i := range l {
-		l[_i].config = cfg
-	}
-}
