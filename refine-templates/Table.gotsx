@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "src/tables.tsx" -}}
 import React, {useState} from "react";
@@ -6,7 +6,7 @@ import {HttpError} from "@refinedev/core";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
 import * as AntdIcons from "@ant-design/icons";
-import * as Interfaces from "./interfaces";
+import * as Interfaces from "./typedefs";
 import { Cursors } from "./data-provider";
 import * as Custom from "./custom";
 import * as View from "./view";
@@ -14,14 +14,14 @@ import * as Action from "./action";
 
 {{ range $n := $.Graph.Nodes }}
 {{- $orderFields := orderFields $n }}
-export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.I{{$n.Name}}> & { extendTable?: RA.useTableProps<Interfaces.I{{$n.Name}}, HttpError> }
+export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.{{ER_prepareName $n.Name}}Interface> & { extendTable?: RA.useTableProps<Interfaces.{{ ER_prepareName $n.Name }}Interface, HttpError> }
 export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, ...props} ) => {
 
     const [cursors, setCursors] = useState<Cursors>({first: 10,})
     const [perPage, setPerPage] = useState<number>(10)
 
     {{- $allFields := prepend $n.Fields $n.ID }}
-    const table = RA.useTable<Interfaces.I{{$n.Name}}>({
+    const table = RA.useTable<Interfaces.{{ER_prepareName $n.Name}}Interface>({
         resource: "{{$n.Name | kebabcase}}",
         initialSorter: [
             {
@@ -152,7 +152,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                 {{- end }}
                 {/* endregion Edges*/}
 
-                <Antd.Table.Column<Interfaces.I{{ $n.Name }}>
+                <Antd.Table.Column<Interfaces.{{ ER_prepareName $n.Name }}Interface>
                     title="Actions"
                     dataIndex="actions"
                     render={(_, record) => (

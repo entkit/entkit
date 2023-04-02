@@ -39,3 +39,24 @@ func NewEntgqlExtension(opts ...entgql.ExtensionOption) (*entgql.Extension, erro
 		)...,
 	)
 }
+
+type Mutation struct {
+	description string
+	isCreate    bool
+}
+
+func NewMutation(description string, isCreate bool) Mutation {
+	return Mutation{
+		description: description,
+		isCreate:    isCreate,
+	}
+}
+
+func (v Mutation) IsCreate() bool { return v.isCreate }
+
+func (v Mutation) GetDescription() string { return v.description }
+
+func (v Mutation) Description(desc string) entgql.MutationOption {
+	v.description = desc
+	return v
+}

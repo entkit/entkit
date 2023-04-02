@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "src/sorter-enums.tsx" -}}
 {{- range $n := $.Graph.Nodes -}}

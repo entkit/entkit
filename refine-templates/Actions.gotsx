@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "src/action.tsx" -}}
 import React from "react";
@@ -17,7 +17,7 @@ import {
     useLink,
 } from "@refinedev/core";
 import * as Custom from "./custom";
-import * as Type from "./interfaces";
+import * as Type from "./typedefs";
 {{- if $.Extension.Auth.Enabled }}
 import { usePermissions } from "@refinedev/core";
 {{- end }}
@@ -34,7 +34,7 @@ export type {{$cName}}Props = ButtonProps &
     RefineButtonCommonProps &
     RefineButtonSingleProps &
     RefineButtonLinkingProps & {
-    recordItemIDs: Type.{{ $.Prefix }}ID[],
+    recordItemIDs: Type.{{ $.Extension.Prefix }}ID[],
     onSuccess?: (data: any)=>void
 }
 
@@ -72,7 +72,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
 
     const  notification = useNotification();
     const { mutate, isLoading } = useCustomMutation();
-    //const { mutate, isLoading } = useCustomMutation<Type.I{{ $n.Name }}>();
+    //const { mutate, isLoading } = useCustomMutation<Type.{{ ER_prepareName $n.Name }}Interface>();
     const invalidate = useInvalidate();
 
     return can ? <Popconfirm

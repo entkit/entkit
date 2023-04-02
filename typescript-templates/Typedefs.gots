@@ -1,0 +1,58 @@
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+
+{{- define "src/typedefs.tsx" -}}
+// Custom types
+export type {{$.Extension.Prefix}}String = string
+export type {{$.Extension.Prefix}}Number = number
+export type {{$.Extension.Prefix}}Boolean = boolean
+export type {{$.Extension.Prefix}}Date = Date
+export type {{$.Extension.Prefix}}UUID = string
+export type {{$.Extension.Prefix}}Image = string
+export type {{$.Extension.Prefix}}Code = string
+export type {{$.Extension.Prefix}}URL = string
+export type {{$.Extension.Prefix}}RichText = string
+export type {{$.Extension.Prefix}}StringList = {{$.Extension.Prefix}}String[]
+export type {{$.Extension.Prefix}}NumberList = {{$.Extension.Prefix}}Number[]
+export type {{$.Extension.Prefix}}ID = {{$.Extension.Prefix}}UUID | {{$.Extension.Prefix}}Number
+
+{{ $enums := list }}
+{{- range $n := $.Graph.Nodes }}
+{{- range $f := $n.Fields }}
+
+{{- if $f.IsEnum }}
+{{- if not (has $f.Type.String $enums) }}
+{{- $enums = append $enums $f.Type.String }}
+export enum {{ ER_fieldTSType $f }}{
+    {{- range $v := $f.EnumValues }}
+    "{{ $v }}" = "{{ $v }}",
+    {{- end}}
+}
+{{- end}}
+{{- end}}
+{{- end}}
+{{- end}}
+
+interface gqlField<T> {
+    edges?: {
+        nodes?: Array<T>
+    },
+    totalCount?: number,
+}
+
+{{ range $n := $.Graph.Nodes }}
+{{- $allFields:=prepend $n.Fields $n.ID}}
+export interface {{ ER_prepareName $n.Name }}Interface {
+    {{- range $f := $allFields }}
+    {{ camel $f.Name }}: {{ ER_fieldTSType $f }}, // {{$f.Type.String}}
+    {{- end}}
+    {{- range $e := $n.Edges}}
+    {{- if $e.Unique }}
+    {{ camel $e.Name }}?: {{ER_prepareName $e.Type.Name}}Interface,
+    {{- else }}
+    {{ camel $e.Name }}?: {{ ER_prepareName $e.Type.Name}}Interface[],
+    _{{ camel $e.Name }}?: gqlField<{{ ER_prepareName $e.Type.Name }}Interface>,
+    {{- end }}
+    {{- end }}
+}
+{{- end -}}
+{{- end -}}

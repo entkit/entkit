@@ -24,7 +24,6 @@ type ExtensionOption = func(*Extension) error
 type Extension struct {
 	entc.DefaultExtension
 	IgnoreUncommittedChanges *bool
-	AppPath                  *string // AppPath JS Application path (packages.json directory path)
 	GraphqlURL               *string // Graphql URL
 	Prefix                   *string // General prefix for all generated resources
 	GoJs                     GoJSOptions
@@ -32,6 +31,7 @@ type Extension struct {
 	DefaultEdgesDiagram      string
 	Auth                     *Auth
 
+	UIs  []*UI
 	Meta map[string]any // Meta to share with frontend application
 }
 
@@ -44,10 +44,12 @@ type ForceGraph2DOptions struct {
 	Enabled bool `json:"Enabled,omitempty"`
 }
 
-// WithAppPath define refine-project directory
-func WithAppPath(path string) ExtensionOption {
+func WithUIs(uis ...*UI) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.AppPath = StringP(path)
+		for _, ui := range uis {
+			ui.Extension = ex
+			ex.UIs = append(ex.UIs, ui)
+		}
 		return nil
 	}
 }
@@ -127,6 +129,7 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 			LicenseKey: "test",
 		},
 		Auth: NewAuth(),
+		UIs:  []*UI{},
 	}
 
 	_funcMap := template.FuncMap{
@@ -172,10 +175,6 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		}
 	}
 
-	if ex.AppPath == nil {
-		return nil, errors.New("'AppPath' is required. Use 'WithAppPath' method to set it")
-	}
-
 	if ex.GraphqlURL == nil {
 		return nil, errors.New("'GraphqlURL' is required. Use 'WithGraphqlURL' method to set it")
 	}
@@ -218,7 +217,7 @@ func (ex *Extension) Templates() []*gen.Template {
 // Hooks Define Ent hooks
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{
-		GenerateRefineScriptsHook(ex),
+		GenerateUIsHook(ex),
 		GenerateAuthResourcesHook(ex),
 	}
 }

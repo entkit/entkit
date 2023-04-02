@@ -1,10 +1,10 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "partial:imports" -}}
 import {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
-import * as Interfaces from "./interfaces";
+import * as Interfaces from "./typedefs";
 import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 import CodeEditor from '@uiw/react-textarea-code-editor';
@@ -26,7 +26,7 @@ const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>(
 {{- end }}
 
 {{- end}}
-const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$ed.Type.Name}}>({
+const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_prepareName $ed.Type.Name}}Interface>({
     resource: "{{ $ed.Type.Name }}",
     optionLabel: "{{$titleField.Name}}",
     optionValue: "id",
@@ -91,7 +91,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.I{{$ed.
 {{- range $n := $.Graph.Nodes}}
 
 export const {{$n.Name}}Edit: React.FC = () => {
-    const { formProps, saveButtonProps, queryResult } = RA.useForm<Interfaces.I{{$n.Name}}>(
+    const { formProps, saveButtonProps, queryResult } = RA.useForm<Interfaces.{{ER_prepareName $n.Name}}Interface>(
         {
             redirect: false,
             metaData: {
@@ -162,7 +162,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
 
 {{- range $n := $.Graph.Nodes }}
 export const {{$n.Name}}Create: React.FC = () => {
-    const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.I{{$n.Name}}>();
+    const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.{{ER_prepareName $n.Name}}Interface>();
 
     {{- (include "partial:selectProps" $n) | nindent 4 }}
 

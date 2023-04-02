@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "src/header.tsx" -}}
 import {Col, Grid, Layout as AntdLayout, Row} from "antd";

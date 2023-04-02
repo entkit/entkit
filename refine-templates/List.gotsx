@@ -1,10 +1,10 @@
-{{- /* gotype: github.com/entkit/entkit.RefineGen */ -}}
+{{- /* gotype: github.com/entkit/entkit.UI */ -}}
 
 {{- define "src/list.tsx" -}}
 import React, {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Tables from "./tables";
-import * as Type from "./interfaces";
+import * as Type from "./typedefs";
 import * as Action from "./action";
 {{- if $.Extension.Auth.Enabled }}
 import { usePermissions } from "@refinedev/core";
@@ -20,7 +20,7 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
     const can = true;
     {{- end }}
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Prefix}}ID[]>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Extension.Prefix}}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
 
     return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (
