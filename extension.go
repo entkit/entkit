@@ -70,8 +70,8 @@ func WithGraphqlURL(url string) ExtensionOption {
 	}
 }
 
-// WithTypeScriptPrefix define typescript types/vars prefix
-func WithTypeScriptPrefix(prefix string) ExtensionOption {
+// WithPrefix define typescript types/vars prefix
+func WithPrefix(prefix string) ExtensionOption {
 	return func(ex *Extension) (err error) {
 		ex.Prefix = StringP(prefix)
 		return nil
