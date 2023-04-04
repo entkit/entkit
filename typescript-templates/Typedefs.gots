@@ -1,19 +1,20 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator*/ -}}
 
 {{- define "src/typedefs.tsx" -}}
+{{- $prefix := $.Extension.Prefix}}
 // Custom types
-export type {{$.Extension.Prefix}}String = string
-export type {{$.Extension.Prefix}}Number = number
-export type {{$.Extension.Prefix}}Boolean = boolean
-export type {{$.Extension.Prefix}}Date = Date
-export type {{$.Extension.Prefix}}UUID = string
-export type {{$.Extension.Prefix}}Image = string
-export type {{$.Extension.Prefix}}Code = string
-export type {{$.Extension.Prefix}}URL = string
-export type {{$.Extension.Prefix}}RichText = string
-export type {{$.Extension.Prefix}}StringList = {{$.Extension.Prefix}}String[]
-export type {{$.Extension.Prefix}}NumberList = {{$.Extension.Prefix}}Number[]
-export type {{$.Extension.Prefix}}ID = {{$.Extension.Prefix}}UUID | {{$.Extension.Prefix}}Number
+export type {{$prefix}}String = string
+export type {{$prefix}}Number = number
+export type {{$prefix}}Boolean = boolean
+export type {{$prefix}}Date = Date
+export type {{$prefix}}UUID = string
+export type {{$prefix}}Image = string
+export type {{$prefix}}Code = string
+export type {{$prefix}}URL = string
+export type {{$prefix}}RichText = string
+export type {{$prefix}}StringList = {{$prefix}}String[]
+export type {{$prefix}}NumberList = {{$prefix}}Number[]
+export type {{$prefix}}ID = {{$prefix}}UUID | {{$prefix}}Number
 
 {{ $enums := list }}
 {{- range $n := $.Graph.Nodes }}

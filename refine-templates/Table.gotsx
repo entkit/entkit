@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/tables.tsx" -}}
 import React, {useState} from "react";

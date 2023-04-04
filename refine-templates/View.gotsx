@@ -1,6 +1,7 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/view.tsx" -}}
+{{- $prefix := $.Extension.Prefix }}
 import React from "react";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";
@@ -17,21 +18,21 @@ export type ViewProps<T> = Omit<React.HTMLProps<HTMLElement>, "value"> & {
 }
 
 // region Date
-export const {{$.Extension.Prefix}}DateViewOnShow: React.FC<ViewProps<Date>> = ({value}) => {
+export const {{$prefix}}DateViewOnShow: React.FC<ViewProps<Date>> = ({value}) => {
     return value ? <RA.DateField format="LLL" value={ value }/> : <RA.TextField value="Never"/>
 }
-export const {{$.Extension.Prefix}}DateViewOnList: React.FC<ViewProps<Date>> = {{$.Extension.Prefix}}DateViewOnShow
-export const {{$.Extension.Prefix}}DateViewOnForm: React.FC = (props) => {
+export const {{$prefix}}DateViewOnList: React.FC<ViewProps<Date>> = {{$prefix}}DateViewOnShow
+export const {{$prefix}}DateViewOnForm: React.FC = (props) => {
     return <Antd.DatePicker {...props} showTime={true} />
 }
 // endregion Date
 
 // region Boolean
-export const {{$.Extension.Prefix}}BooleanViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Boolean>> = ({value}) => {
+export const {{$prefix}}BooleanViewOnShow: React.FC<ViewProps<Type.{{$prefix}}Boolean>> = ({value}) => {
     return <RA.TextField value={ value ? "Yes" : "No"}/>
 }
-export const {{$.Extension.Prefix}}BooleanViewOnList = {{$.Extension.Prefix}}BooleanViewOnShow
-export const {{$.Extension.Prefix}}BooleanViewOnForm: React.FC = (props)=>{
+export const {{$prefix}}BooleanViewOnList = {{$prefix}}BooleanViewOnShow
+export const {{$prefix}}BooleanViewOnForm: React.FC = (props)=>{
     return <Antd.Radio.Group {...props} >
         <Antd.Radio value={true}>Yes</Antd.Radio>
         <Antd.Radio value={false}>No</Antd.Radio>
@@ -40,61 +41,61 @@ export const {{$.Extension.Prefix}}BooleanViewOnForm: React.FC = (props)=>{
 // endregion Boolean
 
 // region String
-export const {{$.Extension.Prefix}}StringViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}String>> = ({value}) => {
+export const {{$prefix}}StringViewOnShow: React.FC<ViewProps<Type.{{$prefix}}String>> = ({value}) => {
     return <Antd.Typography.Text copyable={true}>{ value }</Antd.Typography.Text>
 }
-export const {{$.Extension.Prefix}}StringViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}String>> = ({value}) => {
+export const {{$prefix}}StringViewOnList: React.FC<ViewProps<Type.{{$prefix}}String>> = ({value}) => {
     return <Antd.Tooltip title={value}>
         <RA.TextField value={value} ellipsis={true} style={ {width: '100px'} }/>
     </Antd.Tooltip>
 }
-export const {{$.Extension.Prefix}}StringViewOnForm: React.FC = (props) => {
+export const {{$prefix}}StringViewOnForm: React.FC = (props) => {
     return <Antd.Input {...props} />
 }
 // endregion String
 
 // region Number
-export const {{$.Extension.Prefix}}NumberViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Number>> = ({value, ...props}) => {
-    return <{{$.Extension.Prefix}}StringViewOnShow value={String(value)} {...props} />
+export const {{$prefix}}NumberViewOnShow: React.FC<ViewProps<Type.{{$prefix}}Number>> = ({value, ...props}) => {
+    return <{{$prefix}}StringViewOnShow value={String(value)} {...props} />
 }
-export const {{$.Extension.Prefix}}NumberViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Number>> = ({value, ...props}) => {
-    return <{{$.Extension.Prefix}}NumberViewOnShow value={value} {...props} />
+export const {{$prefix}}NumberViewOnList: React.FC<ViewProps<Type.{{$prefix}}Number>> = ({value, ...props}) => {
+    return <{{$prefix}}NumberViewOnShow value={value} {...props} />
 }
-export const {{$.Extension.Prefix}}NumberViewOnForm: React.FC = (props) => {
+export const {{$prefix}}NumberViewOnForm: React.FC = (props) => {
     return <Antd.InputNumber {...props} />
 }
 // endregion Number
 
 // region String List
-export const {{$.Extension.Prefix}}StringListViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}StringList>> = ({value}) => {
-    return <>{ value?.map( (v, i) => <{{$.Extension.Prefix}}StringViewOnShow key={i} value={ String(i+1) + '. ' + v}/> ) }</>;
+export const {{$prefix}}StringListViewOnShow: React.FC<ViewProps<Type.{{$prefix}}StringList>> = ({value}) => {
+    return <>{ value?.map( (v, i) => <{{$prefix}}StringViewOnShow key={i} value={ String(i+1) + '. ' + v}/> ) }</>;
 }
-export const {{$.Extension.Prefix}}StringListViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}StringList>> = ({value}) => {
+export const {{$prefix}}StringListViewOnList: React.FC<ViewProps<Type.{{$prefix}}StringList>> = ({value}) => {
     return <Antd.Typography.Text>{ String( value?.length || 0 )+" items" }</Antd.Typography.Text>
 }
-export const {{$.Extension.Prefix}}StringListViewOnForm: React.FC = (props) => {
+export const {{$prefix}}StringListViewOnForm: React.FC = (props) => {
     return <Antd.Select {...props}  mode="tags" />
 }
 // endregion
 
 // region Image
-export const {{$.Extension.Prefix}}ImageViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Image>> = ({value}) => {
+export const {{$prefix}}ImageViewOnShow: React.FC<ViewProps<Type.{{$prefix}}Image>> = ({value}) => {
     return <Antd.Image style={ {width: '100%', maxWidth: '256px' } } src={value}/>
 }
-export const {{$.Extension.Prefix}}ImageViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Image>> = ({value}) => {
+export const {{$prefix}}ImageViewOnList: React.FC<ViewProps<Type.{{$prefix}}Image>> = ({value}) => {
     return <Antd.Image width={48} src={value}/>
 }
-export const {{$.Extension.Prefix}}ImageViewOnForm: React.FC = {{$.Extension.Prefix}}StringViewOnForm
+export const {{$prefix}}ImageViewOnForm: React.FC = {{$prefix}}StringViewOnForm
 // endregion Image
 
 // region UUID
-export const {{$.Extension.Prefix}}UUIDViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}UUID>> = {{$.Extension.Prefix}}StringViewOnShow
-export const {{$.Extension.Prefix}}UUIDViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}UUID>> = {{$.Extension.Prefix}}StringViewOnList
-export const {{$.Extension.Prefix}}UUIDViewOnForm: React.FC = {{$.Extension.Prefix}}StringListViewOnForm
+export const {{$prefix}}UUIDViewOnShow: React.FC<ViewProps<Type.{{$prefix}}UUID>> = {{$prefix}}StringViewOnShow
+export const {{$prefix}}UUIDViewOnList: React.FC<ViewProps<Type.{{$prefix}}UUID>> = {{$prefix}}StringViewOnList
+export const {{$prefix}}UUIDViewOnForm: React.FC = {{$prefix}}StringListViewOnForm
 // endregion UUID
 
 // region Code
-export const {{$.Extension.Prefix}}CodeViewOnForm: React.FC<any> = (props) => {
+export const {{$prefix}}CodeViewOnForm: React.FC<any> = (props) => {
     return <CodeEditor
         {...props}
         language={props.Language || 'js'}
@@ -109,32 +110,32 @@ export const {{$.Extension.Prefix}}CodeViewOnForm: React.FC<any> = (props) => {
         } }
     />
 }
-export const {{$.Extension.Prefix}}CodeViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Code>> = ({value}) => {
-    return <{{$.Extension.Prefix}}CodeViewOnForm value={value} readOnly={true}/>
+export const {{$prefix}}CodeViewOnShow: React.FC<ViewProps<Type.{{$prefix}}Code>> = ({value}) => {
+    return <{{$prefix}}CodeViewOnForm value={value} readOnly={true}/>
 }
-export const {{$.Extension.Prefix}}CodeViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}Code>> = ({value}) => {
+export const {{$prefix}}CodeViewOnList: React.FC<ViewProps<Type.{{$prefix}}Code>> = ({value}) => {
     return <RA.TextField value={value} code={true} ellipsis={true} style={ {width: '100px'} }/>
 }
 // endregion Code
 
 // region Rich Text
-export const {{$.Extension.Prefix}}RichTextViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}RichText>> = ({value})=>{
+export const {{$prefix}}RichTextViewOnShow: React.FC<ViewProps<Type.{{$prefix}}RichText>> = ({value})=>{
     return <div dangerouslySetInnerHTML={ {__html: value || ""} }></div>
 }
-export const {{$.Extension.Prefix}}RichTextViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}RichText>> = {{$.Extension.Prefix}}StringViewOnList
-export const {{$.Extension.Prefix}}RichTextViewOnForm: React.FC = (props) => <ReactQuill {...props} theme="snow"/>
+export const {{$prefix}}RichTextViewOnList: React.FC<ViewProps<Type.{{$prefix}}RichText>> = {{$prefix}}StringViewOnList
+export const {{$prefix}}RichTextViewOnForm: React.FC = (props) => <ReactQuill {...props} theme="snow"/>
 // endregion Rich Text
 
 // region URL
-export const {{$.Extension.Prefix}}URLViewOnShow: React.FC<ViewProps<Type.{{$.Extension.Prefix}}URL>> = ({value}) => {
+export const {{$prefix}}URLViewOnShow: React.FC<ViewProps<Type.{{$prefix}}URL>> = ({value}) => {
     return <Antd.Button href={ value } target="_blank" icon={<AntdIcons.LinkOutlined/>}>
         <RA.TextField value={value} ellipsis={true} style={ {width: '100%', maxWidth: "350px"} } type={"secondary"} />
     </Antd.Button>
 }
-export const {{$.Extension.Prefix}}URLViewOnList: React.FC<ViewProps<Type.{{$.Extension.Prefix}}URL>> = ({value}) => {
+export const {{$prefix}}URLViewOnList: React.FC<ViewProps<Type.{{$prefix}}URL>> = ({value}) => {
     return <Antd.Button type="primary" href={ value } target="_blank" icon={<AntdIcons.LinkOutlined/>}>Open</Antd.Button>
 }
-export const {{$.Extension.Prefix}}URLViewOnForm: React.FC = {{$.Extension.Prefix}}StringViewOnForm
+export const {{$prefix}}URLViewOnForm: React.FC = {{$prefix}}StringViewOnForm
 // endregion URL
 
 // region Enums
@@ -145,8 +146,8 @@ export const {{$.Extension.Prefix}}URLViewOnForm: React.FC = {{$.Extension.Prefi
 {{- if $f.IsEnum }}
 {{- if not (has $f.Type.String $enums) }}
 {{- $enums = append $enums $f.Type.String }}
-export const {{ ER_fieldTSType $f }}ViewOnShow = {{$.Extension.Prefix}}StringViewOnShow
-export const {{ ER_fieldTSType $f }}ViewOnList = {{$.Extension.Prefix}}StringViewOnList
+export const {{ ER_fieldTSType $f }}ViewOnShow = {{$prefix}}StringViewOnShow
+export const {{ ER_fieldTSType $f }}ViewOnList = {{$prefix}}StringViewOnList
 export const {{ ER_fieldTSType $f }}ViewOnForm: React.FC = (props)=>{
     return  <Antd.Select
         {...props}

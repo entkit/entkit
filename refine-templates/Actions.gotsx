@@ -1,6 +1,7 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/action.tsx" -}}
+{{- $prefix := $.Extension.Prefix }}
 import React from "react";
 import * as Antd from "antd";
 import * as AntdIcons from "@ant-design/icons";
@@ -34,7 +35,7 @@ export type {{$cName}}Props = ButtonProps &
     RefineButtonCommonProps &
     RefineButtonSingleProps &
     RefineButtonLinkingProps & {
-    recordItemIDs: Type.{{ $.Extension.Prefix }}ID[],
+    recordItemIDs: Type.{{ $prefix }}ID[],
     onSuccess?: (data: any)=>void
 }
 
@@ -104,7 +105,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                 },
                 {
                     onSuccess: (resp) => {
-                        recordItemIDs.forEach((id: Type.EntID)=>{
+                        recordItemIDs.forEach((id: Type.{{$prefix}}ID)=>{
                             invalidate({
                                 resource: "{{ $n.Name | kebabcase}}",
                                 invalidates: ["resourceAll"],

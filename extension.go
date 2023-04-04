@@ -31,8 +31,8 @@ type Extension struct {
 	DefaultEdgesDiagram      string
 	Auth                     *Auth
 
-	UIs  []*UI
-	Meta map[string]any // Meta to share with frontend application
+	Generators []*Generator
+	Meta       map[string]any // Meta to share with frontend application
 }
 
 type GoJSOptions struct {
@@ -44,12 +44,9 @@ type ForceGraph2DOptions struct {
 	Enabled bool `json:"Enabled,omitempty"`
 }
 
-func WithUIs(uis ...*UI) ExtensionOption {
+func WithGenerator(path string, adapter GeneratorAdapter, options ...GeneratorOption) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		for _, ui := range uis {
-			ui.Extension = ex
-			ex.UIs = append(ex.UIs, ui)
-		}
+		ex.Generators = append(ex.Generators, NewGenerator(ex, path, adapter, options...))
 		return nil
 	}
 }
@@ -128,8 +125,8 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 			Enabled:    true,
 			LicenseKey: "test",
 		},
-		Auth: NewAuth(),
-		UIs:  []*UI{},
+		Auth:       NewAuth(),
+		Generators: []*Generator{},
 	}
 
 	_funcMap := template.FuncMap{
@@ -217,7 +214,7 @@ func (ex *Extension) Templates() []*gen.Template {
 // Hooks Define Ent hooks
 func (ex *Extension) Hooks() []gen.Hook {
 	return []gen.Hook{
-		GenerateUIsHook(ex),
+		GeneratorHook(ex),
 		GenerateAuthResourcesHook(ex),
 	}
 }

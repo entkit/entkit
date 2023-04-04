@@ -1,6 +1,7 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/list.tsx" -}}
+{{- $prefix := $.Extension.Prefix }}
 import React, {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Tables from "./tables";
@@ -20,7 +21,7 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
     const can = true;
     {{- end }}
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{$.Extension.Prefix}}ID[]>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{ $prefix }}ID[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
 
     return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (

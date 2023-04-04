@@ -14,11 +14,11 @@ import (
 	"text/template"
 )
 
-type UI struct {
+type Generator struct {
 	Extension *Extension `json:"Extension,omitempty"`
 	Path      *string    `json:"Path,omitempty"`
 	Enabled   *bool      `json:"Enabled,omitempty"`
-	Adapter   UIAdapter
+	Adapter   GeneratorAdapter
 	Graph     *gen.Graph
 	SkipModes SkipModes
 	Ops       []gen.Op
@@ -37,33 +37,33 @@ func (sm *SkipModes) Cast(value int) entgql.SkipMode {
 	return entgql.SkipMode(value)
 }
 
-type UIAdapter interface {
+type GeneratorAdapter interface {
 	GetName() string
 }
 
-type UIAdapterWithDependencies interface {
-	GetDependencies() []UIAdapter
+type GeneratorAdapterWithDependencies interface {
+	GetDependencies() []GeneratorAdapter
 }
 
-type UIAdapterWithFS interface {
+type GeneratorAdapterWithFS interface {
 	GetFS() fs.FS
 }
 
-type UIAdapterWithAfterCommand interface {
+type GeneratorAdapterWithAfterCommand interface {
 	CommandAfterGen() string
 }
 
-type UIAdapterWithTemplates interface {
-	UIAdapterWithFS
+type GeneratorAdapterWithTemplates interface {
+	GeneratorAdapterWithFS
 	GetTemplates() []string
 }
 
-type UIAdapterWithStaticTemplates interface {
-	UIAdapterWithFS
+type GeneratorAdapterWithStaticTemplates interface {
+	GeneratorAdapterWithFS
 	GetStaticTemplates() []string
 }
 
-func parseTemplate(path string, adapter UIAdapterWithFS) *gen.Template {
+func parseTemplate(path string, adapter GeneratorAdapterWithFS) *gen.Template {
 	t := gen.NewTemplate(path).Funcs(funcMap)
 	var _funcMap template.FuncMap = map[string]interface{}{}
 	// copied from: https://github.com/helm/helm/blob/8648ccf5d35d682dcd5f7a9c2082f0aaf071e817/pkg/engine/engine.go#L147-L154
@@ -78,57 +78,57 @@ func parseTemplate(path string, adapter UIAdapterWithFS) *gen.Template {
 	return gen.MustParse(t.Funcs(_funcMap).ParseFS(adapter.GetFS(), path))
 }
 
-func (ui *UI) Generate(graph *gen.Graph) {
-	ui.Graph = graph
+func (gr *Generator) Generate(graph *gen.Graph) {
+	gr.Graph = graph
 
-	uiAdapterWithDependencies, ok := ui.Adapter.(UIAdapterWithDependencies)
+	uiAdapterWithDependencies, ok := gr.Adapter.(GeneratorAdapterWithDependencies)
 	if ok {
 		deps := uiAdapterWithDependencies.GetDependencies()
 		for _, depAdapter := range deps {
-			ui.generateAdapterOutput(depAdapter, graph)
+			gr.generateAdapterOutput(depAdapter, graph)
 		}
 	}
 
-	ui.generateAdapterOutput(ui.Adapter, graph)
+	gr.generateAdapterOutput(gr.Adapter, graph)
 
-	ui.runAfterGenCommands()
+	gr.runAfterGenCommands()
 }
 
-func (ui *UI) generateAdapterOutput(adapter UIAdapter, graph *gen.Graph) {
-	uIAdapterWithFS, ok := adapter.(UIAdapterWithFS)
+func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.Graph) {
+	uIAdapterWithFS, ok := adapter.(GeneratorAdapterWithFS)
 	if !ok {
 		panic("unable to parse template from adapter that not implements FS")
 	}
 
-	uiWithTemplates, ok := (adapter).(UIAdapterWithTemplates)
+	genWithTemplates, ok := (adapter).(GeneratorAdapterWithTemplates)
 	if ok {
-		for _, t := range uiWithTemplates.GetTemplates() {
+		for _, t := range genWithTemplates.GetTemplates() {
 			_t := parseTemplate(t, uIAdapterWithFS)
-			ui.rendAndSave(_t, true)
+			gr.rendAndSave(_t, true)
 		}
 	}
 
-	uiWithStaticTemplates, ok := (adapter).(UIAdapterWithStaticTemplates)
+	genWithStaticTemplates, ok := (adapter).(GeneratorAdapterWithStaticTemplates)
 	if ok {
-		for _, t := range uiWithStaticTemplates.GetStaticTemplates() {
+		for _, t := range genWithStaticTemplates.GetStaticTemplates() {
 			_t := parseTemplate(t, uIAdapterWithFS)
-			ui.rendAndSave(_t, false)
+			gr.rendAndSave(_t, false)
 		}
 	}
 }
 
-func (ui *UI) runAfterGenCommands() {
-	adapterWithAfterGenCommand, ok := (ui.Adapter).(UIAdapterWithAfterCommand)
+func (gr *Generator) runAfterGenCommands() {
+	adapterWithAfterGenCommand, ok := (gr.Adapter).(GeneratorAdapterWithAfterCommand)
 	if !ok {
 		return
 	}
 	cmd := exec.Command("/bin/sh", "-c", adapterWithAfterGenCommand.CommandAfterGen())
-	cmd.Dir = PString(ui.Path)
+	cmd.Dir = PString(gr.Path)
 	out, _ := cmd.Output()
 	println(string(out))
 }
 
-func (ui *UI) rendAndSave(tmpl *gen.Template, override bool) {
+func (gr *Generator) rendAndSave(tmpl *gen.Template, override bool) {
 	rootName := path.Base(tmpl.Name())
 	for _, t := range tmpl.Templates() {
 		var b bytes.Buffer
@@ -143,27 +143,27 @@ func (ui *UI) rendAndSave(tmpl *gen.Template, override bool) {
 
 		t = t.Funcs(funcMap)
 
-		err := tmpl.ExecuteTemplate(&b, t.Name(), ui)
+		err := tmpl.ExecuteTemplate(&b, t.Name(), gr)
 		if err != nil {
 			panic(err)
 		}
 
-		err = ui.saveGenerated(t.Name(), b, override)
+		err = gr.saveGenerated(t.Name(), b, override)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-func (ui *UI) exists(name string) bool {
+func (gr *Generator) exists(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
 }
 
-func (ui *UI) saveFile(path string, content []byte, override bool) error {
+func (gr *Generator) saveFile(path string, content []byte, override bool) error {
 	if override {
 		_ = os.Remove(path)
-	} else if ui.exists(path) {
+	} else if gr.exists(path) {
 		return nil
 	}
 
@@ -179,8 +179,8 @@ func (ui *UI) saveFile(path string, content []byte, override bool) error {
 	return err
 }
 
-func (ui *UI) saveGenerated(name string, content bytes.Buffer, override bool) error {
-	resDir := PString(ui.Path)
+func (gr *Generator) saveGenerated(name string, content bytes.Buffer, override bool) error {
+	resDir := PString(gr.Path)
 	p := filepath.Join(resDir, name)
 
 	err := os.MkdirAll(filepath.Dir(p), os.ModePerm)
@@ -188,12 +188,12 @@ func (ui *UI) saveGenerated(name string, content bytes.Buffer, override bool) er
 		panic(err)
 	}
 
-	return ui.saveFile(p, content.Bytes(), override)
+	return gr.saveFile(p, content.Bytes(), override)
 }
 
-type UIOption = func(*UI) error
+type GeneratorOption = func(*Generator) error
 
-func GenerateUIsHook(ex *Extension) gen.Hook {
+func GeneratorHook(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 
@@ -216,8 +216,8 @@ func GenerateUIsHook(ex *Extension) gen.Hook {
 			}
 
 			if tracked {
-				for _, ui := range ex.UIs {
-					ui.Generate(g)
+				for _, generator := range ex.Generators {
+					generator.Generate(g)
 				}
 			}
 
@@ -226,10 +226,11 @@ func GenerateUIsHook(ex *Extension) gen.Hook {
 	}
 }
 
-func NewUI(path string, adapter UIAdapter, options ...UIOption) *UI {
-	ui := &UI{
-		Path:    StringP(path),
-		Adapter: adapter,
+func NewGenerator(extension *Extension, path string, adapter GeneratorAdapter, options ...GeneratorOption) *Generator {
+	ui := &Generator{
+		Extension: extension,
+		Path:      StringP(path),
+		Adapter:   adapter,
 		SkipModes: SkipModes{
 			SkipEnumField:           entgql.SkipEnumField,
 			SkipMutationCreateInput: entgql.SkipMutationCreateInput,

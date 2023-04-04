@@ -1,11 +1,11 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/auth.tsx" -}}
-
+{{- $prefix := $.Extension.Prefix }}
 {{- $keycloakEnabled := and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
 
 {{- if $keycloakEnabled -}}
-import { keycloakBackendClientId } from "../environment";
+import { keycloakBackendClientId } from "./environment";
 import Keycloak from "keycloak-js";
 {{- end }}
 
@@ -31,7 +31,7 @@ export function getPermissions(keycloak: Keycloak) {
                 .then(data=>{
                     const res: Record<string, string[]> = {}
                     data.forEach((p: { rsname: string, scopes: string[] })=>{
-                        res[p.rsname.replace(/^{{ $.Extension.Prefix }}/, "")] = p.scopes.map(s=>s.replace(/^{{ $.Extension.Prefix }}/, ""));
+                        res[p.rsname.replace(/^{{ indirect $prefix }}/, "")] = p.scopes.map(s=>s.replace(/^{{ $prefix }}/, ""));
                     })
                     return res
                 })

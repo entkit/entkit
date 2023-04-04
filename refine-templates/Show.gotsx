@@ -1,6 +1,7 @@
-{{- /* gotype: github.com/entkit/entkit.UI */ -}}
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/show.tsx" -}}
+{{- $prefix := $.Extension.Prefix }}
 import React, { useState } from "react";
 import { useShow } from "@refinedev/core";
 import * as RA from "@refinedev/antd";
@@ -19,7 +20,7 @@ import * as Action from "./action";
 {{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}ShowProps = {
-    id?: Interfaces.{{$.Extension.Prefix}}ID,
+    id?: Interfaces.{{$prefix}}ID,
     withEdges?: boolean,
 } & RA.ShowProps
 export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdges, ...showProps}) => {

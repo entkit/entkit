@@ -22,8 +22,8 @@ func (r Refine) GetFS() fs.FS {
 	return _refineTemplates
 }
 
-func (r Refine) GetDependencies() []UIAdapter {
-	return []UIAdapter{
+func (r Refine) GetDependencies() []GeneratorAdapter {
+	return []GeneratorAdapter{
 		TypescriptAdapter,
 	}
 }
@@ -66,5 +66,6 @@ func (r Refine) GetTemplates() []string {
 		"refine-templates/Actions.gotsx",
 		"refine-templates/Helpers.gotsx",
 		"refine-templates/Diagram.gotsx",
+		"refine-templates/Auth.gotsx",
 	}
 }
