@@ -18,10 +18,10 @@ type Keycloak struct {
 	MasterAdminUsername *string `json:"MasterAdminUsername,omitempty"`
 	MasterAdminPassword *string `json:"MasterAdminPassword,omitempty"`
 
-	AdminUsername         *string           `json:"AdminUsername,omitempty"`
-	AdminPassword         *string           `json:"AdminPassword,omitempty"`
-	BackendClientConfig   *gocloak.Client   `json:"BackendClientConfig,omitempty"`
-	FrontendClientConfigs []*gocloak.Client `json:"FrontendClientConfigs,omitempty"`
+	AdminUsername        *string         `json:"AdminUsername,omitempty"`
+	AdminPassword        *string         `json:"AdminPassword,omitempty"`
+	BackendClientConfig  *gocloak.Client `json:"BackendClientConfig,omitempty"`
+	FrontendClientConfig *gocloak.Client `json:"FrontendClientConfig,omitempty"`
 
 	GoCloak *gocloak.GoCloak `json:"GoCloak,omitempty"`
 }
@@ -40,18 +40,18 @@ func NewKeycloak(
 	adminUser string,
 	adminPassword string,
 	backendClientConfigs *gocloak.Client,
-	frontendClientConfigs []*gocloak.Client,
+	frontendClientConfig *gocloak.Client,
 	options ...KeycloakOption,
 ) *Keycloak {
 	k := &Keycloak{
-		Host:                  StringP(host),
-		Realm:                 StringP(realm),
-		MasterAdminUsername:   StringP(masterAdminUsername),
-		MasterAdminPassword:   StringP(masterAdminPassword),
-		AdminUsername:         StringP(adminUser),
-		AdminPassword:         StringP(adminPassword),
-		BackendClientConfig:   backendClientConfigs,
-		FrontendClientConfigs: frontendClientConfigs,
+		Host:                 StringP(host),
+		Realm:                StringP(realm),
+		MasterAdminUsername:  StringP(masterAdminUsername),
+		MasterAdminPassword:  StringP(masterAdminPassword),
+		AdminUsername:        StringP(adminUser),
+		AdminPassword:        StringP(adminPassword),
+		BackendClientConfig:  backendClientConfigs,
+		FrontendClientConfig: frontendClientConfig,
 	}
 	for _, opt := range options {
 		if err := opt(k); err != nil {
@@ -137,12 +137,11 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 
 	backendClient := kc.prepareBackendClient(ctx, token)
 
-	kc.prepareFrontendClients(ctx, token)
+	kc.prepareFrontendClient(ctx, token)
 
-	actions := []string{"Read", "Create", "Update", "Delete"}
 	scopesMap := map[string]*gocloak.ScopeRepresentation{}
 
-	for _, action := range actions {
+	for _, action := range DefaultActions {
 		scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, prefix, action)
 		scopesMap[action] = scope
 	}
@@ -278,24 +277,16 @@ func (kc *Keycloak) prepareRealm(ctx context.Context, token string) *gocloak.Rea
 	return realm
 }
 
-func (kc *Keycloak) prepareFrontendClients(ctx context.Context, token string) []*gocloak.Client {
-	var result []*gocloak.Client
-	for _, config := range kc.FrontendClientConfigs {
-		result = append(result, kc.prepareFrontendClient(ctx, token, *config))
-	}
-	return result
-}
-
-func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string, clientConfig gocloak.Client) *gocloak.Client {
+func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string) *gocloak.Client {
 	var client *gocloak.Client
 	clients, err := kc.GoCloak.GetClients(ctx, token, PString(kc.Realm), gocloak.GetClientsParams{
-		ClientID: clientConfig.ClientID,
+		ClientID: kc.FrontendClientConfig.ClientID,
 	})
 	if err != nil {
 		panic(err)
 	}
 	if len(clients) == 0 {
-		client = &clientConfig
+		client = kc.FrontendClientConfig
 	} else {
 		var m map[string]any
 
@@ -305,7 +296,7 @@ func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string, cli
 			panic(err)
 		}
 
-		jb, _ := json.Marshal(clientConfig)
+		jb, _ := json.Marshal(kc.FrontendClientConfig)
 		err = json.Unmarshal(jb, &m)
 		if err != nil {
 			panic(err)

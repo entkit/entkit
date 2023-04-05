@@ -16,6 +16,9 @@ import (
 func EntkitAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		{{- if (indirect $auth.Enabled)}}
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		var err error
 		{{- if (indirect $auth.Keycloak.Enabled) }}
 		kc := entkit.NewBackendKeycloak(
@@ -39,6 +42,9 @@ func EntkitAuthMiddleware(next http.Handler) http.Handler {
 func EntkitAuthGinMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		{{- if (indirect $auth.Enabled)}}
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "POST, GET")
+		c.Header("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		var err error
 		{{- if (indirect $auth.Keycloak.Enabled) }}
 		kc := entkit.NewBackendKeycloak(

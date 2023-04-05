@@ -16,6 +16,8 @@ import { NavigateToResource, CatchAllNavigate } from "@refinedev/react-router-v6
 import { usePermissions } from "@refinedev/core";
 {{- end }}
 
+{{- $indexNode := ER_indexNode $.Graph}}
+
 export const RoutesBundle: React.FC = ()=>{
     return <Routes>
         <Route
@@ -29,11 +31,11 @@ export const RoutesBundle: React.FC = ()=>{
                 </Authenticated>
             }
         >
-            {{- range $n := $.Graph.Nodes}}
-            {{- if $n.Annotations.ENTKIT.IndexRoute }}
-            <Route index element={<NavigateToResource resource="{{ $n.Name | kebabcase }}" />}/>
-            {{- end }}
 
+            {{- if not (empty $indexNode) }}
+            <Route index element={<NavigateToResource resource="{{ $indexNode.Name | kebabcase }}" />}/>
+            {{- end }}
+            {{- range $n := $.Graph.Nodes}}
             {{- $routePath := $n.Annotations.ENTKIT.Route }}
             {{- if empty $routePath }}
             {{ $routePath = $n.Name | kebabcase }}
@@ -57,15 +59,15 @@ export const RoutesBundle: React.FC = ()=>{
             {{- end}}
         </Route>
 
-        {/*<Route
+        <Route
             element={
                 <Authenticated fallback={<Outlet />}>
-                    <NavigateToResource resource="posts" />
+                    <NavigateToResource resource="{{ $indexNode.Name | kebabcase }}" />
                 </Authenticated>
             }
         >
             <Route path="/login" element={<Login />} />
-        </Route>*/}
+        </Route>
 
         <Route
             element={

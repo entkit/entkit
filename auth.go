@@ -9,6 +9,19 @@ type Auth struct {
 	Keycloak *Keycloak `json:"Keycloak,omitempty"`
 }
 
+var (
+	ActionRead     = "Read"
+	ActionCreate   = "Create"
+	ActionUpdate   = "Update"
+	ActionDelete   = "Delete"
+	DefaultActions = []string{
+		ActionRead,
+		ActionCreate,
+		ActionUpdate,
+		ActionDelete,
+	}
+)
+
 type AuthOption = func(auth *Auth) error
 
 func NewAuth(options ...AuthOption) *Auth {
