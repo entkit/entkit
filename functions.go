@@ -39,6 +39,10 @@ func someNode(graph *gen.Graph, field string) *gen.Type {
 	return nil
 }
 
+func indexNode(graph *gen.Graph) *gen.Type {
+	return someNode(graph, "IndexRoute")
+}
+
 func titleField(node *gen.Type) *gen.Field {
 	f := someField(node, "TitleField")
 	if f != nil {

@@ -141,6 +141,7 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		"ER_someField":       someField,
 		"ER_titleField":      titleField,
 		"ER_someNode":        someNode,
+		"ER_indexNode":       indexNode,
 		"ER_mainImageField":  mainImageField,
 		"ER_getActionByName": getActionByName,
 		"ER_prepareName": func(str string) string {
