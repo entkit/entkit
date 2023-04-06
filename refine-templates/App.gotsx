@@ -101,36 +101,31 @@ function App() {
             }
         },
         getPermissions: async ()=> {
-            return new Promise((resolve, reject) => {
-                {{- if $.Extension.Auth.Keycloak.Enabled -}}
-                keycloak.updateToken(30).then(() => {
-                    fetch(keycloak.authServerUrl + '/realms/' + keycloak.realm + '/protocol/openid-connect/token',
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'Authorization': 'Bearer ' + keycloak.token,
-                            },
-                            body: `grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&response_include_resource_name=true&response_mode=permissions&audience=${environment.keycloakBackendClientId}`
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to get permissions');
-                            }
-                            return response.json();
-                        })
-                        .then(data=>{
-                            const res: Record<string, string[]> = {}
-                            data.forEach((p: { rsname: string, scopes: string[] })=>{
-                                res[p.rsname.replace(/^{{ $prefix }}/, "")] = p.scopes.map(s=>s.replace(/^{{ $prefix }}/, ""));
-                            })
-                            setPermissions(res)
-                            resolve(res)
-                        })
-                        .catch(error => reject(error));
-                }).catch(error => reject('Failed to update token:'+ error.message));
-                {{- end }}
-            });
+            return fetch(
+                `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/token`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Bearer ${keycloak.token}`,
+                    },
+                    body: `grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&response_include_resource_name=true&response_mode=permissions&audience=${environment.keycloakBackendClientId}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to get permissions');
+                    }
+                    return response.json();
+                })
+                .then(data=>{
+                    const res: Record<string, string[]> = {}
+                    data.forEach((p: { rsname: string, scopes: string[] })=>{
+                        res[p.rsname.replace(/^{{ $prefix }}/, "")] = p.scopes.map(s=>s.replace(/^{{ $prefix }}/, ""));
+                    })
+                    setPermissions(res)
+                    return res
+                })
+                .catch(error => console.log(error));
         },
         getIdentity: async () => {
             if (keycloak?.tokenParsed) {

@@ -141,7 +141,7 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph, prefix string) {
 
 	scopesMap := map[string]*gocloak.ScopeRepresentation{}
 
-	for _, action := range DefaultActions {
+	for _, action := range DefaultActionScopes {
 		scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, prefix, action)
 		scopesMap[action] = scope
 	}

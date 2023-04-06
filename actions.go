@@ -28,7 +28,7 @@ var (
 		"list",
 		ActionAsGeneral(),
 		ActionWithLabel("List"),
-		ActionWithScope("read"),
+		ActionWithScope(ActionReadScope),
 		ActionWithIcon("AntdIcons.UnorderedListOutlined"),
 		ActionDisplayOnList(false),
 		ActionDisplayOnShow(true),
@@ -38,6 +38,7 @@ var (
 	EditAction = NewAction(
 		"edit",
 		ActionWithLabel("Edit"),
+		ActionWithScope(ActionUpdateScope),
 		ActionWithRoute(NewRoute("edit/:id", "Edit.{name}Edit")),
 		ActionWithIcon("AntdIcons.EditOutlined"),
 		ActionDisplayOnList(true),
@@ -49,6 +50,7 @@ var (
 		"create",
 		ActionAsGeneral(),
 		ActionWithLabel("Create"),
+		ActionWithScope(ActionCreateScope),
 		ActionWithIcon("AntdIcons.PlusCircleOutlined"),
 		ActionWithRoute(NewRoute("create", "Create.{name}Create")),
 		ActionDisplayOnList(true),
@@ -59,7 +61,7 @@ var (
 	ShowAction = NewAction(
 		"show",
 		ActionWithLabel("Show"),
-		ActionWithScope("read"),
+		ActionWithScope(ActionReadScope),
 		ActionWithIcon("AntdIcons.EyeOutlined"),
 		ActionWithRoute(NewRoute("show/:id", "Show.{name}MainShow")),
 		ActionDisplayOnList(true),
@@ -69,6 +71,7 @@ var (
 	DeleteAction = NewAction(
 		"delete",
 		ActionWithLabel("Delete"),
+		ActionWithScope(ActionDeleteScope),
 		ActionWithIcon("AntdIcons.DeleteOutlined"),
 		ActionWithProps(map[string]any{
 			"danger": true,
@@ -82,6 +85,9 @@ var (
 			OperationAsMutation(),
 		)),
 	)
+	DefaultActions = []*Action{
+		ShowAction, ListAction, CreateAction, EditAction,
+	}
 )
 
 type ActionOption = func(*Action) error
@@ -94,6 +100,10 @@ func NewAction(name string, options ...ActionOption) *Action {
 		if err := opt(action); err != nil {
 			panic(err)
 		}
+	}
+
+	if action.Scope == nil {
+		action.Scope = action.Name
 	}
 	return action
 

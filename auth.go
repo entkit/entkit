@@ -10,15 +10,15 @@ type Auth struct {
 }
 
 var (
-	ActionRead     = "Read"
-	ActionCreate   = "Create"
-	ActionUpdate   = "Update"
-	ActionDelete   = "Delete"
-	DefaultActions = []string{
-		ActionRead,
-		ActionCreate,
-		ActionUpdate,
-		ActionDelete,
+	ActionReadScope     = "Read"
+	ActionCreateScope   = "Create"
+	ActionUpdateScope   = "Update"
+	ActionDeleteScope   = "Delete"
+	DefaultActionScopes = []string{
+		ActionReadScope,
+		ActionCreateScope,
+		ActionUpdateScope,
+		ActionDeleteScope,
 	}
 )
 
