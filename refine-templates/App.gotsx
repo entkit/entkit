@@ -20,19 +20,15 @@ import routerProvider, {
 } from "@refinedev/react-router-v6";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { RoutesBundle } from "./routes";
-import * as environment from "./environment";
 import * as AntdIcons from "@ant-design/icons";
 {{- if $.Extension.Auth.Enabled }}
 {{- if $.Extension.Auth.Keycloak.Enabled}}
 import {useKeycloak} from "@react-keycloak/web";
 {{- end }}
-import {getPermissions} from "./auth";
-import { usePermissions } from "@refinedev/core";
 {{- end }}
 
-const client = new GraphQLClient(environment.graphqlUrl);
-
 function App() {
+    const client = new GraphQLClient(window.environment.graphqlUrl);
 
     {{- if $.Extension.Auth.Enabled }}
     const [permissions, setPermissions] = useState<any|undefined>();
@@ -109,7 +105,7 @@ function App() {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Authorization': `Bearer ${keycloak.token}`,
                     },
-                    body: `grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&response_include_resource_name=true&response_mode=permissions&audience=${environment.keycloakBackendClientId}`
+                    body: `grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&response_include_resource_name=true&response_mode=permissions&audience=${window.environment.auth.keycloak.backendClientId}`
                 })
                 .then(response => {
                     if (!response.ok) {

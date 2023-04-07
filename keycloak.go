@@ -26,6 +26,22 @@ type Keycloak struct {
 	GoCloak *gocloak.GoCloak `json:"GoCloak,omitempty"`
 }
 
+type KeycloakEnvironment struct {
+	URL             string `json:"url,omitempty"`
+	Realm           string `json:"realm,omitempty"`
+	ClientID        string `json:"clientId,omitempty"`
+	BackendClientID string `json:"backendClientId,omitempty"`
+}
+
+func (kc *Keycloak) GetEnvironmentConfig() *KeycloakEnvironment {
+	return &KeycloakEnvironment{
+		URL:             PString(kc.Host),
+		Realm:           PString(kc.Realm),
+		ClientID:        PString(kc.FrontendClientConfig.ClientID),
+		BackendClientID: PString(kc.BackendClientConfig.ClientID),
+	}
+}
+
 type KeycloakOption = func(keycloak *Keycloak) error
 
 type KeycloakFrontendClientConfig struct {

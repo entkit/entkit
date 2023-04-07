@@ -10,20 +10,19 @@ var (
 	_typescriptTemplates embed.FS
 )
 
-type Typescript struct{}
+type TypescriptAdapter struct{}
 
-// Generate Typescript definitions based on Ent definitions
-var TypescriptAdapter = Typescript{}
+var DefaultTypescriptAdapter = TypescriptAdapter{}
 
-func (r Typescript) GetName() string {
+func (r TypescriptAdapter) GetName() string {
 	return "typescript"
 }
 
-func (r Typescript) GetFS() fs.FS {
+func (r TypescriptAdapter) GetFS() fs.FS {
 	return _typescriptTemplates
 }
 
-func (r Typescript) GetTemplates() []string {
+func (r TypescriptAdapter) GetTemplates() []string {
 	return []string{
 		"typescript-templates/Typedefs.gots",
 	}

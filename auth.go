@@ -9,6 +9,20 @@ type Auth struct {
 	Keycloak *Keycloak `json:"Keycloak,omitempty"`
 }
 
+type AuthEnvironment struct {
+	Keycloak *KeycloakEnvironment `json:"keycloak,omitempty"`
+}
+
+func (at *Auth) GetEnvironmentConfig() *AuthEnvironment {
+	c := AuthEnvironment{}
+	if PBool(at.Enabled) {
+		if PBool(at.Keycloak.Enabled) {
+			c.Keycloak = at.Keycloak.GetEnvironmentConfig()
+		}
+	}
+	return &c
+}
+
 var (
 	ActionReadScope     = "Read"
 	ActionCreateScope   = "Create"

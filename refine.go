@@ -24,7 +24,8 @@ func (r Refine) GetFS() fs.FS {
 
 func (r Refine) GetDependencies() []GeneratorAdapter {
 	return []GeneratorAdapter{
-		TypescriptAdapter,
+		DefaultEnvironmentAdapter,
+		DefaultTypescriptAdapter,
 	}
 }
 
@@ -50,7 +51,6 @@ func (r Refine) GetTemplates() []string {
 		"refine-templates/Package.gojson",
 		"refine-templates/Index.gohtml",
 		"refine-templates/Header.gotsx",
-		"refine-templates/Environment.gotsx",
 		"refine-templates/Index.gotsx",
 		"refine-templates/Login.gotsx",
 		"refine-templates/App.gotsx",
@@ -66,6 +66,5 @@ func (r Refine) GetTemplates() []string {
 		"refine-templates/Actions.gotsx",
 		"refine-templates/Helpers.gotsx",
 		"refine-templates/Diagram.gotsx",
-		"refine-templates/Auth.gotsx",
 	}
 }

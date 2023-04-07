@@ -33,6 +33,8 @@ type Extension struct {
 
 	Generators []*Generator
 	Meta       map[string]any // Meta to share with frontend application
+
+	Environment *Environment
 }
 
 type GoJSOptions struct {
@@ -175,6 +177,12 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 
 	if ex.GraphqlURL == nil {
 		return nil, errors.New("'GraphqlURL' is required. Use 'WithGraphqlURL' method to set it")
+	}
+
+	ex.Environment = &Environment{
+		Meta:       ex.Meta,
+		GraphqlURL: PString(ex.GraphqlURL),
+		Auth:       ex.Auth.GetEnvironmentConfig(),
 	}
 
 	return ex, nil
