@@ -1,0 +1,9 @@
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- define ".gitignore" -}}
+
+{{- range $g := $.Extension.Generators -}}
+{{- if $g.Serve -}}
+/{{ $g.Name }}
+{{ end -}}
+{{- end -}}
+{{- end -}}

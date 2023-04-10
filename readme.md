@@ -1,4 +1,5 @@
 # entkit
+
 Powerful tool that combines the power of two frameworks, [Ent](https://entgo.io/)(ORM) and [Refine](https://refine.dev/)(UI).
 
 ![GitHub contributors](https://img.shields.io/github/contributors/diazoxide/entkit)
@@ -17,11 +18,13 @@ It simplifies the process of generating CRUDs from Ent definitions with customiz
 ![main.png](docs%2Fimages%2Fmain.png)
 
 ## Live Demo and Package Info
+
 Live demo: https://demo.entkit.dev/
 
 Go.dev Package: https://pkg.go.dev/github.com/entkit/entkit
 
 ## Roadmap
+
 - [x] Generates CRUD operations based on Ent definitions
 - [x] Customizable views for each CRUD operation
 - [x] Customizable fields for lists, forms, and show views using annotations
@@ -45,15 +48,18 @@ Go.dev Package: https://pkg.go.dev/github.com/entkit/entkit
 - [ ] Godoc: provide comprehensive documentation
 
 ### Smart search
+
 entkit provides a smart search component to easily find records by any attribute with a custom operator.
 ![search.gif](docs%2Fimages%2Fsearch.gif)
 
 ## Requirements
+
 The platform uses a Graphql API as the data-provider interface and therefore a GQL extension is mandatory.
 
 ## How to set up?
 
 ### Extension registration on entc.go
+
 Add extension to your Ent framework `entc.go` file.
 
 #### Example
@@ -99,6 +105,7 @@ This is important for smart-search component
 > `EntityWhereInput.ApplySearchQuery(q)`
 
 #### Example
+
 ```go
 package graphql
 
@@ -153,8 +160,9 @@ e.g. `entkit.FilterOperator("contains")`
 - [**ViewOnForm**](#custom-views) - custom view of field on form
 
 ### For Entities
+
 - **Icon** (field/entity) - set icon of entity to show on navigation, breadcrumbs, edges, etc.
-  * `entkit.Icon("some-antdesign-icon")`
+  - `entkit.Icon("some-antdesign-icon")`
 - [**Actions**](#custom-actions) - custom actions
 - **NoList** - disable list and hide entity from navigation
 - **NoShow** - disable entity show page
@@ -168,34 +176,41 @@ e.g. `entkit.FilterOperator("contains")`
 2. Your package.json file is changed so run `npm install` to get deps.
 3. Check directory of refine application. On src directory you can find `entkit` folder with ent resources.
 4. Update your `App.ts` file
-    ```tsx
-    import React from "react";
-    import "@pankod/refine-antd/dist/reset.css";
-    import {Refine} from "@pankod/refine-core";
-    import {ErrorComponent, Layout, notificationProvider, ReadyPage,} from "@pankod/refine-antd";
-    import routerProvider from "@pankod/refine-react-router-v6";
-    import {GraphQLClient} from "graphql-request";
-    import {Resources} from "./entkit/resources";
-    import dataProvider from "./entkit/data-provider";
-    
-    // Provide your graphql query endpoint
-    const client = new GraphQLClient("http://localhost:8081/query");
-    
-    function App() {
-        return (
-            <Refine
-                routerProvider={routerProvider}
-                dataProvider={dataProvider(client)}
-                Layout={Layout}
-                ReadyPage={ReadyPage}
-                notificationProvider={notificationProvider}
-                catchAll={<ErrorComponent/>}
-                resources={Resources}
-            />
-        );
-    }
-    export default App;
-    ```
+
+   ```tsx
+   import React from "react";
+   import "@pankod/refine-antd/dist/reset.css";
+   import { Refine } from "@pankod/refine-core";
+   import {
+     ErrorComponent,
+     Layout,
+     notificationProvider,
+     ReadyPage,
+   } from "@pankod/refine-antd";
+   import routerProvider from "@pankod/refine-react-router-v6";
+   import { GraphQLClient } from "graphql-request";
+   import { Resources } from "./entkit/resources";
+   import dataProvider from "./entkit/data-provider";
+
+   // Provide your graphql query endpoint
+   const client = new GraphQLClient("http://localhost:8081/query");
+
+   function App() {
+     return (
+       <Refine
+         routerProvider={routerProvider}
+         dataProvider={dataProvider(client)}
+         Layout={Layout}
+         ReadyPage={ReadyPage}
+         notificationProvider={notificationProvider}
+         catchAll={<ErrorComponent />}
+         resources={Resources}
+       />
+     );
+   }
+   export default App;
+   ```
+
 5. Run `npm run dev`
 6. Ready
 
@@ -211,38 +226,42 @@ Querying all fields with your defined operator (**FilterOperator Annotation**) i
 
 ```tsx
 function App() {
-    return (
-        <Refine
-            //...
-            Header={Header}
-            //...
-        />
-    );
+  return (
+    <Refine
+      //...
+      Header={Header}
+      //...
+    />
+  );
 }
 ```
 
 #### Header component
 
 ```tsx
-import {SearchComponent} from "../../entkit/search-component";
+import { SearchComponent } from "../../entkit/search-component";
 
 export const Header: React.FC = () => {
-    const screens = useBreakpoint();
-    return (
-        <AntdHeader style={{
-            padding: "0 24px",
-            background: "white",
-        }}>
-            <Row align="middle"
-                 style={{
-                     justifyContent: screens.sm ? "space-between" : "end",
-                 }}>
-                <Col xs={0} sm={12}>
-                    <SearchComponent/>
-                </Col>
-            </Row>
-        </AntdHeader>
-    );
+  const screens = useBreakpoint();
+  return (
+    <AntdHeader
+      style={{
+        padding: "0 24px",
+        background: "white",
+      }}
+    >
+      <Row
+        align="middle"
+        style={{
+          justifyContent: screens.sm ? "space-between" : "end",
+        }}
+      >
+        <Col xs={0} sm={12}>
+          <SearchComponent />
+        </Col>
+      </Row>
+    </AntdHeader>
+  );
 };
 ```
 
@@ -252,12 +271,12 @@ export const Header: React.FC = () => {
 
 To customize entkit components you can find `./entkit/custom.tsx` file on your refine root directory.
 
-
 ## Custom Actions
 
 Add entity annotation to your schema
 
 ### Annotation Example
+
 ```
 entkit.Actions(
    entkit.ShowAction,
@@ -282,29 +301,31 @@ entkit.Actions(
 ### Implementation Example
 
 1. First you need to add custom graphql mutation with `WhereInput`
-    ```graphql
-    # ./mutations.graphql
-    myCustomGqlOperation(where: PageWhereInput!): [Page!]
-    ```
+   ```graphql
+   # ./mutations.graphql
+   myCustomGqlOperation(where: PageWhereInput!): [Page!]
+   ```
 2. Then let's write mutation resolver
-    ```go
-    func (r *mutationResolver) MyCustomGqlOperation(ctx context.Context, where generated.PageWhereInput) ([]*generated.Page, error) {
-        w, err := where.P()
-        p, err := r.client.Page.Query().Where(w).All(ctx)
-    
-        err = someCustomAction(p...)
-        if err != nil {
-            return nil, err
-        }
-        return p, nil
-    }
-    ```
-   
+
+   ```go
+   func (r *mutationResolver) MyCustomGqlOperation(ctx context.Context, where generated.PageWhereInput) ([]*generated.Page, error) {
+       w, err := where.P()
+       p, err := r.client.Page.Query().Where(w).All(ctx)
+
+       err = someCustomAction(p...)
+       if err != nil {
+           return nil, err
+       }
+       return p, nil
+   }
+   ```
+
 ## Edges diagram graph view
-The Edge Graph Diagram is an effective tool for visualizing 
-the relationships between your entities. It presents an 
-interactive representation of the edges, displaying record 
-IDs and their connections to the main record, making it 
+
+The Edge Graph Diagram is an effective tool for visualizing
+the relationships between your entities. It presents an
+interactive representation of the edges, displaying record
+IDs and their connections to the main record, making it
 easier to understand and analyze complex data.
 
 ![edges-diagram.png](docs%2Fimages%2Fedges-diagram.png)
@@ -312,19 +333,20 @@ easier to understand and analyze complex data.
 ### How to enable
 
 > **Important!**
-> By default, the Edge Graph Diagram utilizes GoJS technology. 
-Both GoJS and react-force-graph-2d are available options, 
-allowing you to select the best solution for your needs. 
-However, it's important to note that GoJS is a proprietary 
-library and requires a license key purchased from the GoJS 
-official website for commercial use. On the other hand, 
-react-force-graph-2d is an open-source option.
+> By default, the Edge Graph Diagram utilizes GoJS technology.
+> Both GoJS and react-force-graph-2d are available options,
+> allowing you to select the best solution for your needs.
+> However, it's important to note that GoJS is a proprietary
+> library and requires a license key purchased from the GoJS
+> official website for commercial use. On the other hand,
+> react-force-graph-2d is an open-source option.
 
 ### How to switch GoJS to react-force-graph-2d
 
 Customize entkit extension configs on **entc.go** file
 
 e.g.
+
 ```go
 entRefine, err := entkit.NewExtension(
     ...
@@ -341,6 +363,7 @@ entRefine, err := entkit.NewExtension(
 ### GoJS license and configuration
 
 e.g.
+
 ```go
 entRefine, err := entkit.NewExtension(
     ...
@@ -360,7 +383,8 @@ entRefine, err := entkit.NewExtension(
 On entkit every view of field is customizable for every type of layout.
 
 ### Special annotations
-1. View - *Forcing list and show views*
+
+1. View - _Forcing list and show views_
 2. ViewOnList
 3. ViewOnShow
 4. ViewOnForm
@@ -368,13 +392,19 @@ On entkit every view of field is customizable for every type of layout.
 ### How to customize?
 
 1. First create new React Component on [custom.tsx](#file-customtsx) (e.g. `MyCustomTitle`) with `ViewProps` type props.
+
    ```tsx
-   import {ViewProps} from "./view";
-   
-   export const MyCustomTitle: React.FC<ViewProps<string>> = ({value}) => {
-      return <RA.Typography.Text copyable={true} style={ {color: "red"} }>{ value }</RA.Typography.Text>
-   }
+   import { ViewProps } from "./view";
+
+   export const MyCustomTitle: React.FC<ViewProps<string>> = ({ value }) => {
+     return (
+       <RA.Typography.Text copyable={true} style={{ color: "red" }}>
+         {value}
+       </RA.Typography.Text>
+     );
+   };
    ```
+
 2. Define type of field on schema by `entkit.View` annotation
    ```go
    field.String("title").
@@ -384,30 +414,33 @@ On entkit every view of field is customizable for every type of layout.
             ...
         ),
    ```
-   
 3. Regenerate and check
-    ![custom-list-field.png](docs%2Fimages%2Fcustom-list-field.png)
- 
+   ![custom-list-field.png](docs%2Fimages%2Fcustom-list-field.png)
+
 ## Custom Badge view
 
 ### What is a badge?
+
 Badge is a public view of entity on other items edge views.
-e.g. 
+e.g.
 ![img.png](docs/images/badge-view.png)
 
 ### Badge customization
-First you need to create new React component like [Custom Views](#custom-views). 
-Then use `Badge` annotation to connect it with entity. 
+
+First you need to create new React component like [Custom Views](#custom-views).
+Then use `Badge` annotation to connect it with entity.
 
 ## Example
+
 Check out the documentation for more information and examples.
 
-Both frameworks (Ent and Refine) are configured as described in documentation. 
+Both frameworks (Ent and Refine) are configured as described in documentation.
 
 ## Contacts
+
 ![logo.svg](docs%2Fimages%2Flogo.svg)
-**Linkedin**:  https://www.linkedin.com/in/aaron-yor/
+**Linkedin**: https://www.linkedin.com/in/aaron-yor/
 
-**Discord**:   aaron․yordanyan#7556
+**Discord**: aaron․yordanyan#7556
 
-**Phone**:     +374 98 471111
+**Phone**: +374 98 471111

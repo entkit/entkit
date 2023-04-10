@@ -30,8 +30,8 @@ func (r Refine) GetDependencies() []GeneratorAdapter {
 }
 
 func (r Refine) CommandAfterGen(generator *Generator) string {
-	return "echo DONT FORGET TO REMOVE"
-	//return "npm i && npm run lint && npm run build"
+	return "echo remove-me"
+	//return "npm ls || npm i && npm run lint && npm run build"
 }
 
 func (r Refine) BuildPath() string {

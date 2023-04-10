@@ -28,9 +28,12 @@ func main() {
     app := cli.NewApp()
     app.Name = "EntKit APP"
     app.Version = "0.1.0"
-    app.Description = "This is entkit-cli tools"
+    app.Description = "This is EntKit CLI tools"
     app.Authors = []*cli.Author{
-        {Name: "Aaron", Email: "aaron.yor@gmail.com"},
+        {
+			Name: "Aaron Yordanyan",
+			Email: "aaron.yor@gmail.com",
+		},
     }
 
     app.Flags = []cli.Flag{

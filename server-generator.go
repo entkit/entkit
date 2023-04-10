@@ -56,13 +56,17 @@ func (r ServerAdapter) CommandAfterGen(generator *Generator) string {
 
 func (r ServerAdapter) GetTemplates() []string {
 	return []string{
-		"server-templates/main.tmpl",
-		"server-templates/embed-fs.tmpl",
+		"server-templates/Gitignore.goignore",
+		"server-templates/Main.tmpl",
+		"server-templates/Embed-fs.tmpl",
+		"server-templates/Dockerfile.godockerfile",
+		"server-templates/Dockerignore.goignore",
+		"server-templates/Docker-compose.goyaml",
 	}
 }
 
 func (r ServerAdapter) GetStaticTemplates() []string {
 	return []string{
-		"server-templates/client.tmpl",
+		"server-templates/Client.tmpl",
 	}
 }

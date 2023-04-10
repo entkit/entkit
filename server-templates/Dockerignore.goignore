@@ -1,0 +1,10 @@
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- define "../.dockerignore" -}}
+
+node_modules
+**/node_modules
+build
+**/build
+/runtime
+
+{{- end -}}

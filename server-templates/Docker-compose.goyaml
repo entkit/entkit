@@ -1,0 +1,27 @@
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- define "../docker-compose.yaml" -}}
+version: "3.9"
+
+services:
+  {{- range $i, $g := $.Extension.Generators }}
+  {{- if $g.Serve }}
+  {{ $g.Name }}:
+    build: "./"
+    command: ["serve", "{{ $g.Name }}"]
+    ports:
+      - "8{{$i}}:80"
+  {{- end -}}
+  {{- end -}}
+  {{ if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
+  keycloak:
+    command: [ "start-dev" ]
+    image: quay.io/keycloak/keycloak:21.0.0
+    volumes:
+        - ./runtime/keycloak:/opt/keycloak/data/
+    environment:
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+        - "8080:8080"
+  {{- end -}}
+{{- end -}}
