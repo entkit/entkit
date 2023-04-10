@@ -46,9 +46,9 @@ type ForceGraph2DOptions struct {
 	Enabled bool `json:"Enabled,omitempty"`
 }
 
-func WithGenerator(path string, adapter GeneratorAdapter, options ...GeneratorOption) ExtensionOption {
+func WithGenerator(name string, adapter GeneratorAdapter, options ...GeneratorOption) ExtensionOption {
 	return func(ex *Extension) (err error) {
-		ex.Generators = append(ex.Generators, NewGenerator(ex, path, adapter, options...))
+		ex.Generators = append(ex.Generators, NewGenerator(ex, name, adapter, options...))
 		return nil
 	}
 }
@@ -149,6 +149,7 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		"ER_prepareName": func(str string) string {
 			return PrepareName(PString(ex.Prefix), str)
 		},
+		"ER_relPath": relPath,
 	}
 
 	if len(funcMap) == 0 {

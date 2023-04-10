@@ -15,10 +15,12 @@ import (
 )
 
 type Generator struct {
+	Name      *string    `json:"Name,omitempty"`
 	Extension *Extension `json:"Extension,omitempty"`
-	Path      *string    `json:"Path,omitempty"`
-	Enabled   *bool      `json:"Enabled,omitempty"`
 	Adapter   GeneratorAdapter
+	Path      *string `json:"Path,omitempty"`
+	Enabled   *bool   `json:"Enabled,omitempty"`
+	Serve     *bool   `json:"Serve,omitempty"`
 	Graph     *gen.Graph
 	SkipModes SkipModes
 	Ops       []gen.Op
@@ -50,7 +52,19 @@ type GeneratorAdapterWithFS interface {
 }
 
 type GeneratorAdapterWithAfterCommand interface {
-	CommandAfterGen() string
+	CommandAfterGen(generator *Generator) string
+}
+
+type GeneratorAdapterWithBeforeCommand interface {
+	CommandBeforeGen(generator *Generator) string
+}
+
+type GeneratorAdapterWithBefore interface {
+	BeforeGen(generator *Generator) error
+}
+
+type GeneratorAdapterWithAfter interface {
+	AfterGen(generator *Generator) error
 }
 
 type GeneratorAdapterWithTemplates interface {
@@ -78,8 +92,19 @@ func parseTemplate(path string, adapter GeneratorAdapterWithFS) *gen.Template {
 	return gen.MustParse(t.Funcs(_funcMap).ParseFS(adapter.GetFS(), path))
 }
 
+func (gr *Generator) ServableAdapter() ServableAdapter {
+	sa, ok := (gr.Adapter).(ServableAdapter)
+	if ok {
+		return sa
+	}
+	panic("provided Adapter is not a ServableAdapter")
+}
+
 func (gr *Generator) Generate(graph *gen.Graph) {
 	gr.Graph = graph
+
+	gr.runBeforeGenCommands()
+	gr.runBeforeGen()
 
 	uiAdapterWithDependencies, ok := gr.Adapter.(GeneratorAdapterWithDependencies)
 	if ok {
@@ -91,7 +116,8 @@ func (gr *Generator) Generate(graph *gen.Graph) {
 
 	gr.generateAdapterOutput(gr.Adapter, graph)
 
-	gr.runAfterGenCommands()
+	gr.runAfterGenCommand()
+	gr.runAfterGen()
 }
 
 func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.Graph) {
@@ -117,14 +143,55 @@ func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.
 	}
 }
 
-func (gr *Generator) runAfterGenCommands() {
+func (gr *Generator) runAfterGen() {
+	adapter, ok := (gr.Adapter).(GeneratorAdapterWithAfter)
+	if !ok {
+		return
+	}
+	err := adapter.AfterGen(gr)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (gr *Generator) runBeforeGen() {
+	adapter, ok := (gr.Adapter).(GeneratorAdapterWithBefore)
+	if !ok {
+		return
+	}
+	err := adapter.BeforeGen(gr)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (gr *Generator) runCMD(command string) (out []byte, err error) {
+	cmd := exec.Command("/bin/sh", "-c", command)
+	cmd.Dir = PString(gr.Path)
+	return cmd.Output()
+}
+
+func (gr *Generator) runAfterGenCommand() {
 	adapterWithAfterGenCommand, ok := (gr.Adapter).(GeneratorAdapterWithAfterCommand)
 	if !ok {
 		return
 	}
-	cmd := exec.Command("/bin/sh", "-c", adapterWithAfterGenCommand.CommandAfterGen())
-	cmd.Dir = PString(gr.Path)
-	out, _ := cmd.Output()
+	out, err := gr.runCMD(adapterWithAfterGenCommand.CommandAfterGen(gr))
+	if err != nil {
+		panic(err.Error())
+	}
+	println(string(out))
+}
+
+func (gr *Generator) runBeforeGenCommands() {
+	adapterWithBeforeGenCommand, ok := (gr.Adapter).(GeneratorAdapterWithBeforeCommand)
+	if !ok {
+		return
+	}
+	out, err := gr.runCMD(adapterWithBeforeGenCommand.CommandBeforeGen(gr))
+	if err != nil {
+		panic(err.Error())
+	}
 	println(string(out))
 }
 
@@ -193,6 +260,13 @@ func (gr *Generator) saveGenerated(name string, content bytes.Buffer, override b
 
 type GeneratorOption = func(*Generator) error
 
+func TargetPath(path string) GeneratorOption {
+	return func(gen *Generator) (err error) {
+		gen.Path = StringP(path)
+		return nil
+	}
+}
+
 func GeneratorHook(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
@@ -226,10 +300,10 @@ func GeneratorHook(ex *Extension) gen.Hook {
 	}
 }
 
-func NewGenerator(extension *Extension, path string, adapter GeneratorAdapter, options ...GeneratorOption) *Generator {
-	ui := &Generator{
+func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, options ...GeneratorOption) *Generator {
+	generator := &Generator{
+		Name:      StringP(name),
 		Extension: extension,
-		Path:      StringP(path),
 		Adapter:   adapter,
 		SkipModes: SkipModes{
 			SkipEnumField:           entgql.SkipEnumField,
@@ -257,9 +331,21 @@ func NewGenerator(extension *Extension, path string, adapter GeneratorAdapter, o
 		},
 	}
 	for _, opt := range options {
-		if err := opt(ui); err != nil {
+		if err := opt(generator); err != nil {
 			panic(err)
 		}
 	}
-	return ui
+
+	_, ok := (generator.Adapter).(ServableAdapter)
+	if ok {
+		if generator.Serve == nil {
+			generator.Serve = BoolP(true)
+		}
+	}
+
+	if generator.Path == nil {
+		generator.Path = StringP(filepath.Join("..", name))
+	}
+
+	return generator
 }

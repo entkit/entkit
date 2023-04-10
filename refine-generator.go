@@ -29,8 +29,27 @@ func (r Refine) GetDependencies() []GeneratorAdapter {
 	}
 }
 
-func (r Refine) CommandAfterGen() string {
-	return "npm i && npm run lint && npm run build"
+func (r Refine) CommandAfterGen(generator *Generator) string {
+	return "echo DONT FORGET TO REMOVE"
+	//return "npm i && npm run lint && npm run build"
+}
+
+func (r Refine) BuildPath() string {
+	return "build"
+}
+
+func (r Refine) RewritePath() string {
+	return "index.html"
+}
+
+func (r Refine) StaticPaths() []string {
+	return []string{
+		`^static/.*`,
+		`^images/.*`,
+		`^favicon\.ico`,
+		`^asset-manifest\.json`,
+		`^environment\.json`,
+	}
 }
 
 func (r Refine) GetStaticTemplates() []string {
