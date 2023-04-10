@@ -1,0 +1,17 @@
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+
+{{- define "embed-fs.go" -}}
+package main
+
+import "embed"
+
+{{- range $g := $.Extension.Generators }}
+{{- if $g.Serve }}
+
+//go:embed {{$g.Name}}
+var {{$g.Name | pascal}}FS embed.FS
+
+{{- end }}
+{{- end }}
+
+{{- end }}

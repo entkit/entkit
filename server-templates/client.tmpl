@@ -1,0 +1,22 @@
+{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- define "client.go" -}}
+
+package main
+
+import (
+    "github.com/urfave/cli/v2"
+    "{{$.Graph.Config.Package}}"
+)
+
+// This file will not be regenerated automatically.
+
+func InitClient(*cli.Context) (*ent.Client, error){
+    panic("not implemented InitClient")
+}
+
+func NewSchema(client *ent.Client) graphql.ExecutableSchema {
+    // just return your `mypackage.NewSchema(client)`
+	panic("not implemented NewSchema")
+}
+
+{{- end -}}
