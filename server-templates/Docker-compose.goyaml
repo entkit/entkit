@@ -8,6 +8,7 @@ services:
   {{ $g.Name }}:
     build: "./"
     command: ["serve", "{{ $g.Name }}"]
+    volumes: ["./runtime:/app/runtime"]
     ports:
       - "8{{$i}}:80"
   {{- end -}}
