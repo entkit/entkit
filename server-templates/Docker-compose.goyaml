@@ -9,8 +9,8 @@ services:
   {{- $ENV_PREFIX := indirect $g.Name | snakecase | upper }}
   {{ $g.Name }}:
     build: "./"
-    command: [ "serve", "{{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}", "{{ $g.Name }}"]
-    volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
+    command: [ "serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}{{ $g.Name }}"]
+    volumes: [ {{ print (indirect $g.Name) "-shared" | snakecase }}:/app/shared ]
     ports:
       - "8{{$i}}:80"
   {{- end -}}
@@ -20,7 +20,7 @@ services:
     command: [ "start-dev" ]
     image: quay.io/keycloak/keycloak:21.0.0
     volumes:
-        - keycloak_runtime:/opt/keycloak/data/
+        - keycloak_data:/opt/keycloak/data/
     environment:
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
@@ -30,8 +30,8 @@ services:
 volumes:
   {{- range $i, $g := $.Extension.Generators }}
   {{- if $g.Serve }}
-  {{ print (indirect $g.Name) "-runtime" | snakecase }}:
+  {{ print (indirect $g.Name) "-shared" | snakecase }}:
   {{- end -}}
   {{- end }}
-  keycloak_runtime:
+  keycloak_data:
 {{- end -}}
