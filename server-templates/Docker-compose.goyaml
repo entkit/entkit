@@ -12,7 +12,7 @@ services:
     command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }} {{ $g.Name }}"]
     volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
     ports:
-      - "8{{$i}}:80"
+      - "{{add 8080 $i}}:80"
   {{- end -}}
   {{- end -}}
   {{ if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
