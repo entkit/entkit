@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/tables.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import React, {useState} from "react";
 import {HttpError} from "@refinedev/core";
 import * as RA from "@refinedev/antd";

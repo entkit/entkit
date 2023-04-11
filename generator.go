@@ -15,8 +15,10 @@ import (
 )
 
 type Generator struct {
-	Name      *string    `json:"Name,omitempty"`
-	Extension *Extension `json:"Extension,omitempty"`
+	Name          *string    `json:"Name,omitempty"`
+	Extension     *Extension `json:"Extension,omitempty"`
+	SkipGoModTidy *bool      `json:"SkipGoModTidy,omitempty"`
+
 	Adapter   GeneratorAdapter
 	Path      *string `json:"Path,omitempty"`
 	Enabled   *bool   `json:"Enabled,omitempty"`
@@ -106,9 +108,9 @@ func (gr *Generator) Generate(graph *gen.Graph) {
 	gr.runBeforeGenCommands()
 	gr.runBeforeGen()
 
-	uiAdapterWithDependencies, ok := gr.Adapter.(GeneratorAdapterWithDependencies)
+	adapterWithDependencies, ok := gr.Adapter.(GeneratorAdapterWithDependencies)
 	if ok {
-		deps := uiAdapterWithDependencies.GetDependencies()
+		deps := adapterWithDependencies.GetDependencies()
 		for _, depAdapter := range deps {
 			gr.generateAdapterOutput(depAdapter, graph)
 		}
@@ -116,12 +118,16 @@ func (gr *Generator) Generate(graph *gen.Graph) {
 
 	gr.generateAdapterOutput(gr.Adapter, graph)
 
+	if !PBool(gr.SkipGoModTidy) {
+		gr.runCMD("go mod tidy -e")
+	}
+
 	gr.runAfterGenCommand()
 	gr.runAfterGen()
 }
 
 func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.Graph) {
-	uIAdapterWithFS, ok := adapter.(GeneratorAdapterWithFS)
+	adapterWithFS, ok := adapter.(GeneratorAdapterWithFS)
 	if !ok {
 		panic("unable to parse template from adapter that not implements FS")
 	}
@@ -129,7 +135,7 @@ func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.
 	genWithTemplates, ok := (adapter).(GeneratorAdapterWithTemplates)
 	if ok {
 		for _, t := range genWithTemplates.GetTemplates() {
-			_t := parseTemplate(t, uIAdapterWithFS)
+			_t := parseTemplate(t, adapterWithFS)
 			gr.rendAndSave(_t, true)
 		}
 	}
@@ -137,7 +143,7 @@ func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.
 	genWithStaticTemplates, ok := (adapter).(GeneratorAdapterWithStaticTemplates)
 	if ok {
 		for _, t := range genWithStaticTemplates.GetStaticTemplates() {
-			_t := parseTemplate(t, uIAdapterWithFS)
+			_t := parseTemplate(t, adapterWithFS)
 			gr.rendAndSave(_t, false)
 		}
 	}
@@ -165,10 +171,13 @@ func (gr *Generator) runBeforeGen() {
 	}
 }
 
-func (gr *Generator) runCMD(command string) (out []byte, err error) {
+func (gr *Generator) runCMD(command string) {
 	cmd := exec.Command("/bin/sh", "-c", command)
 	cmd.Dir = PString(gr.Path)
-	return cmd.Output()
+	out, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Command", cmd, out, err.Error())
+	}
 }
 
 func (gr *Generator) runAfterGenCommand() {
@@ -176,11 +185,7 @@ func (gr *Generator) runAfterGenCommand() {
 	if !ok {
 		return
 	}
-	out, err := gr.runCMD(adapterWithAfterGenCommand.CommandAfterGen(gr))
-	if err != nil {
-		panic(err.Error())
-	}
-	println(string(out))
+	gr.runCMD(adapterWithAfterGenCommand.CommandAfterGen(gr))
 }
 
 func (gr *Generator) runBeforeGenCommands() {
@@ -188,11 +193,7 @@ func (gr *Generator) runBeforeGenCommands() {
 	if !ok {
 		return
 	}
-	out, err := gr.runCMD(adapterWithBeforeGenCommand.CommandBeforeGen(gr))
-	if err != nil {
-		panic(err.Error())
-	}
-	println(string(out))
+	gr.runCMD(adapterWithBeforeGenCommand.CommandBeforeGen(gr))
 }
 
 func (gr *Generator) rendAndSave(tmpl *gen.Template, override bool) {
@@ -263,6 +264,13 @@ type GeneratorOption = func(*Generator) error
 func TargetPath(path string) GeneratorOption {
 	return func(gen *Generator) (err error) {
 		gen.Path = StringP(path)
+		return nil
+	}
+}
+
+func SkipGoModTidy() GeneratorOption {
+	return func(gen *Generator) (err error) {
+		gen.SkipGoModTidy = BoolP(true)
 		return nil
 	}
 }
@@ -344,7 +352,7 @@ func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, o
 	}
 
 	if generator.Path == nil {
-		generator.Path = StringP(filepath.Join("..", name))
+		generator.Path = StringP(name)
 	}
 
 	return generator

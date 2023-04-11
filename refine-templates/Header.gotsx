@@ -1,6 +1,8 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/header.tsx" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import {Col, Grid, Layout as AntdLayout, Row} from "antd";
 import {SearchComponent} from "search-component";
 

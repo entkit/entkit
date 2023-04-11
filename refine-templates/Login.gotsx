@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/login.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import { Layout as AntdLayout, Button } from "antd";
 import { useLogin } from "@refinedev/core";
 

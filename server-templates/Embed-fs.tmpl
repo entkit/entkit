@@ -1,6 +1,8 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "embed-fs.go" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 package main
 
 import "embed"

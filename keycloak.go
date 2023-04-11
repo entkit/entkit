@@ -17,6 +17,7 @@ type Keycloak struct {
 	Realm               *string `json:"Realm,omitempty"`
 	MasterAdminUsername *string `json:"MasterAdminUsername,omitempty"`
 	MasterAdminPassword *string `json:"MasterAdminPassword,omitempty"`
+	MasterRealm         *string `json:"MasterRealm,omitempty"`
 
 	AdminUsername        *string         `json:"AdminUsername,omitempty"`
 	AdminPassword        *string         `json:"AdminPassword,omitempty"`
@@ -64,6 +65,7 @@ func NewKeycloak(
 		Realm:                StringP(realm),
 		MasterAdminUsername:  StringP(masterAdminUsername),
 		MasterAdminPassword:  StringP(masterAdminPassword),
+		MasterRealm:          StringP("master"),
 		AdminUsername:        StringP(adminUser),
 		AdminPassword:        StringP(adminPassword),
 		BackendClientConfig:  backendClientConfigs,
@@ -77,6 +79,13 @@ func NewKeycloak(
 
 	k.GoCloak = gocloak.NewClient(*k.Host)
 	return k
+}
+
+func KeycloakMasterRealm(realm string) KeycloakOption {
+	return func(gen *Keycloak) (err error) {
+		gen.MasterRealm = StringP(realm)
+		return nil
+	}
 }
 
 func NewBackendKeycloak(host string, realm string, clientId string, secret string) *Keycloak {
@@ -137,7 +146,7 @@ func (kc *Keycloak) getAdminToken(ctx context.Context) string {
 		ctx,
 		PString(kc.MasterAdminUsername),
 		PString(kc.MasterAdminPassword),
-		"master",
+		PString(kc.MasterRealm),
 	)
 	if err != nil {
 		panic(err)

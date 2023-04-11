@@ -1,7 +1,11 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/list.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 {{- $prefix := $.Extension.Prefix }}
+
 import React, {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Tables from "./tables";

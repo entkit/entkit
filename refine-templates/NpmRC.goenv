@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define ".npmrc" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "#" }}
+
 legacy-peer-deps=true
 strict-peer-dependencies=false
 {{- end -}}

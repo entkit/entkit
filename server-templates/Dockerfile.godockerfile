@@ -1,5 +1,8 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+
 {{- define "../Dockerfile" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "#" }}
+
 FROM golang:1.19-alpine
 
 WORKDIR /app

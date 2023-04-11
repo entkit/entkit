@@ -1,5 +1,7 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/helpers.tsx" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 export {}
 {{- end -}}

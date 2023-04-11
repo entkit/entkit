@@ -1,8 +1,11 @@
 {{- /* gotype: github.com/entkit/entkit.Generator*/ -}}
 
 {{- define "src/typedefs.tsx" -}}
-{{- $prefix := $.Extension.Prefix}}
-// Custom types
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
+{{- $prefix := $.Extension.Prefix }}
+
 export type {{$prefix}}String = string
 export type {{$prefix}}Number = number
 export type {{$prefix}}Boolean = boolean

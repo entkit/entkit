@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/show.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 {{- $prefix := $.Extension.Prefix }}
 import React, { useState } from "react";
 import { useShow } from "@refinedev/core";

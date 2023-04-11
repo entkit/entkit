@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define ".prettierignore"}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "#" }}
+
 build/
 dist/
 node_modules/

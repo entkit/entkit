@@ -1,6 +1,6 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 {{- define "../.dockerignore" -}}
-
+{{- $.Extension.FileHeader | ER_replace "^" "#" }}
 node_modules
 **/node_modules
 build

@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/search-component.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import {useState, useEffect} from "react";
 import { Typography, Avatar, AutoComplete, Input } from "antd";
 import { useList, useLink } from "@refinedev/core";

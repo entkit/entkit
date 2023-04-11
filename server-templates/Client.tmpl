@@ -10,8 +10,21 @@ import (
 
 // This file will not be regenerated automatically.
 
-func InitClient(*cli.Context) (*ent.Client, error){
-    panic("not implemented InitClient")
+func InitClient(ctx *cli.Context) (*ent.Client, error){
+    client, err := ent.Open(
+        ctx.String("DatabaseDriver"),
+        ctx.String("DatabaseSourceName"),
+    )
+    if err != nil {
+        return nil, err
+    }
+    if err := client.Schema.Create(
+        context.Background(),
+        //migrate.WithGlobalUniqueID(true),
+    ); err != nil {
+        return nil, err
+    }
+    return client, nil
 }
 
 func NewSchema(client *ent.Client) graphql.ExecutableSchema {

@@ -1,7 +1,11 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/action.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 {{- $prefix := $.Extension.Prefix }}
+
 import React from "react";
 import * as Antd from "antd";
 import * as AntdIcons from "@ant-design/icons";

@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "partial:imports" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import {useState} from "react";
 import * as RA from "@refinedev/antd";
 import * as Antd from "antd";

@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/view.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 {{- $prefix := $.Extension.Prefix }}
 import React from "react";
 import * as RA from "@refinedev/antd";

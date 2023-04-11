@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/data-provider.ts" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import {
     CrudFilters,
     CrudSorting,

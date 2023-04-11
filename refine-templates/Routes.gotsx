@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/routes.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import React from "react";
 import * as List from "./list";
 import * as Show from "./show";

@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "src/app.tsx" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 {{- $prefix := $.Extension.Prefix }}
 import React, {useState} from "react";
 import {AuthBindings,Authenticated, Refine} from "@refinedev/core";

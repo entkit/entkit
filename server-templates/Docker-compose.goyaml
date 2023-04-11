@@ -1,5 +1,6 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 {{- define "../docker-compose.yaml" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "#" }}
 version: "3.9"
 
 services:

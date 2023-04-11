@@ -1,6 +1,9 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
 {{- define "main.go" -}}
+
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 package main
 
 import (
@@ -28,7 +31,7 @@ func main() {
     app := cli.NewApp()
     app.Name = "EntKit APP"
     app.Version = "0.1.0"
-    app.Description = "This is EntKit CLI tools"
+    app.Description = "This is EntKit CLI"
     app.Authors = []*cli.Author{
         {
 			Name: "Aaron Yordanyan",
@@ -41,7 +44,7 @@ func main() {
             Name:    "LogLevel",
 			Aliases: []string{"log-level"},
             Value:   "debug",
-            EnvVars: []string{"VERBOSE"},
+            EnvVars: []string{"LOG_LEVEL"},
         },
         &cli.BoolFlag{
             Name:    "DevMode",
@@ -56,6 +59,18 @@ func main() {
             Name:    "serve",
             Aliases: []string{"s"},
 			Flags: []cli.Flag{
+                &cli.StringFlag{
+                    Name:    "DatabaseDriver",
+                    Aliases: []string{"db-driver"},
+                    Value:   "sqlite3",
+                    EnvVars: []string{"DB_DRIVER"},
+                },
+                &cli.StringFlag{
+                    Name:    "DatabaseSourceName",
+                    Aliases: []string{"db-dsn"},
+                    Value:   "file:runtime/ent/demo.db?mode=rwc&cache=shared&_fk=1",
+                    EnvVars: []string{"DB_DSN"},
+                },
                 &cli.StringFlag{
                     Name:    "Host",
                     Aliases: []string{"host"},

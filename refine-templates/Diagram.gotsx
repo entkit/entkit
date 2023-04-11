@@ -2,6 +2,8 @@
 
 {{- define "src/diagram.tsx" -}}
 
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
 import  { useMemo, useState, useCallback }  from "react";
 {{- if $.Extension.ForceGraph2D.Enabled }}
 import ForceGraph2D, {GraphData, LinkObject, NodeObject} from 'react-force-graph-2d';
