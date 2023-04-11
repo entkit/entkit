@@ -10,7 +10,7 @@ services:
   {{ $g.Name }}:
     build: "./"
     command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}{{ $g.Name }}"]
-    volumes: [ {{ print (indirect $g.Name) "-shared" | snakecase }}:/app/shared ]
+    volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
     ports:
       - "8{{$i}}:80"
   {{- end -}}
@@ -30,7 +30,7 @@ services:
 volumes:
   {{- range $i, $g := $.Extension.Generators }}
   {{- if $g.Serve }}
-  {{ print (indirect $g.Name) "-shared" | snakecase }}:
+  {{ print (indirect $g.Name) "-runtime" | snakecase }}:
   {{- end -}}
   {{- end }}
   keycloak_data:
