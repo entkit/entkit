@@ -6,10 +6,11 @@ version: "3.9"
 services:
   {{- range $i, $g := $.Extension.Generators }}
   {{- if $g.Serve }}
+  {{- $ENV_PREFIX := indirect $g.Name | snakecase | upper }}
   {{ $g.Name }}:
     build: "./"
-    command: ["serve", "{{ $g.Name }}"]
-    volumes: ["./runtime:/app/runtime"]
+    command: [ "serve", "{{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}{{ $g.Name }}"]
+    volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
     ports:
       - "8{{$i}}:80"
   {{- end -}}
@@ -19,11 +20,18 @@ services:
     command: [ "start-dev" ]
     image: quay.io/keycloak/keycloak:21.0.0
     volumes:
-        - ./runtime/keycloak:/opt/keycloak/data/
+        - keycloak_runtime:/opt/keycloak/data/
     environment:
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
         - "8080:8080"
+  {{- end }}
+volumes:
+  {{- range $i, $g := $.Extension.Generators }}
+  {{- if $g.Serve }}
+  {{ print (indirect $g.Name) "-runtime" | snakecase }}:
   {{- end -}}
+  {{- end }}
+  keycloak_runtime:
 {{- end -}}
