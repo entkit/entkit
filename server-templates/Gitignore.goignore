@@ -3,9 +3,4 @@
 
 {{- $.Extension.FileHeader | ER_replace "^" "#" }}
 
-{{- range $g := $.Extension.Generators -}}
-{{- if $g.Serve -}}
-/{{ $g.Name }}
-{{ end -}}
-{{- end -}}
 {{- end -}}

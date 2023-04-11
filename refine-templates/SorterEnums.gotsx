@@ -4,7 +4,7 @@
 
 {{- $.Extension.FileHeader | ER_replace "^" "//" }}
 
-{{- range $n := $.Graph.Nodes -}}
+{{ range $n := $.Graph.Nodes -}}
 export const {{$n.Name}}SorterEnums = {
 {{- $allFields := orderFields $n}}
 {{- range $f := $allFields -}}

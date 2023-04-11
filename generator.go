@@ -176,7 +176,7 @@ func (gr *Generator) runCMD(command string) {
 	cmd.Dir = PString(gr.Path)
 	out, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Command", cmd, out, err.Error())
+		fmt.Println("Command", cmd, string(out), err.Error())
 	}
 }
 
