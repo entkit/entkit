@@ -9,7 +9,7 @@ services:
   {{- $ENV_PREFIX := indirect $g.Name | snakecase | upper }}
   {{ $g.Name }}:
     build: "./"
-    command: [ "serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}{{ $g.Name }}"]
+    command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }}{{ $g.Name }}"]
     volumes: [ {{ print (indirect $g.Name) "-shared" | snakecase }}:/app/shared ]
     ports:
       - "8{{$i}}:80"
