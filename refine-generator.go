@@ -63,6 +63,7 @@ func (r Refine) GetTemplates() []string {
 	return []string{
 		"refine-templates/Tsconfig.gojson",
 		"refine-templates/Eslintignore.goignore",
+		"refine-templates/Dockerignore.goignore",
 		"refine-templates/Eslintrc.gojson",
 		"refine-templates/Prettierignore.goignore",
 		"refine-templates/Prettierrc.gojson",

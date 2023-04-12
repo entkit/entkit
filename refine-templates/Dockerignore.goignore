@@ -1,9 +1,6 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
-{{- define "Dockerfile.dockerignore" -}}
+{{- define ".dockerignore" -}}
 {{- $.Extension.FileHeader | ER_replace "^" "#" }}
-docker-compose.yaml
 node_modules
 **/node_modules
-build
-**/build
 {{- end -}}

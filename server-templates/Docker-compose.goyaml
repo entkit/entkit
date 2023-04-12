@@ -1,6 +1,7 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
-{{- define "../docker-compose.yaml" -}}
+{{- define "docker-compose.yaml" -}}
 {{- $.Extension.FileHeader | ER_replace "^" "#" }}
+
 version: "3.9"
 
 services:
@@ -8,7 +9,9 @@ services:
   {{- if $g.Serve }}
   {{- $ENV_PREFIX := indirect $g.Name | snakecase | upper }}
   {{ $g.Name }}:
-    build: "./"
+    build:
+        context: {{ $.RelCWD }}
+        dockerfile: {{$.Path}}/Dockerfile
     command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }} {{ $g.Name }}"]
     volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
     ports:

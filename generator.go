@@ -19,13 +19,17 @@ type Generator struct {
 	Extension     *Extension `json:"Extension,omitempty"`
 	SkipGoModTidy *bool      `json:"SkipGoModTidy,omitempty"`
 
-	Adapter   GeneratorAdapter
-	Path      *string `json:"Path,omitempty"`
-	Enabled   *bool   `json:"Enabled,omitempty"`
-	Serve     *bool   `json:"Serve,omitempty"`
+	Adapter GeneratorAdapter
+	Path    *string `json:"Path,omitempty"`
+	Enabled *bool   `json:"Enabled,omitempty"`
+	Serve   *bool   `json:"Serve,omitempty"`
+
 	Graph     *gen.Graph
 	SkipModes SkipModes
 	Ops       []gen.Op
+
+	CWD    *string `json:"CWD,omitempty"` // base directory of gen.go file or running `go generate` command CWD
+	RelCWD *string `json:"RelCWD"`        // relative directory of CWD and current generator path
 }
 
 type SkipModes struct {
@@ -309,7 +313,8 @@ func GeneratorHook(ex *Extension) gen.Hook {
 }
 
 func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, options ...GeneratorOption) *Generator {
-	generator := &Generator{
+	var err error
+	g := &Generator{
 		Name:      StringP(name),
 		Extension: extension,
 		Adapter:   adapter,
@@ -338,22 +343,36 @@ func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, o
 			gen.HasSuffix,
 		},
 	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	g.CWD = &cwd
+
 	for _, opt := range options {
-		if err := opt(generator); err != nil {
+		if err := opt(g); err != nil {
 			panic(err)
 		}
 	}
 
-	_, ok := (generator.Adapter).(ServableAdapter)
+	_, ok := (g.Adapter).(ServableAdapter)
 	if ok {
-		if generator.Serve == nil {
-			generator.Serve = BoolP(true)
+		if g.Serve == nil {
+			g.Serve = BoolP(true)
 		}
 	}
 
-	if generator.Path == nil {
-		generator.Path = StringP(name)
+	if g.Path == nil {
+		g.Path = StringP("./" + name)
 	}
 
-	return generator
+	absPath, err := filepath.Abs(*g.Path)
+	relCWD, err := filepath.Rel(absPath, *g.CWD)
+	if err != nil {
+		panic(err)
+	}
+
+	g.RelCWD = &relCWD
+	return g
 }

@@ -1,16 +1,17 @@
 {{- /* gotype: github.com/entkit/entkit.Generator */ -}}
 
-{{- define "../Dockerfile" -}}
+{{- define "Dockerfile" -}}
 {{- $.Extension.FileHeader | ER_replace "^" "#" }}
 
 FROM golang:1.19-alpine
 
-WORKDIR /app
-ADD . /app
-
 # Deps
 RUN apk add --no-cache alpine-sdk
 RUN apk add --no-cache nodejs npm
+
+# Files
+WORKDIR /app
+ADD . /app
 
 # Build
 RUN go mod tidy

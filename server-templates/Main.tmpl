@@ -21,6 +21,7 @@ import (
     "net/http"
     "path/filepath"
     "os"
+    "os/exec"
     "fmt"
     "strings"
     "regexp"
@@ -55,6 +56,88 @@ func main() {
     }
 
     app.Commands = []*cli.Command{
+        {
+            Name: "docker",
+            {{- $imageTag := print ( indirect $.Extension.Prefix ) "-" ( indirect $.Name ) | snakecase }}
+            Subcommands: []*cli.Command{
+                {
+                    Name: "build",
+                    Action: func(context *cli.Context) error {
+                        cmd := exec.Command(
+                            "docker",
+                            "build",
+                            "--file",
+                            "./my-server/Dockerfile",
+                            "--tag",
+                            "{{ $imageTag }}",
+                            ".",
+                        )
+						cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
+                        cmd.Stderr = os.Stderr
+                        cmd.Stdout= os.Stdout
+                        cmd.Stdin= os.Stdin
+                        err := cmd.Run()
+
+                        if err != nil {
+                            return err
+                        }
+
+                        return nil
+                    },
+                },
+				{
+					Name: "push",
+					Flags: []cli.Flag{
+                        &cli.StringFlag{
+                            Name: "registry",
+							Required: true,
+                            Aliases: []string{"reg"},
+                        },
+                        &cli.StringSliceFlag{
+                            Name: "tags",
+							Value: cli.NewStringSlice("latest"),
+                        },
+                    },
+					Action: func(context *cli.Context) error {
+                        tags := context.StringSlice("tags")
+                        repoName := context.String("registry") + "/{{$imageTag}}"
+
+						for _, tag := range tags{
+							remoteImageName:=repoName + ":" + tag
+                            cmd := exec.Command(
+								"docker",
+								"image",
+								"tag",
+                                "{{$imageTag}}:latest",
+                                remoteImageName,
+							)
+                            cmd.Stderr = os.Stderr
+                            cmd.Stdout= os.Stdout
+                            cmd.Stdin= os.Stdin
+                            err := cmd.Run()
+                            if err != nil {
+                                return err
+                            }
+
+                            cmd = exec.Command(
+                                "docker",
+                                "image",
+                                "push",
+                                remoteImageName,
+                            )
+                            cmd.Stderr = os.Stderr
+                            cmd.Stdout= os.Stdout
+                            cmd.Stdin= os.Stdin
+                            err = cmd.Run()
+                            if err != nil {
+                                return err
+                            }
+                        }
+						return nil
+                    },
+                },
+            },
+        },
         {
             Name:    "serve",
             Aliases: []string{"s"},

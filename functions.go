@@ -3,7 +3,6 @@ package entkit
 import (
 	"encoding/json"
 	"entgo.io/ent/entc/gen"
-	"path/filepath"
 )
 
 func someField(node *gen.Type, field string) *gen.Field {
@@ -98,21 +97,4 @@ func snake(s string) string {
 
 func PrepareName(prefix string, name string) string {
 	return prefix + pascal(name)
-}
-
-func relPath(p1 string, p2 string) string {
-	var err error
-	//p1, err = filepath.Abs(p1)
-	//if err != nil {
-	//	panic(err.Error())
-	//}
-	//p2, err = filepath.Abs(p2)
-	//if err != nil {
-	//	panic(err.Error())
-	//}
-	rel, err := filepath.Rel(p1, p2)
-	if err != nil {
-		panic(err.Error())
-	}
-	return rel
 }
