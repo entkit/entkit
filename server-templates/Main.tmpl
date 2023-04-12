@@ -58,7 +58,7 @@ func main() {
     app.Commands = []*cli.Command{
         {
             Name: "docker",
-            {{- $imageTag := print ( indirect $.Extension.Prefix ) "-" ( indirect $.Name ) | snakecase }}
+            {{- $imageTag := print ( indirect $.Extension.Prefix ) "-" ( indirect $.Name ) | kebabcase }}
             Subcommands: []*cli.Command{
                 {
                     Name: "build",
