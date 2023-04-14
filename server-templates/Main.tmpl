@@ -191,6 +191,12 @@ func main() {
                     Aliases: []string{"keycloak-backend-client-id", "kc-backend-client-id"},
                     EnvVars: []string{"KEYCLOAK_BACKEND_CLIENT_ID"},
                 },
+                &cli.StringFlag{
+                    Name:    "KeycloakBackendClientSecret",
+                    Value:   "{{ $.Extension.Auth.Keycloak.BackendClientConfig.Secret }}",
+                    Aliases: []string{"keycloak-backend-client-secret", "kc-backend-client-secret"},
+                    EnvVars: []string{"KEYCLOAK_BACKEND_CLIENT_SECRET"},
+                },
 				{{- end }}
             },
             Description: "Serve EntKit APP",
@@ -254,20 +260,43 @@ srv := handler.NewDefaultServer(NewSchema(client))
 srv.Use(entgql.Transactioner{TxOpener: client})
 //srv.Use(&debug.Tracer{})
 mux.HandleFunc("/playground", playground.Handler("Example", "/query"))
-mux.Handle("/query", ent.EntkitAuthMiddleware(srv))
+
+{{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
+var(
+    keycloakHost = context.String("KeycloakHost")
+    keycloakRealm = context.String("KeycloakRealm")
+    keycloakFrontendClientID = context.String("KeycloakFrontendClientID")
+    keycloakBackendClientID = context.String("KeycloakBackendClientID")
+    keycloakBackendClientSecret = context.String("KeycloakBackendClientSecret")
+)
+{{- end }}
+
+mux.Handle("/query", ent.EntkitAuthMiddleware(
+	srv,
+    {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
+    keycloakHost,
+    keycloakRealm,
+    keycloakBackendClientID,
+    keycloakBackendClientSecret,
+	{{- end }}
+))
 
 mux.HandleFunc("/environment.json", func(writer http.ResponseWriter, request *http.Request) {
     b, _ := json.Marshal(entkit.Environment{
         Meta: map[string]any{{ $.Extension.Meta | toJson }},
         GraphqlURL: context.String("GraphqlURL"),
+		{{- if $.Extension.Auth.Enabled }}
         Auth: &entkit.AuthEnvironment{
+			{{- if $.Extension.Auth.Keycloak.Enabled }}
             Keycloak: &entkit.KeycloakEnvironment{
-                URL:             context.String("KeycloakHost"),
-                Realm:           context.String("KeycloakRealm"),
-                ClientID:        context.String("KeycloakFrontendClientID"),
-                BackendClientID: context.String("KeycloakBackendClientID"),
+                URL:             keycloakHost,
+                Realm:           keycloakRealm,
+                ClientID:        keycloakFrontendClientID,
+                BackendClientID: keycloakBackendClientID,
             },
+			{{- end}}
         },
+		{{- end }}
     })
     writer.Write(b)
 })

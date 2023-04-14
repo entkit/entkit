@@ -13,7 +13,18 @@ import (
 )
 {{- $auth := $.Config.Annotations.ENTKIT.Auth }}
 
-func EntkitAuthMiddleware(next http.Handler) http.Handler {
+// _entkitDefaultValue to provide default values from entc definition and also get ability to provide from caller
+func _entkitDefaultValue(value string, defaultValue string) string {
+	if value == "" {
+	return defaultValue
+	}
+	return value
+}
+
+func EntkitAuthMiddleware(
+	next http.Handler,
+	{{- template "helper/entkit-middleware-additional-params" $ }}
+) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		{{- if (indirect $auth.Enabled)}}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -22,10 +33,10 @@ func EntkitAuthMiddleware(next http.Handler) http.Handler {
 		var err error
 		{{- if (indirect $auth.Keycloak.Enabled) }}
 		kc := entkit.NewBackendKeycloak(
-			"{{$auth.Keycloak.Host}}",
-			"{{$auth.Keycloak.Realm}}",
-			"{{$auth.Keycloak.BackendClientConfig.ClientID}}",
-			"{{$auth.Keycloak.BackendClientConfig.Secret}}",
+			_entkitDefaultValue(keycloakHost, "{{$auth.Keycloak.Host}}"),
+			_entkitDefaultValue(keycloakRealm, "{{$auth.Keycloak.Realm}}"),
+			_entkitDefaultValue(keycloakBackendClientID, "{{$auth.Keycloak.BackendClientConfig.ClientID}}"),
+			_entkitDefaultValue(keycloakBackendClientSecret, "{{$auth.Keycloak.BackendClientConfig.Secret}}"),
 		)
 		r, err = kc.MiddlewareReqHandlerFunc(w, r)
 		{{- end }}
@@ -39,7 +50,9 @@ func EntkitAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func EntkitAuthGinMiddleware() gin.HandlerFunc {
+func EntkitAuthGinMiddleware(
+{{- template "helper/entkit-middleware-additional-params" $ }}
+) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		{{- if (indirect $auth.Enabled)}}
 		c.Header("Access-Control-Allow-Origin", "*")
@@ -113,3 +126,14 @@ func EntkitAuthContextFromRequestContext(ctx context.Context) (*entkit.AuthConte
 }
 
 {{- end }}
+
+{{- /* gotype: entgo.io/ent/entc/gen.Graph */ -}}
+{{- define "helper/entkit-middleware-additional-params" -}}
+{{- $auth := $.Config.Annotations.ENTKIT.Auth }}
+{{- if and (indirect $auth.Enabled) (indirect $auth.Keycloak.Enabled) }}
+	keycloakHost string,
+	keycloakRealm string,
+	keycloakBackendClientID string,
+	keycloakBackendClientSecret string,
+{{- end }}
+{{- end -}}
