@@ -12,7 +12,7 @@ var (
 
 type Refine struct{}
 
-var RefineAdapter = Refine{}
+var DefaultRefineAdapter = Refine{}
 
 func (r Refine) GetName() string {
 	return "refine"
