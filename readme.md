@@ -10,6 +10,7 @@
 [![GitHub license](https://img.shields.io/github/license/entkit/entkit)](https://github.com/entkit/entkit)
 
 Documentation: https://entkit.com
+
 Demo: https://github.com/entkit/entkit-demo
 
 ## Roadmap
