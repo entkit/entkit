@@ -20,8 +20,8 @@ type CodeFieldOptions struct {
 	Language string `json:"Language,omitempty"`
 }
 
-// RefineAnnotation struct container of all annotations
-type RefineAnnotation struct {
+// EntkitAnnotation struct container of all annotations
+type EntkitAnnotation struct {
 	TitleField     bool              `json:"TitleField,omitempty"`     // Mark field as title of entity
 	ImageField     bool              `json:"ImageField,omitempty"`     // Mark field as image
 	MainImageField bool              `json:"MainImageField,omitempty"` // Mark field as main image of entity
@@ -54,12 +54,12 @@ type RefineAnnotation struct {
 }
 
 // Merge implements the schema.Merger interface.
-func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
-	var annotation RefineAnnotation
+func (ra EntkitAnnotation) Merge(other schema.Annotation) schema.Annotation {
+	var annotation EntkitAnnotation
 	switch other := other.(type) {
-	case RefineAnnotation:
+	case EntkitAnnotation:
 		annotation = other
-	case *RefineAnnotation:
+	case *EntkitAnnotation:
 		if other != nil {
 			annotation = *other
 		}
@@ -175,20 +175,20 @@ func (ra RefineAnnotation) Merge(other schema.Annotation) schema.Annotation {
 }
 
 // Name annotation
-func (ra RefineAnnotation) Name() string {
+func (ra EntkitAnnotation) Name() string {
 	return "ENTKIT"
 }
 
 // Actions actions/buttons on list items
-func Actions(actions ...*Action) RefineAnnotation {
-	return RefineAnnotation{
+func Actions(actions ...*Action) EntkitAnnotation {
+	return EntkitAnnotation{
 		Actions: actions,
 	}
 }
 
 // OnlyOnList show field only on list
-func OnlyOnList() RefineAnnotation {
-	return RefineAnnotation{
+func OnlyOnList() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnList: false,
 		HideOnShow: true,
 		HideOnForm: true,
@@ -196,8 +196,8 @@ func OnlyOnList() RefineAnnotation {
 }
 
 // OnlyOnForm show field only on form
-func OnlyOnForm() RefineAnnotation {
-	return RefineAnnotation{
+func OnlyOnForm() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnList: true,
 		HideOnShow: true,
 		HideOnForm: false,
@@ -205,8 +205,8 @@ func OnlyOnForm() RefineAnnotation {
 }
 
 // OnlyOnShow show field only on show page
-func OnlyOnShow() RefineAnnotation {
-	return RefineAnnotation{
+func OnlyOnShow() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnList: true,
 		HideOnShow: false,
 		HideOnForm: true,
@@ -214,138 +214,138 @@ func OnlyOnShow() RefineAnnotation {
 }
 
 // HideOnList hide field on list
-func HideOnList() RefineAnnotation {
-	return RefineAnnotation{
+func HideOnList() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnList: true,
 	}
 }
 
 // HideOnShow hide field on show page
-func HideOnShow() RefineAnnotation {
-	return RefineAnnotation{
+func HideOnShow() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnShow: true,
 	}
 }
 
 // HideOnForm hide field on form
-func HideOnForm() RefineAnnotation {
-	return RefineAnnotation{
+func HideOnForm() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnForm: true,
 	}
 }
 
 // HideOnCreate hide field on form
-func HideOnCreate() RefineAnnotation {
-	return RefineAnnotation{
+func HideOnCreate() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnCreate: true,
 	}
 }
 
 // HideOnUpdate hide field on form
-func HideOnUpdate() RefineAnnotation {
-	return RefineAnnotation{
+func HideOnUpdate() EntkitAnnotation {
+	return EntkitAnnotation{
 		HideOnUpdate: true,
 	}
 }
 
 // TitleField mark field as a title field
-func TitleField() RefineAnnotation {
-	return RefineAnnotation{
+func TitleField() EntkitAnnotation {
+	return EntkitAnnotation{
 		TitleField: true,
 	}
 }
 
 // ImageField mark field as an image field
-func ImageField() RefineAnnotation {
-	return RefineAnnotation{
+func ImageField() EntkitAnnotation {
+	return EntkitAnnotation{
 		ImageField: true,
 	}
 }
 
 // MainImageField mark field as a main image field
-func MainImageField() RefineAnnotation {
-	return RefineAnnotation{
+func MainImageField() EntkitAnnotation {
+	return EntkitAnnotation{
 		MainImageField: true,
 		ImageField:     true,
 	}
 }
 
 // RichTextField mark field as a rich text field (wysiwyg editor)
-func RichTextField() RefineAnnotation {
-	return RefineAnnotation{
+func RichTextField() EntkitAnnotation {
+	return EntkitAnnotation{
 		RichTextField: true,
 	}
 }
 
 // CodeField mark field as a code field
-func CodeField(config *CodeFieldOptions) RefineAnnotation {
-	return RefineAnnotation{
+func CodeField(config *CodeFieldOptions) EntkitAnnotation {
+	return EntkitAnnotation{
 		CodeField: config,
 	}
 }
 
 // URLField mark field as an url field
-func URLField() RefineAnnotation {
-	return RefineAnnotation{
+func URLField() EntkitAnnotation {
+	return EntkitAnnotation{
 		URLField: true,
 	}
 }
 
 // Icon define icon of entity that will be shown on navigations, breadcrumbs etc.
-func Icon(icon string) RefineAnnotation {
-	return RefineAnnotation{
+func Icon(icon string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Icon: &icon,
 	}
 }
 
 // RoutePath define entity route for url.
-func RoutePath(path string) RefineAnnotation {
-	return RefineAnnotation{
+func RoutePath(path string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Route: &path,
 	}
 }
 
 // IndexRoute make entity route as index route
-func IndexRoute() RefineAnnotation {
-	return RefineAnnotation{
+func IndexRoute() EntkitAnnotation {
+	return EntkitAnnotation{
 		IndexRoute: true,
 	}
 }
 
 // Label define label of field
 // todo: implement generator
-func Label(label string) RefineAnnotation {
-	return RefineAnnotation{
+func Label(label string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Label: &label,
 	}
 }
 
 // Description define description of field/entity
 // todo: implement generator
-func Description(description string) RefineAnnotation {
-	return RefineAnnotation{
+func Description(description string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Label: &description,
 	}
 }
 
 // Prefix add prefix to value of field
 // todo: implement generator
-func Prefix(prefix string) RefineAnnotation {
-	return RefineAnnotation{
+func Prefix(prefix string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Prefix: &prefix,
 	}
 }
 
 // Suffix add suffix to value of field
-func Suffix(suffix string) RefineAnnotation {
-	return RefineAnnotation{
+func Suffix(suffix string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Prefix: &suffix,
 	}
 }
 
 // View define field views on list and show
-func View(name string) RefineAnnotation {
-	return RefineAnnotation{
+func View(name string) EntkitAnnotation {
+	return EntkitAnnotation{
 		View:       &name,
 		ViewOnList: &name,
 		ViewOnShow: &name,
@@ -353,37 +353,37 @@ func View(name string) RefineAnnotation {
 }
 
 // ViewOnList define field view on list
-func ViewOnList(name string) RefineAnnotation {
-	return RefineAnnotation{
+func ViewOnList(name string) EntkitAnnotation {
+	return EntkitAnnotation{
 		ViewOnList: &name,
 	}
 }
 
 // ViewOnShow define field view on show page
-func ViewOnShow(name string) RefineAnnotation {
-	return RefineAnnotation{
+func ViewOnShow(name string) EntkitAnnotation {
+	return EntkitAnnotation{
 		ViewOnShow: &name,
 	}
 }
 
 // ViewOnForm define field view on form
-func ViewOnForm(name string) RefineAnnotation {
-	return RefineAnnotation{
+func ViewOnForm(name string) EntkitAnnotation {
+	return EntkitAnnotation{
 		ViewOnForm: &name,
 	}
 }
 
 // Badge define entity badge view
-func Badge(name string) RefineAnnotation {
-	return RefineAnnotation{
+func Badge(name string) EntkitAnnotation {
+	return EntkitAnnotation{
 		Badge: &name,
 	}
 }
 
 // FilterOperator define entity field filter operator
-func FilterOperator(operator gen.Op) RefineAnnotation {
+func FilterOperator(operator gen.Op) EntkitAnnotation {
 	opName := operator.Name()
-	return RefineAnnotation{
+	return EntkitAnnotation{
 		FilterOperator: &opName,
 	}
 }

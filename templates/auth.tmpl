@@ -9,10 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/entkit/entkit"
-	"github.com/entkit/entkit/common"
 )
 {{- $auth := $.Config.Annotations.ENTKIT.Auth }}
-
+{{- $prefix := $.Annotations.ENTKIT.Prefix}}
 // _entkitDefaultValue to provide default values from entc definition and also get ability to provide from caller
 func _entkitDefaultValue(value string, defaultValue string) string {
 	if value == "" {
@@ -80,25 +79,68 @@ func EntkitAuthGinMiddleware(
 	}
 }
 
-func EntkitAuthorizeByResource(ctx context.Context, resource string, scope string) error {
+type {{$prefix}}Resource int
+const (
+	{{- range $i, $n := $.Nodes }}
+	{{ $n.Name | ER_prepareName }}Resource{{- if eq $i 0 }} {{$prefix}}Resource = iota {{- end}}
+	{{- end }}
+)
+func (e {{$prefix}}Resource) String() string {
+    switch e {
+	{{- range $i, $n := $.Nodes }}
+	case {{ $n.Name | ER_prepareName }}Resource:
+		return "{{ $n.Name | ER_prepareName }}"
+	{{- end }}
+    default:
+        return "unknown"
+    }
+}
+
+type {{$prefix}}Scope int
+{{- $scopes := list }}
+{{- range $n := $.Nodes }}
+{{- range $action := $n.Annotations.ENTKIT.Actions }}
+{{- $scope := indirect $action.Scope}}
+{{- $scopes = append $scopes $scope }}
+{{- end }}
+{{- end }}
+{{- $scopes = $scopes | uniq}}
+const (
+	{{- range $i, $scope := $scopes }}
+	{{ $scope | ER_prepareName }}Scope{{- if eq $i 0 }} {{$prefix}}Scope = iota {{- end }}
+	{{- end }}
+)
+func (e {{$prefix}}Scope) String() string {
+    switch e {
+	{{- range $i, $s := $scopes }}
+	case {{ $s | ER_prepareName }}Scope:
+		return "{{ $s | ER_prepareName }}"
+	{{- end }}
+    default:
+        return "unknown"
+    }
+}
+
+
+func EntkitAuthorizeByResource(ctx context.Context, resource {{$prefix}}Resource, scope {{$prefix}}Scope) error {
 	{{- if (indirect $auth.Keycloak.Enabled) }}
-	resource = entkit.PrepareName("{{$.Annotations.ENTKIT.Prefix}}", resource)
-	scope = entkit.PrepareName("{{$.Annotations.ENTKIT.Prefix}}", scope)
 	authContext, err := EntkitAuthContextFromRequestContext(ctx)
 	if err != nil {
 		return err
 	}
 	auth := false
 	for _, p := range authContext.Permissions {
-		if p.Resource == resource {
-			if common.Contains(p.Scopes, scope) {
-				auth = true
-				break
+		if p.Resource == resource.String() {
+			for _, _scope := range p.Scopes{
+				if _scope == scope.String() {
+					auth = true
+					break
+				}
 			}
 		}
 	}
 	if !auth {
-		return errors.New("access restricted for " + resource + " " + scope)
+		return errors.New("access restricted for " + resource.String() + " " + scope.String())
 	}
 	{{- else }}
 	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthorizeByResource, please enable this feature.")

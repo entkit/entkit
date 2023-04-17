@@ -189,7 +189,9 @@ export const {{ $n.Name }}Badge: React.FC<Partial<Type.{{ ER_prepareName $n.Name
             />
         }
     >
-        <Link to={ "/{{ $n.Name | kebabcase}}/show/"+ props.{{ $n.ID.Name | camel }}}>
+        {{- $showAction:= ER_getNodeAction $n "show"}}
+        {{- $routePattern := ER_nodeActionRoutePattern $n "show" }}
+        <Link to={ "{{$routePattern}}".replace(":id", String(props.{{ $n.ID.Name | camel }})) }>
             {{- if not ( empty $mainImageField ) }}
             {{- $mainImageFieldName := $mainImageField.Name | camel }}
             { props.{{ $mainImageFieldName }} ? <Antd.Image width={48} preview={false} src={props.{{ $mainImageFieldName }} }/> : null }

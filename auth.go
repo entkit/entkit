@@ -5,8 +5,9 @@ import (
 )
 
 type Auth struct {
-	Enabled  *bool     `json:"Enabled,omitempty"`
-	Keycloak *Keycloak `json:"Keycloak,omitempty"`
+	Extension *Extension `json:"Extension,omitempty"`
+	Enabled   *bool      `json:"Enabled,omitempty"`
+	Keycloak  *Keycloak  `json:"Keycloak,omitempty"`
 }
 
 type AuthEnvironment struct {
@@ -38,12 +39,11 @@ var (
 
 type AuthOption = func(auth *Auth) error
 
-func NewAuth(options ...AuthOption) *Auth {
+func NewAuth(ex *Extension, options ...AuthOption) *Auth {
 	auth := &Auth{
-		Keycloak: &Keycloak{
-			Enabled: BoolP(false),
-		},
+		Extension: ex,
 	}
+	auth.Keycloak = NewKeycloak(auth)
 	for _, opt := range options {
 		if err := opt(auth); err != nil {
 			panic(err)
@@ -53,9 +53,10 @@ func NewAuth(options ...AuthOption) *Auth {
 }
 
 // AuthWithKeycloak configure authentication and authorization
-func AuthWithKeycloak(kc *Keycloak) AuthOption {
+func AuthWithKeycloak(keycloakOption ...KeycloakOption) AuthOption {
 	return func(at *Auth) (err error) {
 		at.Enabled = BoolP(true)
+		kc := NewKeycloak(at, keycloakOption...)
 		kc.Enabled = BoolP(true)
 		at.Keycloak = kc
 		return nil
@@ -70,7 +71,7 @@ func GenerateAuthResourcesHook(ex *Extension) gen.Hook {
 			}
 
 			if ex.Auth.Keycloak != nil && PBool(ex.Auth.Keycloak.Enabled) {
-				ex.Auth.Keycloak.GenerateKeycloakResources(g, PString(ex.Prefix))
+				ex.Auth.Keycloak.GenerateKeycloakResources(g)
 			}
 
 			return next.Generate(g)

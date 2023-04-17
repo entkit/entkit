@@ -83,8 +83,8 @@ type GeneratorAdapterWithStaticTemplates interface {
 	GetStaticTemplates() []string
 }
 
-func parseTemplate(path string, adapter GeneratorAdapterWithFS) *gen.Template {
-	t := gen.NewTemplate(path).Funcs(funcMap)
+func (gr *Generator) parseTemplate(path string, adapter GeneratorAdapterWithFS) *gen.Template {
+	t := gen.NewTemplate(path).Funcs(gr.Extension.funcMap)
 	var _funcMap template.FuncMap = map[string]interface{}{}
 	// copied from: https://github.com/helm/helm/blob/8648ccf5d35d682dcd5f7a9c2082f0aaf071e817/pkg/engine/engine.go#L147-L154
 	_funcMap["include"] = func(name string, data interface{}) (string, error) {
@@ -139,7 +139,7 @@ func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.
 	genWithTemplates, ok := (adapter).(GeneratorAdapterWithTemplates)
 	if ok {
 		for _, t := range genWithTemplates.GetTemplates() {
-			_t := parseTemplate(t, adapterWithFS)
+			_t := gr.parseTemplate(t, adapterWithFS)
 			gr.rendAndSave(_t, true)
 		}
 	}
@@ -147,7 +147,7 @@ func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.
 	genWithStaticTemplates, ok := (adapter).(GeneratorAdapterWithStaticTemplates)
 	if ok {
 		for _, t := range genWithStaticTemplates.GetStaticTemplates() {
-			_t := parseTemplate(t, adapterWithFS)
+			_t := gr.parseTemplate(t, adapterWithFS)
 			gr.rendAndSave(_t, false)
 		}
 	}
@@ -213,7 +213,7 @@ func (gr *Generator) rendAndSave(tmpl *gen.Template, override bool) {
 			continue
 		}
 
-		t = t.Funcs(funcMap)
+		t = t.Funcs(gr.Extension.funcMap)
 
 		err := tmpl.ExecuteTemplate(&b, t.Name(), gr)
 		if err != nil {

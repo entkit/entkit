@@ -86,7 +86,7 @@ var (
 		)),
 	)
 	DefaultActions = []*Action{
-		ShowAction, ListAction, CreateAction, EditAction,
+		ShowAction, ListAction, CreateAction, EditAction, DeleteAction,
 	}
 )
 
@@ -106,7 +106,6 @@ func NewAction(name string, options ...ActionOption) *Action {
 		action.Scope = action.Name
 	}
 	return action
-
 }
 
 // region Options
