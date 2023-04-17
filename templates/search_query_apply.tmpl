@@ -6,8 +6,10 @@
 {{- /* Add the base header for the generated file */ -}}
 
 {{ template "header" $ }}
-
-import "context"
+import (
+	"context"
+	{{ range $.Nodes }}{{ template "import/types" . }}{{ end }}
+)
 
 {{ range $n := $.Nodes }}
 	{{- $builder := print $n.Name "WhereInput" }}
