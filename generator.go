@@ -282,6 +282,10 @@ func SkipGoModTidy() GeneratorOption {
 func GeneratorHook(ex *Extension) gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
+			// Run ent codegen first to ensure working against an updated schema.
+			if err := next.Generate(g); err != nil {
+				return err
+			}
 
 			var tracked = false
 
@@ -307,7 +311,7 @@ func GeneratorHook(ex *Extension) gen.Hook {
 				}
 			}
 
-			return next.Generate(g)
+			return nil
 		})
 	}
 }
