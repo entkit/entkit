@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 
 {{- define "src/tables.tsx" -}}
 
@@ -15,8 +15,14 @@ import * as Custom from "./custom";
 import * as View from "./view";
 import * as Action from "./action";
 
-{{ range $n := $.Graph.Nodes }}
-{{- $orderFields := orderFields $n }}
+{{/* Take order fields from order terms */}}
+{{- range $n := $.Graph.Nodes }}
+{{- $orderTerms := orderFields $n }}
+{{- $orderFields := list }}
+{{- range $t:=$orderTerms }}
+{{- $orderFields = append $orderFields $t.Field}}
+{{- end -}}
+
 export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.{{ER_prepareName $n.Name}}Interface> & { extendTable?: RA.useTableProps<Interfaces.{{ ER_prepareName $n.Name }}Interface, HttpError> }
 export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, ...props} ) => {
 

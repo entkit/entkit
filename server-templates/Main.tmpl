@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 
 {{- define "main.go" -}}
 
@@ -11,7 +11,7 @@ import (
     "go.uber.org/zap"
     "go.uber.org/zap/zapcore"
     "encoding/json"
-    "github.com/entkit/entkit"
+    "github.com/entkit/entkit/v2"
     "entgo.io/contrib/entgql"
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -225,7 +225,7 @@ func main() {
 {{- end -}}
 
 
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 {{- define "partial:handler" -}}
 var log *zap.Logger
 if context.Bool("DevMode"){
@@ -317,7 +317,7 @@ if err := http.ListenAndServe(host, mux); err != nil {
 
 {{- end -}}
 
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 {{- define "partial:staticHandler" -}}
 if r.Method != "GET" {
     http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)

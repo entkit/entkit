@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 {{- define ".dockerignore" -}}
 {{- $.Extension.FileHeader | ER_replace "^" "#" }}
 node_modules

@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 
 {{- define ".eslintrc" -}}
 {

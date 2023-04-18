@@ -1,4 +1,4 @@
-{{- /* gotype: github.com/entkit/entkit.Generator */ -}}
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 
 {{- define "src/sorter-enums.tsx" -}}
 
@@ -8,8 +8,8 @@
 export const {{$n.Name}}SorterEnums = {
 {{- $allFields := orderFields $n}}
 {{- range $f := $allFields -}}
-{{- if not (empty $f.Annotations.EntGQL.OrderField) }}
-    "{{camel $f.Name}}": "{{ $f.Annotations.EntGQL.OrderField }}",
+{{- if not (empty $f.GQL) }}
+    "{{camel $f.Field.Name}}": "{{ $f.GQL }}",
 {{- end}}
 {{- end}}
 }
