@@ -82,7 +82,8 @@ export const SearchComponent: React.FC = () => {
                         {{- else }}
                         null,
                         {{- end }}
-                        `/{{$n.Name | kebabcase}}/show/${item.{{ $n.ID.Name}}}`,
+                        {{- $routePattern := ER_nodeActionRoutePattern $n "show" | trimPrefix "/" }}
+                        window.environment.appPath + "{{$routePattern}}".replace(":id", String(item.{{ $n.ID.Name | camel }})),
                     ),
                 );
                 if (storeOptionGroup.length > 0) {

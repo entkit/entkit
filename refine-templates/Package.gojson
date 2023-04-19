@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
-    "@refinedev/antd": "^5.3.8",
-    "@refinedev/cli": "^2.1.2",
-    "@refinedev/core": "^4.7.0",
-    "@refinedev/inferencer": "^3.1.6",
+    "@refinedev/antd": "^5.9.0",
+    "@refinedev/cli": "^2.5.3",
+    "@refinedev/core": "^4.10.0",
+    "@refinedev/inferencer": "^3.3.0",
     "@refinedev/react-router-v6": "latest",
-    "@refinedev/ui-types": "^1.5.0",
+    "@refinedev/ui-types": "^1.10.0",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
@@ -29,17 +29,17 @@
     "@uiw/react-textarea-code-editor": "^2.0.6",
     "antd": "^5.0.5",
     "camelcase": "^6.2.0",
-    {{ if $.Extension.GoJs.Enabled -}}
+    {{- if $.Extension.GoJs.Enabled }}
     "gojs": "^2.3.1",
     "gojs-react": "^1.1.1",
-    {{ end -}}
-    {{ if $.Extension.ForceGraph2D.Enabled -}}
+    {{- end }}
+    {{- if $.Extension.ForceGraph2D.Enabled }}
     "react-force-graph-2d": "^1.23.17",
-    {{ end -}}
+    {{- end }}
     "gql-query-builder": "^3.5.5",
     "graphql": "^15.6.1",
     "graphql-request": "^4.3.0",
-    {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
+    {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
     "@react-keycloak/web": "^3.4.0",
     {{- end }}
     "keycloak-js": "^20.0.5",

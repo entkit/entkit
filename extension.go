@@ -5,7 +5,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
-	"errors"
 	"github.com/Masterminds/sprig/v3"
 	"text/template"
 )
@@ -188,14 +187,11 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		}
 	}
 
-	if ex.GraphqlURL == nil {
-		return nil, errors.New("'GraphqlURL' is required. Use 'WithGraphqlURL' method to set it")
-	}
-
 	ex.Environment = &Environment{
 		Meta:       ex.Meta,
 		GraphqlURL: PString(ex.GraphqlURL),
 		Auth:       ex.Auth.GetEnvironmentConfig(),
+		AppPath:    "/",
 	}
 
 	return ex, nil

@@ -56,12 +56,12 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
 
     {{- if not (empty $a.Route) }}
     const Link = useLink();
-    {{- $pattern := print "/" $routePath}}
+    {{- $pattern := print $routePath}}
     {{- if not (empty $a.Route.Path)}}
     {{- $pattern = print $pattern "/" $a.Route.Path}}
     {{- end}}
 
-    return can ? <Link to={ "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
+    return can ? <Link to={ window.environment.appPath + "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
         <Antd.Button icon={ <{{default "AntdIcons.FileOutlined" $a.Icon}}/> } {...additionalProps} {...props} >
             {hideText || "{{$label}}"}
         </Antd.Button>

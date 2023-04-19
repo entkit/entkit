@@ -32,6 +32,7 @@ func (r Refine) GetDependencies() []GeneratorAdapter {
 func (r Refine) CommandAfterGen(generator *Generator) string {
 	// TO_DO: remove before commit
 	//return "echo remove-me"
+	//return "npm run lint && npm run build"
 	return "npm ls || npm i && npm run lint && npm run build"
 }
 
@@ -45,11 +46,11 @@ func (r Refine) RewritePath() string {
 
 func (r Refine) StaticPaths() []string {
 	return []string{
-		`^static/.*`,
-		`^images/.*`,
-		`^favicon\.ico`,
-		`^asset-manifest\.json`,
-		`^environment\.json`,
+		`static`,
+		`images`,
+		`favicon.ico`,
+		`asset-manifest.json`,
+		`environment.json`,
 	}
 }
 

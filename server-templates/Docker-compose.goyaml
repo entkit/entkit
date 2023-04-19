@@ -12,8 +12,9 @@ services:
     build:
         context: {{ $.RelCWD }}
         dockerfile: {{$.Path}}/Dockerfile
-    command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" "}" }} {{ $g.Name }}"]
+    command: [ "entkit serve {{ print "${" $ENV_PREFIX "_EXTRA_ARGS" ":-}" }} {{ $g.Name }}"]
     volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
+    profiles: [ "app" ]
     ports:
       - "{{add 8080 $i}}:80"
   {{- end -}}
@@ -30,6 +31,7 @@ services:
         KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
         - "8080:8080"
+    profiles: [ "service" ]
   {{- end }}
 volumes:
   {{- range $i, $g := $.Extension.Generators }}

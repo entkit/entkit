@@ -21,7 +21,7 @@ declare global {
     }
 }
 
-fetch("/environment.json")
+fetch("environment.json")
     .then((res) => res.json())
     .then((data) => {
         window.environment = data;

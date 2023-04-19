@@ -162,32 +162,32 @@ function App() {
                                 {{- $action := ER_getActionByName $n "list" }}
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
-                                {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                list: "{{$path}}",
+                                {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
+                                list: window.environment.appPath + "{{$path}}",
                                 {{- end }}
                                 {{- end }}
 
                                 {{- $action = ER_getActionByName $n "show" }}
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
-                                {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                show: "{{$path}}",
+                                {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
+                                show: window.environment.appPath + "{{$path}}",
                                 {{- end }}
                                 {{- end }}
 
                                 {{- $action = ER_getActionByName $n "create" }}
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
-                                {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                create: "{{$path}}",
+                                {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
+                                create: window.environment.appPath + "{{$path}}",
                                 {{- end }}
                                 {{- end }}
 
                                 {{- $action = ER_getActionByName $n "edit" }}
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
-                                {{- $path := print "/" $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                edit: "{{$path}}",
+                                {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
+                                edit: window.environment.appPath + "{{ $path }}",
                                 {{- end }}
                                 {{- end }}
                                 meta: {

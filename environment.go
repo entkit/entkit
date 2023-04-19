@@ -13,6 +13,7 @@ var (
 type Environment = struct {
 	Meta       map[string]any   `json:"meta,omitempty"`
 	GraphqlURL string           `json:"graphqlUrl,omitempty"`
+	AppPath    string           `json:"appPath,omitempty"`
 	Auth       *AuthEnvironment `json:"auth,omitempty"`
 }
 

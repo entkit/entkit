@@ -14,7 +14,7 @@ import * as Show from "./show";
 import * as Type  from "./typedefs";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import CodeEditor from '@uiw/react-textarea-code-editor';
+import CodeEditor, { TextareaCodeEditorProps }  from '@uiw/react-textarea-code-editor';
 
 export type ViewProps<T> = Omit<React.HTMLProps<HTMLElement>, "value"> & {
     value: T | undefined
@@ -98,10 +98,9 @@ export const {{$prefix}}UUIDViewOnForm: React.FC = {{$prefix}}StringListViewOnFo
 // endregion UUID
 
 // region Code
-export const {{$prefix}}CodeViewOnForm: React.FC<any> = (props) => {
+export const {{$prefix}}CodeViewOnForm: React.FC<TextareaCodeEditorProps> = (props) => {
     return <CodeEditor
         {...props}
-        language={props.Language || 'js'}
         padding={15}
         style={ {
             overflow: 'auto',
@@ -191,7 +190,7 @@ export const {{ $n.Name }}Badge: React.FC<Partial<Type.{{ ER_prepareName $n.Name
     >
         {{- $showAction:= ER_getNodeAction $n "show"}}
         {{- $routePattern := ER_nodeActionRoutePattern $n "show" }}
-        <Link to={ "{{$routePattern}}".replace(":id", String(props.{{ $n.ID.Name | camel }})) }>
+        <Link to={ window.environment.appPath + "{{$routePattern}}".replace(":id", String(props.{{ $n.ID.Name | camel }})) }>
             {{- if not ( empty $mainImageField ) }}
             {{- $mainImageFieldName := $mainImageField.Name | camel }}
             { props.{{ $mainImageFieldName }} ? <Antd.Image width={48} preview={false} src={props.{{ $mainImageFieldName }} }/> : null }

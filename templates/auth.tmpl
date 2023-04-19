@@ -1,9 +1,8 @@
-{{- /* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */ -}}
 {{- /* gotype: entgo.io/ent/entc/gen.Graph */ -}}
+
 {{- define "entkit-auth" -}}
 
 {{ template "header" $ }}
-
 import (
 	"context"
 	"errors"
@@ -20,7 +19,7 @@ func _entkitDefaultValue(value string, defaultValue string) string {
 	return value
 }
 
-func EntkitAuthMiddleware(
+func {{ $prefix | pascal }}AuthMiddleware(
 	next http.Handler,
 	{{- template "helper/entkit-middleware-additional-params" $ }}
 ) http.Handler {
@@ -43,13 +42,13 @@ func EntkitAuthMiddleware(
 			next.ServeHTTP(w, r)
 		}
 		{{- else }}
-		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthMiddleware, please enable this feature.")
+		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize {{ $prefix | pascal }}AuthMiddleware, please enable this feature.")
 		next.ServeHTTP(w, r)
 		{{- end }}
 	})
 }
 
-func EntkitAuthGinMiddleware(
+func {{ $prefix | pascal }}AuthGinMiddleware(
 {{- template "helper/entkit-middleware-additional-params" $ }}
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -73,7 +72,7 @@ func EntkitAuthGinMiddleware(
 			c.Abort()
 		}
 		{{- else }}
-		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthGinMiddleware, please enable this feature.")
+		fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize {{ $prefix | pascal }}AuthGinMiddleware, please enable this feature.")
 		c.Next()
 		{{- end }}
 	}
@@ -121,10 +120,9 @@ func (e {{$prefix}}Scope) String() string {
     }
 }
 
-
-func EntkitAuthorizeByResource(ctx context.Context, resource {{$prefix}}Resource, scope {{$prefix}}Scope) error {
+func {{ $prefix | pascal}}AuthorizeByResource(ctx context.Context, resource {{$prefix}}Resource, scope {{$prefix}}Scope) error {
 	{{- if (indirect $auth.Keycloak.Enabled) }}
-	authContext, err := EntkitAuthContextFromRequestContext(ctx)
+	authContext, err := {{ $prefix | pascal}}AuthContextFromRequestContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -143,12 +141,28 @@ func EntkitAuthorizeByResource(ctx context.Context, resource {{$prefix}}Resource
 		return errors.New("access restricted for " + resource.String() + " " + scope.String())
 	}
 	{{- else }}
-	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthorizeByResource, please enable this feature.")
+	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize {{ $prefix | pascal }}AuthorizeByResource, please enable this feature.")
 	{{- end }}
 	return nil
 }
 
-func EntkitAuthContextFromRequestContext(ctx context.Context) (*entkit.AuthContext, error) {
+
+{{- range $n := $.Nodes }}
+{{- $dones := list }}
+{{- range $action := $n.Annotations.ENTKIT.Actions }}
+{{- $scope := $action.Scope }}
+{{- if not (has $scope $dones) }}
+{{- $dones = append $dones $scope }}
+
+func {{ print "enforce-" $n.Name "-" $scope | ER_prepareName}}(ctx context.Context) error{
+	return {{ $prefix | pascal}}AuthorizeByResource(ctx, {{ $n.Name | ER_prepareName }}Resource, {{ $scope | ER_prepareName }}Scope)
+}
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+func {{ $prefix | pascal }}AuthContextFromRequestContext(ctx context.Context) (*entkit.AuthContext, error) {
 	{{- if (indirect $auth.Keycloak.Enabled) }}
 	val := ctx.Value(entkit.AuthContextKey)
 	if val == nil {
@@ -162,7 +176,7 @@ func EntkitAuthContextFromRequestContext(ctx context.Context) (*entkit.AuthConte
 	}
 	return raw, nil
 	{{- else }}
-	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize EntkitAuthContextFromRequestContext, please enable this feature.")
+	fmt.Println("Entkit: Authentication/Authorization is currently disabled. To utilize {{ $prefix | pascal}}AuthContextFromRequestContext, please enable this feature.")
 	return nil, nil
 	{{- end }}
 }

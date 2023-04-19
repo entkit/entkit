@@ -37,7 +37,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
         cursors: {{$ed.Name}}Cursors,
         fields: ["{{ $.ID.Name }}", "{{$titleField.Name}}"]
     },
-    onSearch: (value) => [
+    onSearch: (value: string) => [
         {
             field: "{{$titleField.Name}}",
             {{- $operator := "contains" }}

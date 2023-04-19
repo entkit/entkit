@@ -23,7 +23,15 @@ import * as Action from "./action";
 {{- $orderFields = append $orderFields $t.Field}}
 {{- end -}}
 
-export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.{{ER_prepareName $n.Name}}Interface> & { extendTable?: RA.useTableProps<Interfaces.{{ ER_prepareName $n.Name }}Interface, HttpError> }
+export type {{$n.Name}}TableProps = Antd.TableProps<Interfaces.{{ER_prepareName $n.Name}}Interface>
+    & {
+        extendTable?: RA.useTableProps<
+            Interfaces.{{ ER_prepareName $n.Name }}Interface,
+            HttpError,
+            any,
+            Interfaces.{{ ER_prepareName $n.Name }}Interface
+        >
+    }
 export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, ...props} ) => {
 
     const [cursors, setCursors] = useState<Cursors>({first: 10,})

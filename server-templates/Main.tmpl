@@ -2,8 +2,8 @@
 
 {{- define "main.go" -}}
 
-{{- $.Extension.FileHeader | ER_replace "^" "//" }}
-
+{{- $.Extension.FileHeader | ER_replace "^" "//" -}}
+{{- $prefix := indirect $.Extension.Prefix }}
 package main
 
 import (
@@ -23,8 +23,8 @@ import (
     "os"
     "os/exec"
     "fmt"
+    "strconv"
     "strings"
-    "regexp"
     "time"
 )
 
@@ -58,7 +58,7 @@ func main() {
     app.Commands = []*cli.Command{
         {
             Name: "docker",
-            {{- $imageTag := print ( indirect $.Extension.Prefix ) "-" ( indirect $.Name ) | kebabcase }}
+            {{- $imageTag := print $prefix "-" ( indirect $.Name ) | kebabcase }}
             Subcommands: []*cli.Command{
                 {
                     Name: "build",
@@ -67,7 +67,7 @@ func main() {
                             "docker",
                             "build",
                             "--file",
-                            "./my-server/Dockerfile",
+                            "{{ $.Path }}/Dockerfile",
                             "--tag",
                             "{{ $imageTag }}",
                             ".",
@@ -142,6 +142,19 @@ func main() {
             Name:    "serve",
             Aliases: []string{"s"},
 			Flags: []cli.Flag{
+                &cli.BoolFlag{
+                    Name:    "UnionServer",
+					Usage:   "Run API server with frontend server together",
+                    Aliases: []string{"union-server","u"},
+                    Value:   false,
+                    EnvVars: []string{"UNION_SERVER"},
+                },
+                &cli.BoolFlag{
+                    Name:    "HTTPS",
+                    Aliases: []string{"https","ssl"},
+                    Value:   false,
+                    EnvVars: []string{"HTTPS"},
+                },
                 &cli.StringFlag{
                     Name:    "DatabaseDriver",
                     Aliases: []string{"db-driver"},
@@ -157,16 +170,42 @@ func main() {
                 &cli.StringFlag{
                     Name:    "Host",
                     Aliases: []string{"host"},
-                    Value:   ":80",
+                    Value:   "localhost",
                     EnvVars: []string{"HOST"},
+                },
+                &cli.IntFlag{
+                    Name:    "Port",
+                    Aliases: []string{"port", "p"},
+                    Value:   80,
+                    EnvVars: []string{"PORT"},
+                },
+                &cli.StringFlag{
+                    Name:    "AppPath",
+                    Aliases: []string{"app-path"},
+                    Value:   "/",
+                    EnvVars: []string{"APP_PATH"},
                 },
                 &cli.StringFlag{
                     Name:    "GraphqlURL",
                     Aliases: []string{"graphql-url", "gql-url"},
-                    Value:   "{{$.Extension.GraphqlURL}}",
+                    {{- if not (empty $.Extension.GraphqlURL) }}
+					Value:   "{{ $.Extension.GraphqlURL }}",
+					{{- end }}
                     EnvVars: []string{"GRAPHQL_URL"},
                 },
-				{{ if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled -}}
+                &cli.StringFlag{
+                    Name:    "GraphqlURIPath",
+                    Aliases: []string{"graphql-uri-path", "gql-uri-path"},
+                    Value:   "/query",
+                    EnvVars: []string{"GRAPHQL_URI_PATH"},
+                },
+                &cli.StringFlag{
+                    Name:    "GraphqlPlaygroundURIPath",
+                    Aliases: []string{"graphql-playground-uri-path", "gql-playground-uri-path"},
+                    Value:   "/playground",
+                    EnvVars: []string{"GRAPHQL_PLAYGROUND_URI_PATH"},
+                },
+				{{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
                 &cli.StringFlag{
                     Name:    "KeycloakHost",
                     Aliases: []string{"keycloak-host", "kc-host"},
@@ -227,6 +266,9 @@ func main() {
 
 {{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 {{- define "partial:handler" -}}
+
+{{- $prefix := indirect $.Extension.Prefix -}}
+
 var log *zap.Logger
 if context.Bool("DevMode"){
     log, _ = zap.NewDevelopment()
@@ -235,7 +277,6 @@ if context.Bool("DevMode"){
 }
 
 providedLevel:=context.String("LogLevel")
-
 level, err := zapcore.ParseLevel(providedLevel)
 if err != nil {
     log.Fatal("unsupported log level", zap.String("provided", providedLevel))
@@ -245,6 +286,24 @@ log = log.WithOptions(zap.IncreaseLevel(level))
 defer log.Sync()
 
 log.Info("starting server...")
+isHttps := context.Bool("HTTPS")
+host := context.String("Host")
+port := ":" + strconv.Itoa(context.Int("Port"))
+appPath := strings.Trim(context.String("AppPath"), "/" )
+isUnionServer := context.Bool("UnionServer")
+gqlURL := context.String("GraphqlURL")
+gqlURIPath := context.String("GraphqlURIPath")
+gqlPlaygroundURIPath := context.String("GraphqlPlaygroundURIPath")
+proto := "http://"
+appUrl := proto + "localhost" + port + "/" + appPath + "/"
+
+if isHttps {
+    proto = "https://"
+}
+
+if gqlURL == "" {
+    gqlURL += proto + host + port + gqlURIPath
+}
 
 start := time.Now()
 client, err := InitClient(context)
@@ -256,11 +315,6 @@ log.Info("ent client initialized", zap.Duration("duration", time.Since(start)))
 // Up MUX server
 mux := http.NewServeMux()
 
-srv := handler.NewDefaultServer(NewSchema(client))
-srv.Use(entgql.Transactioner{TxOpener: client})
-//srv.Use(&debug.Tracer{})
-mux.HandleFunc("/playground", playground.Handler("Example", "/query"))
-
 {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
 var(
     keycloakHost = context.String("KeycloakHost")
@@ -271,20 +325,30 @@ var(
 )
 {{- end }}
 
-mux.Handle("/query", ent.EntkitAuthMiddleware(
-	srv,
-    {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
-    keycloakHost,
-    keycloakRealm,
-    keycloakBackendClientID,
-    keycloakBackendClientSecret,
-	{{- end }}
-))
+log.Info("Union server", zap.Bool("enabled", isUnionServer), zap.String("graphql-url", gqlURL))
 
-mux.HandleFunc("/environment.json", func(writer http.ResponseWriter, request *http.Request) {
+if isUnionServer {
+    srv := handler.NewDefaultServer(NewSchema(client))
+    srv.Use(entgql.Transactioner{TxOpener: client})
+    //srv.Use(&debug.Tracer{})
+    mux.HandleFunc(gqlPlaygroundURIPath, playground.Handler("Example", gqlURIPath))
+
+    mux.Handle(gqlURIPath, ent.{{ $prefix | pascal }}AuthMiddleware(
+        srv,
+        {{- if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled }}
+        keycloakHost,
+        keycloakRealm,
+        keycloakBackendClientID,
+        keycloakBackendClientSecret,
+        {{- end }}
+    ))
+}
+
+mux.HandleFunc("/"+appPath+"/environment.json", func(writer http.ResponseWriter, request *http.Request) {
     b, _ := json.Marshal(entkit.Environment{
         Meta: map[string]any{{ $.Extension.Meta | toJson }},
-        GraphqlURL: context.String("GraphqlURL"),
+        GraphqlURL: gqlURL,
+		AppPath: "/"+appPath+"/",
 		{{- if $.Extension.Auth.Enabled }}
         Auth: &entkit.AuthEnvironment{
 			{{- if $.Extension.Auth.Keycloak.Enabled }}
@@ -301,17 +365,15 @@ mux.HandleFunc("/environment.json", func(writer http.ResponseWriter, request *ht
     writer.Write(b)
 })
 
-if os.Getenv("SKIP_EMBED_SERVER") != "true" {
-    mux.HandleFunc(
-		"/",
-		func (w http.ResponseWriter, r *http.Request) {
-            {{- (include "partial:staticHandler" $) | nindent 12 }}
-        },
-	)
-}
-host := context.String("Host")
-log.Info("server started", zap.String("address", host))
-if err := http.ListenAndServe(host, mux); err != nil {
+mux.HandleFunc(
+    "/"+appPath+"/",
+    func (w http.ResponseWriter, r *http.Request) {
+        {{- (include "partial:staticHandler" $) | nindent 12 }}
+    },
+)
+
+log.Info("server started", zap.String("address", appUrl))
+if err := http.ListenAndServe(port, mux); err != nil {
     log.Fatal("server failed", zap.String("reason", err.Error()))
 }
 
@@ -327,10 +389,20 @@ start := time.Now()
 log.Debug("request starts", zap.String("path", r.URL.Path), zap.Time("time", start))
 
 path := filepath.Clean(r.URL.Path)
-path = strings.TrimPrefix(path, "/")
+path = strings.TrimPrefix(path, "/"+appPath+"/")
 
-rePattern := `{{ join $.ServableAdapter.StaticPaths "|" }}`
-isStaticPath, _ := regexp.MatchString(rePattern, path)
+staticPaths := []string{
+{{- range $s := $.ServableAdapter.StaticPaths -}}
+    "{{ $s | trimAll "|" }}",
+{{- end -}}
+}
+isStaticPath := false
+for _, v := range staticPaths {
+    if path == v || strings.HasPrefix(path, v+"/"){
+        isStaticPath = true
+		continue
+    }
+}
 
 if isStaticPath {
     w.Header().Set("Cache-Control", "public, max-age=31536000")
@@ -353,12 +425,31 @@ if err != nil {
 contentType := mime.TypeByExtension(filepath.Ext(path))
 w.Header().Set("Content-Type", contentType)
 
-stat, err := file.Stat()
-if err == nil && stat.Size() > 0 {
-    w.Header().Set("Content-Length", fmt.Sprintf("%d", stat.Size()))
+
+
+var n int64
+if path == "{{$.ServableAdapter.RewritePath}}" {
+    buf := new(strings.Builder)
+    _, err := io.Copy(buf, file)
+    if err != nil {
+        panic(err)
+    }
+    // check errors
+    newStr := strings.Replace(buf.String(), "%PUBLIC_URL%", "/"+appPath+"/", -1)
+    for _, sp := range staticPaths {
+        newStr = strings.Replace(newStr, "/"+sp, "/"+appPath+"/" + sp, -1)
+    }
+    r := strings.NewReader(newStr)
+    w.Header().Set("Content-Length", fmt.Sprintf("%d", r.Size()))
+    n, _ = io.Copy(w, r)
+} else {
+    stat, err := file.Stat()
+    if err == nil && stat.Size() > 0 {
+        w.Header().Set("Content-Length", fmt.Sprintf("%d", stat.Size()))
+    }
+    n, _ = io.Copy(w, file)
 }
 
-n, _ := io.Copy(w, file)
 log.Debug("serving file", zap.String("path", path), zap.Int64("bytes", n))
 log.Info("request handled", zap.String("path", r.URL.Path), zap.Duration("duration", time.Since(start)))
 {{- end -}}
