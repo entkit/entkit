@@ -16,7 +16,7 @@ services:
     volumes: [ {{ print (indirect $g.Name) "-runtime" | snakecase }}:/app/runtime ]
     profiles: [ "app" ]
     ports:
-      - "{{add 8080 $i}}:80"
+      - "{{add 8081 $i}}:80"
   {{- end -}}
   {{- end -}}
   {{ if and $.Extension.Auth.Enabled $.Extension.Auth.Keycloak.Enabled}}
@@ -26,7 +26,6 @@ services:
     volumes:
         - keycloak_data:/opt/keycloak/data/
     environment:
-        PROXY_ADDRESS_FORWARDING: true
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
     ports:

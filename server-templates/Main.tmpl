@@ -290,12 +290,17 @@ isHttps := context.Bool("HTTPS")
 host := context.String("Host")
 port := ":" + strconv.Itoa(context.Int("Port"))
 appPath := strings.Trim(context.String("AppPath"), "/" )
+if appPath == ""{
+	appPath = "/"
+} else{
+	appPath = "/" + appPath + "/"
+}
 isUnionServer := context.Bool("UnionServer")
 gqlURL := context.String("GraphqlURL")
 gqlURIPath := context.String("GraphqlURIPath")
 gqlPlaygroundURIPath := context.String("GraphqlPlaygroundURIPath")
 proto := "http://"
-appUrl := proto + "localhost" + port + "/" + appPath + "/"
+appUrl := proto + "localhost" + port + appPath
 
 if isHttps {
     proto = "https://"
@@ -344,11 +349,11 @@ if isUnionServer {
     ))
 }
 
-mux.HandleFunc("/"+appPath+"/environment.json", func(writer http.ResponseWriter, request *http.Request) {
+mux.HandleFunc(appPath+"environment.json", func(writer http.ResponseWriter, request *http.Request) {
     b, _ := json.Marshal(entkit.Environment{
         Meta: map[string]any{{ $.Extension.Meta | toJson }},
         GraphqlURL: gqlURL,
-		AppPath: "/"+appPath+"/",
+		AppPath: appPath,
 		{{- if $.Extension.Auth.Enabled }}
         Auth: &entkit.AuthEnvironment{
 			{{- if $.Extension.Auth.Keycloak.Enabled }}
@@ -366,7 +371,7 @@ mux.HandleFunc("/"+appPath+"/environment.json", func(writer http.ResponseWriter,
 })
 
 mux.HandleFunc(
-    "/"+appPath+"/",
+    appPath,
     func (w http.ResponseWriter, r *http.Request) {
         {{- (include "partial:staticHandler" $) | nindent 12 }}
     },
@@ -389,7 +394,7 @@ start := time.Now()
 log.Debug("request starts", zap.String("path", r.URL.Path), zap.Time("time", start))
 
 path := filepath.Clean(r.URL.Path)
-path = strings.TrimPrefix(path, "/"+appPath+"/")
+path = strings.TrimPrefix(path, appPath)
 
 staticPaths := []string{
 {{- range $s := $.ServableAdapter.StaticPaths -}}
@@ -434,10 +439,9 @@ if path == "{{$.ServableAdapter.RewritePath}}" {
     if err != nil {
         panic(err)
     }
-    // check errors
-    newStr := strings.Replace(buf.String(), "%PUBLIC_URL%", "/"+appPath+"/", -1)
+    newStr := strings.Replace(buf.String(), "%PUBLIC_URL%", appPath, -1)
     for _, sp := range staticPaths {
-        newStr = strings.Replace(newStr, "/"+sp, "/"+appPath+"/" + sp, -1)
+        newStr = strings.Replace(newStr, "/"+sp, appPath + sp, -1)
     }
     r := strings.NewReader(newStr)
     w.Header().Set("Content-Length", fmt.Sprintf("%d", r.Size()))

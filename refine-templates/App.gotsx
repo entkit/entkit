@@ -41,6 +41,9 @@ function App() {
     if (!initialized) {
         return <div>Loading...</div>;
     }
+    const loginUrl = window.environment.appPath + "login";
+    const appUrl = window.location.origin + window.environment.appPath;
+
     const authProvider: AuthBindings = {
         login: async () => {
             const urlSearchParams = new URLSearchParams(window.location.search);
@@ -57,11 +60,11 @@ function App() {
         logout: async () => {
             try {
                 await keycloak.logout({
-                    redirectUri: window.location.origin,
+                    redirectUri: appUrl,
                 });
                 return {
                     success: true,
-                    redirectTo: "/login",
+                    redirectTo: loginUrl,
                 };
             } catch (error) {
                 return {
@@ -86,7 +89,7 @@ function App() {
                     return {
                         authenticated: false,
                         logout: true,
-                        redirectTo: "/login",
+                        redirectTo: loginUrl,
                         error: new Error("Token not found"),
                     };
                 }
@@ -94,7 +97,7 @@ function App() {
                 return {
                     authenticated: false,
                     logout: true,
-                    redirectTo: "/login",
+                    redirectTo: loginUrl,
                     error: new Error("Token not found"),
                 };
             }
