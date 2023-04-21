@@ -11,13 +11,11 @@ A Comprehensive Solution for Building Data-Driven Applications with Ease and Eff
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/entkit/entkit)
 [![GitHub license](https://img.shields.io/github/license/entkit/entkit)](https://github.com/entkit/entkit)
 
-* [Documentation](https://entkit.com/docs/get-started/introduction)
+[Documentation](https://entkit.com/docs/get-started/introduction) | [Example project](https://github.com/entkit/entkit-demo) | [Live demo](https://demo-refine-project.entkit.com)
 
-* [Example project](https://github.com/entkit/entkit-demo)
-
-* [Live demo](https://demo-refine-project.entkit.com)
-  - username: `entuser`
-  - password: `entuser`
+>Live demo credentials
+>  - username: `entuser`
+>  - password: `entuser`
 
 ![logo-color.svg](docs%2Flogo-color.svg)
 
