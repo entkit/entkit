@@ -184,34 +184,6 @@ func ActionDisplayOn(actionNames ...string) ActionOption {
 	}
 }
 
-func ActionDisplayOnList(display bool) ActionOption {
-	return func(ac *Action) (err error) {
-		ac.OnList = BoolP(display)
-		return nil
-	}
-}
-
-func ActionDisplayOnEdit(display bool) ActionOption {
-	return func(ac *Action) (err error) {
-		ac.OnEdit = BoolP(display)
-		return nil
-	}
-}
-
-func ActionDisplayOnShow(display bool) ActionOption {
-	return func(ac *Action) (err error) {
-		ac.OnShow = BoolP(display)
-		return nil
-	}
-}
-
-func ActionDisplayOnCreate(display bool) ActionOption {
-	return func(ac *Action) (err error) {
-		ac.OnCreate = BoolP(display)
-		return nil
-	}
-}
-
 func ActionAsGeneral() ActionOption {
 	return func(ac *Action) (err error) {
 		ac.General = BoolP(true)
