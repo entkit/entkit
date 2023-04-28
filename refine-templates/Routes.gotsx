@@ -5,10 +5,14 @@
 {{- $.Extension.FileHeader | ER_replace "^" "//" }}
 
 import React from "react";
+
+// Components imports
 import * as List from "./list";
 import * as Show from "./show";
 import * as Create from "./create";
 import * as Edit from "./edit";
+import * as EdgesDiagram from "./edges-diagram";
+
 import { Login } from "./login";
 import { Header } from "./header";
 import { Authenticated} from "@refinedev/core";

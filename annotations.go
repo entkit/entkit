@@ -28,27 +28,25 @@ type EntkitAnnotation struct {
 	CodeField      *CodeFieldOptions `json:"CodeField,omitempty"`      // Mark field as code field
 	URLField       bool              `json:"URLField,omitempty"`       // Mark field as url field
 	RichTextField  bool              `json:"RichTextField,omitempty"`  // Mark field as rich text field
-	HideOnList     bool              `json:"HideOnList,omitempty"`
-	HideOnShow     bool              `json:"HideOnShow,omitempty"`
-	HideOnForm     bool              `json:"HideOnForm,omitempty"`
-	HideOnCreate   bool              `json:"HideOnCreate,omitempty"`
-	HideOnUpdate   bool              `json:"HideOnUpdate,omitempty"`
-	FilterOperator *string           `json:"FilterOperator,omitempty"`
-	Icon           *string           `json:"Icon,omitempty"`
-	Label          *string           `json:"Label,omitempty"`
-	Description    *string           `json:"Description,omitempty"`
-	Prefix         *string           `json:"Prefix,omitempty"`
-	Suffix         *string           `json:"Suffix,omitempty"`
-	Actions        []*Action         `json:"Actions,omitempty"`
-	View           *string           `json:"View,omitempty"`
-
-	Route      *string `json:"Route,omitempty"`
-	IndexRoute bool    `json:"IndexRoute,omitempty"`
-
-	ViewOnShow *string `json:"ViewOnShow,omitempty"`
-	ViewOnList *string `json:"ViewOnList,omitempty"`
-	ViewOnForm *string `json:"ViewOnForm,omitempty"`
-	Badge      *string `json:"Badge,omitempty"`
+	HideOnList     bool              `json:"HideOnList,omitempty"`     // Hide field on list
+	HideOnShow     bool              `json:"HideOnShow,omitempty"`     // Hide field on show
+	HideOnForm     bool              `json:"HideOnForm,omitempty"`     // Hide field on all forms
+	HideOnCreate   bool              `json:"HideOnCreate,omitempty"`   // Hide field on create form
+	HideOnUpdate   bool              `json:"HideOnUpdate,omitempty"`   // Hide field on update form
+	FilterOperator *string           `json:"FilterOperator,omitempty"` // Set filter operator for field `gen.Op`
+	Icon           *string           `json:"Icon,omitempty"`           // Set entity or field icon
+	Label          *string           `json:"Label,omitempty"`          // Set label for entity or field
+	Description    *string           `json:"Description,omitempty"`    // Set description for entity or field
+	Prefix         *string           `json:"Prefix,omitempty"`         // Set prefix on field: TODO
+	Suffix         *string           `json:"Suffix,omitempty"`         // Set suffix on field: TODO
+	Actions        []*Action         `json:"Actions,omitempty"`        // Set entity related actions
+	View           *string           `json:"View,omitempty"`           // Set view for field
+	Route          *string           `json:"Route,omitempty"`          // Set root Route for entity
+	IndexRoute     bool              `json:"IndexRoute,omitempty"`     // Mark entity as index route
+	ViewOnShow     *string           `json:"ViewOnShow,omitempty"`     // Set a view of entity on show
+	ViewOnList     *string           `json:"ViewOnList,omitempty"`     // Set a view of entity on list
+	ViewOnForm     *string           `json:"ViewOnForm,omitempty"`     // Set a view on entity on form
+	Badge          *string           `json:"Badge,omitempty"`          // Set a badge view
 
 	EdgesDiagram *string `json:"EdgesDiagram,omitempty"`
 }

@@ -80,6 +80,7 @@ func (r Refine) GetTemplates() []string {
 		"refine-templates/Form.gotsx",
 		"refine-templates/Table.gotsx",
 		"refine-templates/List.gotsx",
+		"refine-templates/EdgesDiagram.gotsx",
 		"refine-templates/Routes.gotsx",
 		"refine-templates/DataProvider.gots",
 		"refine-templates/SearchComponent.gotsx",

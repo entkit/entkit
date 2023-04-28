@@ -18,8 +18,9 @@ type Action struct {
 	OnShow          *bool           `json:"OnShow,omitempty"`          // Display on show
 	OnEdit          *bool           `json:"OnEdit,omitempty"`          // Display on edit
 	OnCreate        *bool           `json:"OnCreate,omitempty"`        // Display on edit
-	Route           *Route          `json:"Route,omitempty"`           // Route of action
-	Operation       *Operation      `json:"Operation,omitempty"`       // Operation of action
+	DisplayOn       []string        `json:"DisplayOn,omitempty"`
+	Route           *Route          `json:"Route,omitempty"`     // Route of action
+	Operation       *Operation      `json:"Operation,omitempty"` // Operation of action
 }
 
 var (
@@ -30,8 +31,7 @@ var (
 		ActionWithLabel("List"),
 		ActionWithScope(ActionReadScope),
 		ActionWithIcon("AntdIcons.UnorderedListOutlined"),
-		ActionDisplayOnList(false),
-		ActionDisplayOnShow(true),
+		ActionDisplayOn("show", "edgesDiagram"),
 		ActionWithRoute(NewRoute("/", "List.{name}List", RouteAsIndex())),
 	)
 	// EditAction standard edit action
@@ -41,9 +41,7 @@ var (
 		ActionWithScope(ActionUpdateScope),
 		ActionWithRoute(NewRoute("edit/:id", "Edit.{name}Edit")),
 		ActionWithIcon("AntdIcons.EditOutlined"),
-		ActionDisplayOnList(true),
-		ActionDisplayOnShow(true),
-		ActionDisplayOnEdit(false),
+		ActionDisplayOn("list", "show", "edgesDiagram"),
 	)
 	// CreateAction standard create action
 	CreateAction = NewAction(
@@ -53,9 +51,7 @@ var (
 		ActionWithScope(ActionCreateScope),
 		ActionWithIcon("AntdIcons.PlusCircleOutlined"),
 		ActionWithRoute(NewRoute("create", "Create.{name}Create")),
-		ActionDisplayOnList(true),
-		ActionDisplayOnShow(false),
-		ActionDisplayOnEdit(false),
+		ActionDisplayOn("list"),
 	)
 	// ShowAction standard show action
 	ShowAction = NewAction(
@@ -64,8 +60,7 @@ var (
 		ActionWithScope(ActionReadScope),
 		ActionWithIcon("AntdIcons.EyeOutlined"),
 		ActionWithRoute(NewRoute("show/:id", "Show.{name}MainShow")),
-		ActionDisplayOnList(true),
-		ActionDisplayOnEdit(true),
+		ActionDisplayOn("list", "edit", "edgesDiagram"),
 	)
 	// DeleteAction standard delete action
 	DeleteAction = NewAction(
@@ -76,14 +71,21 @@ var (
 		ActionWithProps(map[string]any{
 			"danger": true,
 		}),
-		ActionDisplayOnShow(true),
-		ActionDisplayOnList(true),
-		ActionDisplayOnEdit(false),
+		ActionDisplayOn("list", "show", "edgesDiagram"),
 		ActionWithOperation(NewOperation(
 			"delete",
 			OperationAsBulk(),
 			OperationAsMutation(),
 		)),
+	)
+	// EdgesDiagramAction edges diagram action (optional)
+	EdgesDiagramAction = NewAction(
+		"edgesDiagram",
+		ActionWithLabel("Edges Diagram"),
+		ActionWithScope(ActionReadScope),
+		ActionWithIcon("AntdIcons.EyeOutlined"),
+		ActionWithRoute(NewRoute("edges/:id", "EdgesDiagram.{name}EdgesDiagram")),
+		ActionDisplayOn("show", "edit"),
 	)
 	DefaultActions = []*Action{
 		ShowAction, ListAction, CreateAction, EditAction, DeleteAction,
@@ -171,6 +173,13 @@ func ActionWithProps(props map[string]any) ActionOption {
 func WithCustomComponent(component string) ActionOption {
 	return func(ac *Action) (err error) {
 		ac.CustomComponent = StringP(component)
+		return nil
+	}
+}
+
+func ActionDisplayOn(actionNames ...string) ActionOption {
+	return func(ac *Action) (err error) {
+		ac.DisplayOn = actionNames
 		return nil
 	}
 }

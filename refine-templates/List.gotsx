@@ -41,7 +41,7 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
             {selectedRowKeys.length ? <>
                 {{- range $a := $n.Annotations.ENTKIT.Actions }}
                 {{- if not (empty $a.Operation) }}
-                {{- if and (not $a.General) $a.OnList $a.Operation.Bulk }}
+                {{- if and (not $a.General) (has "list" $a.DisplayOn) $a.Operation.Bulk }}
                 {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
                 <Action.{{ $aName }}
                     key="{{$aName}}"

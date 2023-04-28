@@ -76,110 +76,51 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
     const { data, isLoading } = queryResult;
     const record = data?.data
 
-    const [edgesDiagram, setEdgesDiagram] = useState(false)
-
     if(!record){
         return <></>
     }
 
-    const nodes: Array<Diagram.Node|undefined> =  [
-            {
-                id: record.{{$n.ID.Name}},
-                label: record.{{$n.ID.Name}},
-                {{/*color: "#dddddd"*/}}
-            },
-            {{- range $e := $n.EdgesWithID }}
-            {{- $titleField := (ER_titleField $e.Type) }}
-            {{- if $e.Unique }}
-            record.{{ camel $e.Name }} ? {
-                id: record.{{ camel $e.Name }}.id || "n/a",
-                label: record.{{ camel $e.Name }}.id ||"n/a",
-            } : undefined,
-            {{- else }}
-            ...(record.{{ camel $e.Name }} || []).map((i)=>{
-                return {
-                    id: i.{{$e.Type.ID.Name}},
-                    label: i.{{$e.Type.ID.Name}},
-                }
-            }),
-            Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
-                ? {
-                    id: "{{ $e.Type.Name }}_more",
-                    label: `More ${Number(record._{{ camel $e.Name }}?.totalCount) - Number(record.{{ camel $e.Name }}?.length)}`
-                }
-                : undefined,
-            {{- end }}
-            {{- end }}
-        ];
-    const links:Array<Diagram.Link|undefined> = [
-            {{- range $e := $n.EdgesWithID }}
-            {{- if $e.Unique }}
-            record.{{ camel $e.Name }} ? {
-                source: record.{{$n.ID.Name}},
-                target: record.{{ camel $e.Name }}?.id || "n/a",
-                label: "{{ ER_label $e.Name }}"
-            } : undefined,
-            {{- else }}
-            ...(record.{{ camel $e.Name }} || []).map((i)=>{
-                return {
-                    source: record.{{$n.ID.Name}},
-                    target: i.{{$e.Type.ID.Name}},
-                    label: "{{ER_label $e.Name }}"
-                }
-            }),
-            Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
-            ? {
-                source: record.{{$n.ID.Name}},
-                target: "{{$e.Type.Name}}_more",
-                label: "{{ER_label $e.Name }}"
-            }
-            : undefined,
-            {{- end }}
-            {{- end }}
-        ]
-
     return (
-        <RA.Show isLoading={isLoading}
-                 headerButtons={({ defaultButtons }) => (
-                     <>
-                     {{/*{defaultButtons}*/}}
-                     <Antd.Button icon={<AntdIcons.ClusterOutlined />} type="primary" onClick={ ()=>{ setEdgesDiagram(!edgesDiagram) } }>Edges Diagram</Antd.Button>
-                     {{- range $a := $n.Annotations.ENTKIT.Actions }}
-                     {{ if $a.OnShow }}
-                     <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
-                     {{- end }}
-                     {{- end }}
-                     </>
-                 )}
-                 {...showProps}
+        <RA.Show
+            isLoading={isLoading}
+            headerButtons={() => (
+                 <>
+                 {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                 {{ if has "show" $a.DisplayOn }}
+                 <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                 {{- end }}
+                 {{- end }}
+                 </>
+            )}
+            {...showProps}
         >
-            {!edgesDiagram ? <>
-                {{- range $f := $allFields}}
-                <Antd.Typography.Title level={5}>{{ $f.Name | ER_label }}</Antd.Typography.Title>
-                {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
-                {{- if not (empty $f.Annotations.ENTKIT.ViewOnShow) }}
-                {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnShow }}
-                {{- end}}
-                <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
-                {{- end }}
 
-                {withEdges ? <>
-                    <Antd.Typography.Title level={3}>Edges</Antd.Typography.Title>
-                    <Antd.Descriptions>
-                        {{- range $e := $n.EdgesWithID }}
-                        {{- $titleField := (ER_titleField $e.Type) }}
-                        {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
-                        {{- end}}
-                        {{- if $e.Unique }}
-                        <Antd.Descriptions.Item label="{{ $e.Name | ER_label }}">
-                            <{{$viewName}} { ...record?.{{ camel $e.Name }} } />
-                        </Antd.Descriptions.Item>
-                        {{- end}}
-                        {{- end}}
-                    </Antd.Descriptions>
-                    <Antd.Tabs
+            {{- range $f := $allFields}}
+            <Antd.Typography.Title level={5}>{{ $f.Name | ER_label }}</Antd.Typography.Title>
+            {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
+            {{- if not (empty $f.Annotations.ENTKIT.ViewOnShow) }}
+            {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnShow }}
+            {{- end}}
+            <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
+            {{- end }}
+
+            {withEdges ? <>
+                <Antd.Typography.Title level={3}>Edges</Antd.Typography.Title>
+                <Antd.Descriptions>
+                    {{- range $e := $n.EdgesWithID }}
+                    {{- $titleField := (ER_titleField $e.Type) }}
+                    {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
+                    {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
+                    {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
+                    {{- end}}
+                    {{- if $e.Unique }}
+                    <Antd.Descriptions.Item label="{{ $e.Name | ER_label }}">
+                        <{{$viewName}} { ...record?.{{ camel $e.Name }} } />
+                    </Antd.Descriptions.Item>
+                    {{- end}}
+                    {{- end}}
+                </Antd.Descriptions>
+                <Antd.Tabs
                     defaultActiveKey="0"
                     items={[
                         {{- range $i, $e := $n.EdgesWithID }}
@@ -212,16 +153,7 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
                     ]}
                 />
 
-                </> : null }
             </> : null }
-
-            { edgesDiagram ?
-                {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTKIT.EdgesDiagram }}
-                <{{$diagramView}}
-                    nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
-                    links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
-                />
-            : null }
 
         </RA.Show>
     )

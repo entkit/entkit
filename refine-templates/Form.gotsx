@@ -12,6 +12,7 @@ import {Cursors} from "./data-provider";
 import dayjs from "dayjs";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import * as View from "./view";
+import * as Action from "./action";
 import * as Custom from "./custom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -99,7 +100,8 @@ export const {{$n.Name}}Edit: React.FC = () => {
             redirect: false,
             metaData: {
                 fields: [
-                    {{- range $f := $n.Fields}}
+                    {{- $allFields := append $n.Fields $n.ID}}
+                    {{- range $f := $allFields}}
                     {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
                     {{- if not $f.Annotations.ENTKIT.HideOnForm }}
                     {{- if not $f.Annotations.ENTKIT.HideOnEdit }}
@@ -136,8 +138,20 @@ export const {{$n.Name}}Edit: React.FC = () => {
 
     {{- (include "partial:selectProps" $n) | nindent 4 }}
 
+    const id = queryResult?.data?.data.id;
     return (
-        <RA.Edit saveButtonProps={saveButtonProps}>
+        <RA.Edit
+            saveButtonProps={saveButtonProps}
+            headerButtons={() => (
+                <>
+                    {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                    {{ if has "edit" $a.DisplayOn }}
+                    <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ id ? [id] : [] }/>
+                    {{- end }}
+                    {{- end }}
+                </>
+            )}
+        >
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
@@ -170,7 +184,18 @@ export const {{$n.Name}}Create: React.FC = () => {
     {{- (include "partial:selectProps" $n) | nindent 4 }}
 
     return (
-        <RA.Create saveButtonProps={saveButtonProps}>
+        <RA.Create
+            saveButtonProps={saveButtonProps}
+            headerButtons={() => (
+               <>
+                   {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                   {{ if has "create" $a.DisplayOn }}
+                   <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [] }/>
+                   {{- end }}
+                   {{- end }}
+               </>
+            )}
+        >
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}

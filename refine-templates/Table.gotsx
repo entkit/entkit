@@ -175,7 +175,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     render={(_, record) => (
                         <Antd.Space>
                             {{- range $a := $n.Annotations.ENTKIT.Actions }}
-                            {{- if and (not $a.General) $a.OnList }}
+                            {{- if and (not $a.General) (has "list" $a.DisplayOn) }}
                             <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }}
                                 recordItemIDs={ [record.id] }
                                 size="small"
