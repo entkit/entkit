@@ -83,7 +83,7 @@ var (
 		"edgesDiagram",
 		ActionWithLabel("Edges Diagram"),
 		ActionWithScope(ActionReadScope),
-		ActionWithIcon("AntdIcons.EyeOutlined"),
+		ActionWithIcon("AntdIcons.ClusterOutlined"),
 		ActionWithRoute(NewRoute("edges/:id", "EdgesDiagram.{name}EdgesDiagram")),
 		ActionDisplayOn("show", "edit"),
 	)
