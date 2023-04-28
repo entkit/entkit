@@ -1,0 +1,163 @@
+{{- define "src/edges-diagram.tsx" -}}
+{{- $.Extension.FileHeader | ER_replace "^" "//" }}
+
+{{- $prefix := $.Extension.Prefix }}
+
+import React, {useState} from "react";
+import { useParams } from "react-router-dom";
+
+import * as Type from "./typedefs";
+import * as Diagram from "./diagram";
+import * as Action from "./action";
+
+import * as RA from "@refinedev/antd";
+import { useShow } from "@refinedev/core";
+{{- if $.Extension.Auth.Enabled }}
+import { usePermissions } from "@refinedev/core";
+{{- end }}
+
+{{ range $n := $.Graph.Nodes -}}
+{{- $titleField := (ER_titleField $n) }}
+{{- $allFields := prepend $n.Fields $n.ID }}
+
+export type {{$n.Name}}EdgesDiagramProps = {
+    id?: Type.{{$prefix}}ID,
+} & RA.ShowProps
+export const {{$n.Name}}EdgesDiagram :React.FC<{{$n.Name}}EdgesDiagramProps> = ({id, ...showProps} ) => {
+
+    const routeParams = useParams();
+    if (!id){
+        id = routeParams.id
+    }
+
+    const { queryResult } = useShow<Type.{{ ER_prepareName $n.Name }}Interface>({
+        resource: "{{ $n.Name | kebabcase }}",
+        id,
+        metaData: {
+            fields: [
+                {{- range $f :=  $allFields }}
+                "{{ $f.Name | camel }}",
+                {{- end -}}
+
+                {{- range $e := $n.EdgesWithID }}
+                {{- $edgeAllFields := prepend $e.Type.Fields $e.Type.ID }}
+                {{- if $e.Unique }}
+                {
+                    "{{ camel $e.Name }}": [
+                        {{- range $f :=  $edgeAllFields}}
+                        "{{ $f.Name | camel }}",
+                        {{- end }}
+                    ]
+                },
+                {{- else }}
+                {
+                    operation: "{{ $e.Name | camel }}",
+                    fields: [
+                        {
+                            edges: [
+                                {
+                                    node: [
+                                        {{- range $f :=  $edgeAllFields}}
+                                        "{{ $f.Name | camel }}",
+                                        {{- end }}
+                                    ]
+                                },
+                            ],
+                        },
+                        "totalCount",
+                    ],
+                    variables: {
+                        first: 10
+                    }
+                },
+                {{- end }}
+                {{- end }}
+            ],
+        },
+    });
+    const { data, isLoading } = queryResult;
+    const record = data?.data
+    if(!record){
+        return <></>
+    }
+
+    const nodes: Array<Diagram.Node|undefined> =  [
+        {
+            id: record.{{$n.ID.Name}},
+            label: record.{{$n.ID.Name}},
+            {{/*color: "#dddddd"*/}}
+        },
+        {{- range $e := $n.EdgesWithID }}
+        {{- $titleField := (ER_titleField $e.Type) }}
+        {{- if $e.Unique }}
+        record.{{ camel $e.Name }} ? {
+            id: record.{{ camel $e.Name }}.id || "n/a",
+            label: record.{{ camel $e.Name }}.id ||"n/a",
+        } : undefined,
+        {{- else }}
+        ...(record.{{ camel $e.Name }} || []).map((i)=>{
+            return {
+                id: i.{{$e.Type.ID.Name}},
+                label: i.{{$e.Type.ID.Name}},
+            }
+        }),
+        Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
+            ? {
+                id: "{{ $e.Type.Name }}_more",
+                label: `More ${Number(record._{{ camel $e.Name }}?.totalCount) - Number(record.{{ camel $e.Name }}?.length)}`
+            }
+            : undefined,
+        {{- end }}
+        {{- end }}
+    ];
+    const links:Array<Diagram.Link|undefined> = [
+        {{- range $e := $n.EdgesWithID }}
+        {{- if $e.Unique }}
+        record.{{ camel $e.Name }} ? {
+            source: record.{{$n.ID.Name}},
+            target: record.{{ camel $e.Name }}?.id || "n/a",
+            label: "{{ ER_label $e.Name }}"
+        } : undefined,
+        {{- else }}
+        ...(record.{{ camel $e.Name }} || []).map((i)=>{
+            return {
+                source: record.{{$n.ID.Name}},
+                target: i.{{$e.Type.ID.Name}},
+                label: "{{ER_label $e.Name }}"
+            }
+        }),
+        Number(record._{{ camel $e.Name }}?.totalCount) > Number(record.{{ camel $e.Name }}?.length)
+            ? {
+                source: record.{{$n.ID.Name}},
+                target: "{{$e.Type.Name}}_more",
+                label: "{{ER_label $e.Name }}"
+            }
+            : undefined,
+        {{- end }}
+        {{- end }}
+    ]
+
+    return (
+        <RA.Show isLoading={isLoading}
+                 headerButtons={() => (
+                     <>
+                         {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                         {{ if has "edgesDiagram" $a.DisplayOn }}
+                         <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                         {{- end }}
+                         {{- end }}
+                     </>
+                 )}
+                 {...showProps}
+        >
+            {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTKIT.EdgesDiagram }}
+            <{{$diagramView}}
+                nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
+                links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }
+            />
+        </RA.Show>
+    )
+}
+
+{{ end -}}
+{{- end -}}
