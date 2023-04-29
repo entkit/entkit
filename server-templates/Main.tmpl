@@ -17,6 +17,8 @@ import (
     "github.com/99designs/gqlgen/graphql/playground"
     "github.com/urfave/cli/v2"
     "io"
+	"bytes"
+	"regexp"
     "mime"
     "net/http"
     "path/filepath"
@@ -382,27 +384,6 @@ if gqlPlaygroundServerEnabled{
 }
 
 if appServerEnabled {
-    mux.HandleFunc(appPath+"environment.json", func(writer http.ResponseWriter, request *http.Request) {
-        b, _ := json.Marshal(entkit.Environment{
-            Meta: map[string]any{{ $.Extension.Meta | toJson }},
-            GraphqlURL: gqlURL,
-            AppPath: appPath,
-            {{- if $.Extension.Auth.Enabled }}
-            Auth: &entkit.AuthEnvironment{
-                {{- if $.Extension.Auth.Keycloak.Enabled }}
-                Keycloak: &entkit.KeycloakEnvironment{
-                    URL:             keycloakHost,
-                    Realm:           keycloakRealm,
-                    ClientID:        keycloakFrontendClientID,
-                    BackendClientID: keycloakBackendClientID,
-                },
-                {{- end}}
-            },
-            {{- end }}
-        })
-        writer.Write(b)
-    })
-
     mux.HandleFunc(
         appPath,
         func (w http.ResponseWriter, r *http.Request) {
@@ -466,15 +447,31 @@ w.Header().Set("Content-Type", contentType)
 
 var n int64
 if path == "{{$.ServableAdapter.RewritePath}}" {
-    buf := new(strings.Builder)
+    b, _ := json.Marshal(entkit.Environment{
+        Meta:       map[string]any{},
+        GraphqlURL: gqlURL,
+        AppPath:    appPath,
+        Auth: &entkit.AuthEnvironment{
+            Keycloak: &entkit.KeycloakEnvironment{
+                URL:             keycloakHost,
+                Realm:           keycloakRealm,
+                ClientID:        keycloakFrontendClientID,
+                BackendClientID: keycloakBackendClientID,
+            },
+        },
+    })
+    buf := new(bytes.Buffer)
     _, err := io.Copy(buf, file)
     if err != nil {
         panic(err)
     }
-    newStr := strings.Replace(buf.String(), "%PUBLIC_URL%", appPath, -1)
+    newStr := buf.String()
     for _, sp := range staticPaths {
         newStr = strings.Replace(newStr, "/"+sp, appPath + sp, -1)
     }
+    re := regexp.MustCompile("(<script data-name=\"environment\">window.environment=).*?(</script>)")
+    newStr = re.ReplaceAllString(newStr, "$1"+string(b)+"$2")
+
     r := strings.NewReader(newStr)
     w.Header().Set("Content-Length", fmt.Sprintf("%d", r.Size()))
     n, _ = io.Copy(w, r)
