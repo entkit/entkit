@@ -50,11 +50,13 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
 {{- end}}
 {{- end -}}
 
+
 {{- define "partial:fieldInput" -}}
+{{- /* gotype: entgo.io/ent/entc/gen.Field */ -}}
 <Antd.Form.Item
     name="{{ camel .Name }}"
     label="{{ .Name | ER_label }}"
-    rules={[{required: {{ not .Optional }}}]}
+    rules={[{required: {{ and (not .Optional) (not .Default) }}}]}
     {{- if .IsTime }}
     getValueProps={(value) => ({
         value: value ? dayjs(value) : "",
