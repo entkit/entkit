@@ -25,16 +25,15 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
     const can = true;
     {{- end }}
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState<Type.{{ $prefix }}ID[]>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const rowSelection = {selectedRowKeys, onChange: setSelectedRowKeys};
 
-    return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={({ defaultButtons }) => (
+    return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={() => (
         <>
-            {{/*{defaultButtons}*/}}
             {{- range $a := $n.Annotations.ENTKIT.Actions }}
             {{- if $a.General }}
             {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
-            <Action.{{ $aName }} key="{{$aName}}" recordItemIDs={ selectedRowKeys }/>
+            <Action.{{ $aName }} key="{{$aName}}" recordItemIDs={ selectedRowKeys as Type.{{ ER_fieldTSType $n.ID }}[]}/>
             {{- end }}
             {{- end }}
 
@@ -45,7 +44,7 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
                 {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
                 <Action.{{ $aName }}
                     key="{{$aName}}"
-                    recordItemIDs={ selectedRowKeys }
+                    recordItemIDs={ selectedRowKeys as Type.{{ ER_fieldTSType $n.ID }}[]}
                     onSuccess={ ()=>setSelectedRowKeys([]) }
                 />
                 {{- end }}

@@ -21,7 +21,7 @@ import { usePermissions } from "@refinedev/core";
 {{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}EdgesDiagramProps = {
-    id?: Type.{{$prefix}}ID,
+    id?: Type.{{ ER_fieldTSType $n.ID }},
 } & RA.ShowProps
 export const {{$n.Name}}EdgesDiagram :React.FC<{{$n.Name}}EdgesDiagramProps> = ({id, ...showProps} ) => {
 
