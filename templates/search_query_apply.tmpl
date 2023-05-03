@@ -29,7 +29,7 @@ import (
 		{{- range $f := $allFields }}
 		{{- $fAnts := ER_fieldConfig $f }}
 		{{- $operator := "EQ" }}
-		{{- if not (isNil $fAnts.FilterOperator)}}
+		{{- if not (isNil $fAnts.FilterOperator) }}
 		{{ $operator = indirect $fAnts.FilterOperator }}
 		{{- end}}
 		{{- if $f.IsUUID }}
