@@ -12,7 +12,7 @@ A Comprehensive Solution for Building Data-Driven Applications with Ease and Eff
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/entkit/entkit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/entkit/entkit/v2)](https://goreportcard.com/report/github.com/entkit/entkit/v2)
 
-[Documentation](https://entkit.com/docs/get-started/introduction) | [Example project](https://github.com/entkit/entkit-demo) | [Live demo](https://demo-refine-project.entkit.com)
+[Documentation](https://entkit.com/docs/get-started/introduction) | [GoDoc](https://pkg.go.dev/github.com/entkit/entkit/v2) | [Example project](https://github.com/entkit/entkit-demo) | [Live demo](https://demo-refine-project.entkit.com)
 
 >Live demo credentials
 >  - username: `entuser`
