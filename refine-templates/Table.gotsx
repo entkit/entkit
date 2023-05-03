@@ -17,6 +17,7 @@ import * as Action from "./action";
 
 {{/* Take order fields from order terms */}}
 {{- range $n := $.Graph.Nodes }}
+{{- $ants := ER_nodeConfig $n }}
 {{- $orderTerms := orderFields $n }}
 {{- $orderFields := list }}
 {{- range $t:=$orderTerms }}
@@ -48,11 +49,12 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
         ],
         initialFilter: [
             {{ range $f := $allFields }}
-            {{- if not $f.Annotations.ENTKIT.HideOnList -}}
+            {{- $fAnts := ER_fieldConfig $f}}
+            {{- if not $fAnts.HideOnList -}}
             {
                 field: "{{$f.Name | camel }}",
                 value: null,
-                operator: "{{ lower (default "EQ" $f.Annotations.ENTKIT.FilterOperator) }}",
+                operator: "{{ lower (default "EQ" $fAnts.FilterOperator) }}",
             },
             {{- end -}}
             {{- end -}}
@@ -64,7 +66,7 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                 {{- end }}
                 {{- range $e :=  $n.Edges}}
                 {{- $edgeAllFields := prepend $e.Type.Fields $e.Type.ID }}
-                {{- $titleField := (ER_titleField $e.Type) }}
+                {{- $titleField := $.Extension.TitleField $e.Type }}
                 {{- if $e.Unique }}
                 {
                     "{{ $e.Name | camel }}": [
@@ -104,7 +106,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
             <Antd.Table {...table.tableProps} pagination={false} rowKey="{{$n.ID.Name}}" {...props}>
                 { /* region Fields */ }
                 {{- range $f := $allFields }}
-                {{- if not $f.Annotations.ENTKIT.HideOnList }}
+                {{- $fAnts := ER_fieldConfig $f}}
+                {{- if not $fAnts.HideOnList }}
                 <Antd.Table.Column
                     dataIndex="{{ camel $f.Name }}"
                     title="{{ $f.Name | ER_label }}"
@@ -115,8 +118,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     {{- end }}
                     render={ (value)=> {
                         {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnList" ) }}
-                        {{- if not (empty $f.Annotations.ENTKIT.ViewOnList) }}
-                        {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnList }}
+                        {{- if not (empty $fAnts.ViewOnList) }}
+                        {{ $viewName = print "Custom." (indirect $fAnts.ViewOnList) }}
                         {{- end}}
                         return <{{$viewName}} value={ value } />
                     } }
@@ -147,7 +150,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
 
                 { /* region Edges */ }
                 {{- range $e := $n.Edges }}
-                {{- if not $e.Annotations.ENTKIT.HideOnList }}
+                {{- $eAnts := ER_edgeConfig $e }}
+                {{- if not $eAnts.HideOnList }}
                 {{- $titleField := (ER_titleField $e.Type) }}
                 <Antd.Table.Column
                     dataIndex="{{ camel $e.Name }}"
@@ -155,8 +159,8 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     render={
                         {{- if $e.Unique }}
                         {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                        {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
-                        {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
+                        {{- if not (isNil $eAnts.Badge) }}
+                        {{ $viewName = print "Custom." $eAnts.Badge }}
                         {{- end}}
                         (value)=>(<{{$viewName}} { ...value } />)
                         {{- else }}
@@ -174,9 +178,9 @@ export const {{$n.Name}}Table :React.FC<{{$n.Name}}TableProps> = ({extendTable, 
                     dataIndex="actions"
                     render={(_, record) => (
                         <Antd.Space>
-                            {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                            {{- range $a := $ants.Actions }}
                             {{- if and (not $a.General) (has "list" $a.DisplayOn) }}
-                            <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }}
+                            <Action.{{ ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }}
                                 recordItemIDs={ [record.id] }
                                 size="small"
                                 hideText={true}

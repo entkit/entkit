@@ -28,9 +28,11 @@ import { usePermissions } from "@refinedev/core";
 {{- end }}
 
 {{- range $n := $.Graph.Nodes }}
-{{- range $a := $n.Annotations.ENTKIT.Actions }}
-{{- $cName := ( print $n.Name "-" $a.Name "-Action") | pascal }}
-{{- $routePath := $n.Annotations.ENTKIT.Route }}
+{{- $ants := ER_nodeConfig $n }}
+{{- $actions := $ants.Actions }}
+{{- range $a := $actions }}
+{{- $cName := ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }}
+{{- $routePath := indirect $ants.Route }}
 {{- if empty $routePath}}
 {{ $routePath = $n.Name | kebabcase }}
 {{- end }}
@@ -54,11 +56,11 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
 
     {{- $label := default $a.Name $a.Label }}
 
-    {{- if not (empty $a.Route) }}
+    {{- if not (isNil $a.Route) }}
     const Link = useLink();
-    {{- $pattern := print $routePath}}
-    {{- if not (empty $a.Route.Path)}}
-    {{- $pattern = print $pattern "/" $a.Route.Path}}
+    {{- $pattern := $routePath}}
+    {{- if not (isNil $a.Route.Path)}}
+    {{- $pattern = print $pattern "/" (indirect $a.Route.Path)}}
     {{- end}}
 
     return can ? <Link to={ window.environment.appPath + "{{ $pattern }}".replace(":id", String(recordItemIDs[0])) }>
@@ -67,11 +69,11 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
         </Antd.Button>
     </Link> : null
     {{- end }}
-    {{- if not (empty $a.Operation )}}
+    {{- if not (isNil $a.Operation )}}
 
     {{- $standards := list "Edit" "Show" }}
     {{- $opName := $a.Operation.Name }}
-    {{- if eq $a.Operation.Name "Delete" }}
+    {{- if eq (indirect $a.Operation.Name) "Delete" }}
     {{- $opName = print "delete-" ($n.Name | plural) | camel }}
     {{- end }}
 
@@ -124,7 +126,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                     },
                     onError: (error) => {
                         {{- $message := "" }}
-                        {{- if empty $a.FailMessage}}
+                        {{- if empty $a.Operation.FailMessage}}
                         {{- $message = "error.message" }}
                         {{- else }}
                         {{- $message = print "`" $a.Operation.FailMessage "`"}}

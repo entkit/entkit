@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"entgo.io/ent/entc/gen"
 	"errors"
-	"fmt"
 	"github.com/Nerzal/gocloak/v12"
 	"net/http"
 	"strings"
@@ -228,29 +227,16 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph) {
 
 	for _, node := range g.Nodes {
 		var resScopes []gocloak.ScopeRepresentation
-		ant, ok := node.Annotations["ENTKIT"].(map[string]any)
-		if ok {
-			b, _ := json.Marshal(ant["Actions"])
-			var _actions []*Action
-			err := json.Unmarshal(b, &_actions)
-			if err != nil {
-				fmt.Printf("%+v\n", ant["Actions"])
-				panic("Unexpected error.")
-			} else {
-				for _, a := range _actions {
-					name := a.Scope
-					if name == nil {
-						name = a.Name
-					}
-					if PString(name) == "Read" {
+		ant := kc.Auth.Extension.GetNodeAnnotations(node)
 
-					}
-					scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, kc.Auth.Extension.Pascal(PString(name)))
-					resScopes = append(resScopes, *scope)
-				}
+		for _, a := range ant.Actions {
+			name := a.Scope
+			if name == nil {
+				name = a.Name
 			}
-		} else {
-			panic("Unexpected error.")
+
+			scope := kc.prepareResourcesScopes(ctx, *backendClient.ID, token, kc.Auth.Extension.Pascal(PString(name)))
+			resScopes = append(resScopes, *scope)
 		}
 
 		resource := kc.prepareResource(ctx, *backendClient.ID, token, node.Name, &resScopes)

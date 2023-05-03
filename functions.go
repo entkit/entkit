@@ -11,7 +11,7 @@ import (
 
 func (ex *Extension) someField(node *gen.Type, field string) *gen.Field {
 	for _, f := range node.Fields {
-		_ant := f.Annotations["ENTKIT"]
+		_ant := f.Annotations[AnnotationKey]
 		ant, ok := _ant.(map[string]any)
 
 		if !ok {
@@ -28,7 +28,7 @@ func (ex *Extension) someField(node *gen.Type, field string) *gen.Field {
 
 func (ex *Extension) someNode(graph *gen.Graph, field string) *gen.Type {
 	for _, n := range graph.Nodes {
-		_ant := n.Annotations["ENTKIT"]
+		_ant := n.Annotations[AnnotationKey]
 		ant, ok := _ant.(map[string]any)
 
 		if !ok {
@@ -44,8 +44,10 @@ func (ex *Extension) someNode(graph *gen.Graph, field string) *gen.Type {
 }
 
 func (ex *Extension) GetNodeAction(node *gen.Type, name string) *Action {
-	ant := ex.getNodeAnnotations(node)
-	for _, action := range ant.Actions {
+	ant := ex.GetNodeAnnotations(node)
+	actions := ant.Actions
+
+	for _, action := range actions {
 		if PString(action.Name) == name {
 			return action
 		}
@@ -53,41 +55,61 @@ func (ex *Extension) GetNodeAction(node *gen.Type, name string) *Action {
 	return nil
 }
 
-func (ex *Extension) getNodeAnnotations(node *gen.Type) *EntkitAnnotation {
-	_ant, ok := node.Annotations["ENTKIT"]
-	if !ok {
-		return nil
+func applyNodeDefaultAnnotations(ant *Annotation) {
+	if len(ant.Actions) == 0 {
+		ant.Actions = DefaultActions
 	}
-	return ex._parseAnnotations(_ant)
 }
 
-func (ex *Extension) getFieldAnnotations(field *gen.Field) *EntkitAnnotation {
-	_ant, ok := field.Annotations["ENTKIT"]
-	if !ok || _ant == nil {
-		return nil
+func (ex *Extension) GetNodeAnnotations(node *gen.Type) *Annotation {
+	ants := &Annotation{}
+	rawAnts, ok := node.Annotations[AnnotationKey]
+	if ok && rawAnts != nil {
+		ants = ex._parseAnnotations(rawAnts)
 	}
-	return ex._parseAnnotations(_ant)
+
+	applyNodeDefaultAnnotations(ants)
+
+	return ants
 }
 
-func (ex *Extension) NodeActionRoutePattern(node *gen.Type, actionName string) string {
+func (ex *Extension) GetFieldAnnotations(field *gen.Field) *Annotation {
+	ant, ok := field.Annotations[AnnotationKey]
+	if !ok || ant == nil {
+		return &Annotation{}
+	}
+	return ex._parseAnnotations(ant)
+}
+
+func (ex *Extension) GetEdgeAnnotations(field *gen.Edge) *Annotation {
+	ant, ok := field.Annotations[AnnotationKey]
+	if !ok || ant == nil {
+		return &Annotation{}
+	}
+	return ex._parseAnnotations(ant)
+}
+
+func (ex *Extension) NodeActionRoutePattern(node *gen.Type, actionName string) *string {
 	action := ex.GetNodeAction(node, actionName)
-	ant := ex.getNodeAnnotations(node)
+	if action == nil {
+		return nil
+	}
+	ant := ex.GetNodeAnnotations(node)
 	rootPath := ex.Snake(node.Name)
 	if ant.Route != nil {
 		rootPath = PString(ant.Route)
 	}
 
-	return "/" + rootPath + "/" + PString(action.Route.Path)
-
+	return StringP(rootPath + "/" + PString(action.Route.Path))
 }
 
-func (ex *Extension) _parseAnnotations(data any) *EntkitAnnotation {
+func (ex *Extension) _parseAnnotations(data any) *Annotation {
 	j, err := json.Marshal(data)
 	if err != nil {
 		panic(err)
 	}
 
-	var ant EntkitAnnotation
+	var ant Annotation
 	err = json.Unmarshal(j, &ant)
 	if err != nil {
 		panic(err)
@@ -112,16 +134,10 @@ func (ex *Extension) MainImageField(node *gen.Type) *gen.Field {
 }
 
 func (ex *Extension) GetActionByName(node *gen.Type, name string) *Action {
-	_ant, ok := node.Annotations["ENTKIT"].(map[string]any)
-	j, _ := json.Marshal(_ant)
-	var ant EntkitAnnotation
-	_ = json.Unmarshal(j, &ant)
-
-	if ok {
-		for _, a := range ant.Actions {
-			if PString(a.Name) == name {
-				return a
-			}
+	ant := ex.GetNodeAnnotations(node)
+	for _, a := range ant.Actions {
+		if PString(a.Name) == name {
+			return a
 		}
 	}
 	return nil
@@ -208,30 +224,29 @@ func (ex *Extension) TsType(gotype string, prefix string) string {
 	return prefix + t
 }
 
-func (ex *Extension) FieldTSType(field gen.Field) string {
-	ant, ok := field.Annotations["ENTKIT"].(map[string]any)
+func (ex *Extension) FieldTSType(field *gen.Field) string {
+	ant := ex.GetFieldAnnotations(field)
 
 	prefix := PString(ex.Prefix)
+
 	if field.IsEnum() {
 		return prefix + ex.UcFirst(strings.Replace(field.Type.String(), ".", "", -1))
 	}
 
-	if ok {
-		isImage, ok := ant["ImageField"].(bool)
-		if ok && isImage {
-			return prefix + "Image"
-		}
-		isURLField, ok := ant["URLField"].(bool)
-		if ok && isURLField {
-			return prefix + "URL"
-		}
-		isRichTextField, ok := ant["RichTextField"].(bool)
-		if ok && isRichTextField {
-			return prefix + "RichText"
-		}
-		if ant["CodeField"] != nil {
-			return prefix + "Code"
-		}
+	if ant.ImageField != nil && *ant.ImageField {
+		return prefix + "Image"
+	}
+
+	if ant.URLField != nil && *ant.URLField {
+		return prefix + "URL"
+	}
+
+	if ant.RichTextField != nil && *ant.RichTextField {
+		return prefix + "RichText"
+	}
+
+	if ant.CodeField != nil {
+		return prefix + "Code"
 	}
 
 	return ex.TsType(field.Type.String(), prefix)

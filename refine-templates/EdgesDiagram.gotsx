@@ -1,3 +1,5 @@
+{{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
+
 {{- define "src/edges-diagram.tsx" -}}
 {{- $.Extension.FileHeader | ER_replace "^" "//" }}
 
@@ -17,6 +19,7 @@ import { usePermissions } from "@refinedev/core";
 {{- end }}
 
 {{ range $n := $.Graph.Nodes -}}
+{{- $ants := ER_nodeConfig $n }}
 {{- $titleField := (ER_titleField $n) }}
 {{- $allFields := prepend $n.Fields $n.ID }}
 
@@ -139,18 +142,20 @@ export const {{$n.Name}}EdgesDiagram :React.FC<{{$n.Name}}EdgesDiagramProps> = (
 
     return (
         <RA.Show isLoading={isLoading}
+                 title={"Edges Diagram"}
                  headerButtons={() => (
                      <>
-                         {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                         {{- $actions := $ants.Actions }}
+                         {{- range $a := $actions }}
                          {{ if has "edgesDiagram" $a.DisplayOn }}
-                         <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                         <Action.{{ ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }} recordItemIDs={ [record.id] }/>
                          {{- end }}
                          {{- end }}
                      </>
                  )}
                  {...showProps}
         >
-            {{- $diagramView := default $.Extension.DefaultEdgesDiagram $n.Annotations.ENTKIT.EdgesDiagram }}
+            {{- $diagramView := default $.Extension.DefaultEdgesDiagram $ants.EdgesDiagram }}
             <{{$diagramView}}
                 nodes={ nodes.filter((n): n is Diagram.Node => typeof n !== "undefined") }
                 links={ links.filter((n): n is Diagram.Link => typeof n !== "undefined") }

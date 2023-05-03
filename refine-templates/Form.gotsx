@@ -21,15 +21,11 @@ import 'react-quill/dist/quill.snow.css';
 {{- end -}}
 
 {{- define "partial:selectProps" }}
+{{- /*gotype: entgo.io/ent/entc/gen.Type*/ -}}
 {{- range $ed := .EdgesWithID }}
+{{- $titleField := ER_titleField $ed.Type}}
 const [ {{$ed.Name}}Cursors, set{{pascal $ed.Name}}Cursors] = useState<Cursors>({})
-{{- $titleField := $ed.Type.ID }}
-{{- range $f:=$ed.Type.Fields }}
-{{- if $f.Annotations.ENTKIT.TitleField }}
-{{- $titleField = $f }}
-{{- end }}
 
-{{- end}}
 const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_prepareName $ed.Type.Name}}Interface>({
     resource: "{{ $ed.Type.Name }}",
     optionLabel: "{{$titleField.Name}}",
@@ -53,6 +49,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
 
 {{- define "partial:fieldInput" -}}
 {{- /* gotype: entgo.io/ent/entc/gen.Field */ -}}
+{{- $fAnts := ER_fieldConfig .}}
 <Antd.Form.Item
     name="{{ camel .Name }}"
     label="{{ .Name | ER_label }}"
@@ -64,8 +61,8 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
     {{- end }}
 >
     {{- $viewName := ( print "View." (ER_fieldTSType .) "ViewOnForm" ) }}
-    {{- if not (empty .Annotations.ENTKIT.ViewOnForm) }}
-    {{ $viewName = print "Custom." .Annotations.ENTKIT.ViewOnForm }}
+    {{- if not (isNil $fAnts.ViewOnForm) }}
+    {{ $viewName = print "Custom." (indirect $fAnts.ViewOnForm) }}
     {{- end}}
      <{{$viewName}}/>
 </Antd.Form.Item>
@@ -73,7 +70,8 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
 
 {{- define "partial:edgeInputs" -}}
 {{- range $e := .EdgesWithID }}
-{{- if not $e.Annotations.ENTKIT.HideOnForm }}
+{{- $eAnts := ER_edgeConfig $e }}
+{{- if not $eAnts.HideOnForm }}
 {{- $gqlFieldName := print `{["` (singular $e.Name | camel) `IDs"]}` }}
 {{- $mode := `"multiple"` }}
 {{- if $e.Unique}}
@@ -95,6 +93,7 @@ const { selectProps: {{$ed.Name}}SelectProps } = RA.useSelect<Interfaces.{{ER_pr
 {{- template "partial:imports" . }}
 
 {{- range $n := $.Graph.Nodes}}
+{{- $ants := ER_nodeConfig $n }}
 
 export const {{$n.Name}}Edit: React.FC = () => {
     const { formProps, saveButtonProps, queryResult } = RA.useForm<Interfaces.{{ER_prepareName $n.Name}}Interface>(
@@ -103,17 +102,17 @@ export const {{$n.Name}}Edit: React.FC = () => {
             metaData: {
                 fields: [
                     {{- $allFields := append $n.Fields $n.ID}}
-                    {{- range $f := $allFields}}
+                    {{- range $f := $allFields }}
+                    {{- $fAnts := ER_fieldConfig $f}}
                     {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                    {{- if not $f.Annotations.ENTKIT.HideOnForm }}
-                    {{- if not $f.Annotations.ENTKIT.HideOnEdit }}
+                    {{- if and (not $fAnts.HideOnForm) (not $fAnts.HideOnUpdate) }}
                     "{{ camel $f.Name}}",
                     {{- end }}
                     {{- end }}
                     {{- end }}
-                    {{- end }}
                     {{- range $e := $n.EdgesWithID}}
-                    {{- if not $e.Annotations.ENTKIT.HideOnForm }}
+                    {{- $eAnts := ER_edgeConfig $e }}
+                    {{- if and (not $eAnts.HideOnForm) (not $eAnts.HideOnUpdate) }}
                     {{- if $e.Unique}}
                     {
                         "{{ camel $e.Name }}": [ "id" ]
@@ -146,9 +145,10 @@ export const {{$n.Name}}Edit: React.FC = () => {
             saveButtonProps={saveButtonProps}
             headerButtons={() => (
                 <>
-                    {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                    {{- $actions := $ants.Actions }}
+                    {{- range $a := $actions }}
                     {{ if has "edit" $a.DisplayOn }}
-                    <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ id ? [id] : [] }/>
+                    <Action.{{ ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }} recordItemIDs={ id ? [id] : [] }/>
                     {{- end }}
                     {{- end }}
                 </>
@@ -156,11 +156,10 @@ export const {{$n.Name}}Edit: React.FC = () => {
         >
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
+                {{- $fAnts := ER_fieldConfig $f }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_update_input" ) }}
-                {{- if not $f.Annotations.ENTKIT.HideOnForm }}
-                {{- if not $f.Annotations.ENTKIT.HideOnEdit }}
+                {{- if and (not $fAnts.HideOnForm) ($fAnts.HideOnUpdate)}}
                 {{ (include "partial:fieldInput" $f) | nindent 16 }}
-                {{- end }}
                 {{- end }}
                 {{- end }}
                 {{- end }}
@@ -180,6 +179,7 @@ export const {{$n.Name}}Edit: React.FC = () => {
 {{- template "partial:imports" .}}
 
 {{- range $n := $.Graph.Nodes }}
+{{- $ants := ER_nodeConfig $n }}
 export const {{$n.Name}}Create: React.FC = () => {
     const {formProps, saveButtonProps, queryResult} = RA.useForm<Interfaces.{{ER_prepareName $n.Name}}Interface>();
 
@@ -190,9 +190,10 @@ export const {{$n.Name}}Create: React.FC = () => {
             saveButtonProps={saveButtonProps}
             headerButtons={() => (
                <>
-                   {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                   {{- $actions := $ants.Actions }}
+                   {{- range $a := $actions }}
                    {{ if has "create" $a.DisplayOn }}
-                   <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [] }/>
+                   <Action.{{ ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }} recordItemIDs={ [] }/>
                    {{- end }}
                    {{- end }}
                </>
@@ -200,9 +201,10 @@ export const {{$n.Name}}Create: React.FC = () => {
         >
             <Antd.Form {...formProps} layout="vertical">
                 {{- range $f := $n.Fields }}
+                {{- $fAnts := ER_fieldConfig $f }}
                 {{- if not (isSkipMode $f.Annotations.EntGQL.Skip "mutation_create_input" ) }}
-                {{- if not $f.Annotations.ENTKIT.HideOnForm }}
-                {{- if not $f.Annotations.ENTKIT.HideOnCreate }}
+                {{- if not $fAnts.HideOnForm }}
+                {{- if not $fAnts.HideOnCreate }}
                 {{- (include "partial:fieldInput" $f) | nindent 16 }}
                 {{- end }}
                 {{- end }}

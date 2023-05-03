@@ -98,8 +98,9 @@ func (e {{$prefix}}Resource) String() string {
 type {{$prefix}}Scope int
 {{- $scopes := list }}
 {{- range $n := $.Nodes }}
-{{- range $action := $n.Annotations.ENTKIT.Actions }}
-{{- $scope := indirect $action.Scope}}
+{{- $ants := ER_nodeConfig $n }}
+{{- range $a := $ants.Actions }}
+{{- $scope := indirect $a.Scope}}
 {{- $scopes = append $scopes $scope }}
 {{- end }}
 {{- end }}
@@ -148,9 +149,10 @@ func {{ $prefix | pascal}}AuthorizeByResource(ctx context.Context, resource {{$p
 
 
 {{- range $n := $.Nodes }}
+{{- $ants:= ER_nodeConfig $n}}
 {{- $dones := list }}
-{{- range $action := $n.Annotations.ENTKIT.Actions }}
-{{- $scope := $action.Scope }}
+{{- range $a := $ants.Actions }}
+{{- $scope := indirect $a.Scope }}
 {{- if not (has $scope $dones) }}
 {{- $dones = append $dones $scope }}
 

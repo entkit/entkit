@@ -27,7 +27,11 @@ import (
 
 		{{- $allFields := append $n.Fields $n.ID }}
 		{{- range $f := $allFields }}
-		{{- $operator := default "EQ" $f.Annotations.ENTKIT.FilterOperator }}
+		{{- $fAnts := ER_fieldConfig $f }}
+		{{- $operator := "EQ" }}
+		{{- if not (isNil $fAnts.FilterOperator)}}
+		{{ $operator = indirect $fAnts.FilterOperator }}
+		{{- end}}
 		{{- if $f.IsUUID }}
 		// id uuid Field
 		u, err := uuid.Parse(*q)
