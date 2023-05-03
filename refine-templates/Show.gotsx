@@ -1,7 +1,6 @@
 {{- /* gotype: github.com/entkit/entkit/v2.Generator */ -}}
 
 {{- define "src/show.tsx" -}}
-
 {{- $.Extension.FileHeader | ER_replace "^" "//" }}
 
 {{- $prefix := $.Extension.Prefix }}
@@ -19,6 +18,7 @@ import * as Custom from "./custom";
 import * as Action from "./action";
 
 {{- range $n := $.Graph.Nodes -}}
+{{- $ant := ER_nodeConfig $n }}
 {{- $titleField := (ER_titleField $n) }}
 {{- $allFields := prepend $n.Fields $n.ID }}
 
@@ -85,9 +85,9 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
             isLoading={isLoading}
             headerButtons={() => (
                  <>
-                 {{- range $a := $n.Annotations.ENTKIT.Actions }}
-                 {{ if has "show" $a.DisplayOn }}
-                 <Action.{{ ( print $n.Name "-" $a.Name "-Action") | pascal }} recordItemIDs={ [record.id] }/>
+                 {{- range $a := $ant.Actions }}
+                 {{- if has "show" $a.DisplayOn }}
+                 <Action.{{ ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal }} recordItemIDs={ [record.id] }/>
                  {{- end }}
                  {{- end }}
                  </>
@@ -96,10 +96,11 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
         >
 
             {{- range $f := $allFields}}
+            {{- $fAnts := ER_fieldConfig $f}}
             <Antd.Typography.Title level={5}>{{ $f.Name | ER_label }}</Antd.Typography.Title>
             {{- $viewName := ( print "View." (ER_fieldTSType $f) "ViewOnShow" ) }}
-            {{- if not (empty $f.Annotations.ENTKIT.ViewOnShow) }}
-            {{ $viewName = print "Custom." $f.Annotations.ENTKIT.ViewOnShow }}
+            {{- if not (isNil $fAnts.ViewOnShow) }}
+            {{ $viewName = print "Custom." (indirect $fAnts.ViewOnShow) }}
             {{- end}}
             <{{$viewName}} value={ record?.{{ camel $f.Name }} } />
             {{- end }}
@@ -108,10 +109,11 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
                 <Antd.Typography.Title level={3}>Edges</Antd.Typography.Title>
                 <Antd.Descriptions>
                     {{- range $e := $n.EdgesWithID }}
+                    {{- $eAnts := ER_edgeConfig $e}}
                     {{- $titleField := (ER_titleField $e.Type) }}
                     {{- $viewName := ( print "View." $e.Type.Name "Badge" ) }}
-                    {{- if not (empty $e.Annotations.ENTKIT.Badge) }}
-                    {{ $viewName = print "Custom." $e.Annotations.ENTKIT.Badge }}
+                    {{- if not (empty $eAnts.Badge) }}
+                    {{ $viewName = print "Custom." $eAnts.Badge }}
                     {{- end}}
                     {{- if $e.Unique }}
                     <Antd.Descriptions.Item label="{{ $e.Name | ER_label }}">
@@ -124,13 +126,14 @@ export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdge
                     defaultActiveKey="0"
                     items={[
                         {{- range $i, $e := $n.EdgesWithID }}
+                        {{- $enAnts := ER_nodeConfig $e.Type}}
                         {{- if not (isNil $e.Ref) }}
                         {{- if not $e.Unique }}
                         {{- $titleField := (ER_titleField $e.Type) }}
                         {{- $filterOperator := print "has" (pascal $e.Ref.Name) "With" }}
                         {
                             label: <span>
-                                <AntdIcons.{{default "FileOutlined" $e.Type.Annotations.ENTKIT.Icon}} />
+                                <AntdIcons.{{default "FileOutlined" $enAnts.Icon}} />
                                 {{$e.Name | ER_label}}
                             </span>,
                             key: "{{$i}}",

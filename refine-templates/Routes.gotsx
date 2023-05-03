@@ -52,22 +52,24 @@ export const RoutesBundle: React.FC = ()=>{
             <Route index element={<NavigateToResource resource="{{ $indexNode.Name | kebabcase }}" />}/>
             {{- end }}
             {{- range $n := $.Graph.Nodes}}
-            {{- $routePath := $n.Annotations.ENTKIT.Route }}
+            {{ $ant := ER_nodeConfig $n}}
+            {{- $routePath := $ant.Route }}
             {{- if empty $routePath }}
             {{ $routePath = $n.Name | kebabcase }}
             {{- end }}
             <Route path="{{ $routePath }}">
-                {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                {{- $actions := $ant.Actions }}
+                {{- range $a := $actions }}
                 {{- if not (empty $a.Route) }}
                 <Route
-                    {{ if $a.Route.Index -}}
+                    {{- if $a.Route.Index }}
                     index
-                    {{- end -}}
-                    {{ if not (empty $a.Route.Path ) -}}
+                    {{- end }}
+                    {{- if not (empty $a.Route.Path ) }}
                     path="{{ $a.Route.Path | trimAll "/" }}"
-                    {{- end -}}
+                    {{- end }}
                     {{- $element := replace $a.Route.Element "{name}" $n.Name}}
-                    element={<{{$element}}/>}
+                    element={<{{ $element }}/>}
                 />
                 {{- end }}
                 {{- end }}

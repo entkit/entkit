@@ -9,6 +9,8 @@ import (
 	"text/template"
 )
 
+const AnnotationKey = "ENTKIT"
+
 var (
 	//go:embed templates/*
 	_templates embed.FS
@@ -161,6 +163,9 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 		"ER_replace":                ex.Replace,
 		"ER_getNodeAction":          ex.GetNodeAction,
 		"ER_nodeActionRoutePattern": ex.NodeActionRoutePattern,
+		"ER_nodeConfig":             ex.GetNodeAnnotations,
+		"ER_fieldConfig":            ex.GetFieldAnnotations,
+		"ER_edgeConfig":             ex.GetEdgeAnnotations,
 	}
 
 	if len(ex.funcMap) == 0 {

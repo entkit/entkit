@@ -155,7 +155,8 @@ function App() {
                     resources={
                         [
                             {{- range $n := $.Graph.Nodes}}
-                            {{- $routePath := $n.Annotations.ENTKIT.Route }}
+                            {{- $ants := ER_nodeConfig $n }}
+                            {{- $routePath := indirect $ants.Route }}
                             {{- if empty $routePath}}
                             {{- $routePath = $n.Name | kebabcase }}
                             {{- end }}
@@ -166,7 +167,7 @@ function App() {
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
                                 {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                list: window.environment.appPath + "{{$path}}",
+                                list: window.environment.appPath + "{{ $path }}",
                                 {{- end }}
                                 {{- end }}
 
@@ -174,7 +175,7 @@ function App() {
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
                                 {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                show: window.environment.appPath + "{{$path}}",
+                                show: window.environment.appPath + "{{ $path }}",
                                 {{- end }}
                                 {{- end }}
 
@@ -182,7 +183,7 @@ function App() {
                                 {{- if not (empty $action) }}
                                 {{- if not (empty $action.Route) }}
                                 {{- $path := print $routePath "/" (indirect $action.Route.Path) | trimSuffix "/" }}
-                                create: window.environment.appPath + "{{$path}}",
+                                create: window.environment.appPath + "{{ $path }}",
                                 {{- end }}
                                 {{- end }}
 
@@ -194,9 +195,9 @@ function App() {
                                 {{- end }}
                                 {{- end }}
                                 meta: {
-                                    icon: <AntdIcons.{{ default "FileOutlined" $n.Annotations.ENTKIT.Icon}}/>,
+                                    icon: <AntdIcons.{{ default "FileOutlined" $ants.Icon }}/>,
                                     {{- if $.Extension.Auth.Enabled}}
-                                    hide: !permissions?.{{$n.Name}}?.includes("Read")
+                                    hide: !permissions?.{{ $n.Name }}?.includes("Read")
                                     {{- end }}
                                 }
                             },
