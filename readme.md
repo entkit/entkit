@@ -2,6 +2,7 @@
 
 A Comprehensive Solution for Building Data-Driven Applications with Ease and Efficiency
 
+[![GitHub license](https://img.shields.io/github/license/entkit/entkit)](https://github.com/entkit/entkit)
 ![GitHub contributors](https://img.shields.io/github/contributors/entkit/entkit)
 [![GitHub issues](https://img.shields.io/github/issues/entkit/entkit)](https://github.com/entkit/entkit/issues)
 [![GitHub stars](https://img.shields.io/github/stars/entkit/entkit)](https://github.com/entkit/entkit/stargazers)
@@ -9,7 +10,7 @@ A Comprehensive Solution for Building Data-Driven Applications with Ease and Eff
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/entkit/entkit)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/entkit/entkit)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/entkit/entkit)
-[![GitHub license](https://img.shields.io/github/license/entkit/entkit)](https://github.com/entkit/entkit)
+[![Go Report Card](https://goreportcard.com/badge/github.com/entkit/entkit/v2)](https://goreportcard.com/report/github.com/entkit/entkit/v2)
 
 [Documentation](https://entkit.com/docs/get-started/introduction) | [Example project](https://github.com/entkit/entkit-demo) | [Live demo](https://demo-refine-project.entkit.com)
 

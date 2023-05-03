@@ -372,6 +372,10 @@ func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, o
 	}
 
 	absPath, err := filepath.Abs(*g.Path)
+	if err != nil {
+		panic(err)
+	}
+
 	relCWD, err := filepath.Rel(absPath, *g.CWD)
 	if err != nil {
 		panic(err)
