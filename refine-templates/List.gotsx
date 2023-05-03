@@ -16,6 +16,8 @@ import { usePermissions } from "@refinedev/core";
 {{- end }}
 
 {{- range $n := $.Graph.Nodes }}
+{{- $ants := ER_nodeConfig $n }}
+{{- $actions := $ants.Actions }}
 export type {{$n.Name}}ListProps = RA.ListProps & { tableProps?: Tables.{{$n.Name}}TableProps}
 export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...props} ) => {
     {{- if $.Extension.Auth.Enabled }}
@@ -30,18 +32,18 @@ export const {{$n.Name}}List :React.FC<{{$n.Name}}ListProps> = ({tableProps, ...
 
     return can ? <RA.List {...props} resource="{{$n.Name | kebabcase}}" headerButtons={() => (
         <>
-            {{- range $a := $n.Annotations.ENTKIT.Actions }}
+            {{- range $a := $actions }}
             {{- if $a.General }}
-            {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
+            {{- $aName:= ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal}}
             <Action.{{ $aName }} key="{{$aName}}" recordItemIDs={ selectedRowKeys as Type.{{ ER_fieldTSType $n.ID }}[]}/>
             {{- end }}
             {{- end }}
 
             {selectedRowKeys.length ? <>
-                {{- range $a := $n.Annotations.ENTKIT.Actions }}
+                {{- range $a := $actions }}
                 {{- if not (empty $a.Operation) }}
                 {{- if and (not $a.General) (has "list" $a.DisplayOn) $a.Operation.Bulk }}
-                {{- $aName:= ( print $n.Name "-" $a.Name "-Action") | pascal}}
+                {{- $aName:= ( print $n.Name "-" (indirect $a.Name) "-Action") | pascal}}
                 <Action.{{ $aName }}
                     key="{{$aName}}"
                     recordItemIDs={ selectedRowKeys as Type.{{ ER_fieldTSType $n.ID }}[]}

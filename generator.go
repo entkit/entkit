@@ -380,3 +380,7 @@ func NewGenerator(extension *Extension, name string, adapter GeneratorAdapter, o
 	g.RelCWD = &relCWD
 	return g
 }
+
+func (gr *Generator) DefaultActions() []*Action {
+	return DefaultActions
+}
