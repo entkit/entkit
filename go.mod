@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/Nerzal/gocloak/v12 v12.0.0
 	github.com/otiai10/copy v1.10.0
+	github.com/stretchr/testify v1.8.2
 	github.com/vektah/gqlparser/v2 v2.5.1
 	golang.org/x/text v0.9.0
 )
@@ -20,6 +21,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
@@ -33,6 +35,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
