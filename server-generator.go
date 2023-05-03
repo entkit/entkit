@@ -68,5 +68,6 @@ func (r ServerAdapter) GetTemplates() []string {
 func (r ServerAdapter) GetStaticTemplates() []string {
 	return []string{
 		"server-templates/Client.tmpl",
+		"server-templates/Env.goenv",
 	}
 }
