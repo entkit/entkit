@@ -520,6 +520,9 @@ func (kc *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient 
 	policies, err := kc.GoCloak.GetPolicies(ctx, token, PString(kc.Realm), idOfClient, gocloak.GetPolicyParams{
 		Name: gocloak.StringP(name),
 	})
+	if err != nil {
+		panic(err)
+	}
 	if len(policies) > 0 {
 		err := kc.GoCloak.DeletePolicy(ctx, token, PString(kc.Realm), idOfClient, *policies[0].ID)
 		if err != nil {
