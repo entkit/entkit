@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Keycloak is a struct that contains keycloak configuration
 type Keycloak struct {
 	Auth                *Auth   `json:"Auth,omitempty"`
 	Enabled             *bool   `json:"Enabled,omitempty"`
@@ -27,6 +28,7 @@ type Keycloak struct {
 	GoCloak *gocloak.GoCloak `json:"GoCloak,omitempty"`
 }
 
+// KeycloakEnvironment is a struct that contains keycloak environment configuration
 type KeycloakEnvironment struct {
 	URL             string `json:"url,omitempty"`
 	Realm           string `json:"realm,omitempty"`
@@ -34,6 +36,7 @@ type KeycloakEnvironment struct {
 	BackendClientID string `json:"backendClientId,omitempty"`
 }
 
+// GetEnvironmentConfig returns keycloak environment configuration
 func (kc *Keycloak) GetEnvironmentConfig() *KeycloakEnvironment {
 	return &KeycloakEnvironment{
 		URL:             PString(kc.Host),
@@ -43,8 +46,10 @@ func (kc *Keycloak) GetEnvironmentConfig() *KeycloakEnvironment {
 	}
 }
 
+// KeycloakOption is a function that configure keycloak
 type KeycloakOption = func(keycloak *Keycloak) error
 
+// NewKeycloak returns new keycloak instance
 func NewKeycloak(
 	auth *Auth,
 	options ...KeycloakOption,
@@ -89,6 +94,7 @@ func NewKeycloak(
 	return k
 }
 
+// KeycloakHost set keycloak host
 func KeycloakHost(host string) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.Host = StringP(host)
@@ -96,6 +102,7 @@ func KeycloakHost(host string) KeycloakOption {
 	}
 }
 
+// KeycloakRealm set keycloak realm
 func KeycloakRealm(realm string) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.Realm = StringP(realm)
@@ -103,6 +110,7 @@ func KeycloakRealm(realm string) KeycloakOption {
 	}
 }
 
+// KeycloakMasterAdminCredentials set keycloak master admin credentials
 func KeycloakMasterAdminCredentials(username string, password string) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.MasterAdminUsername = StringP(username)
@@ -111,6 +119,7 @@ func KeycloakMasterAdminCredentials(username string, password string) KeycloakOp
 	}
 }
 
+// KeycloakMasterRealm set keycloak master realm
 func KeycloakMasterRealm(realm string) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.MasterRealm = StringP(realm)
@@ -118,6 +127,7 @@ func KeycloakMasterRealm(realm string) KeycloakOption {
 	}
 }
 
+// KeycloakGeneratedAdminCredentials set keycloak generated admin credentials
 func KeycloakGeneratedAdminCredentials(username string, password string) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.AdminUsername = StringP(username)
@@ -126,6 +136,7 @@ func KeycloakGeneratedAdminCredentials(username string, password string) Keycloa
 	}
 }
 
+// KeycloakBackendClientConfig set keycloak backend client config
 func KeycloakBackendClientConfig(clientConfig gocloak.Client) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.BackendClientConfig = &clientConfig
@@ -133,6 +144,7 @@ func KeycloakBackendClientConfig(clientConfig gocloak.Client) KeycloakOption {
 	}
 }
 
+// KeycloakFrontendClientConfig set keycloak frontend client config
 func KeycloakFrontendClientConfig(clientConfig gocloak.Client) KeycloakOption {
 	return func(kc *Keycloak) (err error) {
 		kc.FrontendClientConfig = &clientConfig
@@ -140,6 +152,7 @@ func KeycloakFrontendClientConfig(clientConfig gocloak.Client) KeycloakOption {
 	}
 }
 
+// NewBackendKeycloak returns new backend keycloak instance
 func NewBackendKeycloak(host string, realm string, clientId string, secret string) *Keycloak {
 	k := Keycloak{
 		Host:  StringP(host),
@@ -153,6 +166,7 @@ func NewBackendKeycloak(host string, realm string, clientId string, secret strin
 	return &k
 }
 
+// MiddlewareReqHandlerFunc is a middleware that checks if the request is authorized
 func (kc *Keycloak) MiddlewareReqHandlerFunc(w http.ResponseWriter, r *http.Request) (*http.Request, error) {
 	auth := r.Header.Get("Authorization")
 	if !strings.HasPrefix(auth, "Bearer ") {
@@ -180,6 +194,7 @@ func (kc *Keycloak) MiddlewareReqHandlerFunc(w http.ResponseWriter, r *http.Requ
 	return r.WithContext(ctx), nil
 }
 
+// getResourcesPermissions returns the permissions of the token
 func (kc *Keycloak) getResourcesPermissions(token string) (*[]gocloak.RequestingPartyPermission, error) {
 	return kc.GoCloak.GetRequestingPartyPermissions(
 		context.Background(),
@@ -193,6 +208,7 @@ func (kc *Keycloak) getResourcesPermissions(token string) (*[]gocloak.Requesting
 	)
 }
 
+// getAdminToken returns the admin token
 func (kc *Keycloak) getAdminToken(ctx context.Context) string {
 	token, err := kc.GoCloak.LoginAdmin(
 		ctx,
@@ -206,6 +222,7 @@ func (kc *Keycloak) getAdminToken(ctx context.Context) string {
 	return token.AccessToken
 }
 
+// GenerateKeycloakResources generates keycloak resources
 func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph) {
 	ctx := context.Background()
 	token := kc.getAdminToken(ctx)
@@ -277,6 +294,7 @@ func (kc *Keycloak) GenerateKeycloakResources(g *gen.Graph) {
 	})
 }
 
+// prepareUser prepares the user
 func (kc *Keycloak) prepareUser(ctx context.Context, token string, clientRoles map[string][]gocloak.Role) *gocloak.User {
 	var user *gocloak.User
 	users, err := kc.GoCloak.GetUsers(ctx, token, PString(kc.Realm), gocloak.GetUsersParams{
@@ -316,6 +334,7 @@ func (kc *Keycloak) prepareUser(ctx context.Context, token string, clientRoles m
 	return user
 }
 
+// prepareRealm prepares the realm
 func (kc *Keycloak) prepareRealm(ctx context.Context, token string) *gocloak.RealmRepresentation {
 	realm, _ := kc.GoCloak.GetRealm(ctx, token, PString(kc.Realm))
 	if realm == nil {
@@ -341,6 +360,7 @@ func (kc *Keycloak) prepareRealm(ctx context.Context, token string) *gocloak.Rea
 	return realm
 }
 
+// prepareFrontendClient prepares the frontend client
 func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string) *gocloak.Client {
 	var client *gocloak.Client
 	clients, err := kc.GoCloak.GetClients(ctx, token, PString(kc.Realm), gocloak.GetClientsParams{
@@ -402,6 +422,7 @@ func (kc *Keycloak) prepareFrontendClient(ctx context.Context, token string) *go
 	return client
 }
 
+// prepareBackendClient prepares the backend client
 func (kc *Keycloak) prepareBackendClient(ctx context.Context, token string) *gocloak.Client {
 	clientConfig := kc.BackendClientConfig
 	var client *gocloak.Client
@@ -483,6 +504,7 @@ func (kc *Keycloak) prepareBackendClient(ctx context.Context, token string) *goc
 	return client
 }
 
+// preparePermission prepares the permission
 func (kc *Keycloak) preparePermission(ctx context.Context, token string, idOfClient string, name string, permissionType string, resourcesIDs *[]string, scopesIDs *[]string, policies []string) *gocloak.PermissionRepresentation {
 	name = kc.Auth.Extension.PrepareName(name)
 	permission := &gocloak.PermissionRepresentation{}
@@ -513,6 +535,7 @@ func (kc *Keycloak) preparePermission(ctx context.Context, token string, idOfCli
 	return permission
 }
 
+// preparePolicy prepares the policy
 func (kc *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient string, name string, roles []gocloak.Role) *gocloak.PolicyRepresentation {
 	name = kc.Auth.Extension.PrepareName(name)
 	policy := &gocloak.PolicyRepresentation{}
@@ -550,6 +573,7 @@ func (kc *Keycloak) preparePolicy(ctx context.Context, token string, idOfClient 
 	return policy
 }
 
+// prepareRole prepares the role
 func (kc *Keycloak) prepareRole(ctx context.Context, idOfClient string, token string, name string, compositeRoles *[]gocloak.Role) gocloak.Role {
 	name = kc.Auth.Extension.PrepareName(name)
 	role, err := kc.GoCloak.GetClientRole(ctx, token, PString(kc.Realm), idOfClient, name)
@@ -587,6 +611,7 @@ func (kc *Keycloak) prepareRole(ctx context.Context, idOfClient string, token st
 	return *role
 }
 
+// prepareResourcesScopes prepares the resources scopes
 func (kc *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient string, token string, name string) *gocloak.ScopeRepresentation {
 	name = kc.Auth.Extension.PrepareName(name)
 	var scope *gocloak.ScopeRepresentation
@@ -613,6 +638,7 @@ func (kc *Keycloak) prepareResourcesScopes(ctx context.Context, idOfClient strin
 	return scope
 }
 
+// prepareResource prepares the resource
 func (kc *Keycloak) prepareResource(ctx context.Context, idOfClient string, token string, name string, scopes *[]gocloak.ScopeRepresentation) *gocloak.ResourceRepresentation {
 	name = kc.Auth.Extension.PrepareName(name)
 	var resource gocloak.ResourceRepresentation

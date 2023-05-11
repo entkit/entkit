@@ -14,6 +14,7 @@ import (
 	"text/template"
 )
 
+// Generator main struct
 type Generator struct {
 	Name          *string    `json:"Name,omitempty"`
 	Extension     *Extension `json:"Extension,omitempty"`
@@ -41,48 +42,59 @@ type SkipModes struct {
 	SkipWhereInput          entgql.SkipMode
 }
 
+// Cast converts int to entgql.SkipMode
 func (sm *SkipModes) Cast(value int) entgql.SkipMode {
 	return entgql.SkipMode(value)
 }
 
+// GeneratorAdapter interface
 type GeneratorAdapter interface {
 	GetName() string
 }
 
+// GeneratorAdapterWithDependencies interface
 type GeneratorAdapterWithDependencies interface {
 	GetDependencies() []GeneratorAdapter
 }
 
+// GeneratorAdapterWithFS interface
 type GeneratorAdapterWithFS interface {
 	GetFS() fs.FS
 }
 
+// GeneratorAdapterWithAfterCommand interface
 type GeneratorAdapterWithAfterCommand interface {
 	CommandAfterGen(generator *Generator) string
 }
 
+// GeneratorAdapterWithBeforeCommand interface
 type GeneratorAdapterWithBeforeCommand interface {
 	CommandBeforeGen(generator *Generator) string
 }
 
+// GeneratorAdapterWithBefore interface
 type GeneratorAdapterWithBefore interface {
 	BeforeGen(generator *Generator) error
 }
 
+// GeneratorAdapterWithAfter interface
 type GeneratorAdapterWithAfter interface {
 	AfterGen(generator *Generator) error
 }
 
+// GeneratorAdapterWithTemplates interface
 type GeneratorAdapterWithTemplates interface {
 	GeneratorAdapterWithFS
 	GetTemplates() []string
 }
 
+// GeneratorAdapterWithStaticTemplates interface
 type GeneratorAdapterWithStaticTemplates interface {
 	GeneratorAdapterWithFS
 	GetStaticTemplates() []string
 }
 
+// parseTemplate parses template from adapter FS
 func (gr *Generator) parseTemplate(path string, adapter GeneratorAdapterWithFS) *gen.Template {
 	t := gen.NewTemplate(path).Funcs(gr.Extension.funcMap)
 	var _funcMap template.FuncMap = map[string]interface{}{}
@@ -106,6 +118,7 @@ func (gr *Generator) ServableAdapter() ServableAdapter {
 	panic("provided Adapter is not a ServableAdapter")
 }
 
+// Generate generates code from adapter
 func (gr *Generator) Generate(graph *gen.Graph) {
 	gr.Graph = graph
 
@@ -130,6 +143,7 @@ func (gr *Generator) Generate(graph *gen.Graph) {
 	gr.runAfterGen()
 }
 
+// generateAdapterOutput generates code from adapter
 func (gr *Generator) generateAdapterOutput(adapter GeneratorAdapter, graph *gen.Graph) {
 	adapterWithFS, ok := adapter.(GeneratorAdapterWithFS)
 	if !ok {

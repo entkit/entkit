@@ -9,6 +9,7 @@ import (
 	"unicode"
 )
 
+// someField returns first field with annotation field
 func (ex *Extension) someField(node *gen.Type, field string) *gen.Field {
 	for _, f := range node.Fields {
 		_ant := f.Annotations[AnnotationKey]
@@ -26,6 +27,7 @@ func (ex *Extension) someField(node *gen.Type, field string) *gen.Field {
 	return nil
 }
 
+// someNode returns first node with annotation field
 func (ex *Extension) someNode(graph *gen.Graph, field string) *gen.Type {
 	for _, n := range graph.Nodes {
 		_ant := n.Annotations[AnnotationKey]
@@ -43,6 +45,7 @@ func (ex *Extension) someNode(graph *gen.Graph, field string) *gen.Type {
 	return nil
 }
 
+// GetNodeAction returns action by name
 func (ex *Extension) GetNodeAction(node *gen.Type, name string) *Action {
 	ant := ex.GetNodeAnnotations(node)
 	actions := ant.Actions
@@ -55,12 +58,14 @@ func (ex *Extension) GetNodeAction(node *gen.Type, name string) *Action {
 	return nil
 }
 
+// applyNodeDefaultAnnotations applies default values to node annotations
 func applyNodeDefaultAnnotations(ant *Annotation) {
 	if len(ant.Actions) == 0 {
 		ant.Actions = DefaultActions
 	}
 }
 
+// GetNodeAnnotations returns node annotations
 func (ex *Extension) GetNodeAnnotations(node *gen.Type) *Annotation {
 	ants := &Annotation{}
 	rawAnts, ok := node.Annotations[AnnotationKey]
@@ -73,6 +78,7 @@ func (ex *Extension) GetNodeAnnotations(node *gen.Type) *Annotation {
 	return ants
 }
 
+// GetFieldAnnotations returns field annotations
 func (ex *Extension) GetFieldAnnotations(field *gen.Field) *Annotation {
 	ant, ok := field.Annotations[AnnotationKey]
 	if !ok || ant == nil {
@@ -81,6 +87,7 @@ func (ex *Extension) GetFieldAnnotations(field *gen.Field) *Annotation {
 	return ex._parseAnnotations(ant)
 }
 
+// GetEdgeAnnotations returns edge annotations
 func (ex *Extension) GetEdgeAnnotations(field *gen.Edge) *Annotation {
 	ant, ok := field.Annotations[AnnotationKey]
 	if !ok || ant == nil {
@@ -89,6 +96,7 @@ func (ex *Extension) GetEdgeAnnotations(field *gen.Edge) *Annotation {
 	return ex._parseAnnotations(ant)
 }
 
+// NodeActionRoutePattern returns route pattern for node action
 func (ex *Extension) NodeActionRoutePattern(node *gen.Type, actionName string) *string {
 	action := ex.GetNodeAction(node, actionName)
 	if action == nil {
@@ -103,6 +111,7 @@ func (ex *Extension) NodeActionRoutePattern(node *gen.Type, actionName string) *
 	return StringP(rootPath + "/" + PString(action.Route.Path))
 }
 
+// _parseAnnotations parses annotations from any type
 func (ex *Extension) _parseAnnotations(data any) *Annotation {
 	j, err := json.Marshal(data)
 	if err != nil {
@@ -117,10 +126,12 @@ func (ex *Extension) _parseAnnotations(data any) *Annotation {
 	return &ant
 }
 
+// IndexNode returns index node
 func (ex *Extension) IndexNode(graph *gen.Graph) *gen.Type {
 	return ex.someNode(graph, "IndexRoute")
 }
 
+// TitleField returns title field
 func (ex *Extension) TitleField(node *gen.Type) *gen.Field {
 	f := ex.someField(node, "TitleField")
 	if f != nil {
@@ -129,10 +140,12 @@ func (ex *Extension) TitleField(node *gen.Type) *gen.Field {
 	return node.ID
 }
 
+// MainImageField returns main image field
 func (ex *Extension) MainImageField(node *gen.Type) *gen.Field {
 	return ex.someField(node, "MainImageField")
 }
 
+// GetActionByName returns action by name
 func (ex *Extension) GetActionByName(node *gen.Type, name string) *Action {
 	ant := ex.GetNodeAnnotations(node)
 	for _, a := range ant.Actions {
@@ -143,6 +156,7 @@ func (ex *Extension) GetActionByName(node *gen.Type, name string) *Action {
 	return nil
 }
 
+// Camel returns camel case string
 func (ex *Extension) Camel(s string) string {
 	fn, ok := gen.Funcs["camel"].(func(s string) string)
 	if !ok {
@@ -151,6 +165,7 @@ func (ex *Extension) Camel(s string) string {
 	return fn(s)
 }
 
+// Pascal returns pascal case string
 func (ex *Extension) Pascal(s string) string {
 	fn, ok := gen.Funcs["pascal"].(func(s string) string)
 	if !ok {
@@ -159,6 +174,7 @@ func (ex *Extension) Pascal(s string) string {
 	return fn(s)
 }
 
+// Snake returns snake case string
 func (ex *Extension) Snake(s string) string {
 	fn, ok := gen.Funcs["snake"].(func(s string) string)
 	if !ok {
@@ -167,20 +183,24 @@ func (ex *Extension) Snake(s string) string {
 	return fn(s)
 }
 
+// PrepareName returns prepared name
 func (ex *Extension) PrepareName(name string) string {
 	return PString(ex.Prefix) + ex.Pascal(name)
 }
 
+// Replace replaces old with new in string
 func (ex *Extension) Replace(old string, new string, s string) string {
 	return strings.Replace(s, old, new, -1)
 }
 
+// ToLabel converts string to label
 func (ex *Extension) ToLabel(str string) string {
 	s := strings.Replace(str, "_", " ", -1)
 	s = cases.Title(language.Und, cases.NoLower).String(s)
 	return s
 }
 
+// UcFirst converts first letter to upper case
 func (ex *Extension) UcFirst(str string) string {
 	for i, v := range str {
 		return string(unicode.ToUpper(v)) + str[i+1:]
@@ -188,6 +208,7 @@ func (ex *Extension) UcFirst(str string) string {
 	return ""
 }
 
+// LcFirst converts first letter to lower case
 func (ex *Extension) LcFirst(str string) string {
 	for i, v := range str {
 		return string(unicode.ToLower(v)) + str[i+1:]
@@ -195,6 +216,7 @@ func (ex *Extension) LcFirst(str string) string {
 	return ""
 }
 
+// TsType returns typescript type
 func (ex *Extension) TsType(gotype string, prefix string) string {
 	unique := true
 	if strings.HasPrefix(gotype, "[]") {
@@ -224,6 +246,7 @@ func (ex *Extension) TsType(gotype string, prefix string) string {
 	return prefix + t
 }
 
+// FieldTSType returns typescript type for field
 func (ex *Extension) FieldTSType(field *gen.Field) string {
 	ant := ex.GetFieldAnnotations(field)
 
@@ -252,6 +275,7 @@ func (ex *Extension) FieldTSType(field *gen.Field) string {
 	return ex.TsType(field.Type.String(), prefix)
 }
 
+// Contains checks if slice contains element
 func Contains[T comparable](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {

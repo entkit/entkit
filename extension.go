@@ -16,6 +16,7 @@ var (
 	_templates embed.FS
 )
 
+// ExtensionOption is a functional option for Extension
 type ExtensionOption = func(*Extension) error
 
 // Extension main struct
@@ -48,6 +49,7 @@ type ForceGraph2DOptions struct {
 	Enabled bool `json:"Enabled,omitempty"`
 }
 
+// WithGenerator add generator to extension
 func WithGenerator(name string, adapter GeneratorAdapter, options ...GeneratorOption) ExtensionOption {
 	return func(ex *Extension) (err error) {
 		ex.Generators = append(ex.Generators, NewGenerator(ex, name, adapter, options...))
@@ -55,6 +57,7 @@ func WithGenerator(name string, adapter GeneratorAdapter, options ...GeneratorOp
 	}
 }
 
+// IgnoreUncommittedChanges ignore uncommitted changes warning message
 func IgnoreUncommittedChanges() ExtensionOption {
 	return func(ex *Extension) (err error) {
 		ex.IgnoreUncommittedChanges = BoolP(true)
@@ -202,6 +205,7 @@ func NewExtension(opts ...ExtensionOption) (*Extension, error) {
 	return ex, nil
 }
 
+// Annotations Define Ent annotations
 type Annotations struct {
 	Prefix string
 	Auth   *Auth
