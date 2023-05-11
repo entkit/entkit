@@ -1,8 +1,9 @@
 package entkit
 
+// Operation struct
 type Operation struct {
-	Mutation       *bool     `json:"Mutation,omitempty"`
-	Query          *bool     `json:"Query,omitempty"`
+	Mutation       *bool     `json:"Mutation,omitempty"`       // Mark operation as mutation
+	Query          *bool     `json:"Query,omitempty"`          // Mark operation as query
 	Name           *string   `json:"Name,omitempty"`           // Operation of graphql
 	Fields         *[]string `json:"Fields,omitempty"`         // Fields to take after operation
 	Single         *bool     `json:"Single,omitempty"`         // Show on single item
@@ -13,6 +14,7 @@ type Operation struct {
 
 type OperationOption = func(operation *Operation) error
 
+// NewOperation creates new operation
 func NewOperation(name string, options ...OperationOption) *Operation {
 	action := &Operation{
 		Name: StringP(name),
@@ -25,6 +27,7 @@ func NewOperation(name string, options ...OperationOption) *Operation {
 	return action
 }
 
+// OperationWithSuccessMessage sets success message
 func OperationWithSuccessMessage(message string) OperationOption {
 	return func(op *Operation) (err error) {
 		op.SuccessMessage = &message
@@ -32,6 +35,7 @@ func OperationWithSuccessMessage(message string) OperationOption {
 	}
 }
 
+// OperationWithFailMessage sets fail message
 func OperationWithFailMessage(message string) OperationOption {
 	return func(op *Operation) (err error) {
 		op.FailMessage = &message
@@ -39,6 +43,7 @@ func OperationWithFailMessage(message string) OperationOption {
 	}
 }
 
+// OperationWithFields sets fields
 func OperationWithFields(fields []string) OperationOption {
 	return func(op *Operation) (err error) {
 		op.Fields = &fields
@@ -46,6 +51,7 @@ func OperationWithFields(fields []string) OperationOption {
 	}
 }
 
+// OperationAsBulk marks operation as bulk
 func OperationAsBulk() OperationOption {
 	return func(op *Operation) (err error) {
 		op.Single = BoolP(false)
@@ -54,14 +60,7 @@ func OperationAsBulk() OperationOption {
 	}
 }
 
-func OperationType() OperationOption {
-	return func(op *Operation) (err error) {
-		op.Single = BoolP(false)
-		op.Bulk = BoolP(true)
-		return nil
-	}
-}
-
+// OperationAsSingle marks operation as single
 func OperationAsSingle() OperationOption {
 	return func(op *Operation) (err error) {
 		op.Bulk = BoolP(false)
@@ -70,6 +69,7 @@ func OperationAsSingle() OperationOption {
 	}
 }
 
+// OperationAsMutation marks operation as mutation
 func OperationAsMutation() OperationOption {
 	return func(op *Operation) (err error) {
 		op.Query = BoolP(false)
@@ -78,6 +78,7 @@ func OperationAsMutation() OperationOption {
 	}
 }
 
+// OperationAsQuery marks operation as query
 func OperationAsQuery() OperationOption {
 	return func(op *Operation) (err error) {
 		op.Mutation = BoolP(false)
