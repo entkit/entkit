@@ -166,6 +166,7 @@ func NewBackendKeycloak(host string, realm string, clientId string, secret strin
 	return &k
 }
 
+// getTokenFromRequest returns token from request
 func (kc *Keycloak) getTokenFromRequest(r *http.Request) (string, error) {
 	if r == nil {
 		return "", errors.New("request is nil")
