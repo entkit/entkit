@@ -3,14 +3,10 @@
 A Comprehensive Solution for Building Data-Driven Applications with Ease and Efficiency
 
 [![GitHub license](https://img.shields.io/github/license/entkit/entkit)](https://github.com/entkit/entkit)
-![GitHub contributors](https://img.shields.io/github/contributors/entkit/entkit)
-[![GitHub issues](https://img.shields.io/github/issues/entkit/entkit)](https://github.com/entkit/entkit/issues)
 [![GitHub stars](https://img.shields.io/github/stars/entkit/entkit)](https://github.com/entkit/entkit/stargazers)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/entkit/entkit)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/entkit/entkit)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/entkit/entkit)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/entkit/entkit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/entkit/entkit/v2)](https://goreportcard.com/report/github.com/entkit/entkit/v2)
+[![codecov](https://codecov.io/gh/entkit/entkit/branch/main/graph/badge.svg?token=SDEXU6YQH9)](https://codecov.io/gh/entkit/entkit)
 
 [Documentation](https://entkit.com/docs/get-started/introduction) | [GoDoc](https://pkg.go.dev/github.com/entkit/entkit/v2) | [Example project](https://github.com/entkit/entkit-demo) | [Live demo](https://demo-refine-project.entkit.com)
 
