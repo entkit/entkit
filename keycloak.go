@@ -166,14 +166,29 @@ func NewBackendKeycloak(host string, realm string, clientId string, secret strin
 	return &k
 }
 
-// MiddlewareReqHandlerFunc is a middleware that checks if the request is authorized
-func (kc *Keycloak) MiddlewareReqHandlerFunc(w http.ResponseWriter, r *http.Request) (*http.Request, error) {
+func (kc *Keycloak) getTokenFromRequest(r *http.Request) (string, error) {
+	if r == nil {
+		return "", errors.New("request is nil")
+	}
 	auth := r.Header.Get("Authorization")
 	if !strings.HasPrefix(auth, "Bearer ") {
-		http.Error(w, "\"Invalid Authorization Header\"", http.StatusBadRequest)
+		return "", errors.New("invalid authorization header")
+	}
+
+	bearer := strings.TrimPrefix(auth, "Bearer ")
+	if bearer == "" {
+		return "", errors.New("empty bearer token")
+	}
+	return bearer, nil
+}
+
+// MiddlewareReqHandlerFunc is a middleware that checks if the request is authorized
+func (kc *Keycloak) MiddlewareReqHandlerFunc(w http.ResponseWriter, r *http.Request) (*http.Request, error) {
+	token, err := kc.getTokenFromRequest(r)
+	if err != nil {
+		http.Error(w, "\"Unauthorized\"", http.StatusUnauthorized)
 		return r, errors.New("stop")
 	}
-	token := strings.TrimPrefix(auth, "Bearer ")
 
 	_permissions, err := kc.getResourcesPermissions(token)
 	if err != nil {

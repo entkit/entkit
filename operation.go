@@ -44,7 +44,7 @@ func OperationWithFailMessage(message string) OperationOption {
 }
 
 // OperationWithFields sets fields
-func OperationWithFields(fields []string) OperationOption {
+func OperationWithFields(fields ...string) OperationOption {
 	return func(op *Operation) (err error) {
 		op.Fields = &fields
 		return nil
