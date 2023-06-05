@@ -41,7 +41,7 @@ export type {{$cName}}Props = ButtonProps &
     RefineButtonCommonProps &
     RefineButtonSingleProps &
     RefineButtonLinkingProps & {
-    recordItemIDs: Type.{{ $prefix }}ID[],
+    recordItemIDs: Type.{{ ER_fieldTSType $n.ID }}[],
     onSuccess?: (data: any)=>void
 }
 
@@ -111,7 +111,7 @@ export const {{ $cName }}: React.FC<{{$cName}}Props> = ({recordItemIDs, hideText
                 },
                 {
                     onSuccess: (resp) => {
-                        recordItemIDs.forEach((id: Type.{{$prefix}}ID)=>{
+                        recordItemIDs.forEach((id: Type.{{ ER_fieldTSType $n.ID }})=>{
                             invalidate({
                                 resource: "{{ $n.Name | kebabcase}}",
                                 invalidates: ["resourceAll"],

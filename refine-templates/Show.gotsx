@@ -12,7 +12,7 @@ import * as AntdIcons from "@ant-design/icons";
 
 import * as Lists from "./list";
 import * as Diagram from "./diagram";
-import * as Interfaces from "./typedefs";
+import * as Type from "./typedefs";
 import * as View from "./view";
 import * as Custom from "./custom";
 import * as Action from "./action";
@@ -23,11 +23,11 @@ import * as Action from "./action";
 {{- $allFields := prepend $n.Fields $n.ID }}
 
 export type {{$n.Name}}ShowProps = {
-    id?: Interfaces.{{$prefix}}ID,
+    id?: Type.{{ ER_fieldTSType $n.ID }},
     withEdges?: boolean,
 } & RA.ShowProps
 export const {{$n.Name}}Show : React.FC<{{ $n.Name }}ShowProps> = ({id, withEdges, ...showProps}) => {
-    const { queryResult } = useShow<Interfaces.{{ ER_prepareName $n.Name }}Interface>({
+    const { queryResult } = useShow<Type.{{ ER_prepareName $n.Name }}Interface>({
         resource: "{{ $n.Name | kebabcase }}",
         id,
         metaData: {
